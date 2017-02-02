@@ -60,8 +60,25 @@ Coming soon.
 ## Usage
 ```javascript
 import RNJWPlayer from 'react-native-jwplayer';
-
-// TODO: What do with the module?
-RNJWPlayer;
+...
+<JWPlayer
+  style={styles.player}
+  autostart={false}
+  file={'https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8'}
+  onBeforePlay={() => this.onBeforePlay()}
+  onPlay={() => this.onPlay()}
+  onPlayerError={e => this.onPlayerError(e)}
+  onBuffer={() => this.onBuffer()}
+  onTime={time => this.onTime(time)}
+/>
+...
 ```
-  
+
+## Run example project
+
+For running example project:
+1. Checkout this repository.
+2. Go to `Example` directory and run `yarn` or `npm i`
+3. Go to `Example/ios` and install Pods with `pod install`
+4. Open `demoJWPlayer.xcworkspace` with XCode.
+5. Add your iOS api key for JWplayer into `Info.plist`
