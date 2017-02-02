@@ -3,19 +3,19 @@
 
 ## Getting started
 
-`$ npm install react-native-jwplayer --save`
+`$ npm install react-native-jwplayer --save` or `$ yarn add react-native-jwplayer` (is not supported until not published in *npm*)
 
-or
-
-`$ yarn add react-native-jwplayer`
-
-Current working case (still not in npm) is
+Current working case (whili isn't in *npm*) is
 
 `$ yarn add https://github.com/nulleof/react-native-jwplayer.git`
 
 ### Mostly automatic installation
 
+Link module with
+
 `$ react-native link react-native-jwplayer`
+
+Then add SDK dependencies:
 
 #### Add dependencies
 
@@ -59,19 +59,43 @@ Coming soon.
 
 ## Usage
 ```javascript
-import RNJWPlayer from 'react-native-jwplayer';
 ...
-<JWPlayer
-  style={styles.player}
-  autostart={false}
-  file={'https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8'}
-  onBeforePlay={() => this.onBeforePlay()}
-  onPlay={() => this.onPlay()}
-  onPlayerError={e => this.onPlayerError(e)}
-  onBuffer={() => this.onBuffer()}
-  onTime={time => this.onTime(time)}
-/>
+ 
+import JWPlayer from 'react-native-jwplayer';
+ 
 ...
+ 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  player: {
+    flex: 1,
+  },
+});
+
+...
+ 
+render() {
+ 
+... 
+ 
+<View style={styles.container}>
+  <JWPlayer
+    style={styles.player}
+    autostart={false}
+    file={'https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8'}
+    onBeforePlay={() => this.onBeforePlay()}
+    onPlay={() => this.onPlay()}
+    onPlayerError={e => this.onPlayerError(e)}
+    onBuffer={() => this.onBuffer()}
+    onTime={time => this.onTime(time)}
+  />
+</View>
+ 
+...
+ 
+}
 ```
 
 ## Run example project
