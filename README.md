@@ -38,7 +38,7 @@ Coming soon.
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-jwplayer` and add `RNJWPlayer.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNJWPlayer.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Add [dependencies](#iOS-dependencies)
+4. Add [dependencies](#ios-dependencies)
 5. Run your project (`Cmd+R`)<
 
 #### Android
@@ -55,7 +55,7 @@ Coming soon.
   	```
       compile project(':react-native-jwplayer')
   	```
-4. Add [dependencies](#Android-dependencies)
+4. Add [dependencies](#android-dependencies)
 
 ## Usage
 ```javascript
@@ -77,6 +77,7 @@ import RNJWPlayer from 'react-native-jwplayer';
 ## Run example project
 
 For running example project:
+
 1. Checkout this repository.
 2. Go to `Example` directory and run `yarn` or `npm i`
 3. Go to `Example/ios` and install Pods with `pod install`
