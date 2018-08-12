@@ -14,12 +14,14 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPause;
 @property(nonatomic, copy)RCTBubblingEventBlock onBuffer;
+@property(nonatomic, copy)RCTBubblingEventBlock onSetupPlayerError;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerError;
 @property(nonatomic, copy)RCTBubblingEventBlock onTime;
 -(void)onRNJWPlayerBeforePlay;
 -(void)onRNJWPlayerPlay;
 -(void)onRNJWPlayerPause;
 -(void)onRNJWPlayerBuffer;
--(void)onRNJWPlayerError:(NSError *)error;
--(void)onRNJWPlayerTime:(double)position ofDuration:(double)duration;
+-(void)onRNJWSetupPlayerError:(JWEvent<JWErrorEvent> *)event;
+-(void)onRNJWPlayerError:(JWEvent<JWErrorEvent> *)event;
+-(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event;
 @end

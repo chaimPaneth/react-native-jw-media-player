@@ -81,15 +81,21 @@
     }
 }
 
--(void)onRNJWPlayerError:(NSError *)error {
-    if (self.onPlayerError) {
-        self.onPlayerError(@{@"message": error.localizedDescription, @"info": error.userInfo});
+-(void)onRNJWSetupPlayerError:(JWEvent<JWErrorEvent> *)event {
+    if (self.onSetupPlayerError) {
+        self.onSetupPlayerError(@{@"error": event.error});
     }
 }
 
--(void)onRNJWPlayerTime:(double)position ofDuration:(double)duration {
+-(void)onRNJWPlayerError:(JWEvent<JWErrorEvent> *)event {
+    if (self.onPlayerError) {
+        self.onPlayerError(@{@"error": event.error});
+    }
+}
+
+-(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event {
     if (self.onTime) {
-        self.onTime(@{@"position": @(position), @"duration": @(duration)});
+        self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
     }
 }
 
