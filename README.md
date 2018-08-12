@@ -22,7 +22,7 @@ Then add SDK dependencies:
 ##### iOS dependencies
 Follow official instruction [sdk ios installation](https://developer.jwplayer.com/sdk/ios/docs/developer-guide/intro/getting-started/) for installation via Cocoapods (only supported, other way wasn't tested).
 
-Add `pod 'JWPlayer-SDK', '~> 2.0'` to your Podfile.
+Add `pod 'JWPlayer-SDK'` to your Podfile.
 Then run **pod install** from your `ios` directory.
 
 In your `info.plist` properties file, create an string entry named `JWPlayerKey`, and set its value to be your JW Player Beta license key. Make sure you enter this string exactly as you received it from JW Player, or as it appears in your JW Player Dashboard. The string is case-sensitive.
