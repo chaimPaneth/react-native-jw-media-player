@@ -15,9 +15,10 @@
     if (!_player) {
         JWConfig *config = [self setupConfig];
         
-        RNJWPlayerDelegateProxy *proxy = [RNJWPlayerDelegateProxy new];
-        proxy.delegate = self;
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:proxy];
+        _proxy = [RNJWPlayerDelegateProxy new];
+        _proxy.delegate = self;
+        
+        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
         
         _player.forceFullScreenOnLandscape = YES;
         _player.forceLandscapeOnFullScreen = YES;
@@ -31,9 +32,9 @@
     JWConfig *config = [JWConfig new];
     config.controls = YES;
     config.repeat = NO;
-    config.premiumSkin = JWPremiumSkinSeven;
+    //config.skin = JWPremiumSkinSeven;
     config.autostart = YES;
-    config.stretch = JWStretchUniform;
+    config.stretching = JWStretchingUniform;
     return config;
 }
 
@@ -65,6 +66,12 @@
 -(void)onRNJWPlayerPlay {
     if (self.onPlay) {
         self.onPlay(@{});
+    }
+}
+
+-(void)onRNJWPlayerPause {
+    if (self.onPause) {
+        self.onPause(@{});
     }
 }
 

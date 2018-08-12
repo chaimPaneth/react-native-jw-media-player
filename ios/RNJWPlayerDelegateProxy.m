@@ -3,23 +3,29 @@
 @implementation RNJWPlayerDelegateProxy
 #pragma mark - RNJWPlayer Delegate
 
--(void)onBeforePlay {
+- (void)onBeforePlay {
     [self.delegate onRNJWPlayerBeforePlay];
 }
 
--(void)onPlay {
-    [self.delegate onRNJWPlayerPlay];
-}
-
--(void)onBuffer {
+- (void)onBuffer:(JWEvent<JWBufferEvent> *)event {
     [self.delegate onRNJWPlayerBuffer];
 }
 
--(void)onError:(NSError *)error {
+- (void)onPlay:(JWEvent<JWStateChangeEvent> *)event {
+    [self.delegate onRNJWPlayerPlay];
+}
+
+- (void)onTime:(JWEvent<JWTimeEvent> *)event {
+    [self.delegate onRNJWPlayerTime:event.position ofDuration:event.duration];
+}
+
+- (void)onPause:(JWEvent<JWStateChangeEvent> *)event {
+    [self.delegate onRNJWPlayerPause];
+}
+
+- (void)onError:(NSError *)error {
     [self.delegate onRNJWPlayerError:error];
 }
 
--(void)onTime:(double)position ofDuration:(double)duration {
-    [self.delegate onRNJWPlayerTime:position ofDuration:duration];
-}
+
 @end

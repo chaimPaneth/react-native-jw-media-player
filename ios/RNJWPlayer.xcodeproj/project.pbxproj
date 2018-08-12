@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A9166FF21064ECE00152DD3 /* JWPlayer_iOS_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */; };
 		3BC75FCC1E43B1DB0011FBAA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */; };
 		3BC75FCE1E43B2930011FBAA /* RNJWPlayerNativeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC75FCD1E43B2930011FBAA /* RNJWPlayerNativeView.m */; };
 		3BC75FD11E43B3090011FBAA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FD01E43B3090011FBAA /* Foundation.framework */; };
@@ -28,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNJWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNJWPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWPlayer_iOS_SDK.framework; path = "../../../ios/Pods/JWPlayer-SDK/JWPlayer_iOS_SDK.framework"; sourceTree = "<group>"; };
 		3BC75FC91E43B1B90011FBAA /* RNJWPlayerNativeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNJWPlayerNativeView.h; sourceTree = "<group>"; };
 		3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3BC75FCD1E43B2930011FBAA /* RNJWPlayerNativeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNJWPlayerNativeView.m; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 			files = (
 				3BC75FD11E43B3090011FBAA /* Foundation.framework in Frameworks */,
 				3BC75FCC1E43B1DB0011FBAA /* UIKit.framework in Frameworks */,
+				2A9166FF21064ECE00152DD3 /* JWPlayer_iOS_SDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +65,7 @@
 		3BC75FCA1E43B1DB0011FBAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */,
 				3BC75FD01E43B3090011FBAA /* Foundation.framework */,
 				3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */,
 			);
@@ -224,23 +228,22 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../../../ios/**",
+					"~/Documents/JWPlayer-SDK",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
-					"$(SRCROOT)/../Example/node_modules/react-native/React/**",
-					"$(SRCROOT)/../../../ios/Pods/Headers/Public",
-					"$(SRCROOT)/../../../ios/Pods/Headers/Public/JWPlayer-SDK",
-					"$(SRCROOT)/../Example/ios/Pods/Headers/Public",
-					"$(SRCROOT)/../Example/ios/Pods/Headers/Public/JWPlayer-SDK",
+					"$(SRCROOT)/../../react-native/React",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../../../ios/Pods/JWPlayer-SDK",
-					"$(SRCROOT)/../Example/ios/Pods/JWPlayer-SDK",
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
 				);
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNJWPlayer;
 				SKIP_INSTALL = YES;
 			};
@@ -249,23 +252,22 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../../../ios/**",
+					"~/Documents/JWPlayer-SDK",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
-					"$(SRCROOT)/../Example/node_modules/react-native/React/**",
-					"$(SRCROOT)/../../../ios/Pods/Headers/Public",
-					"$(SRCROOT)/../../../ios/Pods/Headers/Public/JWPlayer-SDK",
-					"$(SRCROOT)/../Example/ios/Pods/Headers/Public",
-					"$(SRCROOT)/../Example/ios/Pods/Headers/Public/JWPlayer-SDK",
+					"$(SRCROOT)/../../react-native/React",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../../../ios/Pods/JWPlayer-SDK",
-					"$(SRCROOT)/../Example/ios/Pods/JWPlayer-SDK",
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
 				);
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNJWPlayer;
 				SKIP_INSTALL = YES;
 			};
