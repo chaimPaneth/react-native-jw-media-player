@@ -16,16 +16,19 @@
 }
 
 - (void)onTime:(JWEvent<JWTimeEvent> *)event {
-    [self.delegate onRNJWPlayerTime:event.position ofDuration:event.duration];
+    [self.delegate onRNJWPlayerTime:event];
 }
 
 - (void)onPause:(JWEvent<JWStateChangeEvent> *)event {
     [self.delegate onRNJWPlayerPause];
 }
 
-- (void)onError:(NSError *)error {
-    [self.delegate onRNJWPlayerError:error];
+- (void)onSetupError:(JWEvent<JWErrorEvent> *)event {
+    [self.delegate onRNJWSetupPlayerError:event];
 }
 
+- (void)onError:(JWEvent<JWErrorEvent> *)event {
+    [self.delegate onRNJWSetupPlayerError:event];
+}
 
 @end
