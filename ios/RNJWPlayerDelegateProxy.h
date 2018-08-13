@@ -5,7 +5,5 @@
 @class RNJWPlayerNativeView;
 
 @interface RNJWPlayerDelegateProxy : NSObject<JWPlayerDelegate>
-
 @property(nonatomic, strong)RNJWPlayerNativeView *delegate;
-
 @end

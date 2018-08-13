@@ -10,6 +10,8 @@
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
+@property(nonatomic)BOOL controls;
+@property(nonatomic)BOOL repeat;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPause;

@@ -33,7 +33,7 @@
     config.controls = YES;
     config.repeat = NO;
     //config.skin = JWPremiumSkinSeven;
-    config.autostart = YES;
+    config.autostart = _autostart;
     config.stretching = JWStretchingUniform;
     return config;
 }
