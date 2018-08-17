@@ -1,29 +1,45 @@
 import React, { Component } from 'react'; // eslint-disable-line
 var ReactNative = require("react-native");
-import { 
+import {
   requireNativeComponent,
   UIManager,
   NativeModules,
+  View
 } from "react-native"; // eslint-disable-line
+import PropTypes from "prop-types";
 
-const RNJWPlayerManager = NativeModules.RNJWPlayerManager;
+// const RNJWPlayerManager = NativeModules.RNJWPlayerManager;
 
-var RCT_RNJWPLAYER_REF = 'rnjwplayer';
+const RCT_RNJWPLAYER_REF = 'rnjwplayer';
 
-//var RCTRNJWPlayerManager = RNJWPlayerManager;
+// //var RCTRNJWPlayerManager = RNJWPlayerManager;
 
-const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
+// const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
 
 const JWPlayerState = {
-  0: 'JWPlayerStatePlaying',
-  1: 'JWPlayerStatePaused',
-  2: 'JWPlayerStateBuffering',
-  3: 'JWPlayerStateIdle',
-  4: 'JWPlayerStateComplete',
-  5: 'JWPlayerStateError',
+  'JWPlayerStatePlaying': 0,
+  'JWPlayerStatePaused': 1,
+  'JWPlayerStateBuffering': 2,
+  'JWPlayerStateIdle': 3,
+  'JWPlayerStateComplete': 4,
+  'JWPlayerStateError': 5,
 };
 
-export default class JWPlayer extends Component {
+class JWPlayer extends Component {
+  static propTypes = {
+    file: PropTypes.string.isRequired,
+    autostart: PropTypes.bool.isRequired,
+    controls: PropTypes.bool.isRequired,
+    repeat: PropTypes.bool.isRequired,
+  };
+
+  static defaultProps = {
+    file: '',
+    autostart: true,
+    controls: true,
+    repeat: false,
+  };
+
   componentDidMount() {
     
   }
@@ -45,23 +61,28 @@ export default class JWPlayer extends Component {
   };
 
   async playerState() {
-    try {
-      var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
-      return state;
-    } catch (e) {
-      console.error(e);
+    // try {
+    //   var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
+    //   return state;
+    // } catch (e) {
+    //   console.error(e);
       return null;
-    }
+    //}
   }
 
 
-  getRNJWPlayerBridgeHandle() {
-    return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
-  };
+  // getRNJWPlayerBridgeHandle() {
+  //   return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
+  // };
 
   render() {
-    return <RNJWPlayer 
+    return <View 
       ref={RCT_RNJWPLAYER_REF}
       key="RNJWPlayerKey" {...this.props} />;
   }
 }
+
+module.exports = {
+  JWPlayerState,
+  JWPlayer
+};

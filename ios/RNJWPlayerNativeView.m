@@ -30,10 +30,11 @@
 -(JWConfig*)setupConfig
 {
     JWConfig *config = [JWConfig new];
-    config.controls = YES;
-    config.repeat = NO;
+    //config.controls = _controls;
+    //config.repeat = _repeat;
     //config.skin = JWPremiumSkinSeven;
-    config.autostart = _autostart;
+    //config.autostart = _autostart;
+    //config.mediaId = @"vSsMLwzp";
     config.stretching = JWStretchingUniform;
     return config;
 }
@@ -49,6 +50,39 @@
     return self.player.config.file;
 }
 
+-(void)setAutostart:(BOOL)autostart
+{
+    self.player.config.autostart = autostart;
+    //[self.player play];
+}
+
+-(BOOL)autostart
+{
+    return self.player.config.autostart;
+}
+
+-(void)setControls:(BOOL)controls
+{
+    self.player.config.controls = controls;
+    //[self.player play];
+}
+
+-(BOOL)controls
+{
+    return self.player.config.controls;
+}
+
+-(void)setRepeat:(BOOL)repeat
+{
+    self.player.config.repeat = repeat;
+    //[self.player play];
+}
+
+-(BOOL)repeat
+{
+    return self.player.config.repeat;
+}
+
 -(void)layoutSubviews
 {
     [super layoutSubviews];
@@ -57,45 +91,66 @@
 
 #pragma mark - RNJWPlayer Delegate
 
--(void)onRNJWPlayerBeforePlay {
+-(void)onRNJWPlayerBeforePlay
+{
     if (self.onBeforePlay) {
         self.onBeforePlay(@{});
     }
 }
 
--(void)onRNJWPlayerPlay {
+-(void)onRNJWPlayerPlay
+{
     if (self.onPlay) {
         self.onPlay(@{});
     }
 }
 
--(void)onRNJWPlayerPause {
+-(void)onRNJWPlayerPause
+{
     if (self.onPause) {
         self.onPause(@{});
     }
 }
 
--(void)onRNJWPlayerBuffer {
+-(void)onRNJWPlayerBuffer
+{
     if (self.onBuffer) {
         self.onBuffer(@{});
     }
 }
 
--(void)onRNJWSetupPlayerError:(JWEvent<JWErrorEvent> *)event {
+-(void)onRNJWSetupPlayerError:(JWEvent<JWErrorEvent> *)event
+{
     if (self.onSetupPlayerError) {
         self.onSetupPlayerError(@{@"error": event.error});
     }
 }
 
--(void)onRNJWPlayerError:(JWEvent<JWErrorEvent> *)event {
+-(void)onRNJWPlayerError:(JWEvent<JWErrorEvent> *)event
+{
     if (self.onPlayerError) {
         self.onPlayerError(@{@"error": event.error});
     }
 }
 
--(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event {
+-(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event
+{
     if (self.onTime) {
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
+    }
+}
+
+-(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event
+{
+    if (self.onFullScreen) {
+        self.onFullScreen(@{});
+    }
+}
+
+-(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
+{
+    if (self.onFullScreenRequested) {
+        self.onFullScreenRequested(@{});
     }
 }
 

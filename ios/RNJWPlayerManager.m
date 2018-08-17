@@ -6,7 +6,9 @@
 #import "RCTUIManager.h"
 
 @interface RNJWPlayerManager ()
+
 @property(nonatomic, strong)RNJWPlayerNativeView *playerView;
+
 @end
 
 @implementation RNJWPlayerManager
@@ -27,7 +29,9 @@ RCT_EXPORT_VIEW_PROPERTY(onPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onTime, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
-RCT_EXPORT_VIEW_PROPERTY(autoPlay, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
