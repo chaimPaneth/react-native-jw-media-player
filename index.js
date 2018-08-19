@@ -8,13 +8,13 @@ import {
 } from "react-native"; // eslint-disable-line
 import PropTypes from "prop-types";
 
-// const RNJWPlayerManager = NativeModules.RNJWPlayerManager;
+const RNJWPlayerManager = NativeModules.RNJWPlayerManager;
 
 const RCT_RNJWPLAYER_REF = 'rnjwplayer';
 
-// //var RCTRNJWPlayerManager = RNJWPlayerManager;
+//var RCTRNJWPlayerManager = RNJWPlayerManager;
 
-// const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
+const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
 
 const JWPlayerState = {
   'JWPlayerStatePlaying': 0,
@@ -61,22 +61,22 @@ class JWPlayer extends Component {
   };
 
   async playerState() {
-    // try {
-    //   var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
-    //   return state;
-    // } catch (e) {
-    //   console.error(e);
+    try {
+      var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
+      return state;
+    } catch (e) {
+      console.error(e);
       return null;
-    //}
+    }
   }
 
 
-  // getRNJWPlayerBridgeHandle() {
-  //   return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
-  // };
+  getRNJWPlayerBridgeHandle() {
+    return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
+  };
 
   render() {
-    return <View 
+    return <RNJWPlayer 
       ref={RCT_RNJWPLAYER_REF}
       key="RNJWPlayerKey" {...this.props} />;
   }
