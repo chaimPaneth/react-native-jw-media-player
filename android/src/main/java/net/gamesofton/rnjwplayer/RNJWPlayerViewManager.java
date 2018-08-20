@@ -4,9 +4,7 @@ package net.gamesofton.rnjwplayer;
 import android.view.View;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -15,7 +13,6 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
-import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.events.BufferEvent;
 import com.longtailvideo.jwplayer.events.CompleteEvent;
 import com.longtailvideo.jwplayer.events.ErrorEvent;
@@ -27,6 +24,7 @@ import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -50,7 +48,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   private PlayerConfig mPlayerConfig;
   private ThemedReactContext mContext;
   RNJWPlayerView mPlayerView = null;
-  PlaylistItem pi = null;
+  PlaylistItem mPlayListItem = null;
 
   //Props
   String file = "";
@@ -75,21 +73,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   @Override
   public RNJWPlayerView createViewInstance(ThemedReactContext context) {
 
-    if (mPlayerView == null) {
-      mContext = context;
-      mPlayerConfig = new PlayerConfig.Builder()
-              .stretching(STRETCHING_UNIFORM)
-              .build();
+    mContext = context;
+    mPlayerConfig = new PlayerConfig.Builder()
+            .autostart(true)
+            .stretching(STRETCHING_UNIFORM)
+            .build();
 
-      mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
-      mPlayerView.addOnPlayListener(this);
-      mPlayerView.addOnPauseListener(this);
-      mPlayerView.addOnCompleteListener(this);
-      mPlayerView.addOnErrorListener(this);
-      mPlayerView.addOnSetupErrorListener(this);
-      mPlayerView.addOnBufferListener(this);
-      mPlayerView.addOnTimeListener(this);
-    }
+    mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
+    mPlayerView.addOnPlayListener(this);
+    mPlayerView.addOnPauseListener(this);
+    mPlayerView.addOnCompleteListener(this);
+    mPlayerView.addOnErrorListener(this);
+    mPlayerView.addOnSetupErrorListener(this);
+    mPlayerView.addOnBufferListener(this);
+    mPlayerView.addOnTimeListener(this);
 
     return mPlayerView;
   }
@@ -103,14 +100,14 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
       mPlayerView.play();
 
-//      mPlayerView.stop();
-//      pi = new PlaylistItem.Builder()
-//              .file(file)
-//              .title(title)
-//              .description(desc)
-//              .image(image)
-//              .build();
-//      mPlayerView.load(pi);
+      mPlayerView.stop();
+      mPlayListItem = new PlaylistItem.Builder()
+              .file(file)
+              .title(title)
+              .description(desc)
+              .image(image)
+              .build();
+      mPlayerView.load(mPlayListItem);
 
     }
   }
@@ -122,15 +119,15 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
       mPlayerView.getConfig().setImage(image);
 
-//      mPlayerView.stop();
-//      pi = new PlaylistItem.Builder()
-//              .file(file)
-//              .title(title)
-//              .description(desc)
-//              .image(image)
-//              .build();
-//
-//      mPlayerView.load(pi);
+      mPlayerView.stop();
+      mPlayListItem = new PlaylistItem.Builder()
+              .file(file)
+              .title(title)
+              .description(desc)
+              .image(image)
+              .build();
+
+      mPlayerView.load(mPlayListItem);
     }
   }
 
@@ -139,15 +136,15 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(title!=prop) {
       title = prop;
 
-//      mPlayerView.stop();
-//      pi = new PlaylistItem.Builder()
-//              .file(file)
-//              .title(title)
-//              .description(desc)
-//              .image(image)
-//              .build();
-//
-//      mPlayerView.load(pi);
+      mPlayerView.stop();
+      mPlayListItem = new PlaylistItem.Builder()
+              .file(file)
+              .title(title)
+              .description(desc)
+              .image(image)
+              .build();
+
+      mPlayerView.load(mPlayListItem);
     }
   }
 
@@ -156,15 +153,15 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(desc!=prop) {
       desc = prop;
 
-//      mPlayerView.stop();
-//      pi = new PlaylistItem.Builder()
-//              .file(file)
-//              .title(title)
-//              .description(desc)
-//              .image(image)
-//              .build();
-//
-//      mPlayerView.load(pi);
+      mPlayerView.stop();
+      mPlayListItem = new PlaylistItem.Builder()
+              .file(file)
+              .title(title)
+              .description(desc)
+              .image(image)
+              .build();
+
+      mPlayerView.load(mPlayListItem);
     }
   }
 
@@ -181,22 +178,46 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onPlay(PlayEvent playEvent) {
-
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onPlay");
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topPlay",
+            event);
   }
 
   @Override
   public void onPause(PauseEvent pauseEvent) {
-
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onPause");
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topPause",
+            event);
   }
 
   @Override
   public void onComplete(CompleteEvent completeEvent) {
-
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onComplete");
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topComplete",
+            event);
   }
 
   @Override
   public void onFullscreen(FullscreenEvent fullscreenEvent) {
-
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onFullscreen");
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topFullscreen",
+            event);
   }
 
   @Override
@@ -251,18 +272,40 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onBuffer")))
+            .put("topFullScreen",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onFullScreen")))
+            .put("topPause",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPause")))
+            .put("topPlay",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlay")))
+            .put("topComplete",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onComplete")))
             .build();
+  }
+
+  public static <K, V> Map<K, V> CreateMap(
+          K k1, V v1, K k2, V v2) {
+    Map map = new HashMap<K, V>();
+    map.put(k1, v1);
+    map.put(k2, v2);
+    return map;
   }
 
   @Nullable
   @Override
   public Map<String, Integer> getCommandsMap() {
-    Map<String, Integer> commandsMap = super.getCommandsMap();
-
-    commandsMap.put("play", COMMAND_PLAY);
-    commandsMap.put("pause", COMMAND_PAUSE);
-
-    return commandsMap;
+    return MapBuilder.of(
+            "play", COMMAND_PLAY,
+            "pause", COMMAND_PAUSE
+    );
   }
 
   @Override
@@ -287,26 +330,5 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   public void pause(RNJWPlayerView root) {
     root.pause();
-  }
-
-  @ReactMethod
-  public void state(final int viewId, final Promise promise) {
-    if (mPlayerView != null) {
-      mContext.runOnUiQueueThread(new Runnable() {
-        @Override
-        public void run() {
-          PlayerState playerState = mPlayerView.getState();
-          if (playerState != null) {
-            promise.resolve(playerState);
-          } else {
-            Exception ex = new Exception();
-            promise.reject("RNJW Error", "Failed to get state", ex);
-          }
-        }
-      });
-    } else {
-      Exception ex = new Exception();
-      promise.reject("RNJW Error", "Failed to get player", ex);
-    }
   }
 }

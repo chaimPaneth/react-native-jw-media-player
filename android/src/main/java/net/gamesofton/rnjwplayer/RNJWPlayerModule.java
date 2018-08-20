@@ -36,11 +36,28 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           //RNJWPlayerViewManager playerViewManager = (RNJWPlayerViewManager) nvhm.resolveViewManager(reactTag);
 
           PlayerState playerState = playerView.getState();
-          promise.resolve(playerState);
+          promise.resolve(stateToInt(playerState));
         }
       });
     } catch (IllegalViewOperationException e) {
       promise.reject("RNJW Error", e);
+    }
+  }
+
+  private int stateToInt(PlayerState playerState) {
+    switch (playerState) {
+      case IDLE:
+        return 0;
+      case BUFFERING:
+        return 1;
+      case PLAYING:
+        return 2;
+      case PAUSED:
+        return 3;
+      case COMPLETE:
+        return 4;
+      default:
+        return 0;
     }
   }
 }
