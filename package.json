@@ -57,8 +57,8 @@
   "main": "index.js",
   "name": "react-native-jwplayer",
   "peerDependencies": {
-    "react-native": "^0.40.0",
-    "react": "~15.4.0-rc.4"
+    "react-native": "^0.51 || ^0.52 || ^0.53 || ^0.54 || ^0.55",
+    "react": "^16.0"
   },
   "pre-commit": [
     "lint"

@@ -4,11 +4,14 @@ import {
   requireNativeComponent,
   UIManager,
   NativeModules,
-  View
+  Platform
 } from "react-native"; // eslint-disable-line
 import PropTypes from "prop-types";
 
-const RNJWPlayerManager = NativeModules.RNJWPlayerManager;
+const RNJWPlayerManager =
+  Platform.OS === "ios"
+    ? NativeModules.RNJWPlayerManager
+    : NativeModules.RNJWPlayerModule;
 
 const RCT_RNJWPLAYER_REF = 'rnjwplayer';
 
