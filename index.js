@@ -19,14 +19,25 @@ const RCT_RNJWPLAYER_REF = 'rnjwplayer';
 
 const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
 
-const JWPlayerState = {
-  'JWPlayerStatePlaying': 0,
-  'JWPlayerStatePaused': 1,
-  'JWPlayerStateBuffering': 2,
-  'JWPlayerStateIdle': 3,
-  'JWPlayerStateComplete': 4,
-  'JWPlayerStateError': 5,
+const JWPlayerStateIOS = {
+  JWPlayerStatePlaying: 0,
+  JWPlayerStatePaused: 1,
+  JWPlayerStateBuffering: 2,
+  JWPlayerStateIdle: 3,
+  JWPlayerStateComplete: 4,
+  JWPlayerStateError: 5,
 };
+
+const JWPlayerStateAndroid = {
+  JWPlayerStateIdle: 0,
+  JWPlayerStateBuffering: 1,
+  JWPlayerStatePlaying: 2,
+  JWPlayerStatePaused: 3,
+  JWPlayerStateComplete: 4,
+  JWPlayerStateError: null,
+};
+
+const JWPlayerState = Platform.OS === 'ios' ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
 class JWPlayer extends Component {
   static propTypes = {
