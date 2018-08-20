@@ -6,9 +6,9 @@ import android.content.Context;
 import com.longtailvideo.jwplayer.JWPlayerView;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 
-public class AsapJWPlayer extends JWPlayerView {
+public class RNJWPlayerView extends JWPlayerView {
 
-    public AsapJWPlayer(Context var1, PlayerConfig var2) {
+    public RNJWPlayerView(Context var1, PlayerConfig var2) {
         super(var1, var2);
     }
 
@@ -32,6 +32,4 @@ public class AsapJWPlayer extends JWPlayerView {
             layout(getLeft(), getTop(), getRight(), getBottom());
         }
     };
-
-
 }

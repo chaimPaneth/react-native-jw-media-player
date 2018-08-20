@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.0'
+    }
+}
 
 apply plugin: 'com.android.library'
 
@@ -19,8 +28,19 @@ android {
     }
 }
 
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../node_modules/react-native/android"
+        }
+    }
+}
+
 dependencies {
-    compile 'com.facebook.react:react-native:0.20.+'
+    compile 'com.facebook.react:react-native:+'
     compile 'com.longtailvideo.jwplayer:jwplayer-core:+'
     compile 'com.longtailvideo.jwplayer:jwplayer-common:+'
 }
