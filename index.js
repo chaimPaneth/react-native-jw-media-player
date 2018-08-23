@@ -42,13 +42,42 @@ const JWPlayerState = Platform.OS === 'ios' ? JWPlayerStateIOS : JWPlayerStateAn
 class JWPlayer extends Component {
   static propTypes = {
     file: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    title: PropTypes.string,
+    desc: PropTypes.string,
+    mediaId: PropTypes.string.isRequired,
     autostart: PropTypes.bool.isRequired,
     controls: PropTypes.bool.isRequired,
     repeat: PropTypes.bool.isRequired,
+    displayTitle: PropTypes.bool,
+    displayDesc: PropTypes.bool,
+    playListItem: PropTypes.shape({
+      image: PropTypes.string,
+      title: PropTypes.string,
+      desc: PropTypes.string,
+      mediaId: PropTypes.string.isRequired,
+      autostart: PropTypes.bool.isRequired,
+      controls: PropTypes.bool.isRequired,
+      repeat: PropTypes.bool.isRequired,
+      displayTitle: PropTypes.bool,
+      displayDesc: PropTypes.bool,
+    }),
+    playList: PropTypes.arrayOf(PropTypes.shape({
+      image: PropTypes.string,
+      title: PropTypes.string,
+      desc: PropTypes.string,
+      mediaId: PropTypes.string.isRequired,
+      autostart: PropTypes.bool.isRequired,
+      controls: PropTypes.bool.isRequired,
+      repeat: PropTypes.bool.isRequired,
+      displayTitle: PropTypes.bool,
+      displayDesc: PropTypes.bool,
+    })),
   };
 
   static defaultProps = {
     file: '',
+    mediaId: '',
     autostart: true,
     controls: true,
     repeat: false,
