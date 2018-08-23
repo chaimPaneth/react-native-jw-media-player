@@ -6,6 +6,7 @@ import android.view.View;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -24,6 +25,7 @@ import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   private ThemedReactContext mContext;
   RNJWPlayerView mPlayerView = null;
   PlaylistItem mPlayListItem = null;
+  ArrayList<PlaylistItem> mPlayList = null;
 
   //Props
   String file = "";
@@ -62,6 +65,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   Boolean repeat = false;
   Boolean displayTitle = false;
   Boolean displayDesc = false;
+
+  ReadableMap playListItem; // PlaylistItem
+
+  ReadableArray playList; // List <PlaylistItem>
 
   @Override
   public String getName() {
@@ -97,18 +104,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       file = prop;
 
       mPlayerView.getConfig().setFile(file);
-
       mPlayerView.play();
 
-      mPlayerView.stop();
-      mPlayListItem = new PlaylistItem.Builder()
-              .file(file)
-              .title(title)
-              .description(desc)
-              .image(image)
-              .build();
-      mPlayerView.load(mPlayListItem);
-
+//      mPlayerView.stop();
+//      mPlayListItem = new PlaylistItem.Builder()
+//              .file(file)
+//              .title(title)
+//              .description(desc)
+//              .image(image)
+//              .build();
+//
+//      mPlayerView.load(mPlayListItem);
+//
+//      mPlayerView.play();
     }
   }
 
@@ -118,16 +126,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       image = prop;
 
       mPlayerView.getConfig().setImage(image);
-
-      mPlayerView.stop();
-      mPlayListItem = new PlaylistItem.Builder()
-              .file(file)
-              .title(title)
-              .description(desc)
-              .image(image)
-              .build();
-
-      mPlayerView.load(mPlayListItem);
     }
   }
 
@@ -136,15 +134,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(title!=prop) {
       title = prop;
 
-      mPlayerView.stop();
-      mPlayListItem = new PlaylistItem.Builder()
-              .file(file)
-              .title(title)
-              .description(desc)
-              .image(image)
-              .build();
-
-      mPlayerView.load(mPlayListItem);
+      //TODO: - SET TITLE
     }
   }
 
@@ -153,15 +143,150 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(desc!=prop) {
       desc = prop;
 
-      mPlayerView.stop();
-      mPlayListItem = new PlaylistItem.Builder()
-              .file(file)
-              .title(title)
-              .description(desc)
-              .image(image)
-              .build();
+      //TODO: - SET DESC
+    }
+  }
 
-      mPlayerView.load(mPlayListItem);
+  @ReactProp(name = "displayTitle")
+  public void setDisplayTitle(View view, Boolean prop) {
+    if(displayTitle!=prop) {
+      displayTitle = prop;
+
+      mPlayerView.getConfig().setDisplayTitle(displayTitle);
+    }
+  }
+
+  @ReactProp(name = "displayDesc")
+  public void setDisplayDescription(View view, Boolean prop) {
+    if(displayDesc!=prop) {
+      displayDesc = prop;
+
+      mPlayerView.getConfig().setDisplayDescription(displayDesc);
+    }
+  }
+
+  @ReactProp(name = "autostart")
+  public void setAutostart(View view, Boolean prop) {
+    if(autostart!=prop) {
+      autostart = prop;
+
+      mPlayerView.getConfig().setAutostart(autostart);
+    }
+  }
+
+  @ReactProp(name = "controls")
+  public void setControls(View view, Boolean prop) {
+    if(controls!=prop) {
+      controls = prop;
+
+      mPlayerView.getConfig().setControls(controls);
+    }
+  }
+
+  @ReactProp(name = "repeat")
+  public void setRepeat(View view, Boolean prop) {
+    if(repeat!=prop) {
+      repeat = prop;
+
+      mPlayerView.getConfig().setRepeat(repeat);
+    }
+  }
+
+  @ReactProp(name = "playListItem")
+  public void setPlayListItem(View view, ReadableMap prop) {
+    if(playListItem!=prop) {
+      playListItem = prop;
+
+      if (playListItem != null) {
+        mPlayerView.stop();
+
+        if (playListItem.hasKey("file")) {
+          file = playListItem.getString("file");
+        }
+
+        if (playListItem.hasKey("title")) {
+          title = playListItem.getString("title");
+        }
+
+        if (playListItem.hasKey("desc")) {
+          desc = playListItem.getString("desc");
+        }
+
+        if (playListItem.hasKey("image")) {
+          image = playListItem.getString("image");
+        }
+
+        if (playListItem.hasKey("mediaId")) {
+          mediaId = playListItem.getString("mediaId");
+        }
+
+        mPlayListItem = new PlaylistItem.Builder()
+                .file(file)
+                .title(title)
+                .description(desc)
+                .image(image)
+                .mediaId(mediaId)
+                .build();
+
+        mPlayerView.load(mPlayListItem);
+        mPlayerView.play();
+      }
+    }
+  }
+
+  @ReactProp(name = "playList")
+  public void setPlayList(View view, ReadableArray prop) {
+    if(playList!=prop) {
+      playList = prop;
+
+      if (playList != null) {
+        mPlayerView.stop();
+
+        mPlayList = new ArrayList<PlaylistItem>();
+
+        int j = 0;
+        while (playList.size() > j) {
+          playListItem = playList.getMap(j);
+
+          if (playListItem != null) {
+
+            if (playListItem.hasKey("file")) {
+              file = playListItem.getString("file");
+            }
+
+            if (playListItem.hasKey("title")) {
+              title = playListItem.getString("title");
+            }
+
+            if (playListItem.hasKey("desc")) {
+              desc = playListItem.getString("desc");
+            }
+
+            if (playListItem.hasKey("image")) {
+              image = playListItem.getString("image");
+            }
+
+            if (playListItem.hasKey("mediaId")) {
+              mediaId = playListItem.getString("mediaId");
+            }
+
+            mPlayListItem = new PlaylistItem.Builder()
+                    .file(file)
+                    .title(title)
+                    .description(desc)
+                    .image(image)
+                    .mediaId(mediaId)
+                    .build();
+
+            mPlayList.add(mPlayListItem);
+          }
+
+          j++;
+        }
+
+        mPlayerView.load(mPlayList);
+        mPlayerView.play();
+      }
     }
   }
 
