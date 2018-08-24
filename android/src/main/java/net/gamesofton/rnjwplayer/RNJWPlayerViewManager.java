@@ -1,7 +1,11 @@
 
 package net.gamesofton.rnjwplayer;
 
+import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
@@ -14,22 +18,31 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
+import com.longtailvideo.jwplayer.events.AudioTrackChangedEvent;
+import com.longtailvideo.jwplayer.events.AudioTracksEvent;
+import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
+import com.longtailvideo.jwplayer.events.BeforePlayEvent;
 import com.longtailvideo.jwplayer.events.BufferEvent;
 import com.longtailvideo.jwplayer.events.CompleteEvent;
+import com.longtailvideo.jwplayer.events.ControlsEvent;
 import com.longtailvideo.jwplayer.events.ErrorEvent;
 import com.longtailvideo.jwplayer.events.FullscreenEvent;
+import com.longtailvideo.jwplayer.events.IdleEvent;
 import com.longtailvideo.jwplayer.events.PauseEvent;
 import com.longtailvideo.jwplayer.events.PlayEvent;
+import com.longtailvideo.jwplayer.events.PlaylistCompleteEvent;
+import com.longtailvideo.jwplayer.events.PlaylistEvent;
+import com.longtailvideo.jwplayer.events.PlaylistItemEvent;
 import com.longtailvideo.jwplayer.events.SetupErrorEvent;
 import com.longtailvideo.jwplayer.events.TimeEvent;
+import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
@@ -37,21 +50,37 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         VideoPlayerEvents.OnPlayListener,
         VideoPlayerEvents.OnPauseListener,
         VideoPlayerEvents.OnCompleteListener,
+        VideoPlayerEvents.OnIdleListener,
         VideoPlayerEvents.OnErrorListener,
         VideoPlayerEvents.OnSetupErrorListener,
         VideoPlayerEvents.OnBufferListener,
-        VideoPlayerEvents.OnTimeListener {
+        VideoPlayerEvents.OnTimeListener,
+        VideoPlayerEvents.OnPlaylistListener,
+        VideoPlayerEvents.OnPlaylistItemListener,
+        VideoPlayerEvents.OnPlaylistCompleteListener,
+        VideoPlayerEvents.OnAudioTracksListener,
+        VideoPlayerEvents.OnAudioTrackChangedListener,
+        VideoPlayerEvents.OnControlsListener,
+        AdvertisingEvents.OnBeforePlayListener,
+        AdvertisingEvents.OnBeforeCompleteListener {
 
   public static final String REACT_CLASS = "RNJWPlayer";
 
   public static final int COMMAND_PLAY = 101;
   public static final int COMMAND_PAUSE = 102;
 
+  /**
+  * The application window
+  */
+  Window mWindow;
+
+  Activity mActivity;
+
   private PlayerConfig mPlayerConfig;
   private ThemedReactContext mContext;
   RNJWPlayerView mPlayerView = null;
   PlaylistItem mPlayListItem = null;
-  ArrayList<PlaylistItem> mPlayList = null;
+  List<PlaylistItem> mPlayList = null;
 
   //Props
   String file = "";
@@ -67,7 +96,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   Boolean displayDesc = false;
 
   ReadableMap playListItem; // PlaylistItem
-
   ReadableArray playList; // List <PlaylistItem>
 
   @Override
@@ -81,8 +109,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public RNJWPlayerView createViewInstance(ThemedReactContext context) {
 
     mContext = context;
+
+    mActivity = mContext.getCurrentActivity();
+    if (mActivity != null) {
+      mWindow = mActivity.getWindow();
+    }
+
+//    SkinConfig skinConfig = new SkinConfig.Builder()
+//            .name("ethan")
+//            .url("https://ssl.p.jwpcdn.com/iOS/Skins/ethan.css")
+//            .build();
+
     mPlayerConfig = new PlayerConfig.Builder()
             .autostart(true)
+            //.skinConfig(skinConfig)
             .stretching(STRETCHING_UNIFORM)
             .build();
 
@@ -90,12 +130,67 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.addOnPlayListener(this);
     mPlayerView.addOnPauseListener(this);
     mPlayerView.addOnCompleteListener(this);
+    mPlayerView.addOnIdleListener(this);
     mPlayerView.addOnErrorListener(this);
     mPlayerView.addOnSetupErrorListener(this);
     mPlayerView.addOnBufferListener(this);
     mPlayerView.addOnTimeListener(this);
+    mPlayerView.addOnPlaylistListener(this);
+    mPlayerView.addOnPlaylistItemListener(this);
+    mPlayerView.addOnPlaylistCompleteListener(this);
+    mPlayerView.addOnBeforePlayListener(this);
+    mPlayerView.addOnBeforeCompleteListener(this);
+    mPlayerView.addOnControlsListener(this);
 
     return mPlayerView;
+  }
+
+  private void updateWakeLock(boolean enable) {
+    if (mWindow != null) {
+      if (enable) {
+        mWindow.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+      } else {
+        mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+      }
+    }
+  }
+
+  private void buildPlaylistItem() {
+    //mPlayerView.stop();
+
+    mPlayListItem = new PlaylistItem();
+
+    if (file != null && !file.isEmpty()) {
+      mPlayListItem.setFile(file);
+    }
+
+    if (title != null && !title.isEmpty()) {
+      mPlayListItem.setTitle(title);
+    }
+
+    if (desc != null && !desc.isEmpty()) {
+      mPlayListItem.setDescription(desc);
+    }
+
+    if (image != null && !image.isEmpty()) {
+      mPlayListItem.setImage(image);
+    }
+
+    if (mediaId != null && !mediaId.isEmpty()) {
+      mPlayListItem.setMediaId(mediaId);
+    }
+
+    mPlayerView.load(mPlayListItem);
+
+//    mPlayerView.getConfig().setFile(file);
+//    mPlayerView.getConfig().setImage(image);
+//    mPlayerView.getConfig().setSkinConfig();
+
+//    mPlayerView.getConfig().setAutostart(autostart);
+//    mPlayerView.getConfig().setRepeat(repeat);
+//    mPlayerView.getConfig().setControls(controls);
+//    mPlayerView.getConfig().setDisplayTitle(displayTitle);
+//    mPlayerView.getConfig().setDisplayDescription(displayDesc);
   }
 
   @ReactProp(name = "file")
@@ -103,20 +198,18 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if (file!=prop) {
       file = prop;
 
-      mPlayerView.getConfig().setFile(file);
-      mPlayerView.play();
+      buildPlaylistItem();
 
-//      mPlayerView.stop();
-//      mPlayListItem = new PlaylistItem.Builder()
-//              .file(file)
-//              .title(title)
-//              .description(desc)
-//              .image(image)
-//              .build();
-//
-//      mPlayerView.load(mPlayListItem);
-//
-//      mPlayerView.play();
+      mPlayerView.play();
+    }
+  }
+
+  @ReactProp(name = "mediaId")
+  public void setMediaId(View view, String prop) {
+    if (mediaId!=prop) {
+      mediaId = prop;
+
+      buildPlaylistItem();
     }
   }
 
@@ -125,7 +218,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(image!=prop) {
       image = prop;
 
-      mPlayerView.getConfig().setImage(image);
+      buildPlaylistItem();
     }
   }
 
@@ -134,7 +227,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(title!=prop) {
       title = prop;
 
-      //TODO: - SET TITLE
+      buildPlaylistItem();
     }
   }
 
@@ -143,7 +236,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(desc!=prop) {
       desc = prop;
 
-      //TODO: - SET DESC
+      buildPlaylistItem();
     }
   }
 
@@ -153,6 +246,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       displayTitle = prop;
 
       mPlayerView.getConfig().setDisplayTitle(displayTitle);
+      //buildPlaylistItem();
     }
   }
 
@@ -162,6 +256,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       displayDesc = prop;
 
       mPlayerView.getConfig().setDisplayDescription(displayDesc);
+      //buildPlaylistItem();
     }
   }
 
@@ -171,6 +266,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       autostart = prop;
 
       mPlayerView.getConfig().setAutostart(autostart);
+      //buildPlaylistItem();
     }
   }
 
@@ -180,6 +276,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       controls = prop;
 
       mPlayerView.getConfig().setControls(controls);
+      //buildPlaylistItem();
     }
   }
 
@@ -189,6 +286,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       repeat = prop;
 
       mPlayerView.getConfig().setRepeat(repeat);
+      //buildPlaylistItem();
     }
   }
 
@@ -198,7 +296,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       playListItem = prop;
 
       if (playListItem != null) {
-        mPlayerView.stop();
 
         if (playListItem.hasKey("file")) {
           file = playListItem.getString("file");
@@ -220,15 +317,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           mediaId = playListItem.getString("mediaId");
         }
 
-        mPlayListItem = new PlaylistItem.Builder()
-                .file(file)
-                .title(title)
-                .description(desc)
-                .image(image)
-                .mediaId(mediaId)
-                .build();
+        buildPlaylistItem();
 
-        mPlayerView.load(mPlayListItem);
         mPlayerView.play();
       }
     }
@@ -242,7 +332,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       if (playList != null) {
         mPlayerView.stop();
 
-        mPlayList = new ArrayList<PlaylistItem>();
+        mPlayList = new ArrayList<>();
 
         int j = 0;
         while (playList.size() > j) {
@@ -284,10 +374,56 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           j++;
         }
 
+        mPlayerView.getConfig().setAutostart(autostart);
+        mPlayerView.getConfig().setRepeat(repeat);
+        mPlayerView.getConfig().setControls(controls);
+        mPlayerView.getConfig().setDisplayTitle(displayTitle);
+        mPlayerView.getConfig().setDisplayDescription(displayDesc);
+
         mPlayerView.load(mPlayList);
         mPlayerView.play();
       }
     }
+  }
+
+  @Override
+  public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
+
+  }
+
+  @Override
+  public void onAudioTrackChanged(AudioTrackChangedEvent audioTrackChangedEvent) {
+
+  }
+
+  @Override
+  public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
+
+  }
+
+  @Override
+  public void onBeforeComplete(BeforeCompleteEvent beforeCompleteEvent) {
+
+  }
+
+  @Override
+  public void onIdle(IdleEvent idleEvent) {
+
+  }
+
+  @Override
+  public void onPlaylist(PlaylistEvent playlistEvent) {
+
+  }
+
+  @Override
+  public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
+
+  }
+
+  @Override
+  public void onPlaylistComplete(PlaylistCompleteEvent playlistCompleteEvent) {
+
   }
 
   @Override
@@ -299,6 +435,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topBuffer",
             event);
+
+    updateWakeLock(true);
   }
 
   @Override
@@ -310,6 +448,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topPlay",
             event);
+
+    updateWakeLock(true);
   }
 
   @Override
@@ -321,6 +461,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topPause",
             event);
+
+    updateWakeLock(false);
   }
 
   @Override
@@ -332,6 +474,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topComplete",
             event);
+
+    updateWakeLock(false);
   }
 
   @Override
@@ -354,6 +498,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topPlayerError",
             event);
+
+    updateWakeLock(false);
   }
 
   @Override
@@ -365,6 +511,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topSetupPlayerError",
             event);
+
+    updateWakeLock(false);
   }
 
   @Override
@@ -376,6 +524,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             mPlayerView.getId(),
             "topTime",
             event);
+  }
+
+  @Override
+  public void onControls(ControlsEvent controlsEvent) {
+
   }
 
   public Map getExportedCustomBubblingEventTypeConstants() {

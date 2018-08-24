@@ -73,13 +73,24 @@ class JWPlayer extends Component {
       displayTitle: PropTypes.bool,
       displayDesc: PropTypes.bool,
     })),
+    play: PropTypes.func,
+    pause: PropTypes.func,
+    onBeforePlay: PropTypes.func,
+    onBeforeComplete: PropTypes.func,
+    onPlay: PropTypes.func,
+    onPause: PropTypes.func,
+    onSetupPlayerError: PropTypes.func,
+    onPlayerError: PropTypes.func,
+    onBuffer: PropTypes.func,
+    onTime: PropTypes.func,
+    onFullScreen: PropTypes.func,
   };
 
   static defaultProps = {
     file: '',
     mediaId: '',
     autostart: true,
-    controls: true,
+    controls: false,
     repeat: false,
   };
 
