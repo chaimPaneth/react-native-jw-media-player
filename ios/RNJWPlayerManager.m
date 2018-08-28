@@ -27,11 +27,20 @@ RCT_EXPORT_VIEW_PROPERTY(onBuffer, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSetupPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onTime, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
+
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
+RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
+RCT_EXPORT_VIEW_PROPERTY(title, NSString);
+RCT_EXPORT_VIEW_PROPERTY(image, NSString);
+RCT_EXPORT_VIEW_PROPERTY(desc, NSString);
 RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(displayTitle, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag

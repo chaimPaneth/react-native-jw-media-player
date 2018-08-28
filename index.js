@@ -90,7 +90,7 @@ class JWPlayer extends Component {
     file: '',
     mediaId: '',
     autostart: true,
-    controls: false,
+    controls: true,
     repeat: false,
   };
 
