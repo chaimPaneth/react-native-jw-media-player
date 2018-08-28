@@ -50,6 +50,36 @@
     return self.player.config.file;
 }
 
+-(void)setMediaId:(NSString *)mediaId
+{
+    self.player.config.mediaId = mediaId;
+}
+
+-(NSString *)mediaId
+{
+    return self.player.config.mediaId;
+}
+
+-(void)setTitle:(NSString *)title
+{
+    self.player.config.title = title;
+}
+
+-(NSString *)title
+{
+    return self.player.config.title;
+}
+
+-(void)setDesc:(NSString *)desc
+{
+    self.player.config.desc = desc;
+}
+
+-(NSString *)desc
+{
+    return self.player.config.desc;
+}
+
 -(void)setAutostart:(BOOL)autostart
 {
     self.player.config.autostart = autostart;
@@ -81,6 +111,26 @@
 -(BOOL)repeat
 {
     return self.player.config.repeat;
+}
+
+-(void)setDisplayDesc:(BOOL)displayDesc
+{
+    self.player.config.displayDescription = displayDesc;
+}
+
+-(BOOL)displayDesc
+{
+    return self.player.config.displayDescription;
+}
+
+-(void)setDisplayTitle:(BOOL)displayTitle
+{
+    self.player.config.displayTitle = displayTitle;
+}
+
+-(BOOL)displayTitle
+{
+    return self.player.config.displayTitle;
 }
 
 -(void)layoutSubviews
