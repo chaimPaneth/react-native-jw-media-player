@@ -138,6 +138,9 @@
     [super layoutSubviews];
     self.player.view.frame = self.frame;
 }
+-(BOOL)shouldAutorotate {
+    return NO;
+}
 
 #pragma mark - RNJWPlayer Delegate
 
@@ -192,15 +195,45 @@
 
 -(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event
 {
+    if(event && [[event valueForKey:@"_fullscreen"] boolValue]){
     if (self.onFullScreen) {
         self.onFullScreen(@{});
     }
+    }else{
+        if (self.onFullScreenExit){
+            [[UIDevice currentDevice] setValue:
+             [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
+                                        forKey:@"orientation"];
+            self.onFullScreenExit(@{});
+        }
+    }
+
 }
 
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
 {
+    if([[event valueForKey:@"_fullscreen"] boolValue]){
     if (self.onFullScreenRequested) {
         self.onFullScreenRequested(@{});
+    }
+    }else{
+        if (self.onFullScreenExitRequested) {
+            self.onFullScreenExitRequested(@{});
+        }
+    }
+}
+
+-(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event
+{
+    if (self.onFullScreenExitRequested) {
+        self.onFullScreenExitRequested(@{});
+    }
+}
+
+-(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event
+{
+    if (self.onFullScreenExit){
+        self.onFullScreenExit(@{});
     }
 }
 
