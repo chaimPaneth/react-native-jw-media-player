@@ -2,7 +2,10 @@
 package net.gamesofton.rnjwplayer;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -141,6 +144,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.addOnBeforePlayListener(this);
     mPlayerView.addOnBeforeCompleteListener(this);
     mPlayerView.addOnControlsListener(this);
+    mPlayerView.addOnFullscreenListener(this);
 
     return mPlayerView;
   }
@@ -480,13 +484,26 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onFullscreen(FullscreenEvent fullscreenEvent) {
-    WritableMap event = Arguments.createMap();
-    event.putString("message", "onFullscreen");
+    WritableMap eventEnterFullscreen = Arguments.createMap();
+    eventEnterFullscreen.putString("message", "onFullscreen");
+    WritableMap eventExitFullscreen = Arguments.createMap();
+    eventExitFullscreen.putString("message","onFullscreenExit");
     ReactContext reactContext = (ReactContext) mContext;
-    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            mPlayerView.getId(),
-            "topFullscreen",
-            event);
+    Log.e(RNJWPlayerViewManager.class.getSimpleName(), "onFullscreen: ORIENTATION : "+mActivity.getResources().getConfiguration().orientation);
+    if (mActivity.getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE) {
+     // mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+              mPlayerView.getId(),
+              "topFullScreenExit",
+              eventEnterFullscreen);
+    }else{
+      reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+              mPlayerView.getId(),
+              "topFullScreen",
+              eventExitFullscreen);
+    }
+
+    updateWakeLock(false);
   }
 
   @Override
@@ -554,6 +571,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onFullScreen")))
+            .put("topFullScreenExit",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onFullScreenExit")))
             .put("topPause",
                     MapBuilder.of(
                             "phasedRegistrationNames",
