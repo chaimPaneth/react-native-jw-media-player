@@ -495,12 +495,12 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
               mPlayerView.getId(),
               "topFullScreenExit",
-              eventEnterFullscreen);
+                eventExitFullscreen);
     }else{
       reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
               mPlayerView.getId(),
               "topFullScreen",
-              eventExitFullscreen);
+                eventEnterFullscreen);
     }
 
     updateWakeLock(false);
