@@ -2,6 +2,7 @@ package net.gamesofton.rnjwplayer;
 
 
 import android.content.Context;
+import android.content.res.Configuration;
 
 import com.longtailvideo.jwplayer.JWPlayerView;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
@@ -32,4 +33,12 @@ public class RNJWPlayerView extends JWPlayerView {
             layout(getLeft(), getTop(), getRight(), getBottom());
         }
     };
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            this.setFullscreen(true,true);
+        }
+    }
 }
