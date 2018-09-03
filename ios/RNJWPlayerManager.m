@@ -29,7 +29,8 @@ RCT_EXPORT_VIEW_PROPERTY(onPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onTime, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
-
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
