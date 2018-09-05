@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -40,6 +41,9 @@ import com.longtailvideo.jwplayer.events.SetupErrorEvent;
 import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
+import com.longtailvideo.jwplayer.fullscreen.DefaultFullscreenHandler;
+import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
+import com.longtailvideo.jwplayer.fullscreen.MaximizingFullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
@@ -100,6 +104,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   ReadableMap playListItem; // PlaylistItem
   ReadableArray playList; // List <PlaylistItem>
+    private static final String TAG = "RNJWPlayerViewManager";
 
   @Override
   public String getName() {
@@ -145,6 +150,61 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.addOnBeforeCompleteListener(this);
     mPlayerView.addOnControlsListener(this);
     mPlayerView.addOnFullscreenListener(this);
+        mPlayerView.setFullscreenHandler(new FullscreenHandler() {
+            @Override
+            public void onFullscreenRequested() {
+                WritableMap eventEnterFullscreen = Arguments.createMap();
+                eventEnterFullscreen.putString("message", "onFullscreen");
+                ReactContext reactContext = (ReactContext) mContext;
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                        mPlayerView.getId(),
+                        "topFullScreen",
+                        eventEnterFullscreen);
+            }
+
+            @Override
+            public void onFullscreenExitRequested() {
+                WritableMap eventExitFullscreen = Arguments.createMap();
+                eventExitFullscreen.putString("message", "onFullscreenExit");
+                ReactContext reactContext = (ReactContext) mContext;
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                        mPlayerView.getId(),
+                        "topFullScreenExit",
+                        eventExitFullscreen);
+            }
+
+            @Override
+            public void onResume() {
+
+            }
+
+            @Override
+            public void onPause() {
+
+            }
+
+            @Override
+            public void onDestroy() {
+
+            }
+
+            @Override
+            public void onAllowRotationChanged(boolean b) {
+                Log.e(TAG, "onAllowRotationChanged: "+b );
+            }
+
+            @Override
+            public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+
+            }
+
+            @Override
+            public void setUseFullscreenLayoutFlags(boolean b) {
+
+            }
+        });
 
     return mPlayerView;
   }
@@ -484,26 +544,27 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onFullscreen(FullscreenEvent fullscreenEvent) {
-    WritableMap eventEnterFullscreen = Arguments.createMap();
-    eventEnterFullscreen.putString("message", "onFullscreen");
-    WritableMap eventExitFullscreen = Arguments.createMap();
-    eventExitFullscreen.putString("message","onFullscreenExit");
-    ReactContext reactContext = (ReactContext) mContext;
-    Log.e(RNJWPlayerViewManager.class.getSimpleName(), "onFullscreen: ORIENTATION : "+mActivity.getResources().getConfiguration().orientation);
-    if (mActivity.getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE) {
-     // mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-      reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-              mPlayerView.getId(),
-              "topFullScreenExit",
-                eventExitFullscreen);
-    }else{
-      reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-              mPlayerView.getId(),
-              "topFullScreen",
-                eventEnterFullscreen);
-    }
-
-    updateWakeLock(false);
+//        WritableMap eventEnterFullscreen = Arguments.createMap();
+//        eventEnterFullscreen.putString("message", "onFullscreen");
+//        WritableMap eventExitFullscreen = Arguments.createMap();
+//        eventExitFullscreen.putString("message", "onFullscreenExit");
+//        ReactContext reactContext = (ReactContext) mContext;
+//        Log.e(RNJWPlayerViewManager.class.getSimpleName(), "onFullscreen: ORIENTATION : " + mActivity.getResources().getConfiguration().orientation);
+//        if (mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            //mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+//                    mPlayerView.getId(),
+//                    "topFullScreenExit",
+//                    eventExitFullscreen);
+//        } else {
+//            //mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+//                    mPlayerView.getId(),
+//                    "topFullScreen",
+//                    eventEnterFullscreen);
+//        }
+//
+//        updateWakeLock(false);
   }
 
   @Override
