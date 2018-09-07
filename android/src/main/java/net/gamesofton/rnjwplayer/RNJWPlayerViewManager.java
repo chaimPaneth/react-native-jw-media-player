@@ -51,7 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_EXACT_FIT;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> implements VideoPlayerEvents.OnFullscreenListener,
         VideoPlayerEvents.OnPlayListener,
@@ -131,7 +131,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerConfig = new PlayerConfig.Builder()
             .autostart(true)
             //.skinConfig(skinConfig)
-                .stretching(STRETCHING_EXACT_FIT)
+                .stretching(STRETCHING_UNIFORM)
             .build();
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
