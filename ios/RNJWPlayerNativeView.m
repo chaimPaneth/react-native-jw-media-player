@@ -142,6 +142,28 @@
     return NO;
 }
 
+-(void)setPlayListItem:(NSDictionary *)playListItem
+{
+    self.player.config.file = [playListItem objectForKey:@"file"];
+    self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
+    [self.player play];
+}
+
+-(NSDictionary *)playListItem
+{
+    return self.player.config.playListItem;
+}
+
+-(void)setPlayList:(NSArray *)playList
+{
+    [self.player play];
+}
+
+-(NSArray *)playList
+{
+    return self.player.config.playList;
+}
+
 #pragma mark - RNJWPlayer Delegate
 
 -(void)onRNJWPlayerBeforePlay
