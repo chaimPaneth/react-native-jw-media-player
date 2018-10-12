@@ -42,6 +42,8 @@ RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(displayTitle, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(playListItem, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(playList, NSArray);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
