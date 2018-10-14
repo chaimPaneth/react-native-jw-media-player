@@ -138,6 +138,7 @@
     [super layoutSubviews];
     self.player.view.frame = self.frame;
 }
+
 -(BOOL)shouldAutorotate {
     return NO;
 }
@@ -151,17 +152,41 @@
 
 -(NSDictionary *)playListItem
 {
-    return self.player.config.playListItem;
+    NSString *file = @"";
+    NSString *mediaId = @"";
+    
+    if (self.player.config.file != nil) {
+        file = self.player.config.file;
+    }
+    
+    if (self.player.config.mediaId != nil) {
+        mediaId = self.player.config.mediaId;
+    }
+    
+    NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:2];
+    [playListItemDict setObject:file forKey:@"file"];
+    [playListItemDict setObject:mediaId forKey:@"mediaId"];
+    
+    return playListItemDict;
 }
 
 -(void)setPlayList:(NSArray *)playList
 {
+    NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
+    for (id item in playList) {
+        JWPlaylistItem *playListItem = [JWPlaylistItem new];
+        playListItem.file = [item objectForKey:@"file"];
+        playListItem.mediaId = [item objectForKey:@"mediaId"];
+        [playlistArray addObject:playListItem];
+    }
+    
+    [self.player load:playlistArray];
     [self.player play];
 }
 
 -(NSArray *)playList
 {
-    return self.player.config.playList;
+    return self.player.config.playlist;
 }
 
 #pragma mark - RNJWPlayer Delegate
