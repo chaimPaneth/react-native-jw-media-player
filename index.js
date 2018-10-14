@@ -1,4 +1,4 @@
-import React, { Component } from 'react'; // eslint-disable-line
+import React, { Component } from "react"; // eslint-disable-line
 var ReactNative = require("react-native");
 import {
   requireNativeComponent,
@@ -13,11 +13,11 @@ const RNJWPlayerManager =
     ? NativeModules.RNJWPlayerManager
     : NativeModules.RNJWPlayerModule;
 
-const RCT_RNJWPLAYER_REF = 'rnjwplayer';
+const RCT_RNJWPLAYER_REF = "rnjwplayer";
 
 //var RCTRNJWPlayerManager = RNJWPlayerManager;
 
-const RNJWPlayer = requireNativeComponent('RNJWPlayer', null);
+const RNJWPlayer = requireNativeComponent("RNJWPlayer", null);
 
 const JWPlayerStateIOS = {
   JWPlayerStatePlaying: 0,
@@ -25,7 +25,7 @@ const JWPlayerStateIOS = {
   JWPlayerStateBuffering: 2,
   JWPlayerStateIdle: 3,
   JWPlayerStateComplete: 4,
-  JWPlayerStateError: 5,
+  JWPlayerStateError: 5
 };
 
 const JWPlayerStateAndroid = {
@@ -34,10 +34,11 @@ const JWPlayerStateAndroid = {
   JWPlayerStatePlaying: 2,
   JWPlayerStatePaused: 3,
   JWPlayerStateComplete: 4,
-  JWPlayerStateError: null,
+  JWPlayerStateError: null
 };
 
-const JWPlayerState = Platform.OS === 'ios' ? JWPlayerStateIOS : JWPlayerStateAndroid;
+const JWPlayerState =
+  Platform.OS === "ios" ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
 class JWPlayer extends Component {
   static propTypes = {
@@ -52,6 +53,7 @@ class JWPlayer extends Component {
     displayTitle: PropTypes.bool,
     displayDesc: PropTypes.bool,
     playListItem: PropTypes.shape({
+      file: PropTypes.string.isRequired,
       image: PropTypes.string,
       title: PropTypes.string,
       desc: PropTypes.string,
@@ -60,19 +62,22 @@ class JWPlayer extends Component {
       controls: PropTypes.bool.isRequired,
       repeat: PropTypes.bool.isRequired,
       displayTitle: PropTypes.bool,
-      displayDesc: PropTypes.bool,
+      displayDesc: PropTypes.bool
     }),
-    playList: PropTypes.arrayOf(PropTypes.shape({
-      image: PropTypes.string,
-      title: PropTypes.string,
-      desc: PropTypes.string,
-      mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      controls: PropTypes.bool.isRequired,
-      repeat: PropTypes.bool.isRequired,
-      displayTitle: PropTypes.bool,
-      displayDesc: PropTypes.bool,
-    })),
+    playList: PropTypes.arrayOf(
+      PropTypes.shape({
+        file: PropTypes.string.isRequired,
+        image: PropTypes.string,
+        title: PropTypes.string,
+        desc: PropTypes.string,
+        mediaId: PropTypes.string.isRequired,
+        autostart: PropTypes.bool.isRequired,
+        controls: PropTypes.bool.isRequired,
+        repeat: PropTypes.bool.isRequired,
+        displayTitle: PropTypes.bool,
+        displayDesc: PropTypes.bool
+      })
+    ),
     play: PropTypes.func,
     pause: PropTypes.func,
     onBeforePlay: PropTypes.func,
@@ -83,20 +88,18 @@ class JWPlayer extends Component {
     onPlayerError: PropTypes.func,
     onBuffer: PropTypes.func,
     onTime: PropTypes.func,
-    onFullScreen: PropTypes.func,
+    onFullScreen: PropTypes.func
   };
 
   static defaultProps = {
-    file: '',
-    mediaId: '',
+    file: "",
+    mediaId: "",
     autostart: true,
     controls: true,
-    repeat: false,
+    repeat: false
   };
 
-  componentDidMount() {
-    
-  }
+  componentDidMount() {}
 
   pause() {
     UIManager.dispatchViewManagerCommand(
@@ -104,7 +107,7 @@ class JWPlayer extends Component {
       UIManager.RNJWPlayer.Commands.pause,
       null
     );
-  };
+  }
 
   play() {
     UIManager.dispatchViewManagerCommand(
@@ -112,11 +115,13 @@ class JWPlayer extends Component {
       UIManager.RNJWPlayer.Commands.play,
       null
     );
-  };
+  }
 
   async playerState() {
     try {
-      var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
+      var state = await RNJWPlayerManager.state(
+        this.getRNJWPlayerBridgeHandle()
+      );
       return state;
     } catch (e) {
       console.error(e);
@@ -124,15 +129,18 @@ class JWPlayer extends Component {
     }
   }
 
-
   getRNJWPlayerBridgeHandle() {
     return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
-  };
+  }
 
   render() {
-    return <RNJWPlayer 
-      ref={RCT_RNJWPLAYER_REF}
-      key="RNJWPlayerKey" {...this.props} />;
+    return (
+      <RNJWPlayer
+        ref={RCT_RNJWPLAYER_REF}
+        key="RNJWPlayerKey"
+        {...this.props}
+      />
+    );
   }
 }
 
