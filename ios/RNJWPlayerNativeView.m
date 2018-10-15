@@ -180,7 +180,7 @@
         [playlistArray addObject:playListItem];
     }
     
-    [self.player load:playlistArray];
+    self.player.config.playlist = playlistArray;
     [self.player play];
 }
 
