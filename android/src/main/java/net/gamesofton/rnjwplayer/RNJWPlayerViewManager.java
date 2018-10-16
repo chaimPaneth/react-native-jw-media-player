@@ -101,6 +101,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   Boolean repeat = false;
   Boolean displayTitle = false;
   Boolean displayDesc = false;
+  Boolean nextUpDisplay = false;
 
   ReadableMap playListItem; // PlaylistItem
   ReadableArray playList; // List <PlaylistItem>
@@ -354,6 +355,16 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
+  @ReactProp(name = "nextUpDisplay")
+  public void setnextUpDisplay(View view, Boolean prop) {
+    if(nextUpDisplay!=prop) {
+      nextUpDisplay = prop;
+
+      mPlayerView.getConfig().setNextUpDisplay(nextUpDisplay);
+      //buildPlaylistItem();
+    }
+  }
+
   @ReactProp(name = "playListItem")
   public void setPlayListItem(View view, ReadableMap prop) {
     if(playListItem!=prop) {
@@ -443,6 +454,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         mPlayerView.getConfig().setControls(controls);
         mPlayerView.getConfig().setDisplayTitle(displayTitle);
         mPlayerView.getConfig().setDisplayDescription(displayDesc);
+        mPlayerView.getConfig().setNextUpDisplay(nextUpDisplay);
 
         mPlayerView.load(mPlayList);
         mPlayerView.play();
