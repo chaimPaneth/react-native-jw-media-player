@@ -41,8 +41,10 @@
 
 -(void)setFile:(NSString *)file
 {
+    if(file.length > 0){
     self.player.config.file = file;
     [self.player play];
+}
 }
 
 -(NSString *)file
@@ -52,7 +54,9 @@
 
 -(void)setMediaId:(NSString *)mediaId
 {
+    if(mediaId != nil){
     self.player.config.mediaId = mediaId;
+}
 }
 
 -(NSString *)mediaId
@@ -133,6 +137,16 @@
     return self.player.config.displayTitle;
 }
 
+-(void)setNextUpDisplay:(BOOL)nextUpDisplay
+{
+    self.player.config.nextUpDisplay = nextUpDisplay;
+}
+
+-(BOOL)nextUpDisplay
+{
+    return self.player.config.nextUpDisplay;
+}
+
 -(void)layoutSubviews
 {
     [super layoutSubviews];
@@ -147,6 +161,13 @@
 {
     self.player.config.file = [playListItem objectForKey:@"file"];
     self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
+    self.player.config.title = [playListItem objectForKey:@"title"];
+    self.player.config.desc = [playListItem objectForKey:@"desc"];
+    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
+    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
+    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
+    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
+    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
     [self.player play];
 }
 
@@ -154,19 +175,63 @@
 {
     NSString *file = @"";
     NSString *mediaId = @"";
-    
+    NSString *title = @"";
+    NSString *desc = @"";
+    BOOL autostart = true;
+    BOOL controls = true;
+    BOOL repeat = false;
+    BOOL displayDesc = false;
+    BOOL displayTitle = false;
+
+
+
     if (self.player.config.file != nil) {
         file = self.player.config.file;
     }
-    
+
     if (self.player.config.mediaId != nil) {
         mediaId = self.player.config.mediaId;
     }
-    
-    NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:2];
+
+    if (self.player.config.title != nil) {
+        title = self.player.config.title;
+    }
+
+    if (self.player.config.desc != nil) {
+        desc = self.player.config.desc;
+    }
+
+    if (self.player.config.autostart) {
+        autostart = self.player.config.autostart;
+    }
+
+    if (self.player.config.controls) {
+        controls = self.player.config.controls;
+    }
+
+    if (self.player.config.repeat) {
+        repeat = self.player.config.repeat;
+    }
+
+    if (self.player.config.displayDescription) {
+        displayDesc = self.player.config.displayDescription;
+    }
+
+    if (self.player.config.displayTitle) {
+        displayTitle = self.player.config.displayTitle;
+    }
+
+    NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
     [playListItemDict setObject:file forKey:@"file"];
     [playListItemDict setObject:mediaId forKey:@"mediaId"];
-    
+    [playListItemDict setObject:title forKey:@"title"];
+    [playListItemDict setObject:desc forKey:@"desc"];
+    [playListItemDict setObject:[NSNumber numberWithBool:autostart]  forKey:@"autostart"];
+    [playListItemDict setObject:[NSNumber numberWithBool:controls]  forKey:@"controls"];
+    [playListItemDict setObject:[NSNumber numberWithBool:repeat]  forKey:@"repeat"];
+    [playListItemDict setObject:[NSNumber numberWithBool:displayDesc]  forKey:@"displayDesc"];
+    [playListItemDict setObject:[NSNumber numberWithBool:displayTitle]  forKey:@"displayTitle"];
+
     return playListItemDict;
 }
 
@@ -176,10 +241,14 @@
     for (id item in playList) {
         JWPlaylistItem *playListItem = [JWPlaylistItem new];
         playListItem.file = [item objectForKey:@"file"];
+        playListItem.image = [item objectForKey:@"image"];
+        playListItem.title = [item objectForKey:@"title"];
+        playListItem.desc = [item objectForKey:@"desc"];
         playListItem.mediaId = [item objectForKey:@"mediaId"];
+
         [playlistArray addObject:playListItem];
     }
-    
+
     self.player.config.playlist = playlistArray;
     [self.player play];
 }

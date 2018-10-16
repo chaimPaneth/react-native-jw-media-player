@@ -16,6 +16,7 @@
 @property(nonatomic)BOOL repeat;
 @property(nonatomic)BOOL displayTitle;
 @property(nonatomic)BOOL displayDesc;
+@property(nonatomic)BOOL nextUpDisplay;
 @property(nonatomic, strong)NSString *title;
 @property(nonatomic, strong)NSString *image;
 @property(nonatomic, strong)NSString *desc;
