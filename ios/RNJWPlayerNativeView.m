@@ -201,6 +201,27 @@
         desc = self.player.config.desc;
     }
 
+    if (self.player.config.autostart) {
+        autostart = self.player.config.autostart;
+    }
+
+    if (self.player.config.controls) {
+        controls = self.player.config.controls;
+    }
+
+    if (self.player.config.repeat) {
+        repeat = self.player.config.repeat;
+    }
+
+    if (self.player.config.displayDescription) {
+        displayDesc = self.player.config.displayDescription;
+    }
+
+    if (self.player.config.displayTitle) {
+        displayTitle = self.player.config.displayTitle;
+    }
+
+
     NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
     [playListItemDict setObject:file forKey:@"file"];
     [playListItemDict setObject:mediaId forKey:@"mediaId"];
@@ -293,27 +314,6 @@
        if (event.item.desc != nil) {
            desc = event.item.desc;
        }
-
-       if (self.player.config.autostart) {
-           autostart = self.player.config.autostart;
-       }
-
-       if (self.player.config.controls) {
-           controls = self.player.config.controls;
-       }
-
-       if (self.player.config.repeat) {
-           repeat = self.player.config.repeat;
-       }
-
-       if (self.player.config.displayDescription) {
-          displayDesc = self.player.config.displayDescription;
-       }
-
-       if (self.player.config.displayTitle) {
-         displayTitle = self.player.config.displayTitle;
-       }
-
 
        NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
        [playListItemDict setObject:file forKey:@"file"];
