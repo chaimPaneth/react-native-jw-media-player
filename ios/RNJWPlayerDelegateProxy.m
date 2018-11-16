@@ -28,6 +28,11 @@
     [self.delegate onRNJWPlayerPause];
 }
 
+- (void)onPlaylistItem:(JWEvent<JWPlaylistItemEvent> *)event;
+{
+    [self.delegate onRNJWPlayerPlaylistItem:event];
+}
+
 - (void)onSetupError:(JWEvent<JWErrorEvent> *)event
 {
     [self.delegate onRNJWSetupPlayerError:event];

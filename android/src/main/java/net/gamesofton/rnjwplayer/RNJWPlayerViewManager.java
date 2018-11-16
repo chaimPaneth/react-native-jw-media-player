@@ -147,8 +147,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.addOnPlaylistListener(this);
     mPlayerView.addOnPlaylistItemListener(this);
     mPlayerView.addOnPlaylistCompleteListener(this);
-    mPlayerView.addOnBeforePlayListener(this);
-    mPlayerView.addOnBeforeCompleteListener(this);
+    //mPlayerView.addOnBeforePlayListener(this);
+    //mPlayerView.addOnBeforeCompleteListener(this);
     mPlayerView.addOnControlsListener(this);
     mPlayerView.addOnFullscreenListener(this);
         mPlayerView.setFullscreenHandler(new FullscreenHandler() {
@@ -246,6 +246,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
 
     mPlayerView.load(mPlayListItem);
+    mPlayerView.play();
 
 //    mPlayerView.getConfig().setFile(file);
 //    mPlayerView.getConfig().setImage(image);
@@ -392,7 +393,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           mediaId = playListItem.getString("mediaId");
         }
 
-        buildPlaylistItem();
+        mPlayerView.getConfig().setAutostart(autostart);
+
+        //buildPlaylistItem();
 
         mPlayerView.play();
       }
@@ -444,6 +447,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     .build();
 
             mPlayList.add(mPlayListItem);
+//            buildPlaylistItem();
+//            mPlayerView.play();
           }
 
           j++;
@@ -457,6 +462,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         mPlayerView.getConfig().setNextUpDisplay(nextUpDisplay);
 
         mPlayerView.load(mPlayList);
+        //buildPlaylistItem();
+//        mPlayerView.playlistItem(0);
         mPlayerView.play();
       }
     }
@@ -494,6 +501,15 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onPlaylistItem");
+    event.putInt("index",playlistItemEvent.getIndex());
+    event.putString("playListItem",playlistItemEvent.getPlaylistItem().toJson().toString());
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topPlaylistItem",
+            event);
 
   }
 
@@ -660,6 +676,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onComplete")))
+            .put("topPlaylistItem",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlaylistItem")))
             .build();
   }
 
