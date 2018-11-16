@@ -24,6 +24,7 @@ RCT_EXPORT_VIEW_PROPERTY(onBeforePlay, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlay, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPause, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onBuffer, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onPlaylistItem, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSetupPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onTime, RCTBubblingEventBlock);

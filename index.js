@@ -89,7 +89,8 @@ class JWPlayer extends Component {
     onPlayerError: PropTypes.func,
     onBuffer: PropTypes.func,
     onTime: PropTypes.func,
-    onFullScreen: PropTypes.func
+    onFullScreen: PropTypes.func,
+    onPlaylistItem: PropTypes.func,
   };
 
   static defaultProps = {
