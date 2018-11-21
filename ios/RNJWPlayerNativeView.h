@@ -28,6 +28,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPause;
 @property(nonatomic, copy)RCTBubblingEventBlock onBuffer;
+@property(nonatomic, copy)RCTBubblingEventBlock onIdle;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylistItem;
 @property(nonatomic, copy)RCTBubblingEventBlock onSetupPlayerError;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerError;
@@ -41,6 +42,7 @@
 -(void)onRNJWPlayerPlay;
 -(void)onRNJWPlayerPause;
 -(void)onRNJWPlayerBuffer;
+-(void)onRNJWPlayerIdle;
 -(void)onRNJWPlayerPlaylistItem:(JWEvent<JWPlaylistItemEvent> *)event;
 -(void)onRNJWSetupPlayerError:(JWEvent<JWErrorEvent> *)event;
 -(void)onRNJWPlayerError:(JWEvent<JWErrorEvent> *)event;

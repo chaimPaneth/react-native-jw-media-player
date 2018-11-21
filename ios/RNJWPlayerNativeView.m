@@ -8,7 +8,24 @@
     if (self = [super init]) {
         [self addSubview:self.player.view];
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInterruptionPause:) name:@"onInterruption" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInterruptionPlay:) name:@"onInterruptionRelease" object:nil];
+
     return self;
+}
+
+-(void)onInterruptionPause:(NSNotification *)notification {
+    if (self.onPause) {
+        self.onPause(@{});
+    }
+    NSLog(@" Do something ");
+}
+
+-(void)onInterruptionPlay:(NSNotification *)notification {
+    if (self.onPlay) {
+        self.onPlay(@{});
+    }
+    NSLog(@" Do something ");
 }
 
 - (JWPlayerController *)player {
@@ -286,6 +303,13 @@
 {
     if (self.onBuffer) {
         self.onBuffer(@{});
+    }
+}
+
+-(void)onRNJWPlayerIdle
+{
+    if (self.onIdle) {
+        self.onIdle(@{});
     }
 }
 
