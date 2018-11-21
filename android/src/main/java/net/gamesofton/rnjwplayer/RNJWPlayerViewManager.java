@@ -491,7 +491,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onIdle(IdleEvent idleEvent) {
-
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onPlaylistItem");
   }
 
   @Override
@@ -599,6 +600,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public void onError(ErrorEvent errorEvent) {
     WritableMap event = Arguments.createMap();
     event.putString("message", "onError");
+    event.putString("error",errorEvent.getException().toString());
     ReactContext reactContext = (ReactContext) mContext;
     reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             mPlayerView.getId(),
