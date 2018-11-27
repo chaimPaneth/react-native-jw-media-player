@@ -59,7 +59,15 @@
 -(void)setFile:(NSString *)file
 {
     if(file.length > 0){
-    self.player.config.file = file;
+
+//        NSString* documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+//        NSString *searchFilename = [documentsPath stringByAppendingString:@"/OUTorah/01NetzachYisrael-0.mp4"];
+//        NSString *searchFilename1 = [NSString stringWithFormat:@"file://%@",searchFilename];
+        NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
+                                NSUTF8StringEncoding];
+
+        self.player.config.file = encodedUrl;
+
     [self.player play];
 }
 }
