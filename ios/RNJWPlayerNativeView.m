@@ -1,6 +1,9 @@
 #import "RNJWPlayerNativeView.h"
 #import "RNJWPlayerDelegateProxy.h"
 
+NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
+NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
+
 @implementation RNJWPlayerNativeView
 
 - (instancetype)init
@@ -8,24 +11,17 @@
     if (self = [super init]) {
         [self addSubview:self.player.view];
     }
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInterruptionPause:) name:@"onInterruption" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInterruptionPlay:) name:@"onInterruptionRelease" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
 
     return self;
 }
 
--(void)onInterruptionPause:(NSNotification *)notification {
-    if (self.onPause) {
-        self.onPause(@{});
-    }
-    NSLog(@" Do something ");
-}
-
--(void)onInterruptionPlay:(NSNotification *)notification {
-    if (self.onPlay) {
-        self.onPlay(@{});
-    }
-    NSLog(@" Do something ");
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
 }
 
 - (JWPlayerController *)player {
@@ -422,6 +418,24 @@
     if (self.onFullScreenExit){
         self.onFullScreenExit(@{});
     }
+}
+
+#pragma mark - RNJWPlayer Interruption handling
+
+-(void)audioInterruptionsStarted:(NSNotification *)note {
+    if (self.onPause) {
+        self.onPause(@{});
+    }
+    
+    [self.player pause];
+}
+
+-(void)audioInterruptionsEnded:(NSNotification *)note {
+    if (self.onPlay) {
+        self.onPlay(@{});
+    }
+    
+    [self.player play];
 }
 
 @end
