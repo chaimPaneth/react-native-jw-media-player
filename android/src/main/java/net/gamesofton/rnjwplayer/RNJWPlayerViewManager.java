@@ -2,8 +2,15 @@
 package net.gamesofton.rnjwplayer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.media.AudioManager;
+import android.os.Handler;
+import android.media.AudioManager;
+import android.os.Handler;
+import android.media.AudioManager;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -50,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
@@ -69,7 +77,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         VideoPlayerEvents.OnAudioTrackChangedListener,
         VideoPlayerEvents.OnControlsListener,
         AdvertisingEvents.OnBeforePlayListener,
-        AdvertisingEvents.OnBeforeCompleteListener {
+        AdvertisingEvents.OnBeforeCompleteListener,
+        AudioManager.OnAudioFocusChangeListener {
 
   public static final String REACT_CLASS = "RNJWPlayer";
 
@@ -106,6 +115,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   ReadableMap playListItem; // PlaylistItem
   ReadableArray playList; // List <PlaylistItem>
     private static final String TAG = "RNJWPlayerViewManager";
+    private Handler mHandler;
+    AudioManager audioManager;
+
 
   @Override
   public String getName() {
@@ -136,6 +148,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             .build();
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
+        audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
     mPlayerView.addOnPlayListener(this);
     mPlayerView.addOnPauseListener(this);
     mPlayerView.addOnCompleteListener(this);
@@ -469,6 +482,13 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
+  private Runnable mDelayedStopRunnable = new Runnable() {
+      @Override
+      public void run() {
+          mPlayerView.stop();
+      }
+  };
+
   @Override
   public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
 
@@ -483,6 +503,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
 
   }
+
 
   @Override
   public void onBeforeComplete(BeforeCompleteEvent beforeCompleteEvent) {
@@ -534,6 +555,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onPlay(PlayEvent playEvent) {
+        int result = 0;
+        if (audioManager != null) {
+            result = audioManager.requestAudioFocus(this,
+                    // Use the music stream.
+                    AudioManager.STREAM_MUSIC,
+                    // Request permanent focus.
+                    AudioManager.AUDIOFOCUS_GAIN);
+        }
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.e(TAG, "onBeforePlay: " + result);
+        }
+
+
     WritableMap event = Arguments.createMap();
     event.putString("message", "onPlay");
     ReactContext reactContext = (ReactContext) mContext;
@@ -725,4 +759,21 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public void pause(RNJWPlayerView root) {
     root.pause();
   }
+
+    @Override
+    public void onAudioFocusChange(int i) {
+        mHandler = new Handler();
+        if (i == AudioManager.AUDIOFOCUS_LOSS) {
+            mPlayerView.pause();
+            mHandler.postDelayed(mDelayedStopRunnable,
+                    TimeUnit.SECONDS.toMillis(30));
+        } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            mPlayerView.pause();
+        } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+// Lower the volume, keep playing
+
+        } else if (i == AudioManager.AUDIOFOCUS_GAIN) {
+            mPlayerView.play();
+        }
+    }
 }
