@@ -119,6 +119,15 @@ class JWPlayer extends Component {
     );
   }
 
+
+  stop() {
+    UIManager.dispatchViewManagerCommand(
+      this.getRNJWPlayerBridgeHandle(),
+      UIManager.RNJWPlayer.Commands.stop,
+      null
+    );
+  }
+
   async playerState() {
     try {
       var state = await RNJWPlayerManager.state(
