@@ -90,7 +90,7 @@ class JWPlayer extends Component {
     onBuffer: PropTypes.func,
     onTime: PropTypes.func,
     onFullScreen: PropTypes.func,
-    onPlaylistItem: PropTypes.func,
+    onPlaylistItem: PropTypes.func
   };
 
   static defaultProps = {
@@ -118,7 +118,6 @@ class JWPlayer extends Component {
       null
     );
   }
-
 
   stop() {
     UIManager.dispatchViewManagerCommand(

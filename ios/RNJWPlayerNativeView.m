@@ -14,7 +14,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
-
+    
     return self;
 }
 
@@ -54,18 +54,13 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setFile:(NSString *)file
 {
-    if(file.length > 0){
-
-//        NSString* documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-//        NSString *searchFilename = [documentsPath stringByAppendingString:@"/OUTorah/01NetzachYisrael-0.mp4"];
-//        NSString *searchFilename1 = [NSString stringWithFormat:@"file://%@",searchFilename];
+    if (file != nil && file.length > 0 && file != self.player.config.file) {
         NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
-
+        
         self.player.config.file = encodedUrl;
-
-    [self.player play];
-}
+        [self.player play];
+    }
 }
 
 -(NSString *)file
@@ -75,9 +70,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setMediaId:(NSString *)mediaId
 {
-    if(mediaId != nil){
-    self.player.config.mediaId = mediaId;
-}
+    if(mediaId != nil && mediaId.length > 0 && mediaId != self.player.config.mediaId) {
+        self.player.config.mediaId = mediaId;
+    }
 }
 
 -(NSString *)mediaId
@@ -93,6 +88,16 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(NSString *)title
 {
     return self.player.config.title;
+}
+
+-(void)setImage:(NSString *)image
+{
+    self.player.config.image = image;
+}
+
+-(NSString *)image
+{
+    return self.player.config.image;
 }
 
 -(void)setDesc:(NSString *)desc
@@ -118,13 +123,14 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setControls:(BOOL)controls
 {
-    self.player.config.controls = controls;
+    //self.player.config.controls = controls;
+    self.player.controls = controls;
     //[self.player play];
 }
 
 -(BOOL)controls
 {
-    return self.player.config.controls;
+    return self.player.controls;//self.player.config.controls;
 }
 
 -(void)setRepeat:(BOOL)repeat
@@ -203,46 +209,46 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     BOOL repeat = false;
     BOOL displayDesc = false;
     BOOL displayTitle = false;
-
-
-
+    
+    
+    
     if (self.player.config.file != nil) {
         file = self.player.config.file;
     }
-
+    
     if (self.player.config.mediaId != nil) {
         mediaId = self.player.config.mediaId;
     }
-
+    
     if (self.player.config.title != nil) {
         title = self.player.config.title;
     }
-
+    
     if (self.player.config.desc != nil) {
         desc = self.player.config.desc;
     }
-
+    
     if (self.player.config.autostart) {
         autostart = self.player.config.autostart;
     }
-
+    
     if (self.player.config.controls) {
         controls = self.player.config.controls;
     }
-
+    
     if (self.player.config.repeat) {
         repeat = self.player.config.repeat;
     }
-
+    
     if (self.player.config.displayDescription) {
         displayDesc = self.player.config.displayDescription;
     }
-
+    
     if (self.player.config.displayTitle) {
         displayTitle = self.player.config.displayTitle;
     }
-
-
+    
+    
     NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
     [playListItemDict setObject:file forKey:@"file"];
     [playListItemDict setObject:mediaId forKey:@"mediaId"];
@@ -253,7 +259,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     [playListItemDict setObject:[NSNumber numberWithBool:repeat]  forKey:@"repeat"];
     [playListItemDict setObject:[NSNumber numberWithBool:displayDesc]  forKey:@"displayDesc"];
     [playListItemDict setObject:[NSNumber numberWithBool:displayTitle]  forKey:@"displayTitle"];
-
+    
     return playListItemDict;
 }
 
@@ -267,10 +273,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         playListItem.title = [item objectForKey:@"title"];
         playListItem.desc = [item objectForKey:@"desc"];
         playListItem.mediaId = [item objectForKey:@"mediaId"];
-
+        
         [playlistArray addObject:playListItem];
     }
-
+    
     self.player.config.playlist = playlistArray;
     [self.player play];
 }
@@ -319,38 +325,38 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)onRNJWPlayerPlaylistItem:(JWEvent<JWPlaylistItemEvent> *)event
 {
-   if (self.onPlaylistItem) {
-
-       NSError *error;
-       NSString *file = @"";
-       NSString *mediaId = @"";
-       NSString *title = @"";
-       NSString *desc = @"";
-
-       if (event.item.file != nil) {
-           file = event.item.file;
-       }
-
-       if (event.item.mediaId != nil) {
-           mediaId = event.item.mediaId;
-       }
-
-       if (event.item.title != nil) {
-           title = event.item.title;
-       }
-
-       if (event.item.desc != nil) {
-           desc = event.item.desc;
-       }
-
-       NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
-       [playListItemDict setObject:file forKey:@"file"];
-       [playListItemDict setObject:mediaId forKey:@"mediaId"];
-       [playListItemDict setObject:title forKey:@"title"];
-       [playListItemDict setObject:desc forKey:@"desc"];
-
-       NSData *data = [NSJSONSerialization dataWithJSONObject:playListItemDict options:NSJSONWritingPrettyPrinted error: &error];
-
+    if (self.onPlaylistItem) {
+        
+        NSError *error;
+        NSString *file = @"";
+        NSString *mediaId = @"";
+        NSString *title = @"";
+        NSString *desc = @"";
+        
+        if (event.item.file != nil) {
+            file = event.item.file;
+        }
+        
+        if (event.item.mediaId != nil) {
+            mediaId = event.item.mediaId;
+        }
+        
+        if (event.item.title != nil) {
+            title = event.item.title;
+        }
+        
+        if (event.item.desc != nil) {
+            desc = event.item.desc;
+        }
+        
+        NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
+        [playListItemDict setObject:file forKey:@"file"];
+        [playListItemDict setObject:mediaId forKey:@"mediaId"];
+        [playListItemDict setObject:title forKey:@"title"];
+        [playListItemDict setObject:desc forKey:@"desc"];
+        
+        NSData *data = [NSJSONSerialization dataWithJSONObject:playListItemDict options:NSJSONWritingPrettyPrinted error: &error];
+        
         self.onPlaylistItem(@{@"playListItem": [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]});
     }
 }
@@ -379,9 +385,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event
 {
     if(event && [[event valueForKey:@"_fullscreen"] boolValue]){
-    if (self.onFullScreen) {
-        self.onFullScreen(@{});
-    }
+        if (self.onFullScreen) {
+            self.onFullScreen(@{});
+        }
     }else{
         if (self.onFullScreenExit){
             [[UIDevice currentDevice] setValue:
@@ -390,15 +396,15 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             self.onFullScreenExit(@{});
         }
     }
-
+    
 }
 
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
 {
     if([[event valueForKey:@"_fullscreen"] boolValue]){
-    if (self.onFullScreenRequested) {
-        self.onFullScreenRequested(@{});
-    }
+        if (self.onFullScreenRequested) {
+            self.onFullScreenRequested(@{});
+        }
     }else{
         if (self.onFullScreenExitRequested) {
             self.onFullScreenExitRequested(@{});
