@@ -143,6 +143,36 @@ class JWPlayer extends Component {
     return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    var { mediaId, playListItem, playlist } = nextProps;
+
+    if (mediaId) {
+      return mediaId !== this.props.mediaId;
+    }
+
+    if (playListItem) {
+      if (this.props.playListItem) {
+        return playListItem.mediaId !== this.props.playListItem.mediaId;
+      } else {
+        return true;
+      }
+    }
+
+    if (playlist) {
+      if (this.props.playlist) {
+        return arraysAreEqual(playlist, this.props.playlist);
+      } else {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  arraysAreEqual(ary1, ary2) {
+    return ary1.join("") == ary2.join("");
+  }
+
   render() {
     return (
       <RNJWPlayer

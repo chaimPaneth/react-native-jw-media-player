@@ -49,6 +49,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     //config.autostart = _autostart;
     //config.mediaId = @"vSsMLwzp";
     config.stretching = JWStretchingUniform;
+    //config.preload = JWPreloadNone;
     return config;
 }
 
@@ -187,6 +188,11 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)setPlayListItem:(NSDictionary *)playListItem
 {
     self.player.config.file = [playListItem objectForKey:@"file"];
+    // check if is jw hosted content
+//    if (![((NSString *)[playListItem objectForKey:@"file"]) containsString:@"content.jwplatform.com/manifests/"]) {
+//        self.player.config.preload = JWPreloadNone;
+//    }
+    
     self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
     self.player.config.title = [playListItem objectForKey:@"title"];
     self.player.config.desc = [playListItem objectForKey:@"desc"];
@@ -209,6 +215,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     BOOL repeat = false;
     BOOL displayDesc = false;
     BOOL displayTitle = false;
+    //JWPreload preload = JWPreloadNone;
     
     
     
@@ -248,6 +255,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         displayTitle = self.player.config.displayTitle;
     }
     
+//    if (self.player.config.preload) {
+//        preload = self.player.config.preload;
+//    }
+    
     
     NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
     [playListItemDict setObject:file forKey:@"file"];
@@ -259,6 +270,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     [playListItemDict setObject:[NSNumber numberWithBool:repeat]  forKey:@"repeat"];
     [playListItemDict setObject:[NSNumber numberWithBool:displayDesc]  forKey:@"displayDesc"];
     [playListItemDict setObject:[NSNumber numberWithBool:displayTitle]  forKey:@"displayTitle"];
+    //[playListItemDict setObject:[NSNumber numberWithInt:preload]  forKey:@"preload"];
     
     return playListItemDict;
 }
