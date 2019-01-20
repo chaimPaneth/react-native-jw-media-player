@@ -88,6 +88,7 @@ RCT_EXPORT_METHOD(play:(nonnull NSNumber *)reactTag) {
         if (![view isKindOfClass:[RNJWPlayerNativeView class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
+            view.player.config.controls = [view.player controls];
             [view.player play];
         }
     }];
