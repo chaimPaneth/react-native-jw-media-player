@@ -42,11 +42,11 @@ const JWPlayerState =
 
 class JWPlayer extends Component {
   static propTypes = {
-    file: PropTypes.string.isRequired,
+    file: PropTypes.string,
     image: PropTypes.string,
     title: PropTypes.string,
     desc: PropTypes.string,
-    mediaId: PropTypes.string.isRequired,
+    mediaId: PropTypes.string,
     autostart: PropTypes.bool.isRequired,
     controls: PropTypes.bool.isRequired,
     repeat: PropTypes.bool.isRequired,
@@ -93,13 +93,22 @@ class JWPlayer extends Component {
     onPlaylistItem: PropTypes.func
   };
 
-  static defaultProps = {
-    file: "",
-    mediaId: "",
-    autostart: true,
-    controls: true,
-    repeat: false
-  };
+  // static defaultProps = {
+  //   file: "",
+  //   mediaId: "",
+  //   autostart: true,
+  //   controls: true,
+  //   repeat: false,
+  //   displayTitle: true,
+  //   displayDesc: true,
+  //   playListItem: {
+  //     autostart: true,
+  //     controls: true,
+  //     repeat: false,
+  //     displayTitle: true,
+  //     displayDesc: true
+  //   }
+  // };
 
   componentDidMount() {}
 
@@ -144,10 +153,14 @@ class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var { mediaId, playListItem, playlist } = nextProps;
+    var { mediaId, playListItem, playlist, controls } = nextProps;
 
     if (mediaId) {
       return mediaId !== this.props.mediaId;
+    }
+
+    if (controls !== this.props.controls) {
+      return true;
     }
 
     if (playListItem) {

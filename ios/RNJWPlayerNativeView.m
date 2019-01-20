@@ -8,6 +8,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 - (instancetype)init
 {
+    _player = [[JWPlayerController alloc] init];
+    
     if (self = [super init]) {
         [self addSubview:self.player.view];
     }
@@ -24,43 +26,46 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
 }
 
-- (JWPlayerController *)player {
-    if (!_player) {
-        JWConfig *config = [self setupConfig];
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.forceFullScreenOnLandscape = YES;
-        _player.forceLandscapeOnFullScreen = YES;
-    }
-    
-    return _player;
-}
+//- (JWPlayerController *)player {
+//    if (!_player) {
+//        JWConfig *config = [self setupConfig];
+//
+//        _proxy = [RNJWPlayerDelegateProxy new];
+//        _proxy.delegate = self;
+//
+//        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+//
+//        _player.forceFullScreenOnLandscape = YES;
+//        _player.forceLandscapeOnFullScreen = YES;
+//    }
+//
+//    return _player;
+//}
 
 -(JWConfig*)setupConfig
 {
     JWConfig *config = [JWConfig new];
-    //config.controls = _controls;
-    //config.repeat = _repeat;
+    
     //config.skin = JWPremiumSkinSeven;
-    //config.autostart = _autostart;
-    //config.mediaId = @"vSsMLwzp";
-    config.stretching = JWStretchingUniform;
     //config.preload = JWPreloadNone;
+    config.stretching = JWStretchingUniform;
+//    config.autostart = YES; // _autostart
+//    config.controls = YES; // _controls
+//    config.repeat = NO; // _repeat
+//    config.displayDescription = YES;
+//    config.displayTitle = YES;
     return config;
 }
 
 -(void)setFile:(NSString *)file
 {
-    if (file != nil && file.length > 0 && file != self.player.config.file) {
-        NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-                                NSUTF8StringEncoding];
-        
-        self.player.config.file = encodedUrl;
-        [self.player play];
+    if (file != nil && file.length > 0 && ![file isEqualToString:_player.config.file]) {
+//        NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
+//                                NSUTF8StringEncoding];
+        self.player.config.sources = @[[JWSource sourceWithFile:file
+                                                          label:@"Default Streaming" isDefault:YES]];
+        //self.player.config.file = encodedUrl;
+        //[self.player play];
     }
 }
 
@@ -71,7 +76,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setMediaId:(NSString *)mediaId
 {
-    if(mediaId != nil && mediaId.length > 0 && mediaId != self.player.config.mediaId) {
+    if(mediaId != nil && mediaId.length > 0 && ![mediaId isEqualToString:_player.config.mediaId]) {
         self.player.config.mediaId = mediaId;
     }
 }
@@ -83,7 +88,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setTitle:(NSString *)title
 {
-    self.player.config.title = title;
+    if(title != nil && title.length > 0 && ![title isEqualToString:_player.config.title]) {
+        self.player.config.title = title;
+    }
 }
 
 -(NSString *)title
@@ -93,7 +100,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setImage:(NSString *)image
 {
-    self.player.config.image = image;
+    if(image != nil && image.length > 0 && ![image isEqualToString:_player.config.image]) {
+        self.player.config.image = image;
+    }
 }
 
 -(NSString *)image
@@ -103,7 +112,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setDesc:(NSString *)desc
 {
-    self.player.config.desc = desc;
+    if(desc != nil && desc.length > 0 && ![desc isEqualToString:_player.config.desc]) {
+        self.player.config.desc = desc;
+    }
 }
 
 -(NSString *)desc
@@ -113,8 +124,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setAutostart:(BOOL)autostart
 {
-    self.player.config.autostart = autostart;
-    //[self.player play];
+    if(autostart != self.player.config.autostart) {
+        self.player.config.autostart = autostart;
+        //[self.player play];
+    }
 }
 
 -(BOOL)autostart
@@ -124,9 +137,11 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setControls:(BOOL)controls
 {
-    //self.player.config.controls = controls;
-    self.player.controls = controls;
-    //[self.player play];
+    if(controls != self.player.config.controls) {
+        //self.player.config.controls = controls;
+        self.player.controls = controls;
+        //[self.player play];
+    }
 }
 
 -(BOOL)controls
@@ -136,8 +151,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setRepeat:(BOOL)repeat
 {
-    self.player.config.repeat = repeat;
-    //[self.player play];
+    if(repeat != self.player.config.repeat) {
+        self.player.config.repeat = repeat;
+    }
 }
 
 -(BOOL)repeat
@@ -147,7 +163,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setDisplayDesc:(BOOL)displayDesc
 {
-    self.player.config.displayDescription = displayDesc;
+    if(displayDesc != self.player.config.displayDescription) {
+        self.player.config.displayDescription = displayDesc;
+    }
 }
 
 -(BOOL)displayDesc
@@ -157,7 +175,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setDisplayTitle:(BOOL)displayTitle
 {
-    self.player.config.displayTitle = displayTitle;
+    if(displayTitle != self.player.config.displayTitle) {
+        self.player.config.displayTitle = displayTitle;
+    }
 }
 
 -(BOOL)displayTitle
@@ -187,21 +207,75 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setPlayListItem:(NSDictionary *)playListItem
 {
-    self.player.config.file = [playListItem objectForKey:@"file"];
-    // check if is jw hosted content
-//    if (![((NSString *)[playListItem objectForKey:@"file"]) containsString:@"content.jwplatform.com/manifests/"]) {
-//        self.player.config.preload = JWPreloadNone;
-//    }
+    //NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
+    //NSUTF8StringEncoding];
+//    self.player.config.file = [playListItem objectForKey:@"file"];
+////    self.player.config.sources = @[[JWSource sourceWithFile:[playListItem objectForKey:@"file"]
+////                                                      label:@"Default Streaming" isDefault:YES]];
+//     // check if is jw hosted content
+////    if (![((NSString *)[playListItem objectForKey:@"file"]) containsString:@"content.jwplatform.com/manifests/"]) {
+////        self.player.config.preload = JWPreloadNone;
+////    }
+//
+//    self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
+//    self.player.config.title = [playListItem objectForKey:@"title"];
+//    self.player.config.desc = [playListItem objectForKey:@"desc"];
+//    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
+//    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
+//    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
+//    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
+//    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
+    //[self.player play];
     
-    self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
-    self.player.config.title = [playListItem objectForKey:@"title"];
-    self.player.config.desc = [playListItem objectForKey:@"desc"];
-    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
-    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
-    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
-    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
-    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
-    [self.player play];
+//    JWPlaylistItem *newItem = [[JWPlaylistItem alloc] init];
+//    newItem.file = [playListItem objectForKey:@"file"];
+//    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
+//    newItem.title = [playListItem objectForKey:@"title"];
+//    newItem.desc = [playListItem objectForKey:@"desc"];
+//    newItem.sources = @[[JWSource sourceWithFile:[playListItem objectForKey:@"file"]
+//                                           label:@"Default Streaming" isDefault:YES]];
+
+//    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
+//    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
+//    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
+//    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
+//    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
+    
+    //JWPlaylistItem *newItem = [[JWPlaylistItem alloc] init];
+//    newItem.file = [playListItem objectForKey:@"file"];
+//    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
+//    newItem.title = [playListItem objectForKey:@"title"];
+//    newItem.desc = [playListItem objectForKey:@"desc"];
+    
+    NSString *newFile = [playListItem objectForKey:@"file"];
+    if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString:_player.config.file]) {
+        JWConfig *config = [self setupConfig];
+        config.file = newFile;
+        config.mediaId = [playListItem objectForKey:@"mediaId"];
+        config.title = [playListItem objectForKey:@"title"];
+        config.desc = [playListItem objectForKey:@"desc"];
+        config.image = [playListItem objectForKey:@"image"];
+        
+        config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
+        config.controls = [[playListItem objectForKey:@"controls"] boolValue];
+        config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
+        config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
+        config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
+        
+        _proxy = [RNJWPlayerDelegateProxy new];
+        _proxy.delegate = self;
+        
+        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+        
+        _player.controls = [[playListItem objectForKey:@"controls"] boolValue];
+        
+        _player.forceFullScreenOnLandscape = YES;
+        _player.forceLandscapeOnFullScreen = YES;
+        
+        [self addSubview:self.player.view];
+        
+        //    [self.player.config.playlist arrayByAddingObjectsFromArray:@[newItem]];
+    }
 }
 
 -(NSDictionary *)playListItem
@@ -239,8 +313,12 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         autostart = self.player.config.autostart;
     }
     
-    if (self.player.config.controls) {
-        controls = self.player.config.controls;
+//    if (self.player.config.controls) {
+//        controls = self.player.config.controls;
+//    }
+
+    if (self.player.controls) {
+        controls = self.player.controls;
     }
     
     if (self.player.config.repeat) {
@@ -289,7 +367,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         [playlistArray addObject:playListItem];
     }
     
-    self.player.config.playlist = playlistArray;
+    [self.player.config.playlist arrayByAddingObjectsFromArray:playlistArray];
     [self.player play];
 }
 
