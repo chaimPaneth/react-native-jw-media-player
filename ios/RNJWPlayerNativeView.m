@@ -137,8 +137,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setControls:(BOOL)controls
 {
-    if(controls != self.player.config.controls) {
-        //self.player.config.controls = controls;
+    if(controls != self.player.controls) {
+        self.player.config.controls = controls;
         self.player.controls = controls;
         //[self.player play];
     }
