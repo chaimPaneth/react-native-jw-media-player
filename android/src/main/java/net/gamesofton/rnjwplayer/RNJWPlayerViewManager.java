@@ -53,6 +53,10 @@ import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.fullscreen.MaximizingFullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +88,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   public static final int COMMAND_PLAY = 101;
   public static final int COMMAND_PAUSE = 102;
+  public static final int COMMAND_STOP = 103;
+  public static  String type="";
 
   /**
   * The application window
@@ -94,7 +100,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   private PlayerConfig mPlayerConfig;
   private ThemedReactContext mContext;
-  RNJWPlayerView mPlayerView = null;
+  public static RNJWPlayerView mPlayerView = null;
   PlaylistItem mPlayListItem = null;
   List<PlaylistItem> mPlayList = null;
 
@@ -116,7 +122,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   ReadableArray playList; // List <PlaylistItem>
     private static final String TAG = "RNJWPlayerViewManager";
     private Handler mHandler;
-    AudioManager audioManager;
+    public static AudioManager audioManager;
 
 
   @Override
@@ -527,6 +533,17 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     event.putString("message", "onPlaylistItem");
     event.putInt("index",playlistItemEvent.getIndex());
     event.putString("playListItem",playlistItemEvent.getPlaylistItem().toJson().toString());
+    Log.i("playListItem", playlistItemEvent.getPlaylistItem().toJson().toString());
+    try {
+      JSONObject jObj = new JSONObject(playlistItemEvent.getPlaylistItem().toJson().toString());
+      JSONArray array = jObj.getJSONArray("sources");
+      jObj = new JSONObject(String.valueOf(array.get(0)));
+      type = jObj.getString("type");
+      Log.e(TAG, "onPlaylistItem: TYPE : " + type);
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     ReactContext reactContext = (ReactContext) mContext;
     reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             mPlayerView.getId(),
@@ -720,10 +737,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   public static <K, V> Map<K, V> CreateMap(
-          K k1, V v1, K k2, V v2) {
+          K k1, V v1, K k2, V v2, K k3, V v3) {
     Map map = new HashMap<K, V>();
     map.put(k1, v1);
     map.put(k2, v2);
+    map.put(k3, v3);
     return map;
   }
 
@@ -732,7 +750,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public Map<String, Integer> getCommandsMap() {
     return MapBuilder.of(
             "play", COMMAND_PLAY,
-            "pause", COMMAND_PAUSE
+            "pause", COMMAND_PAUSE,
+            "stop", COMMAND_STOP
     );
   }
 
@@ -747,6 +766,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       case COMMAND_PAUSE:
         pause(root);
         break;
+      case COMMAND_STOP:
+        stop(root);
+        break;
       default:
         //do nothing!!!!
     }
@@ -758,6 +780,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   public void pause(RNJWPlayerView root) {
     root.pause();
+  }
+
+  public void stop(RNJWPlayerView root) {
+    root.stop();
   }
 
     @Override
