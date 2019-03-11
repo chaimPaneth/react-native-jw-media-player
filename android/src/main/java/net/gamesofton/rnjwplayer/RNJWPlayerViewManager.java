@@ -4,11 +4,6 @@ package net.gamesofton.rnjwplayer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.media.AudioManager;
-import android.os.Handler;
-import android.media.AudioManager;
-import android.os.Handler;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -48,9 +43,7 @@ import com.longtailvideo.jwplayer.events.SetupErrorEvent;
 import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
-import com.longtailvideo.jwplayer.fullscreen.DefaultFullscreenHandler;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
-import com.longtailvideo.jwplayer.fullscreen.MaximizingFullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import org.json.JSONArray;
@@ -412,11 +405,25 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           mediaId = playListItem.getString("mediaId");
         }
 
-        mPlayerView.getConfig().setAutostart(autostart);
-
-        //buildPlaylistItem();
+        buildPlaylistItem();
 
         mPlayerView.play();
+
+//        PlayerConfig playerConfig = new PlayerConfig.Builder()
+//                .file(file)
+//                .image(image)
+//                .autostart(autostart)
+//                .displayTitle(displayTitle)
+//                .displayDescription(displayDesc)
+//                .controls(controls)
+//                .repeat(repeat)
+//                .build();
+//
+//        //buildPlaylistItem();
+//
+//        mPlayerView = (RNJWPlayerView) new JWPlayerView(this.mContext, playerConfig);
+//
+//        mPlayerView.play();
       }
     }
   }
