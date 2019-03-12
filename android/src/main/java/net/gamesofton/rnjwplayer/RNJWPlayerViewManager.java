@@ -4,6 +4,7 @@ package net.gamesofton.rnjwplayer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -24,6 +25,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
+import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.events.AudioTrackChangedEvent;
 import com.longtailvideo.jwplayer.events.AudioTracksEvent;
 import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
@@ -135,16 +137,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       mWindow = mActivity.getWindow();
     }
 
-//    SkinConfig skinConfig = new SkinConfig.Builder()
-//            .name("ethan")
-//            .url("https://ssl.p.jwpcdn.com/iOS/Skins/ethan.css")
-//            .build();
+        SkinConfig skinConfig = new SkinConfig.Builder()
+                .name("ethan")
+                .url("https://ssl.p.jwpcdn.com/iOS/Skins/ethan.css")
+                .build();
 
     mPlayerConfig = new PlayerConfig.Builder()
             .autostart(true)
-            //.skinConfig(skinConfig)
+                .skinConfig(new SkinConfig.Builder().build())
                 .stretching(STRETCHING_UNIFORM)
             .build();
+
+        mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
+        mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
+        mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
         audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
