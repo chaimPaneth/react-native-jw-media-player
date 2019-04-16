@@ -33,6 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
@@ -47,6 +48,7 @@ RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(playListItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playList, NSArray);
+RCT_EXPORT_VIEW_PROPERTY(time, NSString);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
@@ -57,7 +59,7 @@ RCT_REMAP_METHOD(state,
         RNJWPlayerNativeView *view = viewRegistry[reactTag];
         if (![view isKindOfClass:[RNJWPlayerNativeView class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
-            
+
             NSError *error = [[NSError alloc] init];
             reject(@"no_player", @"There is no player", error);
         } else {
