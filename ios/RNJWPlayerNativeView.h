@@ -37,6 +37,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenRequested;
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExit;
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExitRequested;
+@property(nonatomic, copy)RCTBubblingEventBlock onSeek;
 
 -(void)onRNJWPlayerBeforePlay;
 -(void)onRNJWPlayerPlay;
@@ -51,5 +52,6 @@
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
+- (void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
 
 @end

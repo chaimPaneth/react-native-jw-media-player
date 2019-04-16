@@ -4,6 +4,9 @@
 NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
 NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
+NSInteger seekTime;
+BOOL isFirst;
+
 @implementation RNJWPlayerNativeView
 
 - (instancetype)init
@@ -284,6 +287,20 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
         _player.controls = [[playListItem objectForKey:@"controls"] boolValue];
 
+        if([playListItem objectForKey:@"time"] != nil){
+            if([[playListItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+                NSLog(@"Time nil");
+            }
+            else{
+                NSLog(@"time: %d",[[playListItem objectForKey:@"time"] intValue]);
+                isFirst = true;
+                seekTime = [[playListItem objectForKey:@"time"] integerValue];
+            }
+        }
+        else{
+            NSLog(@"Time nil");
+        }
+
         _player.forceFullScreenOnLandscape = YES;
         _player.forceLandscapeOnFullScreen = YES;
 
@@ -396,6 +413,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)onRNJWPlayerBeforePlay
 {
     if (self.onBeforePlay) {
+        if(isFirst){
+            isFirst = false;
+            [self.player seek:seekTime];
+        }
         self.onBeforePlay(@{});
     }
 }
@@ -530,6 +551,15 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         self.onFullScreenExit(@{});
     }
 }
+
+-(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event
+{
+    if(self.onSeek){
+        self.onSeek(@{});
+    }
+}
+
+//-(void)onRN
 
 #pragma mark - RNJWPlayer Interruption handling
 
