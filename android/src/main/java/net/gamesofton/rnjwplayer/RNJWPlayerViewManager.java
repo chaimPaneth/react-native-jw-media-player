@@ -411,9 +411,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           mediaId = playListItem.getString("mediaId");
         }
 
+                if (playListItem.hasKey("time") && String.valueOf(playListItem.getInt("time")) != null) {
+                    Log.e(TAG, "setPlayListItem: Value of timer is not null");
+                    buildPlaylistItem();
+                    mPlayerView.seek(playListItem.getInt("time"));
+                }else{
+                    Log.e(TAG, "setPlayListItem: wow timer is not with time");
         buildPlaylistItem();
 
         mPlayerView.play();
+                }
+
+
+
 
 //        PlayerConfig playerConfig = new PlayerConfig.Builder()
 //                .file(file)
