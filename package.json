@@ -6,24 +6,27 @@
     ]
   ],
   "_from": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-  "_id": "react-native-jwplayer@git+https://github.com/chaimPaneth/react-native-jwplayer.git#cbb530b326bd7491a2204ba9dccd878e0d6fd4b6",
+  "_id": "react-native-jwplayer@0.1.0",
   "_inBundle": false,
   "_integrity": "",
   "_location": "/react-native-jwplayer",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
+    "raw": "react-native-jwplayer@git+https://github.com/chaimPaneth/react-native-jwplayer.git",
+    "name": "react-native-jwplayer",
+    "escapedName": "react-native-jwplayer",
     "rawSpec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
     "saveSpec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
     "fetchSpec": "https://github.com/chaimPaneth/react-native-jwplayer.git",
     "gitCommittish": null
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
-  "_resolved": "git+https://github.com/chaimPaneth/react-native-jwplayer.git#cbb530b326bd7491a2204ba9dccd878e0d6fd4b6",
-  "_spec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
+  "_resolved": "git+https://github.com/chaimPaneth/react-native-jwplayer.git#bc31cf00f12b07426a53100341237d7f9ddbbcb2",
+  "_spec": "react-native-jwplayer@git+https://github.com/chaimPaneth/react-native-jwplayer.git",
   "_where": "/Users/chaimpaneth/Projects/OUTorah-V2/OUTorah",
   "author": {
     "name": "NullEOF",

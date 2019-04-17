@@ -107,11 +107,27 @@ RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag) {
     }];
 }
 
-RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback)
+RCT_REMAP_METHOD(getPosition,
+                  tag:(nonnull NSNumber *)reactTag
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSString *savedValue = [[NSUserDefaults standardUserDefaults] stringForKey:@"PlayerTime"];
-    NSLog(@"save time : %@",savedValue);
-    callback(@[[NSNull null], savedValue]);
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            if (view.player) {
+                resolve([NSNumber numberWithInt:[view.player position]]);
+            } else {
+                NSError *error = [[NSError alloc] init];
+                reject(@"no_player", @"There is no player", error);
+            };
+        }
+    }];
 }
 
 
