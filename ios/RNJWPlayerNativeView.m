@@ -264,9 +264,9 @@ BOOL isFirst;
 //    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
 //    newItem.title = [playListItem objectForKey:@"title"];
 //    newItem.desc = [playListItem objectForKey:@"desc"];
-
+    
     NSString *newFile = [playListItem objectForKey:@"file"];
-    if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString:_player.config.file]) {
+    if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
         JWConfig *config = [self setupConfig];
         config.file = newFile;
         config.mediaId = [playListItem objectForKey:@"mediaId"];
@@ -287,26 +287,26 @@ BOOL isFirst;
 
         _player.controls = [[playListItem objectForKey:@"controls"] boolValue];
 
-        if([playListItem objectForKey:@"time"] != nil){
-            if([[playListItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-                NSLog(@"Time nil");
-            }
-            else{
-                NSLog(@"time: %d",[[playListItem objectForKey:@"time"] intValue]);
-                isFirst = true;
-                seekTime = [[playListItem objectForKey:@"time"] integerValue];
-            }
-        }
-        else{
-            NSLog(@"Time nil");
-        }
-
         _player.forceFullScreenOnLandscape = YES;
         _player.forceLandscapeOnFullScreen = YES;
 
         [self addSubview:self.player.view];
 
         //    [self.player.config.playlist arrayByAddingObjectsFromArray:@[newItem]];
+    }
+    
+    if([playListItem objectForKey:@"time"] != nil){
+        if([[playListItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+            NSLog(@"Time nil");
+        }
+        else{
+            NSLog(@"time: %d",[[playListItem objectForKey:@"time"] intValue]);
+            isFirst = true;
+            seekTime = [[playListItem objectForKey:@"time"] integerValue];
+        }
+    }
+    else{
+        NSLog(@"Time nil");
     }
 }
 
@@ -413,9 +413,9 @@ BOOL isFirst;
 -(void)onRNJWPlayerBeforePlay
 {
     if (self.onBeforePlay) {
-        if(isFirst){
+        if(isFirst && seekTime > 0){
             isFirst = false;
-            [self.player seek:seekTime];
+            [self.player seek: seekTime];
         }
         self.onBeforePlay(@{});
     }
@@ -506,7 +506,7 @@ BOOL isFirst;
     if (self.onTime) {
         NSLog(@"position: %@",@(event.position));
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
-        [[NSUserDefaults standardUserDefaults] setObject:@(event.position) forKey:@"PlayerTime"];
+//        [[NSUserDefaults standardUserDefaults] setObject:@(event.position) forKey:@"PlayerTime"];
     }
 }
 

@@ -139,6 +139,18 @@ class JWPlayer extends Component {
     );
   }
 
+  async getPosition() {
+    try {
+      var position = await RNJWPlayerManager.getPosition(
+        this.getRNJWPlayerBridgeHandle()
+      );
+      return position;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   async playerState() {
     try {
       var state = await RNJWPlayerManager.state(
@@ -156,7 +168,7 @@ class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var { mediaId, playListItem, playlist, controls } = nextProps;
+    var { mediaId, playListItem, playlist, controls, time } = nextProps;
 
     if (mediaId) {
       return mediaId !== this.props.mediaId;
@@ -166,8 +178,16 @@ class JWPlayer extends Component {
       return true;
     }
 
+    if (time !== this.props.time) {
+      return true;
+    }
+
     if (playListItem) {
       if (this.props.playListItem) {
+        if (playListItem.time !== this.props.playListItem.time) {
+          return true;
+        }
+
         return playListItem.mediaId !== this.props.playListItem.mediaId;
       } else {
         return true;
