@@ -504,7 +504,9 @@ BOOL isFirst;
 -(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event
 {
     if (self.onTime) {
+        NSLog(@"position: %@",@(event.position));
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
+        [[NSUserDefaults standardUserDefaults] setObject:@(event.position) forKey:@"PlayerTime"];
     }
 }
 

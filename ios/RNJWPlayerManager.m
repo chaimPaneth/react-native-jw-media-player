@@ -107,4 +107,13 @@ RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag) {
     }];
 }
 
+RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback)
+{
+    NSString *savedValue = [[NSUserDefaults standardUserDefaults] stringForKey:@"PlayerTime"];
+    NSLog(@"save time : %@",savedValue);
+    callback(@[[NSNull null], savedValue]);
+}
+
+
+
 @end
