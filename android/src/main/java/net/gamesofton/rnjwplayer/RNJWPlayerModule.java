@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.facebook.react.uimanager.*;
 
@@ -26,6 +27,21 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     return "RNJWPlayerModule";
   }
 
+  @ReactMethod
+  public void getPosition(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+          //RNJWPlayerViewManager playerViewManager = (RNJWPlayerViewManager) nvhm.resolveViewManager(reactTag);
+          promise.resolve((playerView.getPosition()));
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      promise.reject("RNJW Error", e);
+    }
+  }
   @ReactMethod
   public void state(final int reactTag, final Promise promise) {
     try {
