@@ -78,11 +78,11 @@ BOOL isFirst;
 -(void)setFile:(NSString *)file
 {
     if (file != nil && file.length > 0 && ![file isEqualToString:_player.config.file]) {
-//        NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-//                                NSUTF8StringEncoding];
-        self.player.config.sources = @[[JWSource sourceWithFile:file
-                                                          label:@"Default Streaming" isDefault:YES]];
-        //self.player.config.file = encodedUrl;
+       NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
+                                NSUTF8StringEncoding];
+       // self.player.config.sources = @[[JWSource sourceWithFile:file
+                                                          //label:@"Default Streaming" isDefault:YES]];
+        self.player.config.file = encodedUrl;
         //[self.player play];
     }
 }
@@ -264,11 +264,13 @@ BOOL isFirst;
 //    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
 //    newItem.title = [playListItem objectForKey:@"title"];
 //    newItem.desc = [playListItem objectForKey:@"desc"];
-    
+
     NSString *newFile = [playListItem objectForKey:@"file"];
     if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
         JWConfig *config = [self setupConfig];
-        config.file = newFile;
+        NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                                NSUTF8StringEncoding];
+        config.file = encodedUrl;
         config.mediaId = [playListItem objectForKey:@"mediaId"];
         config.title = [playListItem objectForKey:@"title"];
         config.desc = [playListItem objectForKey:@"desc"];
@@ -294,7 +296,7 @@ BOOL isFirst;
 
         //    [self.player.config.playlist arrayByAddingObjectsFromArray:@[newItem]];
     }
-    
+
     if([playListItem objectForKey:@"time"] != nil){
         if([[playListItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
             NSLog(@"Time nil");
