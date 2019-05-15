@@ -1,5 +1,6 @@
 #import "RNJWPlayerNativeView.h"
 #import "RNJWPlayerDelegateProxy.h"
+#import <AVFoundation/AVFoundation.h>
 
 NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
 NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
@@ -9,17 +10,26 @@ BOOL isFirst;
 
 @implementation RNJWPlayerNativeView
 
-- (instancetype)init
-{
-    _player = [[JWPlayerController alloc] init];
+//- (instancetype)init
+//{
+//    _player = [[JWPlayerController alloc] init];
+//
+//    if (self = [super init]) {
+//        [self addSubview:self.player.view];
+//    }
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
+//
+//    return self;
+//}
 
-    if (self = [super init]) {
-        [self addSubview:self.player.view];
+- (id)init {
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
     }
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
-
     return self;
 }
 
@@ -216,55 +226,29 @@ BOOL isFirst;
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    self.player.view.frame = self.frame;
+    
+    if (self.player != nil) {
+        self.player.view.frame = self.frame;
+    }
 }
 
 -(BOOL)shouldAutorotate {
     return NO;
 }
 
+-(void)addObserevers
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
+}
+
 -(void)setPlayListItem:(NSDictionary *)playListItem
 {
-    //NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-    //NSUTF8StringEncoding];
-//    self.player.config.file = [playListItem objectForKey:@"file"];
-////    self.player.config.sources = @[[JWSource sourceWithFile:[playListItem objectForKey:@"file"]
-////                                                      label:@"Default Streaming" isDefault:YES]];
-//     // check if is jw hosted content
-////    if (![((NSString *)[playListItem objectForKey:@"file"]) containsString:@"content.jwplatform.com/manifests/"]) {
-////        self.player.config.preload = JWPreloadNone;
-////    }
-//
-//    self.player.config.mediaId = [playListItem objectForKey:@"mediaId"];
-//    self.player.config.title = [playListItem objectForKey:@"title"];
-//    self.player.config.desc = [playListItem objectForKey:@"desc"];
-//    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
-//    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
-//    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
-//    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
-//    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
-    //[self.player play];
-
-//    JWPlaylistItem *newItem = [[JWPlaylistItem alloc] init];
-//    newItem.file = [playListItem objectForKey:@"file"];
-//    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
-//    newItem.title = [playListItem objectForKey:@"title"];
-//    newItem.desc = [playListItem objectForKey:@"desc"];
-//    newItem.sources = @[[JWSource sourceWithFile:[playListItem objectForKey:@"file"]
-//                                           label:@"Default Streaming" isDefault:YES]];
-
-//    self.player.config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
-//    self.player.config.controls = [[playListItem objectForKey:@"controls"] boolValue];
-//    self.player.config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
-//    self.player.config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
-//    self.player.config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
-
-    //JWPlaylistItem *newItem = [[JWPlaylistItem alloc] init];
-//    newItem.file = [playListItem objectForKey:@"file"];
-//    newItem.mediaId = [playListItem objectForKey:@"mediaId"];
-//    newItem.title = [playListItem objectForKey:@"title"];
-//    newItem.desc = [playListItem objectForKey:@"desc"];
-
+//    [self addObserevers];
+    
     NSString *newFile = [playListItem objectForKey:@"file"];
     if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
         JWConfig *config = [self setupConfig];
@@ -293,8 +277,6 @@ BOOL isFirst;
         _player.forceLandscapeOnFullScreen = YES;
 
         [self addSubview:self.player.view];
-
-        //    [self.player.config.playlist arrayByAddingObjectsFromArray:@[newItem]];
     }
 
     if([playListItem objectForKey:@"time"] != nil){

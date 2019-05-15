@@ -25,7 +25,7 @@
     "#USER",
     "/"
   ],
-  "_resolved": "git+https://github.com/chaimPaneth/react-native-jwplayer.git#bc31cf00f12b07426a53100341237d7f9ddbbcb2",
+  "_resolved": "git+https://github.com/chaimPaneth/react-native-jwplayer.git#02dea9d5b5b22ec78097c150125e67d85a63c6e8",
   "_spec": "react-native-jwplayer@git+https://github.com/chaimPaneth/react-native-jwplayer.git",
   "_where": "/Users/chaimpaneth/Projects/OUTorah-V2/OUTorah",
   "author": {
