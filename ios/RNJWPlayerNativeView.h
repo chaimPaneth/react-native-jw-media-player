@@ -8,7 +8,7 @@
 @interface RNJWPlayerNativeView : UIView
 
 @property(nonatomic, strong)JWPlayerController *player;
-@property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
+@property(nonatomic, weak)RNJWPlayerDelegateProxy *proxy;
 
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
