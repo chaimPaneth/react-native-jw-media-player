@@ -17,7 +17,11 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-    return [[RNJWPlayerNativeView alloc] init];
+    if (!_playerView) {
+        _playerView = [[RNJWPlayerNativeView alloc] init];
+    }
+    
+    return _playerView;
 }
 
 RCT_EXPORT_VIEW_PROPERTY(onBeforePlay, RCTBubblingEventBlock);

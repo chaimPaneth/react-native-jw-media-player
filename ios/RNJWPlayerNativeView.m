@@ -24,20 +24,20 @@ BOOL isFirst;
 //    return self;
 //}
 
-//- (id)init {
-//    self = [super init];
-//    if (self) {
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
-//    }
-//    return self;
-//}
-//
-//- (void)dealloc
-//{
-//    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
-//    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
-//}
+- (id)init {
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
+    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
+}
 
 //- (JWPlayerController *)player {
 //    if (!_player) {
@@ -247,7 +247,7 @@ BOOL isFirst;
 
 -(void)setPlayListItem:(NSDictionary *)playListItem
 {
-    [self addObserevers];
+//    [self addObserevers];
     
     NSString *newFile = [playListItem objectForKey:@"file"];
     if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
