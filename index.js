@@ -184,11 +184,13 @@ class JWPlayer extends Component {
 
     if (playListItem) {
       if (this.props.playListItem) {
-        if (playListItem.time !== this.props.playListItem.time) {
+        if (playListItem.mediaId !== this.props.playListItem.mediaId) {
           return true;
         }
 
-        return playListItem.mediaId !== this.props.playListItem.mediaId;
+        if (playListItem.time !== this.props.playListItem.time) {
+          return true;
+        }
       } else {
         return true;
       }

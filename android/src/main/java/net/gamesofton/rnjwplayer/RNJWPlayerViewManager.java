@@ -4,7 +4,6 @@ package net.gamesofton.rnjwplayer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -87,8 +86,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public static  String type="";
 
   /**
-  * The application window
-  */
+   * The application window
+   */
   Window mWindow;
 
   Activity mActivity;
@@ -96,7 +95,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   private PlayerConfig mPlayerConfig;
   private ThemedReactContext mContext;
   public static RNJWPlayerView mPlayerView = null;
-  PlaylistItem mPlayListItem = null;
+//  PlaylistItem mPlayListItem = null;
   List<PlaylistItem> mPlayList = null;
 
   //Props
@@ -105,6 +104,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   String title = "";
   String desc = "";
   String mediaId = "";
+//  String time = "";
 
   Boolean autostart = true;
   Boolean controls = true;
@@ -115,9 +115,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   ReadableMap playListItem; // PlaylistItem
   ReadableArray playList; // List <PlaylistItem>
-    private static final String TAG = "RNJWPlayerViewManager";
-    private Handler mHandler;
-    public static AudioManager audioManager;
+  private static final String TAG = "RNJWPlayerViewManager";
+  private Handler mHandler;
+  public static AudioManager audioManager;
 
 
   @Override
@@ -137,23 +137,18 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       mWindow = mActivity.getWindow();
     }
 
-        SkinConfig skinConfig = new SkinConfig.Builder()
-                .name("ethan")
-                .url("https://ssl.p.jwpcdn.com/iOS/Skins/ethan.css")
-                .build();
-
     mPlayerConfig = new PlayerConfig.Builder()
             .autostart(true)
-                .skinConfig(new SkinConfig.Builder().build())
-                .stretching(STRETCHING_UNIFORM)
+            .skinConfig(new SkinConfig.Builder().build())
+            .stretching(STRETCHING_UNIFORM)
             .build();
 
-        mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
-        mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
-        mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
+    mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
+    mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
+    mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
-        audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+    audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
     mPlayerView.addOnPlayListener(this);
     mPlayerView.addOnPauseListener(this);
     mPlayerView.addOnCompleteListener(this);
@@ -169,61 +164,61 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     //mPlayerView.addOnBeforeCompleteListener(this);
     mPlayerView.addOnControlsListener(this);
     mPlayerView.addOnFullscreenListener(this);
-        mPlayerView.setFullscreenHandler(new FullscreenHandler() {
-            @Override
-            public void onFullscreenRequested() {
-                WritableMap eventEnterFullscreen = Arguments.createMap();
-                eventEnterFullscreen.putString("message", "onFullscreen");
-                ReactContext reactContext = (ReactContext) mContext;
-                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                        mPlayerView.getId(),
-                        "topFullScreen",
-                        eventEnterFullscreen);
-            }
+    mPlayerView.setFullscreenHandler(new FullscreenHandler() {
+      @Override
+      public void onFullscreenRequested() {
+        WritableMap eventEnterFullscreen = Arguments.createMap();
+        eventEnterFullscreen.putString("message", "onFullscreen");
+        ReactContext reactContext = (ReactContext) mContext;
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                mPlayerView.getId(),
+                "topFullScreen",
+                eventEnterFullscreen);
+      }
 
-            @Override
-            public void onFullscreenExitRequested() {
-                WritableMap eventExitFullscreen = Arguments.createMap();
-                eventExitFullscreen.putString("message", "onFullscreenExit");
-                ReactContext reactContext = (ReactContext) mContext;
-                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                        mPlayerView.getId(),
-                        "topFullScreenExit",
-                        eventExitFullscreen);
-            }
+      @Override
+      public void onFullscreenExitRequested() {
+        WritableMap eventExitFullscreen = Arguments.createMap();
+        eventExitFullscreen.putString("message", "onFullscreenExit");
+        ReactContext reactContext = (ReactContext) mContext;
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                mPlayerView.getId(),
+                "topFullScreenExit",
+                eventExitFullscreen);
+      }
 
-            @Override
-            public void onResume() {
+      @Override
+      public void onResume() {
 
-            }
+      }
 
-            @Override
-            public void onPause() {
+      @Override
+      public void onPause() {
 
-            }
+      }
 
-            @Override
-            public void onDestroy() {
+      @Override
+      public void onDestroy() {
 
-            }
+      }
 
-            @Override
-            public void onAllowRotationChanged(boolean b) {
-                Log.e(TAG, "onAllowRotationChanged: "+b );
-            }
+      @Override
+      public void onAllowRotationChanged(boolean b) {
+        Log.e(TAG, "onAllowRotationChanged: "+b );
+      }
 
-            @Override
-            public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+      @Override
+      public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
 
-            }
+      }
 
-            @Override
-            public void setUseFullscreenLayoutFlags(boolean b) {
+      @Override
+      public void setUseFullscreenLayoutFlags(boolean b) {
 
-            }
-        });
+      }
+    });
 
     return mPlayerView;
   }
@@ -241,30 +236,35 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   private void buildPlaylistItem() {
     //mPlayerView.stop();
 
-    mPlayListItem = new PlaylistItem();
+    PlaylistItem newPlayListItem = new PlaylistItem();
 
-    if (file != null && !file.isEmpty()) {
-      mPlayListItem.setFile(file);
-    }
+    if (file != null && !file.isEmpty() && (mPlayerView.getPlaylistItem() == null || !file.equals(mPlayerView.getPlaylistItem().getFile()))) {
+      newPlayListItem.setFile(file);
 
-    if (title != null && !title.isEmpty()) {
-      mPlayListItem.setTitle(title);
-    }
+      if (title != null && !title.isEmpty()) {
+        newPlayListItem.setTitle(title);
+      }
 
-    if (desc != null && !desc.isEmpty()) {
-      mPlayListItem.setDescription(desc);
-    }
+      if (desc != null && !desc.isEmpty()) {
+        newPlayListItem.setDescription(desc);
+      }
 
-    if (image != null && !image.isEmpty()) {
-      mPlayListItem.setImage(image);
-    }
+      if (image != null && !image.isEmpty()) {
+        newPlayListItem.setImage(image);
+      }
 
-    if (mediaId != null && !mediaId.isEmpty()) {
-      mPlayListItem.setMediaId(mediaId);
-    }
+      if (mediaId != null && !mediaId.isEmpty()) {
+        newPlayListItem.setMediaId(mediaId);
+      }
 
-    mPlayerView.load(mPlayListItem);
-    mPlayerView.play();
+      mPlayerView.load(newPlayListItem);
+//    if (time != null) {
+//      int seekTime = Integer.valueOf(time);
+//      if (seekTime > 0) {
+//        mPlayerView.seek(seekTime);
+//      }
+//    }
+      mPlayerView.play();
 
 //    mPlayerView.getConfig().setFile(file);
 //    mPlayerView.getConfig().setImage(image);
@@ -273,8 +273,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 //    mPlayerView.getConfig().setAutostart(autostart);
 //    mPlayerView.getConfig().setRepeat(repeat);
 //    mPlayerView.getConfig().setControls(controls);
+//      mPlayerView.setControls(controls);
 //    mPlayerView.getConfig().setDisplayTitle(displayTitle);
 //    mPlayerView.getConfig().setDisplayDescription(displayDesc);
+    }
   }
 
   @ReactProp(name = "file")
@@ -282,9 +284,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if (file!=prop) {
       file = prop;
 
-      buildPlaylistItem();
-
-      mPlayerView.play();
+//      buildPlaylistItem();
+//
+//      mPlayerView.play();
     }
   }
 
@@ -293,7 +295,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if (mediaId!=prop) {
       mediaId = prop;
 
-      buildPlaylistItem();
+//      buildPlaylistItem();
     }
   }
 
@@ -302,7 +304,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(image!=prop) {
       image = prop;
 
-      buildPlaylistItem();
+//      buildPlaylistItem();
     }
   }
 
@@ -311,7 +313,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(title!=prop) {
       title = prop;
 
-      buildPlaylistItem();
+//      buildPlaylistItem();
     }
   }
 
@@ -320,7 +322,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(desc!=prop) {
       desc = prop;
 
-      buildPlaylistItem();
+//      buildPlaylistItem();
     }
   }
 
@@ -360,7 +362,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       controls = prop;
 
       mPlayerView.getConfig().setControls(controls);
-      //buildPlaylistItem();
+      mPlayerView.setControls(controls);
     }
   }
 
@@ -373,6 +375,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       //buildPlaylistItem();
     }
   }
+
+//  @ReactProp(name = "time")
+//  public void setTime(View view, String prop) {
+//    if(time!=prop) {
+//      time = prop;
+//
+//      if (time != null) {
+//        int seekTime = Integer.valueOf(time);
+//        if (seekTime > 0) {
+//          mPlayerView.seek(seekTime);
+//        }
+//      }
+//    }
+//  }
 
   @ReactProp(name = "nextUpDisplay")
   public void setnextUpDisplay(View view, Boolean prop) {
@@ -391,55 +407,43 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
       if (playListItem != null) {
 
+        PlaylistItem newPlayListItem = new PlaylistItem();
+
         if (playListItem.hasKey("file")) {
-          file = playListItem.getString("file");
+          String newFile = playListItem.getString("file");
+
+          if (mPlayerView.getPlaylistItem() == null || !newFile.equals(mPlayerView.getPlaylistItem().getFile())) {
+            newPlayListItem.setFile(newFile);
+
+            if (playListItem.hasKey("title")) {
+              newPlayListItem.setTitle(playListItem.getString("title"));
+            }
+
+            if (playListItem.hasKey("desc")) {
+              newPlayListItem.setDescription(playListItem.getString("desc"));
+            }
+
+            if (playListItem.hasKey("image")) {
+              newPlayListItem.setImage(playListItem.getString("image"));
+            }
+
+            if (playListItem.hasKey("mediaId")) {
+              newPlayListItem.setMediaId(playListItem.getString("mediaId"));
+            }
+
+            mPlayerView.load(newPlayListItem);
+
+            if (playListItem.hasKey("time") && !playListItem.isNull("time") && Integer.valueOf(playListItem.getString("time")) > 0) {
+              int seekTime = Integer.valueOf(playListItem.getString("time"));
+              Log.e(TAG, "setPlayListItem: Value of timer is not null");
+              mPlayerView.seek(seekTime);
+              mPlayerView.play();
+            } else {
+              Log.e(TAG, "setPlayListItem: wow timer is not with time");
+              mPlayerView.play();
+            }
+          }
         }
-
-        if (playListItem.hasKey("title")) {
-          title = playListItem.getString("title");
-        }
-
-        if (playListItem.hasKey("desc")) {
-          desc = playListItem.getString("desc");
-        }
-
-        if (playListItem.hasKey("image")) {
-          image = playListItem.getString("image");
-        }
-
-        if (playListItem.hasKey("mediaId")) {
-          mediaId = playListItem.getString("mediaId");
-        }
-
-                if (playListItem.hasKey("time") && playListItem.getInt("time") > 0) {
-                    Log.e(TAG, "setPlayListItem: Value of timer is not null");
-                    buildPlaylistItem();
-                    mPlayerView.seek(playListItem.getInt("time"));
-                }else{
-                    Log.e(TAG, "setPlayListItem: wow timer is not with time");
-        buildPlaylistItem();
-
-        mPlayerView.play();
-                }
-
-
-
-
-//        PlayerConfig playerConfig = new PlayerConfig.Builder()
-//                .file(file)
-//                .image(image)
-//                .autostart(autostart)
-//                .displayTitle(displayTitle)
-//                .displayDescription(displayDesc)
-//                .controls(controls)
-//                .repeat(repeat)
-//                .build();
-//
-//        //buildPlaylistItem();
-//
-//        mPlayerView = (RNJWPlayerView) new JWPlayerView(this.mContext, playerConfig);
-//
-//        mPlayerView.play();
       }
     }
   }
@@ -480,7 +484,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
               mediaId = playListItem.getString("mediaId");
             }
 
-            mPlayListItem = new PlaylistItem.Builder()
+            PlaylistItem newPlayListItem = new PlaylistItem.Builder()
                     .file(file)
                     .title(title)
                     .description(desc)
@@ -488,7 +492,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     .mediaId(mediaId)
                     .build();
 
-            mPlayList.add(mPlayListItem);
+            mPlayList.add(newPlayListItem);
 //            buildPlaylistItem();
 //            mPlayerView.play();
           }
@@ -499,6 +503,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         mPlayerView.getConfig().setAutostart(autostart);
         mPlayerView.getConfig().setRepeat(repeat);
         mPlayerView.getConfig().setControls(controls);
+        mPlayerView.setControls(controls);
         mPlayerView.getConfig().setDisplayTitle(displayTitle);
         mPlayerView.getConfig().setDisplayDescription(displayDesc);
         mPlayerView.getConfig().setNextUpDisplay(nextUpDisplay);
@@ -512,10 +517,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   private Runnable mDelayedStopRunnable = new Runnable() {
-      @Override
-      public void run() {
-          mPlayerView.stop();
-      }
+    @Override
+    public void run() {
+      mPlayerView.stop();
+    }
   };
 
   @Override
@@ -595,17 +600,17 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onPlay(PlayEvent playEvent) {
-        int result = 0;
-        if (audioManager != null) {
-            result = audioManager.requestAudioFocus(this,
-                    // Use the music stream.
-                    AudioManager.STREAM_MUSIC,
-                    // Request permanent focus.
-                    AudioManager.AUDIOFOCUS_GAIN);
-        }
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.e(TAG, "onBeforePlay: " + result);
-        }
+    int result = 0;
+    if (audioManager != null) {
+      result = audioManager.requestAudioFocus(this,
+              // Use the music stream.
+              AudioManager.STREAM_MUSIC,
+              // Request permanent focus.
+              AudioManager.AUDIOFOCUS_GAIN);
+    }
+    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+      Log.e(TAG, "onBeforePlay: " + result);
+    }
 
 
     WritableMap event = Arguments.createMap();
@@ -809,20 +814,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     root.stop();
   }
 
-    @Override
-    public void onAudioFocusChange(int i) {
-        mHandler = new Handler();
-        if (i == AudioManager.AUDIOFOCUS_LOSS) {
-            mPlayerView.pause();
-            mHandler.postDelayed(mDelayedStopRunnable,
-                    TimeUnit.SECONDS.toMillis(30));
-        } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-            mPlayerView.pause();
-        } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+  @Override
+  public void onAudioFocusChange(int i) {
+    mHandler = new Handler();
+    if (i == AudioManager.AUDIOFOCUS_LOSS) {
+      mPlayerView.pause();
+      mHandler.postDelayed(mDelayedStopRunnable,
+              TimeUnit.SECONDS.toMillis(30));
+    } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+      mPlayerView.pause();
+    } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
 // Lower the volume, keep playing
 
-        } else if (i == AudioManager.AUDIOFOCUS_GAIN) {
-            mPlayerView.play();
-        }
+    } else if (i == AudioManager.AUDIOFOCUS_GAIN) {
+      mPlayerView.play();
     }
+  }
 }
