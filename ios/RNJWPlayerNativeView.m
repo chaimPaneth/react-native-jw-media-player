@@ -1,5 +1,6 @@
 #import "RNJWPlayerNativeView.h"
 #import "RNJWPlayerDelegateProxy.h"
+#import "CustomJWPlaylistItem.h"
 #import <AVFoundation/AVFoundation.h>
 
 NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
@@ -245,33 +246,33 @@ BOOL isFirst;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
 }
 
--(void)setPlayListItem:(NSDictionary *)playListItem
+-(void)setPlaylistItem:(NSDictionary *)playlistItem
 {
 //    [self addObserevers];
     
-    NSString *newFile = [playListItem objectForKey:@"file"];
+    NSString *newFile = [playlistItem objectForKey:@"file"];
     if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
         JWConfig *config = [self setupConfig];
         NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
         config.file = encodedUrl;
-        config.mediaId = [playListItem objectForKey:@"mediaId"];
-        config.title = [playListItem objectForKey:@"title"];
-        config.desc = [playListItem objectForKey:@"desc"];
-        config.image = [playListItem objectForKey:@"image"];
+        config.mediaId = [playlistItem objectForKey:@"mediaId"];
+        config.title = [playlistItem objectForKey:@"title"];
+        config.desc = [playlistItem objectForKey:@"desc"];
+        config.image = [playlistItem objectForKey:@"image"];
 
-        config.autostart = [[playListItem objectForKey:@"autostart"] boolValue];
-        config.controls = [[playListItem objectForKey:@"controls"] boolValue];
-        config.repeat = [[playListItem objectForKey:@"repeat"] boolValue];
-        config.displayDescription = [[playListItem objectForKey:@"displayDesc"] boolValue];
-        config.displayTitle = [[playListItem objectForKey:@"displayTitle"] boolValue];
+        config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
+        config.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+        config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
+        config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
+        config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
 
         _proxy = [RNJWPlayerDelegateProxy new];
         _proxy.delegate = self;
 
         _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
 
-        _player.controls = [[playListItem objectForKey:@"controls"] boolValue];
+        _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
 
         _player.forceFullScreenOnLandscape = YES;
         _player.forceLandscapeOnFullScreen = YES;
@@ -279,14 +280,14 @@ BOOL isFirst;
         [self addSubview:self.player.view];
     }
 
-    if([playListItem objectForKey:@"time"] != nil){
-        if([[playListItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+    if([playlistItem objectForKey:@"time"] != nil){
+        if([[playlistItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
             NSLog(@"Time nil");
         }
         else{
-            NSLog(@"time: %d",[[playListItem objectForKey:@"time"] intValue]);
+            NSLog(@"time: %d",[[playlistItem objectForKey:@"time"] intValue]);
             isFirst = true;
-            seekTime = [[playListItem objectForKey:@"time"] integerValue];
+            seekTime = [[playlistItem objectForKey:@"time"] integerValue];
         }
     }
     else{
@@ -294,7 +295,7 @@ BOOL isFirst;
     }
 }
 
--(NSDictionary *)playListItem
+-(NSDictionary *)playlistItem
 {
     NSString *file = @"";
     NSString *mediaId = @"";
@@ -369,22 +370,62 @@ BOOL isFirst;
     return playListItemDict;
 }
 
--(void)setPlayList:(NSArray *)playList
+-(void)setPlaylist:(NSArray *)playlist
 {
-    NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
-    for (id item in playList) {
-        JWPlaylistItem *playListItem = [JWPlaylistItem new];
-        playListItem.file = [item objectForKey:@"file"];
-        playListItem.image = [item objectForKey:@"image"];
-        playListItem.title = [item objectForKey:@"title"];
-        playListItem.desc = [item objectForKey:@"desc"];
-        playListItem.mediaId = [item objectForKey:@"mediaId"];
-
-        [playlistArray addObject:playListItem];
+    if (playlist != nil && playlist.count > 0) {
+        NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
+        for (id item in playlist) {
+            JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
+            NSString *newFile = [item objectForKey:@"file"];
+            NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                                    NSUTF8StringEncoding];
+            playListItem.file = encodedUrl;
+            playListItem.image = [item objectForKey:@"image"];
+            playListItem.title = [item objectForKey:@"title"];
+            playListItem.desc = [item objectForKey:@"desc"];
+            playListItem.mediaId = [item objectForKey:@"mediaId"];
+            
+//            if([item objectForKey:@"time"] != nil){
+//                if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+//                    NSLog(@"Time nil");
+//                }
+//                else{
+//                    NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
+//                    playListItem.seekTime = [[item objectForKey:@"time"] integerValue];
+//                }
+//            }
+//            else{
+//                NSLog(@"Time nil");
+//            }
+            
+            [playlistArray addObject:playListItem];
+        }
+        
+        JWConfig *config = [self setupConfig];
+        
+        config.autostart = YES;
+        config.controls = YES;
+        config.repeat = NO;
+        config.displayDescription = YES;
+        config.displayTitle = YES;
+        
+        config.playlist = playlistArray;
+        
+//        [config.playlist arrayByAddingObjectsFromArray:playlistArray];
+        
+        _proxy = [RNJWPlayerDelegateProxy new];
+        _proxy.delegate = self;
+        
+        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+        
+        _player.controls = YES;
+        
+        _player.forceFullScreenOnLandscape = YES;
+        _player.forceLandscapeOnFullScreen = YES;
+        
+        [self addSubview:self.player.view];
+//        [self.player play];
     }
-
-    [self.player.config.playlist arrayByAddingObjectsFromArray:playlistArray];
-    [self.player play];
 }
 
 -(NSArray *)playList
@@ -442,6 +483,7 @@ BOOL isFirst;
         NSString *mediaId = @"";
         NSString *title = @"";
         NSString *desc = @"";
+        NSNumber *index;
 
         if (event.item.file != nil) {
             file = event.item.file;
@@ -458,16 +500,19 @@ BOOL isFirst;
         if (event.item.desc != nil) {
             desc = event.item.desc;
         }
+        
+        index = [NSNumber numberWithInteger: event.index];
 
         NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
         [playListItemDict setObject:file forKey:@"file"];
         [playListItemDict setObject:mediaId forKey:@"mediaId"];
         [playListItemDict setObject:title forKey:@"title"];
         [playListItemDict setObject:desc forKey:@"desc"];
+        [playListItemDict setObject:index forKey:@"index"];
 
         NSData *data = [NSJSONSerialization dataWithJSONObject:playListItemDict options:NSJSONWritingPrettyPrinted error: &error];
 
-        self.onPlaylistItem(@{@"playListItem": [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]});
+        self.onPlaylistItem(@{@"playlistItem": [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]});
     }
 }
 

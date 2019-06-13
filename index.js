@@ -54,7 +54,7 @@ class JWPlayer extends Component {
     displayDesc: PropTypes.bool,
     nextUpDisplay: PropTypes.bool,
     time: PropTypes.number,
-    playListItem: PropTypes.shape({
+    playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
       title: PropTypes.string,
@@ -67,7 +67,7 @@ class JWPlayer extends Component {
       displayTitle: PropTypes.bool,
       displayDesc: PropTypes.bool
     }),
-    playList: PropTypes.arrayOf(
+    playlist: PropTypes.arrayOf(
       PropTypes.shape({
         file: PropTypes.string.isRequired,
         image: PropTypes.string,
@@ -104,7 +104,7 @@ class JWPlayer extends Component {
   //   repeat: false,
   //   displayTitle: true,
   //   displayDesc: true,
-  //   playListItem: {
+  //   playlistItem: {
   //     autostart: true,
   //     controls: true,
   //     repeat: false,
@@ -168,7 +168,15 @@ class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var { mediaId, playListItem, playlist, controls, time } = nextProps;
+    var { mediaId, playlistItem, playlist, controls, time } = nextProps;
+
+    if (playlist) {
+      if (this.props.playlist) {
+        return controls !== this.props.controls || !this.arraysAreEqual(playlist, this.props.playlist);
+      } else {
+        return true;
+      }
+    }
 
     if (mediaId) {
       return mediaId !== this.props.mediaId;
@@ -182,23 +190,15 @@ class JWPlayer extends Component {
       return true;
     }
 
-    if (playListItem) {
-      if (this.props.playListItem) {
-        if (playListItem.mediaId !== this.props.playListItem.mediaId) {
+    if (playlistItem) {
+      if (this.props.playlistItem) {
+        if (playlistItem.mediaId !== this.props.playlistItem.mediaId) {
           return true;
         }
 
-        if (playListItem.time !== this.props.playListItem.time) {
+        if (playlistItem.time !== this.props.playlistItem.time) {
           return true;
         }
-      } else {
-        return true;
-      }
-    }
-
-    if (playlist) {
-      if (this.props.playlist) {
-        return arraysAreEqual(playlist, this.props.playlist);
       } else {
         return true;
       }
