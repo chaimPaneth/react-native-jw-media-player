@@ -21,8 +21,8 @@
 @property(nonatomic, strong)NSString *image;
 @property(nonatomic, strong)NSString *desc;
 @property(nonatomic, strong)NSString *mediaId;
-@property(nonatomic, strong)NSDictionary *playListItem;
-@property(nonatomic, strong)NSArray *playList;
+@property(nonatomic, strong)NSDictionary *playlistItem;
+@property(nonatomic, strong)NSArray *playlist;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;

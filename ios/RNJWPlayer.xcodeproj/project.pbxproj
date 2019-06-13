@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A2CAD6122AFFAB000C52FD1 /* CustomJWPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A2CAD6022AFFAB000C52FD1 /* CustomJWPlaylistItem.m */; };
 		2A9166FF21064ECE00152DD3 /* JWPlayer_iOS_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */; };
 		3BC75FCC1E43B1DB0011FBAA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */; };
 		3BC75FCE1E43B2930011FBAA /* RNJWPlayerNativeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC75FCD1E43B2930011FBAA /* RNJWPlayerNativeView.m */; };
@@ -29,6 +30,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNJWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNJWPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A2CAD5F22AFFAB000C52FD1 /* CustomJWPlaylistItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomJWPlaylistItem.h; sourceTree = "<group>"; };
+		2A2CAD6022AFFAB000C52FD1 /* CustomJWPlaylistItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomJWPlaylistItem.m; sourceTree = "<group>"; };
 		2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWPlayer_iOS_SDK.framework; path = "../../../ios/Pods/JWPlayer-SDK/JWPlayer_iOS_SDK.framework"; sourceTree = "<group>"; };
 		3BC75FC91E43B1B90011FBAA /* RNJWPlayerNativeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNJWPlayerNativeView.h; sourceTree = "<group>"; };
 		3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -75,6 +78,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				2A2CAD5F22AFFAB000C52FD1 /* CustomJWPlaylistItem.h */,
+				2A2CAD6022AFFAB000C52FD1 /* CustomJWPlaylistItem.m */,
 				3BC75FD21E43B3740011FBAA /* RNJWPlayerDelegateProxy.m */,
 				3BC75FCF1E43B2F70011FBAA /* RNJWPlayerDelegateProxy.h */,
 				3BC75FCD1E43B2930011FBAA /* RNJWPlayerNativeView.m */,
@@ -125,6 +130,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
@@ -144,6 +150,7 @@
 			files = (
 				B3E7B58A1CC2AC0600A0062D /* RNJWPlayerManager.m in Sources */,
 				3BC75FCE1E43B2930011FBAA /* RNJWPlayerNativeView.m in Sources */,
+				2A2CAD6122AFFAB000C52FD1 /* CustomJWPlaylistItem.m in Sources */,
 				3BC75FD31E43B3740011FBAA /* RNJWPlayerDelegateProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
