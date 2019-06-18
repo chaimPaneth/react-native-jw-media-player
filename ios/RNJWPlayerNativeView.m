@@ -224,6 +224,18 @@ BOOL isFirst;
     return self.player.config.nextUpDisplay;
 }
 
+//-(void)setPlaylistId:(NSString *)playlistId
+//{
+//    if(playlistId != nil && playlistId.length > 0 && ![playlistId isEqualToString:_comparePlaylistId]) {
+//        _comparePlaylistId = playlistId;
+//    }
+//}
+//
+//-(NSString *)playlistId
+//{
+//    return _comparePlaylistId;
+//}
+
 -(void)layoutSubviews
 {
     [super layoutSubviews];
@@ -252,6 +264,7 @@ BOOL isFirst;
     
     NSString *newFile = [playlistItem objectForKey:@"file"];
     if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
+        [self reset];
         JWConfig *config = [self setupConfig];
         NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
@@ -370,9 +383,18 @@ BOOL isFirst;
     return playListItemDict;
 }
 
+-(void)reset
+{
+    _player = nil;
+    _proxy = nil;
+}
+
 -(void)setPlaylist:(NSArray *)playlist
 {
-    if (playlist != nil && playlist.count > 0) {
+    if (playlist != nil && playlist.count > 0 && _playlistId != nil && _playlistId.length > 0 && _playlistId != _comparePlaylistId) {
+        _comparePlaylistId = _playlistId;
+        
+        [self reset];
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem

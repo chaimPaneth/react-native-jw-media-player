@@ -67,6 +67,7 @@ class JWPlayer extends Component {
       displayTitle: PropTypes.bool,
       displayDesc: PropTypes.bool
     }),
+    playlistId: PropTypes.string,
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
         file: PropTypes.string.isRequired,

@@ -23,6 +23,8 @@
 @property(nonatomic, strong)NSString *mediaId;
 @property(nonatomic, strong)NSDictionary *playlistItem;
 @property(nonatomic, strong)NSArray *playlist;
+@property(nonatomic, strong)NSString *playlistId;
+@property(nonatomic, strong)NSString *comparePlaylistId;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
