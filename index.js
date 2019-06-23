@@ -169,11 +169,42 @@ class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var { mediaId, playlistItem, playlist, controls, time } = nextProps;
+    var {
+      mediaId,
+      playlistItem,
+      playlist,
+      controls,
+      time,
+      playlistId
+    } = nextProps;
 
     if (playlist) {
       if (this.props.playlist) {
-        return controls !== this.props.controls || !this.arraysAreEqual(playlist, this.props.playlist);
+        var shouldUpdate = false;
+        playlist.map((track, index) => {
+          var { time } = track;
+          if (
+            time &&
+            this.props.playlist.length > index &&
+            time !== this.props.playlist[index].time
+          ) {
+            shouldUpdate = true;
+          }
+        });
+
+        if (shouldUpdate) {
+          return true;
+        }
+
+        if (time !== this.props.time) {
+          return true;
+        }
+
+        return (
+          playlistId !== this.props.playlistId ||
+          controls !== this.props.controls ||
+          !this.arraysAreEqual(playlist, this.props.playlist)
+        );
       } else {
         return true;
       }
