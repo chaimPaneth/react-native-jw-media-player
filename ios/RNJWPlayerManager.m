@@ -53,7 +53,7 @@ RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(playlistId, NSString);
-RCT_EXPORT_VIEW_PROPERTY(time, NSString);
+RCT_EXPORT_VIEW_PROPERTY(time, NSNumber);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
