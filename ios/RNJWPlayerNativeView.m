@@ -460,23 +460,23 @@ NSInteger currentPlayingIndex;
         //        [self.player play];
     }
     
-    if (_playlist.count > currentPlayingIndex) {
-        id item = _playlist[currentPlayingIndex];
-        
-        if([item objectForKey:@"time"] != nil) {
-            if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-                NSLog(@"Time nil");
-            }
-            else{
-                NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
-                isFirst = true;
-                seekTime = [[item objectForKey:@"time"] integerValue];
-            }
-        }
-        else{
-            NSLog(@"Time nil");
-        }
-    }
+//    if (_playlist.count > currentPlayingIndex) {
+//        id item = _playlist[currentPlayingIndex];
+//
+//        if([item objectForKey:@"time"] != nil) {
+//            if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+//                NSLog(@"Time nil");
+//            }
+//            else{
+//                NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
+//                isFirst = true;
+//                seekTime = [[item objectForKey:@"time"] integerValue];
+//            }
+//        }
+//        else{
+//            NSLog(@"Time nil");
+//        }
+//    }
 }
 
 -(NSArray *)playList
@@ -552,23 +552,26 @@ NSInteger currentPlayingIndex;
             desc = event.item.desc;
         }
         
-//        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > currentPlayingIndex) {
-//            id item = _playlist[currentPlayingIndex];
-//
-//            if([item objectForKey:@"time"] != nil) {
-//                if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-//                    NSLog(@"Time nil");
-//                }
-//                else{
-//                    NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
-//                    isFirst = true;
-//                    seekTime = [[item objectForKey:@"time"] integerValue];
-//                }
-//            }
-//            else{
-//                NSLog(@"Time nil");
-//            }
-//        }
+        index = [NSNumber numberWithInteger: event.index];
+        currentPlayingIndex = event.index;
+        
+        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > currentPlayingIndex) {
+            id item = _playlist[currentPlayingIndex];
+
+            if([item objectForKey:@"time"] != nil) {
+                if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+                    NSLog(@"Time nil");
+                }
+                else{
+                    NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
+                    isFirst = true;
+                    seekTime = [[item objectForKey:@"time"] integerValue];
+                }
+            }
+            else{
+                NSLog(@"Time nil");
+            }
+        }
         
 //        if (_time != nil && _time > 0) {
 //            isFirst = YES;
@@ -594,9 +597,6 @@ NSInteger currentPlayingIndex;
 //                }
 //            }
 //        }
-        
-        index = [NSNumber numberWithInteger: event.index];
-        currentPlayingIndex = event.index;
         
         NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
         [playListItemDict setObject:file forKey:@"file"];
