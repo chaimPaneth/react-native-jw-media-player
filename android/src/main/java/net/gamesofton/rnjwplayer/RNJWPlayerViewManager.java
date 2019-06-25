@@ -104,7 +104,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   String title = "";
   String desc = "";
   String mediaId = "";
-//  String time = "";
+//  Number time;
 
   Boolean autostart = true;
   Boolean controls = true;
@@ -113,8 +113,12 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   Boolean displayDesc = false;
   Boolean nextUpDisplay = false;
 
-  ReadableMap playListItem; // PlaylistItem
-  ReadableArray playList; // List <PlaylistItem>
+  ReadableMap playlistItem; // PlaylistItem
+  ReadableArray playlist; // List <PlaylistItem>
+  String playlistId;
+  String comparePlaylistId;
+  Number currentPlayingIndex;
+
   private static final String TAG = "RNJWPlayerViewManager";
   private Handler mHandler;
   public static AudioManager audioManager;
@@ -400,41 +404,51 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
-  @ReactProp(name = "playListItem")
-  public void setPlayListItem(View view, ReadableMap prop) {
-    if(playListItem!=prop) {
-      playListItem = prop;
+  @ReactProp(name = "playlistId")
+  public void setplaylistId(View view, String prop) {
+    if (playlistId!=prop) {
+      playlistId = prop;
+    }
+  }
 
-      if (playListItem != null) {
+  @ReactProp(name = "playlistItem")
+  public void setPlaylistItem(View view, ReadableMap prop) {
+    if(playlistItem != prop) {
+      playlistItem = prop;
 
-        PlaylistItem newPlayListItem = new PlaylistItem();
-
-        if (playListItem.hasKey("file")) {
-          String newFile = playListItem.getString("file");
+      if (playlistItem != null) {
+        if (playlistItem.hasKey("file")) {
+          String newFile = playlistItem.getString("file");
 
           if (mPlayerView.getPlaylistItem() == null || !newFile.equals(mPlayerView.getPlaylistItem().getFile())) {
+//            mPlayerView.stop();
+
+            resetPlaylist();
+
+            PlaylistItem newPlayListItem = new PlaylistItem();
+
             newPlayListItem.setFile(newFile);
 
-            if (playListItem.hasKey("title")) {
-              newPlayListItem.setTitle(playListItem.getString("title"));
+            if (playlistItem.hasKey("title")) {
+              newPlayListItem.setTitle(playlistItem.getString("title"));
             }
 
-            if (playListItem.hasKey("desc")) {
-              newPlayListItem.setDescription(playListItem.getString("desc"));
+            if (playlistItem.hasKey("desc")) {
+              newPlayListItem.setDescription(playlistItem.getString("desc"));
             }
 
-            if (playListItem.hasKey("image")) {
-              newPlayListItem.setImage(playListItem.getString("image"));
+            if (playlistItem.hasKey("image")) {
+              newPlayListItem.setImage(playlistItem.getString("image"));
             }
 
-            if (playListItem.hasKey("mediaId")) {
-              newPlayListItem.setMediaId(playListItem.getString("mediaId"));
+            if (playlistItem.hasKey("mediaId")) {
+              newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
             }
 
             mPlayerView.load(newPlayListItem);
 
-            if (playListItem.hasKey("time") && !playListItem.isNull("time") && Integer.valueOf(playListItem.getString("time")) > 0) {
-              int seekTime = Integer.valueOf(playListItem.getString("time"));
+            if (playlistItem.hasKey("time") && !playlistItem.isNull("time") && playlistItem.getInt("time") > 0) {
+              int seekTime = playlistItem.getInt("time");
               Log.e(TAG, "setPlayListItem: Value of timer is not null");
               mPlayerView.seek(seekTime);
               mPlayerView.play();
@@ -448,40 +462,59 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
-  @ReactProp(name = "playList")
-  public void setPlayList(View view, ReadableArray prop) {
-    if(playList!=prop) {
-      playList = prop;
+  public void reset()
+  {
+    mPlayerView = null;
+    mPlayerConfig = null;
+  }
 
-      if (playList != null) {
-        mPlayerView.stop();
+  public void resetPlaylistItem()
+  {
+    playlistItem = null;
+  }
+
+  public void resetPlaylist()
+  {
+    playlist = null;
+    playlistId = null;
+    comparePlaylistId = null;
+  }
+
+  @ReactProp(name = "playlist")
+  public void setPlayList(View view, ReadableArray prop) {
+    if(playlist != prop) {
+      playlist = prop;
+
+      if (playlist != null && playlist.size() > 0 && playlistId != null && !playlistId.equals(comparePlaylistId)) {
+//        mPlayerView.stop();
+        comparePlaylistId = playlistId;
 
         mPlayList = new ArrayList<>();
 
         int j = 0;
-        while (playList.size() > j) {
-          playListItem = playList.getMap(j);
+        while (playlist.size() > j) {
+          playlistItem = playlist.getMap(j);
 
-          if (playListItem != null) {
+          if (playlistItem != null) {
 
-            if (playListItem.hasKey("file")) {
-              file = playListItem.getString("file");
+            if (playlistItem.hasKey("file")) {
+              file = playlistItem.getString("file");
             }
 
-            if (playListItem.hasKey("title")) {
-              title = playListItem.getString("title");
+            if (playlistItem.hasKey("title")) {
+              title = playlistItem.getString("title");
             }
 
-            if (playListItem.hasKey("desc")) {
-              desc = playListItem.getString("desc");
+            if (playlistItem.hasKey("desc")) {
+              desc = playlistItem.getString("desc");
             }
 
-            if (playListItem.hasKey("image")) {
-              image = playListItem.getString("image");
+            if (playlistItem.hasKey("image")) {
+              image = playlistItem.getString("image");
             }
 
-            if (playListItem.hasKey("mediaId")) {
-              mediaId = playListItem.getString("mediaId");
+            if (playlistItem.hasKey("mediaId")) {
+              mediaId = playlistItem.getString("mediaId");
             }
 
             PlaylistItem newPlayListItem = new PlaylistItem.Builder()
@@ -560,8 +593,21 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     WritableMap event = Arguments.createMap();
     event.putString("message", "onPlaylistItem");
     event.putInt("index",playlistItemEvent.getIndex());
-    event.putString("playListItem",playlistItemEvent.getPlaylistItem().toJson().toString());
-    Log.i("playListItem", playlistItemEvent.getPlaylistItem().toJson().toString());
+
+    currentPlayingIndex = playlistItemEvent.getIndex();
+
+    if (comparePlaylistId != null && playlist != null && playlist.size() > currentPlayingIndex.intValue()) {
+      ReadableMap item = playlist.getMap(currentPlayingIndex.intValue());
+
+      if (item.hasKey("time") && !item.isNull("time") && item.getInt("time") > 0) {
+        int seekTime = item.getInt("time");
+        Log.e(TAG, "setPlayListItem: Value of timer is not null");
+        mPlayerView.seek(seekTime);
+      }
+    }
+
+    event.putString("playlistItem",playlistItemEvent.getPlaylistItem().toJson().toString());
+    Log.i("playlistItem", playlistItemEvent.getPlaylistItem().toJson().toString());
     try {
       JSONObject jObj = new JSONObject(playlistItemEvent.getPlaylistItem().toJson().toString());
       JSONArray array = jObj.getJSONArray("sources");
