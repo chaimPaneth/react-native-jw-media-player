@@ -89,9 +89,9 @@ NSInteger currentPlayingIndex;
 
 -(void)setFile:(NSString *)file
 {
-    if (file != nil && file.length > 0 && ![file isEqualToString:_player.config.file]) {
-        NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-                                NSUTF8StringEncoding];
+    NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
+                            NSUTF8StringEncoding];
+    if (file != nil && file.length > 0 && ![encodedUrl isEqualToString:_player.config.file]) {
         // self.player.config.sources = @[[JWSource sourceWithFile:file
         //label:@"Default Streaming" isDefault:YES]];
         self.player.config.file = encodedUrl;
@@ -272,14 +272,16 @@ NSInteger currentPlayingIndex;
     //    [self addObserevers];
     
     NSString *newFile = [playlistItem objectForKey:@"file"];
-    if (newFile != nil && newFile.length > 0 && ![newFile isEqualToString: _player.config.file]) {
+    NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                            NSUTF8StringEncoding];
+    
+    if (newFile != nil && newFile.length > 0 && ![encodedUrl isEqualToString: _player.config.file]) {
         
         [self reset];
         [self resetPlaylist];
         
         JWConfig *config = [self setupConfig];
-        NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                                NSUTF8StringEncoding];
+        
         config.file = encodedUrl;
         config.mediaId = [playlistItem objectForKey:@"mediaId"];
         config.title = [playlistItem objectForKey:@"title"];
