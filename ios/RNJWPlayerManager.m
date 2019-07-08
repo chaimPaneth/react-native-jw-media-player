@@ -199,7 +199,7 @@ RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)index) {
     };
 }
 
-RCT_EXPORT_METHOD(setControls: (nonnull BOOL *)show) {
+RCT_EXPORT_METHOD(setControls: (BOOL *)show) {
     if (_playerView != nil && _playerView.player != nil) {
         _playerView.player.controls = show;
         _playerView.player.config.controls = show;
@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(setControls: (nonnull BOOL *)show) {
     };
 }
 
-RCT_EXPORT_METHOD(setPlaylistItem: (nonnull NSDictionary *)playlistItem) {
+RCT_EXPORT_METHOD(setPlaylistItem: (NSDictionary *)playlistItem) {
     if (_playerView != nil && _playerView.player != nil) {
         NSString *newFile = [playlistItem objectForKey:@"file"];
         NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
@@ -264,9 +264,52 @@ RCT_EXPORT_METHOD(setPlaylistItem: (nonnull NSDictionary *)playlistItem) {
     };
 }
 
-RCT_EXPORT_METHOD(setPlaylist: (nonnull NSArray *)playlist) {
+RCT_EXPORT_METHOD(setPlaylist: (NSArray *)playlist) {
     if (_playerView != nil && _playerView.player != nil) {
-       
+        _playerView.playlist = playlist;
+        if (playlist != nil && playlist.count > 0 && _playerView.playlistId != nil && _playerView.playlistId.length > 0 && _playerView.playlistId != _playerView.comparePlaylistId) {
+            _playerView.comparePlaylistId = _playerView.playlistId;
+            
+            [_playerView reset];
+            NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
+            for (id item in playlist) {
+                JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
+                NSString *newFile = [item objectForKey:@"file"];
+                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                                        NSUTF8StringEncoding];
+                playListItem.file = encodedUrl;
+                playListItem.image = [item objectForKey:@"image"];
+                playListItem.title = [item objectForKey:@"title"];
+                playListItem.desc = [item objectForKey:@"desc"];
+                playListItem.mediaId = [item objectForKey:@"mediaId"];
+                [playlistArray addObject:playListItem];
+            }
+            
+            JWConfig *config = [_playerView setupConfig];
+            
+            config.autostart = YES;
+            config.controls = YES;
+            config.repeat = NO;
+            config.displayDescription = YES;
+            config.displayTitle = YES;
+            
+            config.playlist = playlistArray;
+            
+            //        [config.playlist arrayByAddingObjectsFromArray:playlistArray];
+            
+            _playerView.proxy = [RNJWPlayerDelegateProxy new];
+            _playerView.proxy.delegate = _playerView;
+            
+            _playerView.player = [[JWPlayerController alloc] initWithConfig: config delegate: _playerView.proxy];
+            
+            _playerView.player.controls = YES;
+            
+            _playerView.player.forceFullScreenOnLandscape = YES;
+            _playerView.player.forceLandscapeOnFullScreen = YES;
+            
+            [_playerView addSubview: _playerView.player.view];
+            //        [self.player play];
+        }
     } else {
         RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
     };
