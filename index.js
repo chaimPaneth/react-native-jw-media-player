@@ -235,7 +235,7 @@ class JWPlayer extends Component {
 
         return (
           playlistId !== this.props.playlistId ||
-          controls !== this.props.controls ||
+          /*controls !== this.props.controls ||*/
           !this.arraysAreEqual(playlist, this.props.playlist)
         );
       } else {
@@ -247,9 +247,9 @@ class JWPlayer extends Component {
       return mediaId !== this.props.mediaId;
     }
 
-    if (controls !== this.props.controls) {
-      return true;
-    }
+    // if (controls !== this.props.controls) {
+    //   return true;
+    // }
 
     if (time !== this.props.time) {
       return true;
@@ -277,6 +277,7 @@ class JWPlayer extends Component {
   }
 
   render() {
+    console.log('reloading')
     return (
       <RNJWPlayer
         ref={RCT_RNJWPLAYER_REF}
