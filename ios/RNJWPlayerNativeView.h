@@ -10,6 +10,10 @@
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
 
+@property(readwrite, assign)NSInteger seekTime;
+@property(readwrite, assign)BOOL isFirst;
+@property(readwrite, assign)NSInteger currentPlayingIndex;
+
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
 @property(nonatomic)BOOL controls;
@@ -56,6 +60,11 @@
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
-- (void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
+-(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
+
+-(JWConfig*)setupConfig;
+-(void)resetPlaylistItem;
+-(void)resetPlaylist;
+-(void)reset;
 
 @end

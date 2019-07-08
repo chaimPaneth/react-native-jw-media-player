@@ -114,53 +114,86 @@ class JWPlayer extends Component {
   //   }
   // };
 
-  componentDidMount() {}
-
   pause() {
-    UIManager.dispatchViewManagerCommand(
-      this.getRNJWPlayerBridgeHandle(),
-      UIManager.RNJWPlayer.Commands.pause,
-      null
-    );
+    // UIManager.dispatchViewManagerCommand(
+    //   this.getRNJWPlayerBridgeHandle(),
+    //   UIManager.RNJWPlayer.Commands.pause,
+    //   null
+    // );
+
+    if (RNJWPlayerManager) RNJWPlayerManager.pause();
   }
 
   play() {
-    UIManager.dispatchViewManagerCommand(
-      this.getRNJWPlayerBridgeHandle(),
-      UIManager.RNJWPlayer.Commands.play,
-      null
-    );
+    // UIManager.dispatchViewManagerCommand(
+    //   this.getRNJWPlayerBridgeHandle(),
+    //   UIManager.RNJWPlayer.Commands.play,
+    //   null
+    // );
+
+    if (RNJWPlayerManager) RNJWPlayerManager.play();
   }
 
   stop() {
-    UIManager.dispatchViewManagerCommand(
-      this.getRNJWPlayerBridgeHandle(),
-      UIManager.RNJWPlayer.Commands.stop,
-      null
-    );
+    // UIManager.dispatchViewManagerCommand(
+    //   this.getRNJWPlayerBridgeHandle(),
+    //   UIManager.RNJWPlayer.Commands.stop,
+    //   null
+    // );
+
+    if (RNJWPlayerManager) RNJWPlayerManager.stop();
+  }
+
+  toggleSpeed() {
+    // UIManager.dispatchViewManagerCommand(
+    //   this.getRNJWPlayerBridgeHandle(),
+    //   UIManager.RNJWPlayer.Commands.toggleSpeed,
+    //   null
+    // );
+
+    if (RNJWPlayerManager) RNJWPlayerManager.toggleSpeed();
+  }
+
+  setPlaylistIndex(index) {
+    if (RNJWPlayerManager) RNJWPlayerManager.setPlaylistIndex(index);
+    // UIManager.dispatchViewManagerCommand(
+    //   this.getRNJWPlayerBridgeHandle(),
+    //   UIManager.RNJWPlayer.Commands.setPlayistIndex,
+    //   null
+    // );
+  }
+
+  setControls(show) {
+    if (RNJWPlayerManager) RNJWPlayerManager.setControls(show);
   }
 
   async getPosition() {
-    try {
-      var position = await RNJWPlayerManager.getPosition(
-        this.getRNJWPlayerBridgeHandle()
-      );
-      return position;
-    } catch (e) {
-      console.error(e);
-      return null;
+    if (RNJWPlayerManager) {
+      try {
+        var position = await RNJWPlayerManager
+          .getPosition
+          // this.getRNJWPlayerBridgeHandle()
+          ();
+        return position;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
     }
   }
 
   async playerState() {
-    try {
-      var state = await RNJWPlayerManager.state(
-        this.getRNJWPlayerBridgeHandle()
-      );
-      return state;
-    } catch (e) {
-      console.error(e);
-      return null;
+    if (RNJWPlayerManager) {
+      try {
+        var state = await RNJWPlayerManager
+          .state
+          // this.getRNJWPlayerBridgeHandle()
+          ();
+        return state;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
     }
   }
 

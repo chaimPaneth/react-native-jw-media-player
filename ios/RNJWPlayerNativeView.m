@@ -6,10 +6,6 @@
 NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
 NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
-NSInteger seekTime;
-BOOL isFirst;
-NSInteger currentPlayingIndex;
-
 @implementation RNJWPlayerNativeView
 
 //- (instancetype)init
@@ -60,6 +56,8 @@ NSInteger currentPlayingIndex;
 -(JWConfig*)setupConfig
 {
     JWConfig *config = [JWConfig new];
+    
+//    config.playbackRateControls = true;
     
 #define RGBA(r, g, b, a) [UIColor colorWithRed:r/255.0 green: g/255.0 blue:b/255.0 alpha:a]
     
@@ -313,8 +311,8 @@ NSInteger currentPlayingIndex;
         }
         else{
             NSLog(@"time: %d",[[playlistItem objectForKey:@"time"] intValue]);
-            isFirst = true;
-            seekTime = [[playlistItem objectForKey:@"time"] integerValue];
+            _isFirst = true;
+            _seekTime = [[playlistItem objectForKey:@"time"] integerValue];
         }
     }
     else{
@@ -491,9 +489,9 @@ NSInteger currentPlayingIndex;
 -(void)onRNJWPlayerBeforePlay
 {
     if (self.onBeforePlay) {
-        if(isFirst && seekTime > 0){
-            isFirst = false;
-            [self.player seek: seekTime];
+        if(_isFirst && _seekTime > 0){
+            _isFirst = false;
+            [self.player seek: _seekTime];
         }
         self.onBeforePlay(@{});
     }
@@ -555,10 +553,10 @@ NSInteger currentPlayingIndex;
         }
         
         index = [NSNumber numberWithInteger: event.index];
-        currentPlayingIndex = event.index;
+        _currentPlayingIndex = event.index;
         
-        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > currentPlayingIndex) {
-            id item = _playlist[currentPlayingIndex];
+        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > _currentPlayingIndex) {
+            id item = _playlist[_currentPlayingIndex];
 
             if([item objectForKey:@"time"] != nil) {
                 if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
@@ -566,8 +564,8 @@ NSInteger currentPlayingIndex;
                 }
                 else{
                     NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
-                    isFirst = true;
-                    seekTime = [[item objectForKey:@"time"] integerValue];
+                    _isFirst = true;
+                    _seekTime = [[item objectForKey:@"time"] integerValue];
                 }
             }
             else{
