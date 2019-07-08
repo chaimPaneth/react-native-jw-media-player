@@ -41,6 +41,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       promise.reject("RNJW Error", e);
     }
   }
+
   @ReactMethod
   public void state(final int reactTag, final Promise promise) {
     try {

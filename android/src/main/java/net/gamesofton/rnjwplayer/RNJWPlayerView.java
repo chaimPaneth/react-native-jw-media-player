@@ -37,9 +37,10 @@ public class RNJWPlayerView extends JWPlayerView {
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             this.setFullscreen(true,true);
-        }else if(newConfig.orientation==Configuration.ORIENTATION_PORTRAIT){
+        } else if (newConfig.orientation==Configuration.ORIENTATION_PORTRAIT) {
             this.setFullscreen(false,false);
         }
     }

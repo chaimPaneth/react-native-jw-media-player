@@ -83,6 +83,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   public static final int COMMAND_PLAY = 101;
   public static final int COMMAND_PAUSE = 102;
   public static final int COMMAND_STOP = 103;
+  public static final int COMMAND_TOGGLE_SPEED = 104;
   public static  String type="";
 
   /**
@@ -811,11 +812,12 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   public static <K, V> Map<K, V> CreateMap(
-          K k1, V v1, K k2, V v2, K k3, V v3) {
+          K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
     Map map = new HashMap<K, V>();
     map.put(k1, v1);
     map.put(k2, v2);
     map.put(k3, v3);
+    map.put(k4, v4);
     return map;
   }
 
@@ -825,7 +827,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     return MapBuilder.of(
             "play", COMMAND_PLAY,
             "pause", COMMAND_PAUSE,
-            "stop", COMMAND_STOP
+            "stop", COMMAND_STOP,
+            "toggleSpeed", COMMAND_TOGGLE_SPEED
     );
   }
 
@@ -843,6 +846,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       case COMMAND_STOP:
         stop(root);
         break;
+      case COMMAND_TOGGLE_SPEED:
+        toggleSpeed(root);
+        break;
       default:
         //do nothing!!!!
     }
@@ -858,6 +864,15 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   public void stop(RNJWPlayerView root) {
     root.stop();
+  }
+
+  public void toggleSpeed(RNJWPlayerView root) {
+    float rate = root.getPlaybackRate();
+    if (rate < 2) {
+      root.setPlaybackRate(rate += 0.5);
+    } else {
+      root.setPlaybackRate((float) 0.5);
+    }
   }
 
   @Override
