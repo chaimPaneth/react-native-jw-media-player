@@ -39,21 +39,21 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
 
-RCT_EXPORT_VIEW_PROPERTY(file, NSString);
-RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
-RCT_EXPORT_VIEW_PROPERTY(title, NSString);
-RCT_EXPORT_VIEW_PROPERTY(image, NSString);
-RCT_EXPORT_VIEW_PROPERTY(desc, NSString);
-RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(displayTitle, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
-RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
-RCT_EXPORT_VIEW_PROPERTY(playlistId, NSString);
-RCT_EXPORT_VIEW_PROPERTY(time, NSNumber);
+//RCT_EXPORT_VIEW_PROPERTY(file, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(title, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(image, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(desc, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(displayTitle, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
+//RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
+//RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
+//RCT_EXPORT_VIEW_PROPERTY(playlistId, NSString);
+//RCT_EXPORT_VIEW_PROPERTY(time, NSNumber);
 
 RCT_REMAP_METHOD(state,
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
@@ -199,7 +199,7 @@ RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)index) {
     };
 }
 
-RCT_EXPORT_METHOD(setControls: (BOOL *)show) {
+RCT_EXPORT_METHOD(setControls: (BOOL)show) {
     if (_playerView != nil && _playerView.player != nil) {
         _playerView.player.controls = show;
         _playerView.player.config.controls = show;
@@ -208,8 +208,8 @@ RCT_EXPORT_METHOD(setControls: (BOOL *)show) {
     };
 }
 
-RCT_EXPORT_METHOD(setPlaylistItem: (NSDictionary *)playlistItem) {
-    if (_playerView != nil && _playerView.player != nil) {
+RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
+    if (_playerView != nil && playlistItem) {
         NSString *newFile = [playlistItem objectForKey:@"file"];
         NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
@@ -217,7 +217,6 @@ RCT_EXPORT_METHOD(setPlaylistItem: (NSDictionary *)playlistItem) {
         if (newFile != nil && newFile.length > 0 && ![encodedUrl isEqualToString: _playerView.player.config.file]) {
             
             [_playerView reset];
-            [_playerView resetPlaylist];
             
             JWConfig *config = [_playerView setupConfig];
             
@@ -229,49 +228,36 @@ RCT_EXPORT_METHOD(setPlaylistItem: (NSDictionary *)playlistItem) {
             
             config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
             config.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-            config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
-            config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
-            config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
+//            config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
+//            config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
+//            config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
             
-            _playerView.proxy = [RNJWPlayerDelegateProxy new];
-            _playerView.proxy.delegate = _playerView;
-            
-            _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
-            
-            _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-            
-            _playerView.player.forceFullScreenOnLandscape = YES;
-            _playerView.player.forceLandscapeOnFullScreen = YES;
-            
-            [_playerView addSubview:_playerView.player.view];
-        }
-        
-        if([playlistItem objectForKey:@"time"] != nil){
-            if([[playlistItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-                NSLog(@"Time nil");
-            }
-            else{
-                NSLog(@"time: %d",[[playlistItem objectForKey:@"time"] intValue]);
-                _playerView.isFirst = true;
-                _playerView.seekTime = [[playlistItem objectForKey:@"time"] integerValue];
-            }
-        }
-        else{
-            NSLog(@"Time nil");
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                _playerView.proxy = [RNJWPlayerDelegateProxy new];
+                _playerView.proxy.delegate = _playerView;
+                
+                _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
+                
+                [_playerView addSubview:_playerView.player.view];
+                
+                _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+                
+                _playerView.player.forceFullScreenOnLandscape = YES;
+                _playerView.player.forceLandscapeOnFullScreen = YES;
+            });
         }
     } else {
         RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
     };
 }
 
-RCT_EXPORT_METHOD(setPlaylist: (NSArray *)playlist) {
-    if (_playerView != nil && _playerView.player != nil) {
-        _playerView.playlist = playlist;
-        if (playlist != nil && playlist.count > 0 && _playerView.playlistId != nil && _playerView.playlistId.length > 0 && _playerView.playlistId != _playerView.comparePlaylistId) {
-            _playerView.comparePlaylistId = _playerView.playlistId;
-            
+RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
+    if (_playerView != nil) {
+        if (playlist != nil && playlist.count > 0) {
             [_playerView reset];
+            
             NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
+            
             for (id item in playlist) {
                 JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
                 NSString *newFile = [item objectForKey:@"file"];
@@ -289,27 +275,34 @@ RCT_EXPORT_METHOD(setPlaylist: (NSArray *)playlist) {
             
             config.autostart = YES;
             config.controls = YES;
-            config.repeat = NO;
-            config.displayDescription = YES;
-            config.displayTitle = YES;
+//            config.repeat = NO;
+//            config.displayDescription = YES;
+//            config.displayTitle = YES;
             
             config.playlist = playlistArray;
             
-            //        [config.playlist arrayByAddingObjectsFromArray:playlistArray];
-            
-            _playerView.proxy = [RNJWPlayerDelegateProxy new];
-            _playerView.proxy.delegate = _playerView;
-            
-            _playerView.player = [[JWPlayerController alloc] initWithConfig: config delegate: _playerView.proxy];
-            
-            _playerView.player.controls = YES;
-            
-            _playerView.player.forceFullScreenOnLandscape = YES;
-            _playerView.player.forceLandscapeOnFullScreen = YES;
-            
-            [_playerView addSubview: _playerView.player.view];
-            //        [self.player play];
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                _playerView.proxy = [RNJWPlayerDelegateProxy new];
+                _playerView.proxy.delegate = _playerView;
+                
+                _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
+                
+                [_playerView addSubview:_playerView.player.view];
+                
+                _playerView.player.controls = YES;
+                
+                _playerView.player.forceFullScreenOnLandscape = YES;
+                _playerView.player.forceLandscapeOnFullScreen = YES;
+            });
         }
+    } else {
+        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
+    };
+}
+
+RCT_EXPORT_METHOD(seekTo: (nonnull NSNumber *)time) {
+    if (_playerView != nil && _playerView.player != nil) {
+        [_playerView.player seek:[time integerValue] ];
     } else {
         RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
     };

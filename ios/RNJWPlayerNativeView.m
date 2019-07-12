@@ -77,11 +77,12 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     timesliderStyling.rail = RGBA(255,255,255,1);
     skinStyling.timeslider = timesliderStyling;
     
-    //    config.autostart = YES; // _autostart
-    //    config.controls = YES; // _controls
-    //    config.repeat = NO; // _repeat
-    //    config.displayDescription = YES;
-    //    config.displayTitle = YES;
+//    config.autostart = YES;
+    config.controls = YES;
+    config.repeat = NO;
+    config.displayDescription = YES;
+    config.displayTitle = YES;
+    
     return config;
 }
 
@@ -276,7 +277,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     if (newFile != nil && newFile.length > 0 && ![encodedUrl isEqualToString: _player.config.file]) {
         
         [self reset];
-        [self resetPlaylist];
         
         JWConfig *config = [self setupConfig];
         
@@ -305,114 +305,114 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         [self addSubview:self.player.view];
     }
     
-    if([playlistItem objectForKey:@"time"] != nil){
-        if([[playlistItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-            NSLog(@"Time nil");
-        }
-        else{
-            NSLog(@"time: %d",[[playlistItem objectForKey:@"time"] intValue]);
-            _isFirst = true;
-            _seekTime = [[playlistItem objectForKey:@"time"] integerValue];
-        }
-    }
-    else{
-        NSLog(@"Time nil");
-    }
+//    if([playlistItem objectForKey:@"time"] != nil){
+//        if([[playlistItem objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+//            NSLog(@"Time nil");
+//        }
+//        else{
+//            NSLog(@"time: %d",[[playlistItem objectForKey:@"time"] intValue]);
+//            _isFirst = true;
+//            _seekTime = [[playlistItem objectForKey:@"time"] integerValue];
+//        }
+//    }
+//    else{
+//        NSLog(@"Time nil");
+//    }
 }
 
--(NSDictionary *)playlistItem
-{
-    NSString *file = @"";
-    NSString *mediaId = @"";
-    NSString *title = @"";
-    NSString *desc = @"";
-    BOOL autostart = true;
-    BOOL controls = true;
-    BOOL repeat = false;
-    BOOL displayDesc = false;
-    BOOL displayTitle = false;
-    //JWPreload preload = JWPreloadNone;
-    
-    
-    
-    if (self.player.config.file != nil) {
-        file = self.player.config.file;
-    }
-    
-    if (self.player.config.mediaId != nil) {
-        mediaId = self.player.config.mediaId;
-    }
-    
-    if (self.player.config.title != nil) {
-        title = self.player.config.title;
-    }
-    
-    if (self.player.config.desc != nil) {
-        desc = self.player.config.desc;
-    }
-    
-    if (self.player.config.autostart) {
-        autostart = self.player.config.autostart;
-    }
-    
-    //    if (self.player.config.controls) {
-    //        controls = self.player.config.controls;
-    //    }
-    
-    if (self.player.controls) {
-        controls = self.player.controls;
-    }
-    
-    if (self.player.config.repeat) {
-        repeat = self.player.config.repeat;
-    }
-    
-    if (self.player.config.displayDescription) {
-        displayDesc = self.player.config.displayDescription;
-    }
-    
-    if (self.player.config.displayTitle) {
-        displayTitle = self.player.config.displayTitle;
-    }
-    
-    //    if (self.player.config.preload) {
-    //        preload = self.player.config.preload;
-    //    }
-    
-    
-    NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
-    [playListItemDict setObject:file forKey:@"file"];
-    [playListItemDict setObject:mediaId forKey:@"mediaId"];
-    [playListItemDict setObject:title forKey:@"title"];
-    [playListItemDict setObject:desc forKey:@"desc"];
-    [playListItemDict setObject:[NSNumber numberWithBool:autostart]  forKey:@"autostart"];
-    [playListItemDict setObject:[NSNumber numberWithBool:controls]  forKey:@"controls"];
-    [playListItemDict setObject:[NSNumber numberWithBool:repeat]  forKey:@"repeat"];
-    [playListItemDict setObject:[NSNumber numberWithBool:displayDesc]  forKey:@"displayDesc"];
-    [playListItemDict setObject:[NSNumber numberWithBool:displayTitle]  forKey:@"displayTitle"];
-    //[playListItemDict setObject:[NSNumber numberWithInt:preload]  forKey:@"preload"];
-    
-    return playListItemDict;
-}
+//-(NSDictionary *)playlistItem
+//{
+//    NSString *file = @"";
+//    NSString *mediaId = @"";
+//    NSString *title = @"";
+//    NSString *desc = @"";
+//    BOOL autostart = true;
+//    BOOL controls = true;
+//    BOOL repeat = false;
+//    BOOL displayDesc = false;
+//    BOOL displayTitle = false;
+//    //JWPreload preload = JWPreloadNone;
+//
+//
+//
+//    if (self.player.config.file != nil) {
+//        file = self.player.config.file;
+//    }
+//
+//    if (self.player.config.mediaId != nil) {
+//        mediaId = self.player.config.mediaId;
+//    }
+//
+//    if (self.player.config.title != nil) {
+//        title = self.player.config.title;
+//    }
+//
+//    if (self.player.config.desc != nil) {
+//        desc = self.player.config.desc;
+//    }
+//
+//    if (self.player.config.autostart) {
+//        autostart = self.player.config.autostart;
+//    }
+//
+//    //    if (self.player.config.controls) {
+//    //        controls = self.player.config.controls;
+//    //    }
+//
+//    if (self.player.controls) {
+//        controls = self.player.controls;
+//    }
+//
+//    if (self.player.config.repeat) {
+//        repeat = self.player.config.repeat;
+//    }
+//
+//    if (self.player.config.displayDescription) {
+//        displayDesc = self.player.config.displayDescription;
+//    }
+//
+//    if (self.player.config.displayTitle) {
+//        displayTitle = self.player.config.displayTitle;
+//    }
+//
+//    //    if (self.player.config.preload) {
+//    //        preload = self.player.config.preload;
+//    //    }
+//
+//
+//    NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] initWithCapacity:3];
+//    [playListItemDict setObject:file forKey:@"file"];
+//    [playListItemDict setObject:mediaId forKey:@"mediaId"];
+//    [playListItemDict setObject:title forKey:@"title"];
+//    [playListItemDict setObject:desc forKey:@"desc"];
+//    [playListItemDict setObject:[NSNumber numberWithBool:autostart]  forKey:@"autostart"];
+//    [playListItemDict setObject:[NSNumber numberWithBool:controls]  forKey:@"controls"];
+//    [playListItemDict setObject:[NSNumber numberWithBool:repeat]  forKey:@"repeat"];
+//    [playListItemDict setObject:[NSNumber numberWithBool:displayDesc]  forKey:@"displayDesc"];
+//    [playListItemDict setObject:[NSNumber numberWithBool:displayTitle]  forKey:@"displayTitle"];
+//    //[playListItemDict setObject:[NSNumber numberWithInt:preload]  forKey:@"preload"];
+//
+//    return playListItemDict;
+//}
 
--(void)resetPlaylist
-{
-    _playlistId = nil;
-    _comparePlaylistId = nil;
-    _playlist = nil;
-}
+//-(void)resetPlaylist
+//{
+//    _playlistId = nil;
+//    _comparePlaylistId = nil;
+//    _playlist = nil;
+//}
 
--(void)resetPlaylistItem
-{
-    self.playlistItem = nil;
-}
+//-(void)resetPlaylistItem
+//{
+//    self.playlistItem = nil;
+//}
 
 -(void)reset
 {
     _player = nil;
     _proxy = nil;
 }
-
+/*
 -(void)setPlaylist:(NSArray *)playlist
 {
     _playlist = playlist;
@@ -478,7 +478,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 //        }
 //    }
 }
-
+*/
 -(NSArray *)playList
 {
     return self.player.config.playlist;
@@ -489,10 +489,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)onRNJWPlayerBeforePlay
 {
     if (self.onBeforePlay) {
-        if(_isFirst && _seekTime > 0){
-            _isFirst = false;
-            [self.player seek: _seekTime];
-        }
+//        if(_isFirst && _seekTime > 0){
+//            _isFirst = false;
+//            [self.player seek: _seekTime];
+//        }
         self.onBeforePlay(@{});
     }
 }
@@ -553,25 +553,25 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         }
         
         index = [NSNumber numberWithInteger: event.index];
-        _currentPlayingIndex = event.index;
-        
-        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > _currentPlayingIndex) {
-            id item = _playlist[_currentPlayingIndex];
-
-            if([item objectForKey:@"time"] != nil) {
-                if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
-                    NSLog(@"Time nil");
-                }
-                else{
-                    NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
-                    _isFirst = true;
-                    _seekTime = [[item objectForKey:@"time"] integerValue];
-                }
-            }
-            else{
-                NSLog(@"Time nil");
-            }
-        }
+//        _currentPlayingIndex = event.index;
+//
+//        if (_comparePlaylistId != nil && _playlist != nil && _playlist.count > _currentPlayingIndex) {
+//            id item = _playlist[_currentPlayingIndex];
+//
+//            if([item objectForKey:@"time"] != nil) {
+//                if([[item objectForKey:@"time"] isKindOfClass:[NSNull class]]){
+//                    NSLog(@"Time nil");
+//                }
+//                else{
+//                    NSLog(@"time: %d",[[item objectForKey:@"time"] intValue]);
+//                    _isFirst = true;
+//                    _seekTime = [[item objectForKey:@"time"] integerValue];
+//                }
+//            }
+//            else{
+//                NSLog(@"Time nil");
+//            }
+//        }
         
 //        if (_time != nil && _time > 0) {
 //            isFirst = YES;
