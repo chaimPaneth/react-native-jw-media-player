@@ -143,8 +143,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
 
     mPlayerConfig = new PlayerConfig.Builder()
-            .autostart(true)
             .skinConfig(new SkinConfig.Builder().build())
+            .repeat(false)
+            .displayTitle(true)
+            .displayDescription(true)
+            .nextUpDisplay(true)
             .stretching(STRETCHING_UNIFORM)
             .build();
 
@@ -597,18 +600,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
     currentPlayingIndex = playlistItemEvent.getIndex();
 
-    if (comparePlaylistId != null && playlist != null && playlist.size() > currentPlayingIndex.intValue()) {
-      ReadableMap item = playlist.getMap(currentPlayingIndex.intValue());
-
-      if (item.hasKey("time") && !item.isNull("time") && item.getInt("time") > 0) {
-        int seekTime = item.getInt("time");
-        Log.e(TAG, "setPlayListItem: Value of timer is not null");
-        mPlayerView.seek(seekTime);
-      }
-    }
+//    if (comparePlaylistId != null && playlist != null && playlist.size() > currentPlayingIndex.intValue()) {
+//      ReadableMap item = playlist.getMap(currentPlayingIndex.intValue());
+//
+//      if (item.hasKey("time") && !item.isNull("time") && item.getInt("time") > 0) {
+//        int seekTime = item.getInt("time");
+//        Log.e(TAG, "setPlayListItem: Value of timer is not null");
+//        mPlayerView.seek(seekTime);
+//      }
+//    }
 
     event.putString("playlistItem",playlistItemEvent.getPlaylistItem().toJson().toString());
     Log.i("playlistItem", playlistItemEvent.getPlaylistItem().toJson().toString());
+
     try {
       JSONObject jObj = new JSONObject(playlistItemEvent.getPlaylistItem().toJson().toString());
       JSONArray array = jObj.getJSONArray("sources");
