@@ -42,49 +42,55 @@ const JWPlayerState =
 
 class JWPlayer extends Component {
   static propTypes = {
-    file: PropTypes.string,
-    image: PropTypes.string,
-    title: PropTypes.string,
-    desc: PropTypes.string,
-    mediaId: PropTypes.string,
-    autostart: PropTypes.bool.isRequired,
-    controls: PropTypes.bool.isRequired,
-    repeat: PropTypes.bool.isRequired,
-    displayTitle: PropTypes.bool,
-    displayDesc: PropTypes.bool,
-    nextUpDisplay: PropTypes.bool,
-    time: PropTypes.number,
-    playlistItem: PropTypes.shape({
-      file: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      title: PropTypes.string,
-      desc: PropTypes.string,
-      time: PropTypes.number,
-      mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      controls: PropTypes.bool.isRequired,
-      repeat: PropTypes.bool.isRequired,
-      displayTitle: PropTypes.bool,
-      displayDesc: PropTypes.bool
-    }),
-    playlistId: PropTypes.string,
-    playlist: PropTypes.arrayOf(
-      PropTypes.shape({
-        file: PropTypes.string.isRequired,
-        image: PropTypes.string,
-        title: PropTypes.string,
-        desc: PropTypes.string,
-        time: PropTypes.number,
-        mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired,
-        controls: PropTypes.bool.isRequired,
-        repeat: PropTypes.bool.isRequired,
-        displayTitle: PropTypes.bool,
-        displayDesc: PropTypes.bool
-      })
-    ),
+    // file: PropTypes.string,
+    // image: PropTypes.string,
+    // title: PropTypes.string,
+    // desc: PropTypes.string,
+    // mediaId: PropTypes.string,
+    // autostart: PropTypes.bool.isRequired,
+    // controls: PropTypes.bool.isRequired,
+    // repeat: PropTypes.bool.isRequired,
+    // displayTitle: PropTypes.bool,
+    // displayDesc: PropTypes.bool,
+    // nextUpDisplay: PropTypes.bool,
+    // time: PropTypes.number,
+    // playlistItem: PropTypes.shape({
+    //   file: PropTypes.string.isRequired,
+    //   image: PropTypes.string,
+    //   title: PropTypes.string,
+    //   desc: PropTypes.string,
+    //   time: PropTypes.number,
+    //   mediaId: PropTypes.string.isRequired,
+    //   autostart: PropTypes.bool.isRequired,
+    //   controls: PropTypes.bool.isRequired,
+    //   repeat: PropTypes.bool.isRequired,
+    //   displayTitle: PropTypes.bool,
+    //   displayDesc: PropTypes.bool
+    // }),
+    // playlistId: PropTypes.string,
+    // playlist: PropTypes.arrayOf(
+    //   PropTypes.shape({
+    //     file: PropTypes.string.isRequired,
+    //     image: PropTypes.string,
+    //     title: PropTypes.string,
+    //     desc: PropTypes.string,
+    //     time: PropTypes.number,
+    //     mediaId: PropTypes.string.isRequired,
+    //     autostart: PropTypes.bool.isRequired,
+    //     controls: PropTypes.bool.isRequired,
+    //     repeat: PropTypes.bool.isRequired,
+    //     displayTitle: PropTypes.bool,
+    //     displayDesc: PropTypes.bool
+    //   })
+    // ),
     play: PropTypes.func,
     pause: PropTypes.func,
+    toggleSpeed: PropTypes.func,
+    setPlaylistIndex: PropTypes.func,
+    setControls: PropTypes.func,
+    loadPlaylistItem: PropTypes.func,
+    loadPlaylist: PropTypes.func,
+    seekTo: PropTypes.func,
     onBeforePlay: PropTypes.func,
     onBeforeComplete: PropTypes.func,
     onPlay: PropTypes.func,
@@ -115,65 +121,45 @@ class JWPlayer extends Component {
   // };
 
   pause() {
-    // UIManager.dispatchViewManagerCommand(
-    //   this.getRNJWPlayerBridgeHandle(),
-    //   UIManager.RNJWPlayer.Commands.pause,
-    //   null
-    // );
-
     if (RNJWPlayerManager) RNJWPlayerManager.pause();
   }
 
   play() {
-    // UIManager.dispatchViewManagerCommand(
-    //   this.getRNJWPlayerBridgeHandle(),
-    //   UIManager.RNJWPlayer.Commands.play,
-    //   null
-    // );
-
     if (RNJWPlayerManager) RNJWPlayerManager.play();
   }
 
   stop() {
-    // UIManager.dispatchViewManagerCommand(
-    //   this.getRNJWPlayerBridgeHandle(),
-    //   UIManager.RNJWPlayer.Commands.stop,
-    //   null
-    // );
-
     if (RNJWPlayerManager) RNJWPlayerManager.stop();
   }
 
   toggleSpeed() {
-    // UIManager.dispatchViewManagerCommand(
-    //   this.getRNJWPlayerBridgeHandle(),
-    //   UIManager.RNJWPlayer.Commands.toggleSpeed,
-    //   null
-    // );
-
     if (RNJWPlayerManager) RNJWPlayerManager.toggleSpeed();
   }
 
   setPlaylistIndex(index) {
     if (RNJWPlayerManager) RNJWPlayerManager.setPlaylistIndex(index);
-    // UIManager.dispatchViewManagerCommand(
-    //   this.getRNJWPlayerBridgeHandle(),
-    //   UIManager.RNJWPlayer.Commands.setPlayistIndex,
-    //   null
-    // );
   }
 
   setControls(show) {
     if (RNJWPlayerManager) RNJWPlayerManager.setControls(show);
   }
 
+  loadPlaylistItem(playlistItem) {
+    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylistItem(playlistItem);
+  }
+
+  loadPlaylist(playlist) {
+    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylist(playlist);
+  }
+
+  seekTo(time) {
+    if (RNJWPlayerManager) RNJWPlayerManager.seekTo(time);
+  }
+
   async getPosition() {
     if (RNJWPlayerManager) {
       try {
-        var position = await RNJWPlayerManager
-          .getPosition
-          // this.getRNJWPlayerBridgeHandle()
-          ();
+        var position = await RNJWPlayerManager.getPosition();
         return position;
       } catch (e) {
         console.error(e);
@@ -185,10 +171,7 @@ class JWPlayer extends Component {
   async playerState() {
     if (RNJWPlayerManager) {
       try {
-        var state = await RNJWPlayerManager
-          .state
-          // this.getRNJWPlayerBridgeHandle()
-          ();
+        var state = await RNJWPlayerManager.state();
         return state;
       } catch (e) {
         console.error(e);
@@ -277,7 +260,6 @@ class JWPlayer extends Component {
   }
 
   render() {
-    console.log('reloading')
     return (
       <RNJWPlayer
         ref={RCT_RNJWPLAYER_REF}
