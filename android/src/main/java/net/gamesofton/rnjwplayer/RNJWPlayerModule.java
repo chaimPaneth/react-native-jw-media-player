@@ -56,7 +56,9 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       if (playlistItem.hasKey("file")) {
         String newFile = playlistItem.getString("file");
 
-        if (RNJWPlayerViewManager.mPlayerView.getPlaylistItem() == null || !newFile.equals(RNJWPlayerViewManager.mPlayerView.getPlaylistItem().getFile())) {
+//        if (RNJWPlayerViewManager.mPlayerView.getPlaylistItem() == null || !newFile.equals(RNJWPlayerViewManager.mPlayerView.getPlaylistItem().getFile())) {
+
+//          RNJWPlayerViewManager.mPlayerView.stop();
 
           PlaylistItem newPlayListItem = new PlaylistItem();
 
@@ -96,7 +98,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerViewManager.mPlayerView.load(newPlayListItem);
 
           RNJWPlayerViewManager.mPlayerView.play();
-        }
+//        }
       }
     }
   }
@@ -196,7 +198,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getPosition(/*final int reactTag, */final Promise promise) {
+  public void position(/*final int reactTag, */final Promise promise) {
     try {
 //      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
 //      uiManager.addUIBlock(new UIBlock() {
