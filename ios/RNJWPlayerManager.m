@@ -137,7 +137,7 @@ RCT_EXPORT_METHOD(stop) {
     };
 }
 
-RCT_REMAP_METHOD(getPosition,
+RCT_REMAP_METHOD(position,
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -214,37 +214,42 @@ RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
         NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
         
-        if (newFile != nil && newFile.length > 0 && ![encodedUrl isEqualToString: _playerView.player.config.file]) {
-            
-            [_playerView reset];
-            
-            JWConfig *config = [_playerView setupConfig];
-            
-            config.file = encodedUrl;
-            config.mediaId = [playlistItem objectForKey:@"mediaId"];
-            config.title = [playlistItem objectForKey:@"title"];
-            config.desc = [playlistItem objectForKey:@"desc"];
-            config.image = [playlistItem objectForKey:@"image"];
-            
-            config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
-            config.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-//            config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
-//            config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
-//            config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                _playerView.proxy = [RNJWPlayerDelegateProxy new];
-                _playerView.proxy.delegate = _playerView;
+        if (newFile != nil && newFile.length > 0) {
+//            if (![encodedUrl isEqualToString: _playerView.player.config.file]) {
+                [_playerView reset];
                 
-                _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
+                JWConfig *config = [_playerView setupConfig];
                 
-                [_playerView addSubview:_playerView.player.view];
+                config.file = encodedUrl;
+                config.mediaId = [playlistItem objectForKey:@"mediaId"];
+                config.title = [playlistItem objectForKey:@"title"];
+                config.desc = [playlistItem objectForKey:@"desc"];
+                config.image = [playlistItem objectForKey:@"image"];
                 
-                _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+                config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
+                config.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+                //            config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
+                //            config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
+                //            config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
                 
-                _playerView.player.forceFullScreenOnLandscape = YES;
-                _playerView.player.forceLandscapeOnFullScreen = YES;
-            });
+                dispatch_async(dispatch_get_main_queue(), ^(void){
+                    _playerView.proxy = [RNJWPlayerDelegateProxy new];
+                    _playerView.proxy.delegate = _playerView;
+                    
+                    _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
+                    
+                    [_playerView addSubview:_playerView.player.view];
+                    
+                    _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+                    
+                    _playerView.player.forceFullScreenOnLandscape = YES;
+                    _playerView.player.forceLandscapeOnFullScreen = YES;
+                });
+//            } else {
+//                [_playerView.player play];
+//            }
+        } else {
+            RCTLogError(@"No file prop, expecting url or file path, got: %@", newFile);
         }
     } else {
         RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
@@ -273,7 +278,7 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
             
             JWConfig *config = [_playerView setupConfig];
             
-            config.autostart = YES;
+            config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
             config.controls = YES;
 //            config.repeat = NO;
 //            config.displayDescription = YES;

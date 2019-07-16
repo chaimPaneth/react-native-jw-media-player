@@ -1,13 +1,8 @@
-
 # react-native-jwplayer
 
 ## Getting started
 
-`$ npm install react-native-jwplayer --save` or `$ yarn add react-native-jwplayer` (is not supported until not published in *npm*)
-
-Current working case (whili isn't in *npm*) is
-
-`$ yarn add https://github.com/nulleof/react-native-jwplayer.git`
+`npm install https://github.com/chaimPaneth/react-native-jwplayer.git --save` or `$ yarn add https://github.com/chaimPaneth/react-native-jwplayer.git`
 
 ### Mostly automatic installation
 
@@ -20,18 +15,32 @@ Then add SDK dependencies:
 #### Add dependencies
 
 ##### iOS dependencies
+
 Follow official instruction [sdk ios installation](https://developer.jwplayer.com/sdk/ios/docs/developer-guide/intro/getting-started/) for installation via Cocoapods (only supported, other way wasn't tested).
 
-Add `pod 'JWPlayer-SDK', '~> 2.0'` to your Podfile.
+Add `pod 'JWPlayer-SDK', '~> 3.5.0'` to your Podfile.
 Then run **pod install** from your `ios` directory.
 
 In your `info.plist` properties file, create an string entry named `JWPlayerKey`, and set its value to be your JW Player Beta license key. Make sure you enter this string exactly as you received it from JW Player, or as it appears in your JW Player Dashboard. The string is case-sensitive.
 
 ##### Android dependencies
-Coming soon.
+
+Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+
+```
+    implementation 'com.longtailvideo.jwplayer:jwplayer-core:+'
+    implementation 'com.longtailvideo.jwplayer:jwplayer-common:+'
+```
+
+Add to AndroidManifest.xml in the Application tag above the Activity tag:
+
+```
+<meta-data
+           android:name="JW_LICENSE_KEY"
+           android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
+```
 
 ### Manual installation
-
 
 #### iOS
 
@@ -44,27 +53,30 @@ Coming soon.
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
-  - Add `import net.gamesofton.rnjwplayer.RNJWPlayerPackage;` to the imports at the top of the file
-  - Add `new RNJWPlayerPackage()` to the list returned by the `getPackages()` method
+
+- Add `import net.gamesofton.rnjwplayer.RNJWPlayerPackage;` to the imports at the top of the file
+- Add `new RNJWPlayerPackage()` to the list returned by the `getPackages()` method
+
 2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':react-native-jwplayer'
-  	project(':react-native-jwplayer').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-jwplayer/android')
-  	```
+   ```
+   include ':react-native-jwplayer'
+   project(':react-native-jwplayer').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-jwplayer/android')
+   ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
-      compile project(':react-native-jwplayer')
-  	```
+   ```
+     implementation project(':react-native-jwplayer')
+   ```
 4. Add [dependencies](#android-dependencies)
 
 ## Usage
+
 ```javascript
 ...
- 
+
 import JWPlayer from 'react-native-jwplayer';
- 
+
 ...
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -75,26 +87,54 @@ const styles = StyleSheet.create({
 });
 
 ...
- 
+
+componentDidMount() {
+  const playlistItem = {
+    title: 'Track',
+    mediaId: -1,
+    image: 'http://image.com/image.png',
+    desc: 'My beautiful track',
+    time: 0,
+    file: 'http://file.com/file.mp3',
+    autostart: true,
+    controls: true,
+    repeat: false,
+    displayDescription: true,
+    displayTitle: true
+  }
+  this.JWPlayer.loadPlaylistItem(playlistItem);
+
+  // for playlist
+  // const playlist = [playlistItem, playlistItem]
+  // this.JWPlayer.loadPlaylist(playlistItem);
+}
+
+...
+
 render() {
- 
-... 
- 
+
+...
+
 <View style={styles.container}>
   <JWPlayer
+    ref={p => (this.JWPlayer = p)}
     style={styles.player}
-    autostart={false}
-    file={'https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8'}
     onBeforePlay={() => this.onBeforePlay()}
     onPlay={() => this.onPlay()}
-    onPlayerError={e => this.onPlayerError(e)}
+    onPause={() => this.onPause()}
+    onIdle={() => console.log("onIdle")}
+    onPlaylistItem={event => this.onPlaylistItem(event)}
+    onSetupPlayerError={event => this.onPlayerError(event)}
+    onPlayerError={event => this.onPlayerError(event)}
     onBuffer={() => this.onBuffer()}
-    onTime={time => this.onTime(time)}
+    onTime={event => this.onTime(event)}
+    onFullScreen={() => this.onFullScreen()}
+    onFullScreenExit={() => this.onFullScreenExit()}
   />
 </View>
- 
+
 ...
- 
+
 }
 ```
 
@@ -107,3 +147,34 @@ For running example project:
 3. Go to `Example/ios` and install Pods with `pod install`
 4. Open `demoJWPlayer.xcworkspace` with XCode.
 5. Add your iOS api key for JWplayer into `Info.plist`
+
+##### PlaylistItem
+| Prop         | Description                                                                                             | Type |
+| ------------ | ------------------------------------------------------------------------------------------------------- | ------- |
+| **`mediaId`** | The JW media id. | `Int`   |
+| **`file`** | The url of the file to play. | `String`   |
+| **`title`** | The title of the track. | `String`   |
+| **`image`** | The url of the player thumbnail. | `String`   |
+| **`autostart`** | Should the track auto start. | `Boolean`   |
+| **`time`** | should the player seek to a certain second. | `Int`   |
+| **`desc`** | Description of the track. | `String`   |
+| **`controls`** | Should the control buttons show. | `Boolean`   |
+| **`repeat`** | Should the track repeat. | `Boolean`   |
+| **`displayDescription`** | Should the player show the description. | `Boolean`   |
+| **`displayTitle`** | Should the player show the title. | `Boolean`   |
+
+## Available methods
+
+| Func                   | Description                                                                                             | Argument                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file. | `Int`                         |
+| **`play`**             | Starts playing.                                                                                         | `none`                        |
+| **`pause`**            | Pauses playing.                                                                                         | `none`                        |
+| **`stop`**             | Stops the player completely.                                                                            | `none`                        |
+| **`state`**            | Returns the current state of the player `idle`, `buffering`, `playing`, `paused`.                       | `none`                        |
+| **`position`**         | Returns the current position of the player in seconds.                                                  | `none`                        |
+| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                             | `none`                        |
+| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                   | `Int`                         |
+| **`setControls`**      | Sets the display of the control buttons on the player.                                                  | `Boolean`                     |
+| **`loadPlaylist`**     | Loads a playlist.                                                                                       | `[PlaylistItems]`             |
+| **`loadPlaylistItem`** | Loads a playlist item.                                                                                  | [PlaylistItem](#PlaylistItem) |

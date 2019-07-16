@@ -156,10 +156,10 @@ class JWPlayer extends Component {
     if (RNJWPlayerManager) RNJWPlayerManager.seekTo(time);
   }
 
-  async getPosition() {
+  async position() {
     if (RNJWPlayerManager) {
       try {
-        var position = await RNJWPlayerManager.getPosition();
+        var position = await RNJWPlayerManager.position();
         return position;
       } catch (e) {
         console.error(e);
