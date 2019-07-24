@@ -47,42 +47,43 @@ class JWPlayer extends Component {
     // title: PropTypes.string,
     // desc: PropTypes.string,
     // mediaId: PropTypes.string,
-    // autostart: PropTypes.bool.isRequired,
+    autostart: PropTypes.bool.isRequired,
     // controls: PropTypes.bool.isRequired,
     // repeat: PropTypes.bool.isRequired,
     // displayTitle: PropTypes.bool,
     // displayDesc: PropTypes.bool,
     // nextUpDisplay: PropTypes.bool,
     // time: PropTypes.number,
-    // playlistItem: PropTypes.shape({
-    //   file: PropTypes.string.isRequired,
-    //   image: PropTypes.string,
-    //   title: PropTypes.string,
-    //   desc: PropTypes.string,
-    //   time: PropTypes.number,
-    //   mediaId: PropTypes.string.isRequired,
-    //   autostart: PropTypes.bool.isRequired,
-    //   controls: PropTypes.bool.isRequired,
-    //   repeat: PropTypes.bool.isRequired,
-    //   displayTitle: PropTypes.bool,
-    //   displayDesc: PropTypes.bool
-    // }),
+    playlistItem: PropTypes.shape({
+      file: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      title: PropTypes.string,
+      desc: PropTypes.string,
+      time: PropTypes.number,
+      mediaId: PropTypes.string.isRequired,
+      autostart: PropTypes.bool.isRequired,
+      // controls: PropTypes.bool.isRequired,
+      // repeat: PropTypes.bool.isRequired,
+      // displayTitle: PropTypes.bool,
+      // displayDesc: PropTypes.bool
+    }),
     // playlistId: PropTypes.string,
-    // playlist: PropTypes.arrayOf(
-    //   PropTypes.shape({
-    //     file: PropTypes.string.isRequired,
-    //     image: PropTypes.string,
-    //     title: PropTypes.string,
-    //     desc: PropTypes.string,
-    //     time: PropTypes.number,
-    //     mediaId: PropTypes.string.isRequired,
-    //     autostart: PropTypes.bool.isRequired,
-    //     controls: PropTypes.bool.isRequired,
-    //     repeat: PropTypes.bool.isRequired,
-    //     displayTitle: PropTypes.bool,
-    //     displayDesc: PropTypes.bool
-    //   })
-    // ),
+    playlist: PropTypes.arrayOf(
+      PropTypes.shape({
+        file: PropTypes.string.isRequired,
+        image: PropTypes.string,
+        title: PropTypes.string,
+        desc: PropTypes.string,
+        time: PropTypes.number,
+        mediaId: PropTypes.string.isRequired,
+        autostart: PropTypes.bool.isRequired,
+        // controls: PropTypes.bool.isRequired,
+        // repeat: PropTypes.bool.isRequired,
+        // displayTitle: PropTypes.bool,
+        // displayDesc: PropTypes.bool
+      })
+    ),
+    onPlaylist: PropTypes.func,
     play: PropTypes.func,
     pause: PropTypes.func,
     toggleSpeed: PropTypes.func,
@@ -196,28 +197,28 @@ class JWPlayer extends Component {
 
     if (playlist) {
       if (this.props.playlist) {
-        var shouldUpdate = false;
-        playlist.map((track, index) => {
-          var { time } = track;
-          if (
-            time &&
-            this.props.playlist.length > index &&
-            time !== this.props.playlist[index].time
-          ) {
-            shouldUpdate = true;
-          }
-        });
+        // var shouldUpdate = false;
+        // playlist.map((track, index) => {
+        //   var { time } = track;
+        //   if (
+        //     time &&
+        //     this.props.playlist.length > index &&
+        //     time !== this.props.playlist[index].time
+        //   ) {
+        //     shouldUpdate = true;
+        //   }
+        // });
 
-        if (shouldUpdate) {
-          return true;
-        }
+        // if (shouldUpdate) {
+        //   return true;
+        // }
 
-        if (time !== this.props.time) {
-          return true;
-        }
+        // if (time !== this.props.time) {
+        //   return true;
+        // }
 
         return (
-          playlistId !== this.props.playlistId ||
+          // playlistId !== this.props.playlistId ||
           /*controls !== this.props.controls ||*/
           !this.arraysAreEqual(playlist, this.props.playlist)
         );
@@ -226,17 +227,17 @@ class JWPlayer extends Component {
       }
     }
 
-    if (mediaId) {
-      return mediaId !== this.props.mediaId;
-    }
+    // if (mediaId) {
+    //   return mediaId !== this.props.mediaId;
+    // }
 
     // if (controls !== this.props.controls) {
     //   return true;
     // }
 
-    if (time !== this.props.time) {
-      return true;
-    }
+    // if (time !== this.props.time) {
+    //   return true;
+    // }
 
     if (playlistItem) {
       if (this.props.playlistItem) {
@@ -244,9 +245,9 @@ class JWPlayer extends Component {
           return true;
         }
 
-        if (playlistItem.time !== this.props.playlistItem.time) {
-          return true;
-        }
+        // if (playlistItem.time !== this.props.playlistItem.time) {
+        //   return true;
+        // }
       } else {
         return true;
       }
@@ -258,6 +259,14 @@ class JWPlayer extends Component {
   arraysAreEqual(ary1, ary2) {
     return ary1.join("") == ary2.join("");
   }
+
+  // componentDidMount() {
+  //   // setTimeout(() => {
+  //   //   if (this.props.componentDidMount) {
+  //   //     this.props.componentDidMount();
+  //   //   }
+  //   // }, 10);
+  // }
 
   render() {
     return (

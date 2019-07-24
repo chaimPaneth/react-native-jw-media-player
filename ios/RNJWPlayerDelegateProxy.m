@@ -3,6 +3,11 @@
 @implementation RNJWPlayerDelegateProxy
 #pragma mark - RNJWPlayer Delegate
 
+- (void)onReady:(JWEvent<JWReadyEvent> *)event
+{
+    [self.delegate onRNJWReady];
+}
+
 - (void)onBeforePlay
 {
     [self.delegate onRNJWPlayerBeforePlay];

@@ -15,7 +15,7 @@
 //@property(readwrite, assign)NSInteger currentPlayingIndex;
 //
 //@property(nonatomic, strong)NSString *file;
-//@property(nonatomic)BOOL autostart;
+@property(nonatomic)BOOL autostart;
 //@property(nonatomic)BOOL controls;
 //@property(nonatomic)BOOL repeat;
 //@property(nonatomic)BOOL displayTitle;
@@ -26,7 +26,7 @@
 //@property(nonatomic, strong)NSString *desc;
 //@property(nonatomic, strong)NSString *mediaId;
 //@property(nonatomic, strong)NSDictionary *playlistItem;
-//@property(nonatomic, strong)NSArray *playlist;
+@property(nonatomic, strong)NSArray *playlist;
 //@property(nonatomic, strong)NSString *playlistId;
 //@property(nonatomic, strong)NSNumber *time;
 ////@property(nonatomic, strong)NSNumber *compareTime;
@@ -46,7 +46,11 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExit;
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExitRequested;
 @property(nonatomic, copy)RCTBubblingEventBlock onSeek;
+@property(nonatomic, copy)RCTBubblingEventBlock onPlaylist;
+@property(nonatomic, copy)RCTBubblingEventBlock onReady;
 
+-(void)onRNJWReady;
+-(void)onRNJWPlaylist;
 -(void)onRNJWPlayerBeforePlay;
 -(void)onRNJWPlayerPlay;
 -(void)onRNJWPlayerPause;

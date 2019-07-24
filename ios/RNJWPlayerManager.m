@@ -38,20 +38,22 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onReady, RCTBubblingEventBlock);
 
 //RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 //RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
 //RCT_EXPORT_VIEW_PROPERTY(title, NSString);
 //RCT_EXPORT_VIEW_PROPERTY(image, NSString);
 //RCT_EXPORT_VIEW_PROPERTY(desc, NSString);
-//RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
 //RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 //RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
 //RCT_EXPORT_VIEW_PROPERTY(displayTitle, BOOL);
 //RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
 //RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
-//RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
-//RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
+RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 //RCT_EXPORT_VIEW_PROPERTY(playlistId, NSString);
 //RCT_EXPORT_VIEW_PROPERTY(time, NSNumber);
 
