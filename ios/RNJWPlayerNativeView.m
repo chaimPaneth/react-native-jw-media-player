@@ -24,10 +24,12 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 - (id)init {
     self = [super init];
+    
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
     }
+    
     return self;
 }
 
@@ -274,35 +276,36 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                             NSUTF8StringEncoding];
     
-    if (newFile != nil && newFile.length > 0 && ![encodedUrl isEqualToString: _player.config.file]) {
-        
-        [self reset];
-        
-        JWConfig *config = [self setupConfig];
-        
-        config.file = encodedUrl;
-        config.mediaId = [playlistItem objectForKey:@"mediaId"];
-        config.title = [playlistItem objectForKey:@"title"];
-        config.desc = [playlistItem objectForKey:@"desc"];
-        config.image = [playlistItem objectForKey:@"image"];
-        
-        config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
-        config.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-        config.repeat = [[playlistItem objectForKey:@"repeat"] boolValue];
-        config.displayDescription = [[playlistItem objectForKey:@"displayDesc"] boolValue];
-        config.displayTitle = [[playlistItem objectForKey:@"displayTitle"] boolValue];
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-        
-        _player.forceFullScreenOnLandscape = YES;
-        _player.forceLandscapeOnFullScreen = YES;
-        
-        [self addSubview:self.player.view];
+    if (newFile != nil && newFile.length > 0) {
+//        if (![encodedUrl isEqualToString:_player.config.file]) {
+            [self reset];
+            
+            JWConfig *config = [self setupConfig];
+            
+            config.file = encodedUrl;
+            config.mediaId = [playlistItem objectForKey:@"mediaId"];
+            config.title = [playlistItem objectForKey:@"title"];
+            config.desc = [playlistItem objectForKey:@"desc"];
+            config.image = [playlistItem objectForKey:@"image"];
+            
+            config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
+            
+            _proxy = [RNJWPlayerDelegateProxy new];
+            _proxy.delegate = self;
+            
+            _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+            
+            _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
+            
+            _player.forceFullScreenOnLandscape = YES;
+            _player.forceLandscapeOnFullScreen = YES;
+            
+            [self addSubview:self.player.view];
+//        } else {
+//            if (_player != nil) {
+//                [_player play];
+//            }
+//        }
     }
     
 //    if([playlistItem objectForKey:@"time"] != nil){
@@ -395,68 +398,71 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 //    return playListItemDict;
 //}
 
-//-(void)resetPlaylist
-//{
+-(void)resetPlaylist
+{
 //    _playlistId = nil;
 //    _comparePlaylistId = nil;
-//    _playlist = nil;
-//}
+    _playlist = nil;
+}
 
-//-(void)resetPlaylistItem
-//{
-//    self.playlistItem = nil;
-//}
+-(void)resetPlaylistItem
+{
+    self.playlistItem = nil;
+}
 
 -(void)reset
 {
     _player = nil;
     _proxy = nil;
 }
-/*
+
 -(void)setPlaylist:(NSArray *)playlist
 {
     _playlist = playlist;
-    if (playlist != nil && playlist.count > 0 && _playlistId != nil && _playlistId.length > 0 && _playlistId != _comparePlaylistId) {
-        _comparePlaylistId = _playlistId;
+    if (playlist != nil && playlist.count > 0) {
+//        if (_playlistId != _comparePlaylistId) {
+//            _comparePlaylistId = _playlistId;
         
-        [self reset];
-        NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
-        for (id item in playlist) {
-            JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
-            NSString *newFile = [item objectForKey:@"file"];
-            NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                                    NSUTF8StringEncoding];
-            playListItem.file = encodedUrl;
-            playListItem.image = [item objectForKey:@"image"];
-            playListItem.title = [item objectForKey:@"title"];
-            playListItem.desc = [item objectForKey:@"desc"];
-            playListItem.mediaId = [item objectForKey:@"mediaId"];
-            [playlistArray addObject:playListItem];
-        }
-        
-        JWConfig *config = [self setupConfig];
-        
-        config.autostart = YES;
-        config.controls = YES;
-        config.repeat = NO;
-        config.displayDescription = YES;
-        config.displayTitle = YES;
-        
-        config.playlist = playlistArray;
-        
-        //        [config.playlist arrayByAddingObjectsFromArray:playlistArray];
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.controls = YES;
-        
-        _player.forceFullScreenOnLandscape = YES;
-        _player.forceLandscapeOnFullScreen = YES;
-        
-        [self addSubview:self.player.view];
+            [self reset];
+            
+            NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
+            for (id item in playlist) {
+                JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
+                NSString *newFile = [item objectForKey:@"file"];
+                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                                        NSUTF8StringEncoding];
+                playListItem.file = encodedUrl;
+                playListItem.image = [item objectForKey:@"image"];
+                playListItem.title = [item objectForKey:@"title"];
+                playListItem.desc = [item objectForKey:@"desc"];
+                playListItem.mediaId = [item objectForKey:@"mediaId"];
+                [playlistArray addObject:playListItem];
+            }
+            
+            JWConfig *config = [self setupConfig];
+            
+            config.autostart = YES;
+            
+            config.playlist = playlistArray;
+            
+            //        [config.playlist arrayByAddingObjectsFromArray:playlistArray];
+            
+            _proxy = [RNJWPlayerDelegateProxy new];
+            _proxy.delegate = self;
+            
+            _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+            
+            _player.controls = YES;
+            
+            _player.forceFullScreenOnLandscape = YES;
+            _player.forceLandscapeOnFullScreen = YES;
+            
+            [self addSubview:self.player.view];
+//        } else {
+//            if (_player != nil) {
+//                [_player play];
+//            }
+//        }
         //        [self.player play];
     }
     
@@ -478,13 +484,28 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 //        }
 //    }
 }
-*/
--(NSArray *)playList
-{
-    return self.player.config.playlist;
-}
+
+//-(NSArray *)playList
+//{
+//    return self.player.config.playlist;
+//}
 
 #pragma mark - RNJWPlayer Delegate
+
+-(void)onRNJWReady
+{
+    if (self.onReady) {
+//        _player.playlistIndex
+        self.onReady(@{});
+    }
+}
+
+-(void)onRNJWPlaylist
+{
+    if (self.onPlaylist) {
+        self.onPlaylist(@{});
+    }
+}
 
 -(void)onRNJWPlayerBeforePlay
 {
