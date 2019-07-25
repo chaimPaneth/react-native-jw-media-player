@@ -40,6 +40,7 @@ import com.longtailvideo.jwplayer.events.PlayEvent;
 import com.longtailvideo.jwplayer.events.PlaylistCompleteEvent;
 import com.longtailvideo.jwplayer.events.PlaylistEvent;
 import com.longtailvideo.jwplayer.events.PlaylistItemEvent;
+import com.longtailvideo.jwplayer.events.ReadyEvent;
 import com.longtailvideo.jwplayer.events.SetupErrorEvent;
 import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
@@ -60,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> implements VideoPlayerEvents.OnFullscreenListener,
+        VideoPlayerEvents.OnReadyListener,
         VideoPlayerEvents.OnPlayListener,
         VideoPlayerEvents.OnPauseListener,
         VideoPlayerEvents.OnCompleteListener,
@@ -145,6 +147,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerConfig = new PlayerConfig.Builder()
             .skinConfig(new SkinConfig.Builder().build())
             .repeat(false)
+            .controls(true)
             .displayTitle(true)
             .displayDescription(true)
             .nextUpDisplay(true)
@@ -227,6 +230,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
       }
     });
+
+    mPlayerView.setControls(true);
 
     return mPlayerView;
   }
@@ -424,7 +429,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         if (playlistItem.hasKey("file")) {
           String newFile = playlistItem.getString("file");
 
-          if (mPlayerView.getPlaylistItem() == null || !newFile.equals(mPlayerView.getPlaylistItem().getFile())) {
+          if (mPlayerView.getPlaylistItem() == null) {
 //            mPlayerView.stop();
 
             resetPlaylist();
@@ -449,17 +454,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
               newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
             }
 
-            mPlayerView.load(newPlayListItem);
-
-            if (playlistItem.hasKey("time") && !playlistItem.isNull("time") && playlistItem.getInt("time") > 0) {
-              int seekTime = playlistItem.getInt("time");
-              Log.e(TAG, "setPlayListItem: Value of timer is not null");
-              mPlayerView.seek(seekTime);
-              mPlayerView.play();
-            } else {
-              Log.e(TAG, "setPlayListItem: wow timer is not with time");
-              mPlayerView.play();
+            if (playlistItem.hasKey("autostart")) {
+              mPlayerView.getConfig().setAutostart(playlistItem.getBoolean("autostart"));
             }
+
+            mPlayerView.load(newPlayListItem);
           }
         }
       }
@@ -489,10 +488,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     if(playlist != prop) {
       playlist = prop;
 
-      if (playlist != null && playlist.size() > 0 && playlistId != null && !playlistId.equals(comparePlaylistId)) {
-//        mPlayerView.stop();
-        comparePlaylistId = playlistId;
-
+      if (playlist != null && playlist.size() > 0) {
         mPlayList = new ArrayList<>();
 
         int j = 0;
@@ -521,6 +517,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
               mediaId = playlistItem.getString("mediaId");
             }
 
+            if (playlistItem.hasKey("autostart")) {
+              mPlayerView.getConfig().setAutostart(playlistItem.getBoolean("autostart"));
+            }
+
             PlaylistItem newPlayListItem = new PlaylistItem.Builder()
                     .file(file)
                     .title(title)
@@ -536,14 +536,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
           j++;
         }
-
-        mPlayerView.getConfig().setAutostart(autostart);
-        mPlayerView.getConfig().setRepeat(repeat);
-        mPlayerView.getConfig().setControls(controls);
-        mPlayerView.setControls(controls);
-        mPlayerView.getConfig().setDisplayTitle(displayTitle);
-        mPlayerView.getConfig().setDisplayDescription(displayDesc);
-        mPlayerView.getConfig().setNextUpDisplay(nextUpDisplay);
 
         mPlayerView.load(mPlayList);
         //buildPlaylistItem();
@@ -670,6 +662,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             mPlayerView.getId(),
             "topPlay",
+            event);
+
+    updateWakeLock(true);
+  }
+
+  @Override
+  public void onReady(ReadyEvent readyEvent) {
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onReady");
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topOnReady",
             event);
 
     updateWakeLock(true);
