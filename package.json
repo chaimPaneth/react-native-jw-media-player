@@ -1,78 +1,49 @@
 {
-  "_args": [
-    [
-      "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-      "/Users/chaimpaneth/Projects/OUTorah-V2/OUTorah"
-    ]
-  ],
-  "_from": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-  "_id": "react-native-jwplayer@git+https://github.com/chaimPaneth/react-native-jwplayer.git#cdbcfd5e3a4cb6199ac45d7b9be56104ef7a6cd1",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/react-native-jwplayer",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-    "rawSpec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-    "saveSpec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-    "fetchSpec": "https://github.com/chaimPaneth/react-native-jwplayer.git",
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "git+https://github.com/chaimPaneth/react-native-jwplayer.git#cdbcfd5e3a4cb6199ac45d7b9be56104ef7a6cd1",
-  "_spec": "git+https://github.com/chaimPaneth/react-native-jwplayer.git",
-  "_where": "/Users/chaimpaneth/Projects/OUTorah-V2/OUTorah",
-  "author": {
-    "name": "NullEOF",
-    "email": "nulleof@gmail.com",
-    "url": "nulleof.com"
-  },
-  "bugs": {
-    "url": "https://github.com/nulleof/react-native-jwplayer/issues"
-  },
-  "bundleDependencies": false,
-  "deprecated": false,
-  "description": "React-native Android/iOS plugin for JWPlayer sdk (https://www.jwplayer.com/)",
-  "devDependencies": {
-    "babel-eslint": "^7.1.1",
-    "babel-preset-react-native-stage-0": "^1.0.1",
-    "eslint": "^3.14.1",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1",
-    "pre-commit": "^1.2.2"
-  },
-  "homepage": "https://github.com/nulleof/react-native-appodeal#readme",
-  "keywords": [
-    "react-native",
-    "JWPlayer",
-    "android",
-    "iOS",
-    "video",
-    "player",
-    "SDK"
-  ],
-  "license": "MIT",
-  "main": "index.js",
-  "name": "react-native-jwplayer",
-  "peerDependencies": {
-    "react-native": "^0.51 || ^0.52 || ^0.53 || ^0.54 || ^0.55",
-    "react": "^16.0"
-  },
-  "pre-commit": [
-    "lint"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nulleof/react-native-jwplayer.git"
-  },
-  "scripts": {
-    "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
-  },
-  "version": "0.1.0"
+    "name": "react-native-jwplayer",
+    "version": "0.1.0",
+    "description": "React-native Android/iOS plugin for JWPlayer sdk (https://www.jwplayer.com/)",
+    "main": "index.js",
+    "scripts": {
+        "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
+    },
+    "pre-commit": [
+        "lint"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/chaimPaneth/react-native-jwplayer.git"
+    },
+    "keywords": [
+        "react",
+        "react-native",
+        "jwplayer",
+        "media",
+        "player",
+        "mediaplayer",
+        "media-player",
+        "jw",
+        "android",
+        "ios",
+        "audio",
+        "video",
+        "sdk"
+    ],
+    "author": "chaimPaneth <chaim@chaimpaneth.com> (chaimpaneth.com)",
+    "license": "MIT",
+    "homepage": "https://github.com/chaimPaneth/react-native-jwplayer#readme",
+    "peerDependencies": {
+        "react-native": "^0.40.0",
+        "react": "~15.4.0-rc.4"
+    },
+    "devDependencies": {
+        "babel-eslint": "^7.1.1",
+        "babel-preset-react-native-stage-0": "^1.0.1",
+        "eslint": "^3.14.1",
+        "eslint-config-airbnb": "^14.0.0",
+        "eslint-plugin-import": "^2.2.0",
+        "eslint-plugin-jsx-a11y": "^3.0.2",
+        "eslint-plugin-react": "^6.9.0",
+        "eslint-plugin-react-native": "^2.2.1",
+        "pre-commit": "^1.2.2"
+    }
 }
