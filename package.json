@@ -1,7 +1,7 @@
 {
     "name": "react-native-jwplayer",
     "version": "0.1.0",
-    "description": "React-native Android/iOS plugin for JWPlayer sdk (https://www.jwplayer.com/)",
+    "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
     "main": "index.js",
     "scripts": {
         "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
