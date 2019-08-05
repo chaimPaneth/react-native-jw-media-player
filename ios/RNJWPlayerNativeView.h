@@ -10,27 +10,17 @@
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
 
-//@property(readwrite, assign)NSInteger seekTime;
-//@property(readwrite, assign)BOOL isFirst;
-//@property(readwrite, assign)NSInteger currentPlayingIndex;
-//
-//@property(nonatomic, strong)NSString *file;
+@property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
-//@property(nonatomic)BOOL controls;
-//@property(nonatomic)BOOL repeat;
-//@property(nonatomic)BOOL displayTitle;
-//@property(nonatomic)BOOL displayDesc;
-//@property(nonatomic)BOOL nextUpDisplay;
-//@property(nonatomic, strong)NSString *title;
-//@property(nonatomic, strong)NSString *image;
-//@property(nonatomic, strong)NSString *desc;
-//@property(nonatomic, strong)NSString *mediaId;
-//@property(nonatomic, strong)NSDictionary *playlistItem;
-@property(nonatomic, strong)NSArray *playlist;
-//@property(nonatomic, strong)NSString *playlistId;
-//@property(nonatomic, strong)NSNumber *time;
-////@property(nonatomic, strong)NSNumber *compareTime;
-//@property(nonatomic, strong)NSString *comparePlaylistId;
+@property(nonatomic)BOOL controls;
+@property(nonatomic)BOOL repeat;
+@property(nonatomic)BOOL displayTitle;
+@property(nonatomic)BOOL displayDesc;
+@property(nonatomic)BOOL nextUpDisplay;
+@property(nonatomic, strong)NSString *title;
+@property(nonatomic, strong)NSString *image;
+@property(nonatomic, strong)NSString *desc;
+@property(nonatomic, strong)NSString *mediaId;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
@@ -67,6 +57,8 @@
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
 
 -(JWConfig*)setupConfig;
+-(void)defaultStyle: (JWConfig*)config;
+-(void)customStyle: (JWConfig*)config :(NSString*)name;
 -(void)reset;
 
 @end

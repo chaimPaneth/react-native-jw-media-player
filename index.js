@@ -1,11 +1,11 @@
-import React, { Component } from "react"; // eslint-disable-line
+import React, { Component } from "react";
 var ReactNative = require("react-native");
 import {
   requireNativeComponent,
   UIManager,
   NativeModules,
   Platform
-} from "react-native"; // eslint-disable-line
+} from "react-native";
 import PropTypes from "prop-types";
 
 const RNJWPlayerManager =
@@ -14,8 +14,6 @@ const RNJWPlayerManager =
     : NativeModules.RNJWPlayerModule;
 
 const RCT_RNJWPLAYER_REF = "rnjwplayer";
-
-//var RCTRNJWPlayerManager = RNJWPlayerManager;
 
 const RNJWPlayer = requireNativeComponent("RNJWPlayer", null);
 
@@ -42,18 +40,17 @@ const JWPlayerState =
 
 class JWPlayer extends Component {
   static propTypes = {
-    // file: PropTypes.string,
-    // image: PropTypes.string,
-    // title: PropTypes.string,
-    // desc: PropTypes.string,
-    // mediaId: PropTypes.string,
-    autostart: PropTypes.bool.isRequired,
-    // controls: PropTypes.bool.isRequired,
-    // repeat: PropTypes.bool.isRequired,
-    // displayTitle: PropTypes.bool,
-    // displayDesc: PropTypes.bool,
-    // nextUpDisplay: PropTypes.bool,
-    // time: PropTypes.number,
+    file: PropTypes.string,
+    image: PropTypes.string,
+    title: PropTypes.string,
+    desc: PropTypes.string,
+    mediaId: PropTypes.string,
+    autostart: PropTypes.bool,
+    controls: PropTypes.bool,
+    repeat: PropTypes.bool,
+    displayTitle: PropTypes.bool,
+    displayDesc: PropTypes.bool,
+    nextUpDisplay: PropTypes.bool,
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
@@ -61,13 +58,8 @@ class JWPlayer extends Component {
       desc: PropTypes.string,
       time: PropTypes.number,
       mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      // controls: PropTypes.bool.isRequired,
-      // repeat: PropTypes.bool.isRequired,
-      // displayTitle: PropTypes.bool,
-      // displayDesc: PropTypes.bool
+      autostart: PropTypes.bool.isRequired
     }),
-    // playlistId: PropTypes.string,
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
         file: PropTypes.string.isRequired,
@@ -76,11 +68,7 @@ class JWPlayer extends Component {
         desc: PropTypes.string,
         time: PropTypes.number,
         mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired,
-        // controls: PropTypes.bool.isRequired,
-        // repeat: PropTypes.bool.isRequired,
-        // displayTitle: PropTypes.bool,
-        // displayDesc: PropTypes.bool
+        autostart: PropTypes.bool.isRequired
       })
     ),
     onPlaylist: PropTypes.func,
@@ -103,23 +91,6 @@ class JWPlayer extends Component {
     onFullScreen: PropTypes.func,
     onPlaylistItem: PropTypes.func
   };
-
-  // static defaultProps = {
-  //   file: "",
-  //   mediaId: "",
-  //   autostart: true,
-  //   controls: true,
-  //   repeat: false,
-  //   displayTitle: true,
-  //   displayDesc: true,
-  //   playlistItem: {
-  //     autostart: true,
-  //     controls: true,
-  //     repeat: false,
-  //     displayTitle: true,
-  //     displayDesc: true
-  //   }
-  // };
 
   pause() {
     if (RNJWPlayerManager) RNJWPlayerManager.pause();
@@ -187,67 +158,50 @@ class JWPlayer extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     var {
+      file,
+      image,
+      desc,
+      title,
       mediaId,
-      playlistItem,
-      playlist,
+      autostart,
       controls,
-      time,
-      playlistId
+      repeat,
+      displayTitle,
+      displayDesc,
+      nextUpDisplay,
+      playlistItem,
+      playlist
     } = nextProps;
+
+    if (
+      file !== this.props.file ||
+      image !== this.props.image ||
+      desc !== this.props.desc ||
+      title !== this.props.title ||
+      mediaId !== this.props.mediaId ||
+      autostart !== this.props.autostart ||
+      controls !== this.props.controls ||
+      repeat !== this.props.repeat ||
+      displayTitle !== this.props.displayTitle ||
+      displayDesc !== this.props.displayDesc ||
+      nextUpDisplay !== this.props.nextUpDisplay
+    ) {
+      return true;
+    }
 
     if (playlist) {
       if (this.props.playlist) {
-        // var shouldUpdate = false;
-        // playlist.map((track, index) => {
-        //   var { time } = track;
-        //   if (
-        //     time &&
-        //     this.props.playlist.length > index &&
-        //     time !== this.props.playlist[index].time
-        //   ) {
-        //     shouldUpdate = true;
-        //   }
-        // });
-
-        // if (shouldUpdate) {
-        //   return true;
-        // }
-
-        // if (time !== this.props.time) {
-        //   return true;
-        // }
-
-        return (
-          // playlistId !== this.props.playlistId ||
-          /*controls !== this.props.controls ||*/
-          !this.arraysAreEqual(playlist, this.props.playlist)
-        );
+        return !this.arraysAreEqual(playlist, this.props.playlist);
       } else {
         return true;
       }
     }
-
-    // if (mediaId) {
-    //   return mediaId !== this.props.mediaId;
-    // }
-
-    // if (controls !== this.props.controls) {
-    //   return true;
-    // }
-
-    // if (time !== this.props.time) {
-    //   return true;
-    // }
 
     if (playlistItem) {
       if (this.props.playlistItem) {
         if (playlistItem.mediaId !== this.props.playlistItem.mediaId) {
           return true;
         }
-
-        // if (playlistItem.time !== this.props.playlistItem.time) {
-        //   return true;
-        // }
       } else {
         return true;
       }
@@ -259,14 +213,6 @@ class JWPlayer extends Component {
   arraysAreEqual(ary1, ary2) {
     return ary1.join("") == ary2.join("");
   }
-
-  // componentDidMount() {
-  //   // setTimeout(() => {
-  //   //   if (this.props.componentDidMount) {
-  //   //     this.props.componentDidMount();
-  //   //   }
-  //   // }, 10);
-  // }
 
   render() {
     return (
