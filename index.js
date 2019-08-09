@@ -75,6 +75,7 @@ class JWPlayer extends Component {
     play: PropTypes.func,
     pause: PropTypes.func,
     toggleSpeed: PropTypes.func,
+    setSpeed: PropTypes.func,
     setPlaylistIndex: PropTypes.func,
     setControls: PropTypes.func,
     loadPlaylistItem: PropTypes.func,
@@ -106,6 +107,10 @@ class JWPlayer extends Component {
 
   toggleSpeed() {
     if (RNJWPlayerManager) RNJWPlayerManager.toggleSpeed();
+  }
+
+  setSpeed(speed) {
+    if (RNJWPlayerManager) RNJWPlayerManager.setSpeed(speed);
   }
 
   setPlaylistIndex(index) {

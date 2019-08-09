@@ -115,6 +115,14 @@ RCT_EXPORT_METHOD(toggleSpeed) {
     };
 }
 
+RCT_EXPORT_METHOD(setSpeed: (double)speed) {
+    if (_playerView != nil && _playerView.player != nil) {
+        _playerView.player.playbackRate = speed;
+    } else {
+        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
+    };
+}
+
 RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)index) {
     if (_playerView != nil && _playerView.player != nil) {
         _playerView.player.playlistIndex = [index integerValue];
