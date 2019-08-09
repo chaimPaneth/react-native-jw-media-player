@@ -49,6 +49,13 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void setSpeed(float speed) {
+    if (RNJWPlayerViewManager.mPlayerView != null) {
+      RNJWPlayerViewManager.mPlayerView.setPlaybackRate(speed);
+    }
+  }
+
+  @ReactMethod
   public void pause() {
     if (RNJWPlayerViewManager.mPlayerView != null) {
       RNJWPlayerViewManager.mPlayerView.pause();
