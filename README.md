@@ -146,22 +146,42 @@ For running example project:
 2. Go to `Example` directory and run `yarn` or `npm i`
 3. Go to `Example/ios` and install Pods with `pod install`
 4. Open `demoJWPlayer.xcworkspace` with XCode.
-5. Add your iOS api key for JWplayer into `Info.plist`
+5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop         | Description                                                                                             | Type |
-| ------------ | ------------------------------------------------------------------------------------------------------- | ------- |
-| **`mediaId`** | The JW media id. | `Int`   |
-| **`file`** | The url of the file to play. | `String`   |
-| **`title`** | The title of the track. | `String`   |
-| **`image`** | The url of the player thumbnail. | `String`   |
-| **`autostart`** | Should the track auto start. | `Boolean`   |
-| **`time`** | should the player seek to a certain second. | `Int`   |
-| **`desc`** | Description of the track. | `String`   |
-| **`controls`** | Should the control buttons show. | `Boolean`   |
-| **`repeat`** | Should the track repeat. | `Boolean`   |
-| **`displayDescription`** | Should the player show the description. | `Boolean`   |
-| **`displayTitle`** | Should the player show the title. | `Boolean`   |
+| Prop                     | Description                                 | Type      |
+| ------------------------ | ------------------------------------------- | --------- |
+| **`mediaId`**            | The JW media id.                            | `Int`     |
+| **`file`**               | The url of the file to play.                | `String`  |
+| **`title`**              | The title of the track.                     | `String`  |
+| **`image`**              | The url of the player thumbnail.            | `String`  |
+| **`autostart`**          | Should the track auto start.                | `Boolean` |
+| **`time`**               | should the player seek to a certain second. | `Int`     |
+| **`desc`**               | Description of the track.                   | `String`  |
+| **`controls`**           | Should the control buttons show.            | `Boolean` |
+| **`repeat`**             | Should the track repeat.                    | `Boolean` |
+| **`displayDescription`** | Should the player show the description.     | `Boolean` |
+| **`displayTitle`**       | Should the player show the title.           | `Boolean` |
+
+## Available props
+
+| Prop                     | Description                                                                                                        | Type                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| **`mediaId`**            | The JW media id.                                                                                                   | `Int`                                               |
+| **`file`**               | The url of the file to play.                                                                                       | `String`                                            |
+| **`title`**              | The title of the track.                                                                                            | `String`                                            |
+| **`image`**              | The url of the player thumbnail.                                                                                   | `String`                                            |
+| **`autostart`**          | Should the track auto start.                                                                                       | `Boolean`                                           |
+| **`time`**               | should the player seek to a certain second.                                                                        | `Int`                                               |
+| **`desc`**               | Description of the track.                                                                                          | `String`                                            |
+| **`controls`**           | Should the control buttons show.                                                                                   | `Boolean`                                           |
+| **`repeat`**             | Should the track repeat.                                                                                           | `Boolean`                                           |
+| **`displayDescription`** | Should the player show the description.                                                                            | `Boolean`                                           |
+| **`displayTitle`**       | Should the player show the title.                                                                                  | `Boolean`                                           |
+| **`playlistItem`**       | An object of playlistItem shape.                                                                                   | [PlaylistItem](#PlaylistItem)                       |
+| **`playlist`**           | An array of playlistItems.                                                                                         | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
+| **`nextUpDisplay`**      | Should the player show the next up item in a playlist.                                                             | `Boolean`                                           |
+| **`playerStyle`**        | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section. | `String`                                            |
 
 ## Available methods
 
@@ -178,3 +198,27 @@ For running example project:
 | **`setControls`**      | Sets the display of the control buttons on the player.                                                  | `Boolean`                     |
 | **`loadPlaylist`**     | Loads a playlist.                                                                                       | `[PlaylistItems]`             |
 | **`loadPlaylistItem`** | Loads a playlist item.                                                                                  | [PlaylistItem](#PlaylistItem) |
+
+## Available callbacks
+
+| Func                     | Description                                                                                                                                                                     | Argument                                                                                                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`onPlaylist`**         | A new playlist is loaded.                                                                                                                                                       | `[playlistItem]` see [PlaylistItem](#PlaylistItem)                                                                                                                                                                                                                                                                              |
+| **`onBeforePlay`**       | Right before playing.                                                                                                                                                           | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onBeforeComplete`**   | Right before playing completed and is starting to play.                                                                                                                         | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onPlay`**             | Player started playing.                                                                                                                                                         | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onPause`**            | Player paused playing.                                                                                                                                                          | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onSetupPlayerError`** | Player faced and error while setting up the player.                                                                                                                             | `{error: String}`                                                                                                                                                                                                                                                                                                               |
+| **`onPlayerError`**      | Player faced an error after setting up the player but when attempting to start playing.                                                                                         | `{error: String}`                                                                                                                                                                                                                                                                                                               |
+| **`onBuffer`**           | The player is buffering.                                                                                                                                                        | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onTime`**             | Interval callback for every millisecond playing.                                                                                                                                | `{time: double, duration: double}`                                                                                                                                                                                                                                                                                              |
+| **`onFullScreen`**       | User clicked on the fullscreen icon. Use this to resize the container view for the player. (Make use of https://github.com/yamill/react-native-orientation for fullscreen mode) | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onPlaylistItem`**     | When starting to play a playlist item.                                                                                                                                          | JW type playlist item see docs [ios](https://developer.jwplayer.com/sdk/ios/reference/Protocols/JWPlaylistItemEvent.html), [android](https://developer.jwplayer.com/sdk/android/reference/com/longtailvideo/jwplayer/events/PlaylistItemEvent.html) contains additional index of current playing item in playlist 0 for default |
+
+##### Custom-style
+
+For setting a custom style on the player:
+  1: Check out the [JW player guide](https://developer.jwplayer.com/jw-player/docs/developer-guide/customization/css-skinning/skins_reference/) for adding a custom css file on your player.
+  2: Put your custom css file in the root folder of your native files.
+  3: Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
+  4: build & run.
