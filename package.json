@@ -1,6 +1,6 @@
 {
     "name": "react-native-jwplayer",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
     "main": "index.js",
     "scripts": {
