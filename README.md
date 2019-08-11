@@ -213,12 +213,18 @@ For running example project:
 | **`onBuffer`**           | The player is buffering.                                                                                                                                                        | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onTime`**             | Interval callback for every millisecond playing.                                                                                                                                | `{time: double, duration: double}`                                                                                                                                                                                                                                                                                              |
 | **`onFullScreen`**       | User clicked on the fullscreen icon. Use this to resize the container view for the player. (Make use of https://github.com/yamill/react-native-orientation for fullscreen mode) | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onFullScreenExit`**       | User clicked on the fullscreen icon to exit. 
+                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onPlaylistItem`**     | When starting to play a playlist item.                                                                                                                                          | JW type playlist item see docs [ios](https://developer.jwplayer.com/sdk/ios/reference/Protocols/JWPlaylistItemEvent.html), [android](https://developer.jwplayer.com/sdk/android/reference/com/longtailvideo/jwplayer/events/PlaylistItemEvent.html) contains additional index of current playing item in playlist 0 for default |
 
 ##### Custom-style
 
 For setting a custom style on the player:
-  1: Check out the [JW player guide](https://developer.jwplayer.com/jw-player/docs/developer-guide/customization/css-skinning/skins_reference/) for adding a custom css file on your player.
-  2: Put your custom css file in the root folder of your native files.
-  3: Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
-  4: build & run.
+
+  1. Check out the [JW player guide](https://developer.jwplayer.com/jw-player/docs/developer-guide/customization/css-skinning/skins_reference/) for adding a custom css file on your player.
+  
+  2. Put your custom css file in the root folder of your native files.
+  
+  3. Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
+  
+  4. build & run.
