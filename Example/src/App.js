@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import JWPlayer from 'react-native-jwplayer';
+import { JWPlayer } from 'react-native-jwplayer';
 
 import Color from './Color';
 
