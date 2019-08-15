@@ -31,7 +31,9 @@ import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
 import com.longtailvideo.jwplayer.events.BeforePlayEvent;
 import com.longtailvideo.jwplayer.events.BufferEvent;
 import com.longtailvideo.jwplayer.events.CompleteEvent;
+import com.longtailvideo.jwplayer.events.ControlBarVisibilityEvent;
 import com.longtailvideo.jwplayer.events.ControlsEvent;
+import com.longtailvideo.jwplayer.events.DisplayClickEvent;
 import com.longtailvideo.jwplayer.events.ErrorEvent;
 import com.longtailvideo.jwplayer.events.FullscreenEvent;
 import com.longtailvideo.jwplayer.events.IdleEvent;
@@ -76,6 +78,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
         VideoPlayerEvents.OnAudioTracksListener,
         VideoPlayerEvents.OnAudioTrackChangedListener,
         VideoPlayerEvents.OnControlsListener,
+        VideoPlayerEvents.OnControlBarVisibilityListener,
+        VideoPlayerEvents.OnDisplayClickListener,
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
@@ -154,9 +158,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             .stretching(STRETCHING_UNIFORM)
             .build();
 
-    mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
-    mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
-    mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
+    setDefaultStyle();
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
     audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
@@ -174,6 +176,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     //mPlayerView.addOnBeforePlayListener(this);
     //mPlayerView.addOnBeforeCompleteListener(this);
     mPlayerView.addOnControlsListener(this);
+    mPlayerView.addOnControlBarVisibilityListener(this);
+    mPlayerView.addOnDisplayClickListener(this);
     mPlayerView.addOnFullscreenListener(this);
     mPlayerView.setFullscreenHandler(new FullscreenHandler() {
       @Override
@@ -234,6 +238,21 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.setControls(true);
 
     return mPlayerView;
+  }
+
+  public void setDefaultStyle() {
+    mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
+    mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
+    mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
+  }
+
+  public void setCustomStyle(String name) {
+    SkinConfig skinConfig = new SkinConfig.Builder()
+            .name(name)
+            .url(String.format("file:///android_asset/%s.css", name))
+            .build();
+
+    mPlayerConfig.setSkinConfig(skinConfig);
   }
 
   private void updateWakeLock(boolean enable) {
@@ -458,7 +477,13 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
               mPlayerView.getConfig().setAutostart(playlistItem.getBoolean("autostart"));
             }
 
+            if (playlistItem.hasKey("playerStyle")) {
+              setCustomStyle(playlistItem.getString("playerStyle"));
+            }
+
             mPlayerView.load(newPlayListItem);
+          } else {
+            mPlayerView.play();
           }
         }
       }
@@ -537,6 +562,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           j++;
         }
 
+        if (playlist.getMap(0).hasKey("playerStyle")) {
+          setCustomStyle(playlist.getMap(0).getString("playerStyle"));
+        }
+
         mPlayerView.load(mPlayList);
         //buildPlaylistItem();
 //        mPlayerView.playlistItem(0);
@@ -551,6 +580,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       mPlayerView.stop();
     }
   };
+
+  @Override
+  public void onDisplayClick(DisplayClickEvent displayClickEvent) {
+
+  }
 
   @Override
   public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
@@ -575,8 +609,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onIdle(IdleEvent idleEvent) {
-    WritableMap event = Arguments.createMap();
-    event.putString("message", "onPlaylistItem");
+//    WritableMap event = Arguments.createMap();
+//    event.putString("message", "onPlaylistItem");
   }
 
   @Override
@@ -774,6 +808,20 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   }
 
+  @Override
+  public void onControlBarVisibilityChanged(ControlBarVisibilityEvent controlBarVisibilityEvent) {
+    WritableMap event = Arguments.createMap();
+    event.putString("message", "onControlBarVisible");
+    event.putBoolean("controls", controlBarVisibilityEvent.isVisible());
+    ReactContext reactContext = (ReactContext) mContext;
+    reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            mPlayerView.getId(),
+            "topControlBarVisible",
+            event);
+
+    updateWakeLock(true);
+  }
+
   public Map getExportedCustomBubblingEventTypeConstants() {
     return MapBuilder.builder()
             .put(
@@ -817,6 +865,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onPlaylistItem")))
+            .put("topControlBarVisible",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onControlBarVisible")))
             .build();
   }
 
