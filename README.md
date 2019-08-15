@@ -1,14 +1,14 @@
-# react-native-jwplayer
+# react-native-jw-media-player
 
 ## Getting started
 
-`npm install https://github.com/chaimPaneth/react-native-jwplayer.git --save` or `$ yarn add https://github.com/chaimPaneth/react-native-jwplayer.git`
+`npm install https://github.com/chaimPaneth/react-native-jw-media-player.git --save` or `$ yarn add https://github.com/chaimPaneth/react-native-jw-media-player.git`
 
 ### Mostly automatic installation
 
 Link module with
 
-`$ react-native link react-native-jwplayer`
+`$ react-native link react-native-jw-media-player`
 
 Then add SDK dependencies:
 
@@ -73,7 +73,7 @@ Add to AndroidManifest.xml in the Application tag above the Activity tag:
 ```javascript
 ...
 
-import JWPlayer from 'react-native-jwplayer';
+import JWPlayer from 'react-native-jw-media-player';
 
 ...
 
