@@ -83,6 +83,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           newPlayListItem.setFile(newFile);
 
+//        if (playlistItem.hasKey("playerStyle")) {
+//          RNJWPlayerViewManager.setCustomStyle(playlistItem.getString("playerStyle"));
+//        }
+
           if (playlistItem.hasKey("title")) {
             newPlayListItem.setTitle(playlistItem.getString("title"));
           }
@@ -205,6 +209,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
         j++;
       }
+
+//      if (playlist.getMap(0).hasKey("playerStyle")) {
+//        RNJWPlayerViewManager.setCustomStyle(playlist.getMap(0).getString("playerStyle"));
+//      }
 
       RNJWPlayerViewManager.mPlayerView.getConfig().setAutostart(autostart);
       RNJWPlayerViewManager.mPlayerView.getConfig().setControls(controls);

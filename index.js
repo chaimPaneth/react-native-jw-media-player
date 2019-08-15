@@ -90,7 +90,8 @@ class JWPlayer extends Component {
     onBuffer: PropTypes.func,
     onTime: PropTypes.func,
     onFullScreen: PropTypes.func,
-    onPlaylistItem: PropTypes.func
+    onPlaylistItem: PropTypes.func,
+    onControlBarVisible: PropTypes.func
   };
 
   pause() {
