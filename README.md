@@ -2,7 +2,7 @@
 
 ## Getting started
 
-`npm install https://github.com/chaimPaneth/react-native-jw-media-player.git --save` or `$ yarn add https://github.com/chaimPaneth/react-native-jw-media-player.git`
+`npm i react-native-jw-media-player --save`
 
 ### Mostly automatic installation
 
