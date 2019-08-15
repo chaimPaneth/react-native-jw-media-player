@@ -4,7 +4,7 @@ import {
   View,
 } from 'react-native';
 
-import JWPlayer from 'react-native-jwplayer';
+import JWPlayer from 'react-native-jw-media-player';
 
 import Color from './Color';
 
