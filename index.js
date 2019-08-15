@@ -35,10 +35,10 @@ const JWPlayerStateAndroid = {
   JWPlayerStateError: null
 };
 
-const JWPlayerState =
+export const JWPlayerState =
   Platform.OS === "ios" ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
-class JWPlayer extends Component {
+export default class JWPlayer extends Component {
   static propTypes = {
     file: PropTypes.string,
     image: PropTypes.string,
@@ -230,8 +230,3 @@ class JWPlayer extends Component {
     );
   }
 }
-
-module.exports = {
-  JWPlayerState,
-  JWPlayer
-};
