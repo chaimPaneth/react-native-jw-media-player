@@ -483,8 +483,15 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event
 {
-    if(self.onSeek){
+    if (self.onSeek) {
         self.onSeek(@{});
+    }
+}
+
+-(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event
+{
+    if (self.onControlBarVisible) {
+        self.onControlBarVisible(@{@"controls": @(event.controls)});
     }
 }
 

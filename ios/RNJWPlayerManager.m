@@ -40,6 +40,7 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onReady, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);

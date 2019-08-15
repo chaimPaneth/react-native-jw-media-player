@@ -38,6 +38,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onSeek;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylist;
 @property(nonatomic, copy)RCTBubblingEventBlock onReady;
+@property(nonatomic, copy)RCTBubblingEventBlock onControlBarVisible;
 
 -(void)onRNJWReady;
 -(void)onRNJWPlaylist;
@@ -55,6 +56,7 @@
 -(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
+-(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
 
 -(JWConfig*)setupConfig;
 -(void)defaultStyle: (JWConfig*)config;

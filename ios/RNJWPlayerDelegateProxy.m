@@ -73,9 +73,14 @@
     [self.delegate onRNJWFullScreenExitRequested:event];
 }
 
--(void)onSeek:(JWEvent<JWSeekEvent> *)event
+- (void)onSeek:(JWEvent<JWSeekEvent> *)event
 {
     [self.delegate onRNJWPlayerSeek:event];
+}
+
+- (void)onControlBarVisible:(JWEvent<JWControlsEvent> *)event
+{
+    [self.delegate onRNJWControlBarVisible:event];
 }
 
 @end
