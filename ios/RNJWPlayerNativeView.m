@@ -326,8 +326,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)onRNJWReady
 {
-    if (self.onReady) {
-        self.onReady(@{});
+    if (self.onPlayerReady) {
+        self.onPlayerReady(@{});
     }
 }
 
