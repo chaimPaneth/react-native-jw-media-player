@@ -71,6 +71,7 @@ export default class JWPlayer extends Component {
         autostart: PropTypes.bool.isRequired
       })
     ),
+    onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
     play: PropTypes.func,
     pause: PropTypes.func,

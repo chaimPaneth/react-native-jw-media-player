@@ -37,7 +37,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExitRequested;
 @property(nonatomic, copy)RCTBubblingEventBlock onSeek;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylist;
-@property(nonatomic, copy)RCTBubblingEventBlock onReady;
+@property(nonatomic, copy)RCTBubblingEventBlock onPlayerReady;
 @property(nonatomic, copy)RCTBubblingEventBlock onControlBarVisible;
 
 -(void)onRNJWReady;
