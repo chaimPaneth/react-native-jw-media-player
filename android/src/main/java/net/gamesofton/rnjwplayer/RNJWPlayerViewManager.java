@@ -704,11 +704,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   @Override
   public void onReady(ReadyEvent readyEvent) {
     WritableMap event = Arguments.createMap();
-    event.putString("message", "onReady");
+    event.putString("message", "onPlayerReady");
     ReactContext reactContext = (ReactContext) mContext;
     reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             mPlayerView.getId(),
-            "topOnReady",
+            "topOnPlayerReady",
             event);
 
     updateWakeLock(true);
@@ -869,6 +869,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onControlBarVisible")))
+            .put("topOnPlayerReady",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlayerReady")))
             .build();
   }
 
