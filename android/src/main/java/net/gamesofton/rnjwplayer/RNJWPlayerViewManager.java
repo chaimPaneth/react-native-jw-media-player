@@ -162,6 +162,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
     audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+    mPlayerView.addOnReadyListener(this);
     mPlayerView.addOnPlayListener(this);
     mPlayerView.addOnPauseListener(this);
     mPlayerView.addOnCompleteListener(this);
@@ -703,6 +704,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @Override
   public void onReady(ReadyEvent readyEvent) {
+    Log.e(TAG, "onReady triggered");
     WritableMap event = Arguments.createMap();
     event.putString("message", "onPlayerReady");
     ReactContext reactContext = (ReactContext) mContext;
