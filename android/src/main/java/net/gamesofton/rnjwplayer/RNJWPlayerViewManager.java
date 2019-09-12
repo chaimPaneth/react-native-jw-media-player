@@ -152,6 +152,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             .skinConfig(new SkinConfig.Builder().build())
             .repeat(false)
             .controls(true)
+            .autostart(false)
             .displayTitle(true)
             .displayDescription(true)
             .nextUpDisplay(true)
@@ -381,6 +382,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
 
   @ReactProp(name = "autostart")
   public void setAutostart(View view, Boolean prop) {
+    if (prop) {
+      mPlayerView.play();
+    }
+
     if(autostart!=prop) {
       autostart = prop;
 
@@ -945,17 +950,24 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   @Override
   public void onAudioFocusChange(int i) {
     mHandler = new Handler();
-    if (i == AudioManager.AUDIOFOCUS_LOSS) {
-      mPlayerView.pause();
-      mHandler.postDelayed(mDelayedStopRunnable,
-              TimeUnit.SECONDS.toMillis(30));
-    } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-      mPlayerView.pause();
-    } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-// Lower the volume, keep playing
 
-    } else if (i == AudioManager.AUDIOFOCUS_GAIN) {
-      mPlayerView.play();
+    switch (i) {
+      case AudioManager.AUDIOFOCUS_LOSS:
+        mPlayerView.pause();
+        mHandler.postDelayed(mDelayedStopRunnable, TimeUnit.SECONDS.toMillis(30));
+        break;
+      case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+        mPlayerView.pause();
+        break;
+      case AudioManager.AUDIOFOCUS_GAIN:
+        Boolean autostart = mPlayerView.getConfig().getAutostart();
+        if (autostart) {
+          mPlayerView.play();
+        }
+        break;
+      case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+        // Lower the volume, keep playing
+        break;
     }
   }
 }
