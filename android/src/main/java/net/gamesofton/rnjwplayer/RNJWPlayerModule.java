@@ -119,8 +119,9 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerViewManager.mPlayerView.setControls(controls);
 
           RNJWPlayerViewManager.mPlayerView.load(newPlayListItem);
-
-          RNJWPlayerViewManager.mPlayerView.play();
+          if(autostart) { 
+            RNJWPlayerViewManager.mPlayerView.play();
+          }
 //        }
       }
     }
