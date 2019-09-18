@@ -75,53 +75,46 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       if (playlistItem.hasKey("file")) {
         String newFile = playlistItem.getString("file");
 
-//        if (RNJWPlayerViewManager.mPlayerView.getPlaylistItem() == null || !newFile.equals(RNJWPlayerViewManager.mPlayerView.getPlaylistItem().getFile())) {
+        PlaylistItem newPlayListItem = new PlaylistItem();
 
-//          RNJWPlayerViewManager.mPlayerView.stop();
+        newPlayListItem.setFile(newFile);
 
-          PlaylistItem newPlayListItem = new PlaylistItem();
+        if (playlistItem.hasKey("playerStyle")) {
+          RNJWPlayerViewManager.setCustomStyle(playlistItem.getString("playerStyle"));
+        }
 
-          newPlayListItem.setFile(newFile);
+        if (playlistItem.hasKey("title")) {
+          newPlayListItem.setTitle(playlistItem.getString("title"));
+        }
 
-//        if (playlistItem.hasKey("playerStyle")) {
-//          RNJWPlayerViewManager.setCustomStyle(playlistItem.getString("playerStyle"));
-//        }
+        if (playlistItem.hasKey("desc")) {
+          newPlayListItem.setDescription(playlistItem.getString("desc"));
+        }
 
-          if (playlistItem.hasKey("title")) {
-            newPlayListItem.setTitle(playlistItem.getString("title"));
-          }
+        if (playlistItem.hasKey("image")) {
+          newPlayListItem.setImage(playlistItem.getString("image"));
+        }
 
-          if (playlistItem.hasKey("desc")) {
-            newPlayListItem.setDescription(playlistItem.getString("desc"));
-          }
+        if (playlistItem.hasKey("mediaId")) {
+          newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
+        }
 
-          if (playlistItem.hasKey("image")) {
-            newPlayListItem.setImage(playlistItem.getString("image"));
-          }
+        Boolean autostart = true;
+        Boolean controls = true;
 
-          if (playlistItem.hasKey("mediaId")) {
-            newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
-          }
+        if (playlistItem.hasKey("autostart")) {
+          autostart = playlistItem.getBoolean("autostart");
+        }
 
-          Boolean autostart = true;
-          Boolean controls = true;
+        if (playlistItem.hasKey("controls")) {
+          controls = playlistItem.getBoolean("controls");
+        }
 
-          if (playlistItem.hasKey("autostart")) {
-            autostart = playlistItem.getBoolean("autostart");
-          }
+        RNJWPlayerViewManager.mPlayerView.getConfig().setAutostart(autostart);
+        RNJWPlayerViewManager.mPlayerView.getConfig().setControls(controls);
+        RNJWPlayerViewManager.mPlayerView.setControls(controls);
 
-          if (playlistItem.hasKey("controls")) {
-            controls = playlistItem.getBoolean("controls");
-          }
-
-          RNJWPlayerViewManager.mPlayerView.getConfig().setAutostart(autostart);
-          RNJWPlayerViewManager.mPlayerView.getConfig().setControls(controls);
-          RNJWPlayerViewManager.mPlayerView.setControls(controls);
-
-          RNJWPlayerViewManager.mPlayerView.load(newPlayListItem);
-
-          RNJWPlayerViewManager.mPlayerView.play();
-//        }
+        RNJWPlayerViewManager.mPlayerView.load(newPlayListItem);
       }
     }
   }
@@ -210,9 +203,9 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         j++;
       }
 
-//      if (playlist.getMap(0).hasKey("playerStyle")) {
-//        RNJWPlayerViewManager.setCustomStyle(playlist.getMap(0).getString("playerStyle"));
-//      }
+      if (playlist.getMap(0).hasKey("playerStyle")) {
+        RNJWPlayerViewManager.setCustomStyle(playlist.getMap(0).getString("playerStyle"));
+      }
 
       RNJWPlayerViewManager.mPlayerView.getConfig().setAutostart(autostart);
       RNJWPlayerViewManager.mPlayerView.getConfig().setControls(controls);
