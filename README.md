@@ -88,25 +88,34 @@ const styles = StyleSheet.create({
 
 ...
 
-componentDidMount() {
-  const playlistItem = {
-    title: 'Track',
-    mediaId: -1,
-    image: 'http://image.com/image.png',
-    desc: 'My beautiful track',
-    time: 0,
-    file: 'http://file.com/file.mp3',
-    autostart: true,
-    controls: true,
-    repeat: false,
-    displayDescription: true,
-    displayTitle: true
-  }
-  this.JWPlayer.loadPlaylistItem(playlistItem);
+const playlistItem = {
+  title: 'Track',
+  mediaId: -1,
+  image: 'http://image.com/image.png',
+  desc: 'My beautiful track',
+  time: 0,
+  file: 'http://file.com/file.mp3',
+  autostart: true,
+  controls: true,
+  repeat: false,
+  displayDescription: true,
+  displayTitle: true
+}
 
-  // for playlist
-  // const playlist = [playlistItem, playlistItem]
-  // this.JWPlayer.loadPlaylist(playlistItem);
+...
+
+componentDidMount() {
+
+  // Not Recommended - load the playlistItem into the player with loadPlaylistItem method
+  /*
+  setTimeout(() => {
+    this.JWPlayer.loadPlaylistItem(playlistItem);
+
+    // for playlist
+    // const playlist = [playlistItem, playlistItem]
+    // this.JWPlayer.loadPlaylist(playlistItem);
+  }, 100)
+  */
 }
 
 ...
@@ -119,6 +128,8 @@ render() {
   <JWPlayer
     ref={p => (this.JWPlayer = p)}
     style={styles.player}
+    playlistItem={playlistItem} // Recommended - pass the playlistItem as a prop into the player
+    // playlist={[playlistItem]}
     onBeforePlay={() => this.onBeforePlay()}
     onPlay={() => this.onPlay()}
     onPause={() => this.onPause()}
@@ -149,19 +160,19 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                     | Description                                 | Type      |
-| ------------------------ | ------------------------------------------- | --------- |
-| **`mediaId`**            | The JW media id.                            | `Int`     |
-| **`file`**               | The url of the file to play.                | `String`  |
-| **`title`**              | The title of the track.                     | `String`  |
-| **`image`**              | The url of the player thumbnail.            | `String`  |
-| **`autostart`**          | Should the track auto start.                | `Boolean` |
-| **`time`**               | should the player seek to a certain second. | `Int`     |
-| **`desc`**               | Description of the track.                   | `String`  |
-| **`controls`**           | Should the control buttons show.            | `Boolean` |
-| **`repeat`**             | Should the track repeat.                    | `Boolean` |
-| **`displayDescription`** | Should the player show the description.     | `Boolean` |
-| **`displayTitle`**       | Should the player show the title.           | `Boolean` |
+| Prop                     | Description                                                                                               | Type      |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- | --------- |
+| **`mediaId`**            | The JW media id.                                                                                          | `Int`     |
+| **`file`**               | The url of the file to play.                                                                              | `String`  |
+| **`title`**              | The title of the track.                                                                                   | `String`  |
+| **`image`**              | The url of the player thumbnail.                                                                          | `String`  |
+| **`autostart`**          | Should the track auto start. (Seems to be a JW issue with android auto starting regardless of this prop). | `Boolean` |
+| **`time`**               | should the player seek to a certain second.                                                               | `Int`     |
+| **`desc`**               | Description of the track.                                                                                 | `String`  |
+| **`controls`**           | Should the control buttons show.                                                                          | `Boolean` |
+| **`repeat`**             | Should the track repeat.                                                                                  | `Boolean` |
+| **`displayDescription`** | Should the player show the description.                                                                   | `Boolean` |
+| **`displayTitle`**       | Should the player show the title.                                                                         | `Boolean` |
 
 ## Available props
 
@@ -171,7 +182,7 @@ For running example project:
 | **`file`**               | The url of the file to play.                                                                                       | `String`                                            |
 | **`title`**              | The title of the track.                                                                                            | `String`                                            |
 | **`image`**              | The url of the player thumbnail.                                                                                   | `String`                                            |
-| **`autostart`**          | Should the track auto start.                                                                                       | `Boolean`                                           |
+| **`autostart`**          | Should the track auto start. (Seems to be a JW issue with android auto starting regardless of this prop).          | `Boolean`                                           |
 | **`time`**               | should the player seek to a certain second.                                                                        | `Int`                                               |
 | **`desc`**               | Description of the track.                                                                                          | `String`                                            |
 | **`controls`**           | Should the control buttons show.                                                                                   | `Boolean`                                           |
@@ -185,19 +196,19 @@ For running example project:
 
 ## Available methods
 
-| Func                   | Description                                                                                             | Argument                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file. | `Int`                         |
-| **`play`**             | Starts playing.                                                                                         | `none`                        |
-| **`pause`**            | Pauses playing.                                                                                         | `none`                        |
-| **`stop`**             | Stops the player completely.                                                                            | `none`                        |
-| **`state`**            | Returns the current state of the player `idle`, `buffering`, `playing`, `paused`.                       | `none`                        |
-| **`position`**         | Returns the current position of the player in seconds.                                                  | `none`                        |
-| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                             | `none`                        |
-| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                   | `Int`                         |
-| **`setControls`**      | Sets the display of the control buttons on the player.                                                  | `Boolean`                     |
-| **`loadPlaylist`**     | Loads a playlist.                                                                                       | `[PlaylistItems]`             |
-| **`loadPlaylistItem`** | Loads a playlist item.                                                                                  | [PlaylistItem](#PlaylistItem) |
+| Func                   | Description                                                                                                                                                                             | Argument                      |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
+| **`play`**             | Starts playing.                                                                                                                                                                         | `none`                        |
+| **`pause`**            | Pauses playing.                                                                                                                                                                         | `none`                        |
+| **`stop`**             | Stops the player completely.                                                                                                                                                            | `none`                        |
+| **`state`**            | Returns the current state of the player `idle`, `buffering`, `playing`, `paused`.                                                                                                       | `none`                        |
+| **`position`**         | Returns the current position of the player in seconds.                                                                                                                                  | `none`                        |
+| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
+| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
+| **`setControls`**      | Sets the display of the control buttons on the player.                                                                                                                                  | `Boolean`                     |
+| **`loadPlaylist`**     | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
+| **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
 
 ## Available callbacks
 
