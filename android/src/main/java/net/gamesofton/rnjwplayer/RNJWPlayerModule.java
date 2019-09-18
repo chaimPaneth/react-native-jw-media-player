@@ -14,14 +14,30 @@ import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext mReactContext;
+
+  private static final String TAG = "RNJWPlayerModule";
 
   public RNJWPlayerModule(ReactApplicationContext reactContext) {
     super(reactContext);
 
     mReactContext = reactContext;
+  }
+
+  private void setCustomStyle(String name) {
+    SkinConfig skinConfig = new SkinConfig.Builder()
+              .name(name)
+              .url(String.format("file:///android_asset/%s.css", name))
+              .build();
+
+    PlayerConfig config = RNJWPlayerViewManager.mPlayerView.getConfig();
+    config.setSkinConfig(skinConfig);
+
+    RNJWPlayerViewManager.mPlayerView.setup(config);
   }
 
   @Override
@@ -80,7 +96,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         newPlayListItem.setFile(newFile);
 
         if (playlistItem.hasKey("playerStyle")) {
-          RNJWPlayerViewManager.setCustomStyle(playlistItem.getString("playerStyle"));
+          setCustomStyle(playlistItem.getString("playerStyle"));
         }
 
         if (playlistItem.hasKey("title")) {
@@ -204,7 +220,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       }
 
       if (playlist.getMap(0).hasKey("playerStyle")) {
-        RNJWPlayerViewManager.setCustomStyle(playlist.getMap(0).getString("playerStyle"));
+        setCustomStyle(playlist.getMap(0).getString("playerStyle"));
       }
 
       RNJWPlayerViewManager.mPlayerView.getConfig().setAutostart(autostart);
