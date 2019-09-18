@@ -248,13 +248,14 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
   }
 
-  public static void setCustomStyle(String name) {
+  public void setCustomStyle(String name) {
     SkinConfig skinConfig = new SkinConfig.Builder()
             .name(name)
             .url(String.format("file:///android_asset/%s.css", name))
             .build();
 
     mPlayerConfig.setSkinConfig(skinConfig);
+    mPlayerView.setup(mPlayerConfig);
   }
 
   private void updateWakeLock(boolean enable) {
@@ -372,6 +373,13 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
       repeat = prop;
 
       mPlayerView.getConfig().setRepeat(repeat);
+    }
+  }
+
+  @ReactProp(name = "playerStyle")
+  public void setPlayerStyle(View view, String prop) {
+    if (prop) {
+      setCustomStyle(prop);
     }
   }
 
