@@ -51,6 +51,7 @@ export default class JWPlayer extends Component {
     displayTitle: PropTypes.bool,
     displayDesc: PropTypes.bool,
     nextUpDisplay: PropTypes.bool,
+    playerStyle: PropTypes.string,
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
@@ -58,7 +59,8 @@ export default class JWPlayer extends Component {
       desc: PropTypes.string,
       time: PropTypes.number,
       mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired
+      autostart: PropTypes.bool.isRequired,
+      playerStyle: PropTypes.string
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -68,7 +70,8 @@ export default class JWPlayer extends Component {
         desc: PropTypes.string,
         time: PropTypes.number,
         mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired
+        autostart: PropTypes.bool.isRequired,
+        playerStyle: PropTypes.string
       })
     ),
     onPlayerReady: PropTypes.func,

@@ -69,6 +69,13 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     return config;
 }
 
+-(void)setPlayerStyle:(NSString *)playerStyle
+{
+    if (playerStyle != nil) {
+        [self customStyle:self.player.config :playerStyle];
+    }
+}
+
 -(void)setFile:(NSString *)file
 {
     NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:

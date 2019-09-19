@@ -55,6 +55,7 @@ RCT_EXPORT_VIEW_PROPERTY(displayDesc, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
+RCT_EXPORT_VIEW_PROPERTY(playerStyle, NSString);
 
 RCT_REMAP_METHOD(state,
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
