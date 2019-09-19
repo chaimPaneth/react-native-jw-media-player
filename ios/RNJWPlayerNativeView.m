@@ -36,25 +36,76 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     skinStyling.name = name;
 }
 
--(void)defaultStyle: (JWConfig*)config
+-(UIColor*)colorWithHexString:(NSString*)hex
 {
-#define RGBA(r, g, b, a) [UIColor colorWithRed:r/255.0 green: g/255.0 blue:b/255.0 alpha:a]
+    NSString *cString = [[hex stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
     
-    //config.skin = JWPremiumSkinSeven;
-    //config.preload = JWPreloadNone;
+    // String should be 6 or 8 characters
+    if ([cString length] < 6) return [UIColor grayColor];
+    
+    // strip 0X if it appears
+    if ([cString hasPrefix:@"0X"]) cString = [cString substringFromIndex:2];
+    
+    if ([cString length] != 6) return  [UIColor grayColor];
+    
+    // Separate into r, g, b substrings
+    NSRange range;
+    range.location = 0;
+    range.length = 2;
+    NSString *rString = [cString substringWithRange:range];
+    
+    range.location = 2;
+    NSString *gString = [cString substringWithRange:range];
+    
+    range.location = 4;
+    NSString *bString = [cString substringWithRange:range];
+    
+    // Scan values
+    unsigned int r, g, b;
+    [[NSScanner scannerWithString:rString] scanHexInt:&r];
+    [[NSScanner scannerWithString:gString] scanHexInt:&g];
+    [[NSScanner scannerWithString:bString] scanHexInt:&b];
+    
+    return [UIColor colorWithRed:((float) r / 255.0f)
+                           green:((float) g / 255.0f)
+                            blue:((float) b / 255.0f)
+                           alpha:1.0f];
+}
+
+-(void)setColors: (NSDictionary*)colors
+{
+    JWConfig *config = self.player.config;
+    
     config.stretching = JWStretchingUniform;
     
     JWSkinStyling *skinStyling = [JWSkinStyling new];
     config.skin = skinStyling;
     
-    JWControlbarStyling *controlbarStyling = [JWControlbarStyling new];
-    controlbarStyling.icons = RGBA(231,236,239,0.7);
-    skinStyling.controlbar = controlbarStyling;
+    if ([colors objectForKey:@"icons"] != nil) {
+        id icons = [colors objectForKey:@"icons"];
+        
+        JWControlbarStyling *controlbarStyling = [JWControlbarStyling new];
+        controlbarStyling.icons = [self colorWithHexString:icons];
+        skinStyling.controlbar = controlbarStyling;
+    }
     
-    JWTimesliderStyling *timesliderStyling = [JWTimesliderStyling new];
-    timesliderStyling.progress = RGBA(58,94,166,1);
-    timesliderStyling.rail = RGBA(255,255,255,1);
-    skinStyling.timeslider = timesliderStyling;
+    if ([colors objectForKey:@"timeslider"] != nil) {
+        JWTimesliderStyling *timesliderStyling = [JWTimesliderStyling new];
+        
+        id timeslider = [colors objectForKey:@"timeslider"];
+        
+        if ([timeslider objectForKey:@"progress"] != nil) {
+            id progress = [timeslider objectForKey:@"progress"];
+            timesliderStyling.progress = [self colorWithHexString:progress];
+        }
+        
+        if ([timeslider objectForKey:@"rail"] != nil) {
+            id rail = [timeslider objectForKey:@"progress"];
+            timesliderStyling.rail = [self colorWithHexString:rail];
+        }
+        
+        skinStyling.timeslider = timesliderStyling;
+    }
 }
 
 -(JWConfig*)setupConfig
@@ -72,7 +123,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)setPlayerStyle:(NSString *)playerStyle
 {
     if (playerStyle != nil) {
-        [self customStyle:self.player.config :playerStyle];
+        _playerStyle = playerStyle;
     }
 }
 
@@ -242,11 +293,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         JWConfig *config = [self setupConfig];
         
-        id playerStyle = [playlistItem objectForKey:@"playerStyle"];
-        if (playerStyle != nil) {
-            [self customStyle:config :playerStyle];
-        } else {
-            [self defaultStyle:config];
+        if (_playerStyle != nil) {
+            [self customStyle:config :_playerStyle];
         }
             
         config.file = encodedUrl;
@@ -304,11 +352,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         JWConfig *config = [self setupConfig];
         
-        id playerStyle = [[playlist[0] objectForKey:@"playerStyle"] stringValue];
-        if (playerStyle != nil) {
-            [self customStyle:config :playerStyle];
-        } else {
-            [self defaultStyle:config];
+        if (_playerStyle != nil) {
+            [self customStyle:config :_playerStyle];
         }
         
         config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];

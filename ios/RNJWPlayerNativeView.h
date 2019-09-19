@@ -60,7 +60,6 @@
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
 
 -(JWConfig*)setupConfig;
--(void)defaultStyle: (JWConfig*)config;
 -(void)customStyle: (JWConfig*)config :(NSString*)name;
 -(void)reset;
 

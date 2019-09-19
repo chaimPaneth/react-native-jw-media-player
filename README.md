@@ -160,40 +160,40 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                     | Description                                                                                                        | Type      |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------- |
-| **`mediaId`**            | The JW media id.                                                                                                   | `Int`     |
-| **`file`**               | The url of the file to play.                                                                                       | `String`  |
-| **`title`**              | The title of the track.                                                                                            | `String`  |
-| **`image`**              | The url of the player thumbnail.                                                                                   | `String`  |
-| **`autostart`**          | Should the track auto start.                                                                                       | `Boolean` |
-| **`time`**               | should the player seek to a certain second.                                                                        | `Int`     |
-| **`desc`**               | Description of the track.                                                                                          | `String`  |
-| **`controls`**           | Should the control buttons show.                                                                                   | `Boolean` |
-| **`repeat`**             | Should the track repeat.                                                                                           | `Boolean` |
-| **`displayDescription`** | Should the player show the description.                                                                            | `Boolean` |
-| **`displayTitle`**       | Should the player show the title.                                                                                  | `Boolean` |
-| **`playerStyle`**        | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section. | `String`  |
+| Prop                     | Description                                 | Type      |
+| ------------------------ | ------------------------------------------- | --------- |
+| **`mediaId`**            | The JW media id.                            | `Int`     |
+| **`file`**               | The url of the file to play.                | `String`  |
+| **`title`**              | The title of the track.                     | `String`  |
+| **`image`**              | The url of the player thumbnail.            | `String`  |
+| **`autostart`**          | Should the track auto start.                | `Boolean` |
+| **`time`**               | should the player seek to a certain second. | `Int`     |
+| **`desc`**               | Description of the track.                   | `String`  |
+| **`controls`**           | Should the control buttons show.            | `Boolean` |
+| **`repeat`**             | Should the track repeat.                    | `Boolean` |
+| **`displayDescription`** | Should the player show the description.     | `Boolean` |
+| **`displayTitle`**       | Should the player show the title.           | `Boolean` |
 
 ## Available props
 
-| Prop                     | Description                                                                                                        | Type                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| **`mediaId`**            | The JW media id.                                                                                                   | `Int`                                               |
-| **`file`**               | The url of the file to play.                                                                                       | `String`                                            |
-| **`title`**              | The title of the track.                                                                                            | `String`                                            |
-| **`image`**              | The url of the player thumbnail.                                                                                   | `String`                                            |
-| **`autostart`**          | Should the track auto start.                                                                                       | `Boolean`                                           |
-| **`time`**               | should the player seek to a certain second.                                                                        | `Int`                                               |
-| **`desc`**               | Description of the track.                                                                                          | `String`                                            |
-| **`controls`**           | Should the control buttons show.                                                                                   | `Boolean`                                           |
-| **`repeat`**             | Should the track repeat.                                                                                           | `Boolean`                                           |
-| **`displayDescription`** | Should the player show the description.                                                                            | `Boolean`                                           |
-| **`displayTitle`**       | Should the player show the title.                                                                                  | `Boolean`                                           |
-| **`playlistItem`**       | An object of playlistItem shape.                                                                                   | [PlaylistItem](#PlaylistItem)                       |
-| **`playlist`**           | An array of playlistItems.                                                                                         | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
-| **`nextUpDisplay`**      | Should the player show the next up item in a playlist.                                                             | `Boolean`                                           |
-| **`playerStyle`**        | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section. | `String`                                            |
+| Prop                     | Description                                                                                                             | Type                                                |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **`mediaId`**            | The JW media id.                                                                                                        | `Int`                                               |
+| **`file`**               | The url of the file to play.                                                                                            | `String`                                            |
+| **`title`**              | The title of the track.                                                                                                 | `String`                                            |
+| **`image`**              | The url of the player thumbnail.                                                                                        | `String`                                            |
+| **`autostart`**          | Should the track auto start.                                                                                            | `Boolean`                                           |
+| **`time`**               | should the player seek to a certain second.                                                                             | `Int`                                               |
+| **`desc`**               | Description of the track.                                                                                               | `String`                                            |
+| **`controls`**           | Should the control buttons show.                                                                                        | `Boolean`                                           |
+| **`repeat`**             | Should the track repeat.                                                                                                | `Boolean`                                           |
+| **`displayDescription`** | Should the player show the description.                                                                                 | `Boolean`                                           |
+| **`displayTitle`**       | Should the player show the title.                                                                                       | `Boolean`                                           |
+| **`playlistItem`**       | An object of playlistItem shape.                                                                                        | [PlaylistItem](#PlaylistItem)                       |
+| **`playlist`**           | An array of playlistItems.                                                                                              | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
+| **`nextUpDisplay`**      | Should the player show the next up item in a playlist.                                                                  | `Boolean`                                           |
+| **`playerStyle`**        | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section.      | `String`                                            |
+| **`colors`**             | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section. | `Object`                                            |
 
 ## Available methods
 
@@ -240,3 +240,19 @@ For setting a custom style on the player:
   3. Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
   
   4. build & run.
+
+##### Colors
+
+To set the colors of icons and progress bar pass to the player a prop as such.
+
+Note: It is expected to pass the colors in hex format without the hashtag example for white FFFFFF.
+
+```javascript
+colors: PropTypes.shape({
+  icons: PropTypes.string,
+  timeslider: PropTypes.shape({
+    progress: PropTypes.string,
+    rail: PropTypes.string
+  })
+})
+```

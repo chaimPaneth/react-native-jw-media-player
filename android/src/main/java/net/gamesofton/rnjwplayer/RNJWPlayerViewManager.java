@@ -159,8 +159,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             .stretching(STRETCHING_UNIFORM)
             .build();
 
-    setDefaultStyle();
-
     mPlayerView = new RNJWPlayerView(mContext.getBaseContext(), mPlayerConfig);
     audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
     mPlayerView.addOnReadyListener(this);
@@ -240,12 +238,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     mPlayerView.setControls(true);
 
     return mPlayerView;
-  }
-
-  public void setDefaultStyle() {
-    mPlayerConfig.getSkinConfig().setControlBarIcons("#E7ECEF");
-    mPlayerConfig.getSkinConfig().setTimeSliderProgress("#3A5EA6");
-    mPlayerConfig.getSkinConfig().setTimeSliderRail("#FFFFFF");
   }
 
   public void setCustomStyle(String name) {
@@ -349,9 +341,30 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
+  @ReactProp(name = "colors")
+  public void setColors(View view, ReadableMap prop) {
+    if (prop != null) {
+      if (prop.hasKey("icons")) {
+        mPlayerConfig.getSkinConfig().setControlBarIcons("#" + prop.getString("icons"));
+      }
+
+      if (prop.hasKey("timeslider")) {
+        ReadableMap timeslider = prop.getMap("timeslider");
+
+        if (timeslider.hasKey("progress")) {
+          mPlayerConfig.getSkinConfig().setTimeSliderProgress("#" + timeslider.getString("progress"));
+        }
+
+        if (timeslider.hasKey("rail")) {
+          mPlayerConfig.getSkinConfig().setTimeSliderRail("#" + timeslider.getString("rail"));
+        }
+      }
+    }
+  }
+
   @ReactProp(name = "playerStyle")
   public void setPlayerStyle(View view, String prop) {
-    if (prop) {
+    if (prop != null) {
       setCustomStyle(prop);
     }
   }
@@ -441,7 +454,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   @ReactProp(name = "playlist")
-  public void setPlayList(View view, ReadableArray prop) {
+  public void setPlaylist(View view, ReadableArray prop) {
     if(playlist != prop) {
       playlist = prop;
 

@@ -8,13 +8,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
+import com.longtailvideo.jwplayer.configuration.PlayerConfig;
+import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.util.Log;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
