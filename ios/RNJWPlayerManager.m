@@ -56,6 +56,7 @@ RCT_EXPORT_VIEW_PROPERTY(nextUpDisplay, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(playerStyle, NSString);
+RCT_EXPORT_VIEW_PROPERTY(colors, NSDictionary);
 
 RCT_REMAP_METHOD(state,
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
@@ -153,11 +154,8 @@ RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
             
             JWConfig *config = [_playerView setupConfig];
             
-            id playerStyle = [playlistItem objectForKey:@"playerStyle"];
-            if (playerStyle != nil) {
-                [_playerView customStyle:config :playerStyle];
-            } else {
-                [_playerView defaultStyle:config];
+            if (_playerView.playerStyle != nil) {
+                [_playerView customStyle:config :_playerView.playerStyle];
             }
             
             config.file = encodedUrl;
@@ -212,11 +210,8 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
             
             JWConfig *config = [_playerView setupConfig];
             
-            id playerStyle = [[playlist[0] objectForKey:@"playerStyle"] stringValue];
-            if (playerStyle != nil) {
-                [_playerView customStyle:config :playerStyle];
-            } else {
-                [_playerView defaultStyle:config];
+            if (_playerView.playerStyle != nil) {
+                [_playerView customStyle:config :_playerView.playerStyle];
             }
             
             config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];

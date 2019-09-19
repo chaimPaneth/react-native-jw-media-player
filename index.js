@@ -52,6 +52,13 @@ export default class JWPlayer extends Component {
     displayDesc: PropTypes.bool,
     nextUpDisplay: PropTypes.bool,
     playerStyle: PropTypes.string,
+    colors: PropTypes.shape({
+      icons: PropTypes.string,
+      timeslider: PropTypes.shape({
+        progress: PropTypes.string,
+        rail: PropTypes.string
+      })
+    }),
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
@@ -59,8 +66,7 @@ export default class JWPlayer extends Component {
       desc: PropTypes.string,
       time: PropTypes.number,
       mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      playerStyle: PropTypes.string
+      autostart: PropTypes.bool.isRequired
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -70,8 +76,7 @@ export default class JWPlayer extends Component {
         desc: PropTypes.string,
         time: PropTypes.number,
         mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired,
-        playerStyle: PropTypes.string
+        autostart: PropTypes.bool.isRequired
       })
     ),
     onPlayerReady: PropTypes.func,
