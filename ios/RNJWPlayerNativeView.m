@@ -100,7 +100,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         }
         
         if ([timeslider objectForKey:@"rail"] != nil) {
-            id rail = [timeslider objectForKey:@"progress"];
+            id rail = [timeslider objectForKey:@"rail"];
             timesliderStyling.rail = [self colorWithHexString:rail];
         }
         
