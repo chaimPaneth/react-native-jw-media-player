@@ -21,6 +21,7 @@
 @property(nonatomic, strong)NSString *image;
 @property(nonatomic, strong)NSString *desc;
 @property(nonatomic, strong)NSString *mediaId;
+@property(nonatomic, strong)NSString *playerStyle;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;

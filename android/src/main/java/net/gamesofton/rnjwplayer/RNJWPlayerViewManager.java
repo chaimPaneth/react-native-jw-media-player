@@ -268,33 +268,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
     }
   }
 
-  private void buildPlaylistItem() {
-    PlaylistItem newPlayListItem = new PlaylistItem();
-
-    if (file != null && !file.isEmpty() && (mPlayerView.getPlaylistItem() == null || !file.equals(mPlayerView.getPlaylistItem().getFile()))) {
-      newPlayListItem.setFile(file);
-
-      if (title != null && !title.isEmpty()) {
-        newPlayListItem.setTitle(title);
-      }
-
-      if (desc != null && !desc.isEmpty()) {
-        newPlayListItem.setDescription(desc);
-      }
-
-      if (image != null && !image.isEmpty()) {
-        newPlayListItem.setImage(image);
-      }
-
-      if (mediaId != null && !mediaId.isEmpty()) {
-        newPlayListItem.setMediaId(mediaId);
-      }
-
-      mPlayerView.load(newPlayListItem);
-      mPlayerView.play();
-    }
-  }
-
   @ReactProp(name = "file")
   public void setFile(View view, String prop) {
     if (file!=prop) {
@@ -384,7 +357,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   @ReactProp(name = "nextUpDisplay")
-  public void setnextUpDisplay(View view, Boolean prop) {
+  public void setNextUpDisplay(View view, Boolean prop) {
     if(nextUpDisplay!=prop) {
       nextUpDisplay = prop;
 
@@ -393,7 +366,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
   }
 
   @ReactProp(name = "playlistId")
-  public void setplaylistId(View view, String prop) {
+  public void setPlaylistId(View view, String prop) {
     if (playlistId!=prop) {
       playlistId = prop;
     }
