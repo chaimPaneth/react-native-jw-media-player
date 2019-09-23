@@ -22,6 +22,7 @@
 @property(nonatomic, strong)NSString *desc;
 @property(nonatomic, strong)NSString *mediaId;
 @property(nonatomic, strong)NSString *playerStyle;
+@property(nonatomic, strong)NSDictionary *playerColors;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
@@ -61,6 +62,7 @@
 
 -(JWConfig*)setupConfig;
 -(void)customStyle: (JWConfig*)config :(NSString*)name;
+-(void)setupColors: (JWConfig*)config;
 -(void)reset;
 
 @end

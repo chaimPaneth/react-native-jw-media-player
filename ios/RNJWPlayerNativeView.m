@@ -74,37 +74,44 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)setColors: (NSDictionary*)colors
 {
-    JWConfig *config = self.player.config;
-    
-    config.stretching = JWStretchingUniform;
-    
-    JWSkinStyling *skinStyling = [JWSkinStyling new];
-    config.skin = skinStyling;
-    
-    if ([colors objectForKey:@"icons"] != nil) {
-        id icons = [colors objectForKey:@"icons"];
-        
-        JWControlbarStyling *controlbarStyling = [JWControlbarStyling new];
-        controlbarStyling.icons = [self colorWithHexString:icons];
-        skinStyling.controlbar = controlbarStyling;
+    if (colors != nil) {
+        _playerColors = colors;
     }
-    
-    if ([colors objectForKey:@"timeslider"] != nil) {
-        JWTimesliderStyling *timesliderStyling = [JWTimesliderStyling new];
+}
+
+-(void)setupColors: (JWConfig *)config
+{
+    if (_playerColors != nil) {
+        config.stretching = JWStretchingUniform;
         
-        id timeslider = [colors objectForKey:@"timeslider"];
+        JWSkinStyling *skinStyling = [JWSkinStyling new];
+        config.skin = skinStyling;
         
-        if ([timeslider objectForKey:@"progress"] != nil) {
-            id progress = [timeslider objectForKey:@"progress"];
-            timesliderStyling.progress = [self colorWithHexString:progress];
+        if ([_playerColors objectForKey:@"icons"] != nil) {
+            id icons = [_playerColors objectForKey:@"icons"];
+            
+            JWControlbarStyling *controlbarStyling = [JWControlbarStyling new];
+            controlbarStyling.icons = [self colorWithHexString:icons];
+            skinStyling.controlbar = controlbarStyling;
         }
         
-        if ([timeslider objectForKey:@"rail"] != nil) {
-            id rail = [timeslider objectForKey:@"rail"];
-            timesliderStyling.rail = [self colorWithHexString:rail];
+        if ([_playerColors objectForKey:@"timeslider"] != nil) {
+            JWTimesliderStyling *timesliderStyling = [JWTimesliderStyling new];
+            
+            id timeslider = [_playerColors objectForKey:@"timeslider"];
+            
+            if ([timeslider objectForKey:@"progress"] != nil) {
+                id progress = [timeslider objectForKey:@"progress"];
+                timesliderStyling.progress = [self colorWithHexString:progress];
+            }
+            
+            if ([timeslider objectForKey:@"rail"] != nil) {
+                id rail = [timeslider objectForKey:@"rail"];
+                timesliderStyling.rail = [self colorWithHexString:rail];
+            }
+            
+            skinStyling.timeslider = timesliderStyling;
         }
-        
-        skinStyling.timeslider = timesliderStyling;
     }
 }
 
@@ -295,6 +302,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
+        } else if (_playerColors != nil) {
+            [self setupColors:config];
         }
             
         config.file = encodedUrl;
@@ -354,6 +363,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
+        } else if (_playerColors != nil) {
+            [self setupColors:config];
         }
         
         config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
