@@ -359,6 +359,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
           mPlayerConfig.getSkinConfig().setTimeSliderRail("#" + timeslider.getString("rail"));
         }
       }
+
+      mPlayerView.setup(mPlayerConfig);
     }
   }
 
