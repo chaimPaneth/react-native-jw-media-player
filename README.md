@@ -257,7 +257,7 @@ colors: PropTypes.shape({
 })
 ```
 
-####Background Audio
+### Background Audio
 
 This package supports Background audio sessions just follow the jwplayer docs for background session.
 
