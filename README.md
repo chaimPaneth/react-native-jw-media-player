@@ -256,3 +256,56 @@ colors: PropTypes.shape({
   })
 })
 ```
+
+####Background Audio
+
+This package supports Background audio sessions just follow the jwplayer docs for background session.
+
+Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
+Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
+
+You need to edit the AppDelegate.h file in iOS
+Here is a complete example - iOS:
+```
+ #import <AVFoundation/AVFoundation.h>
+ #import <Foundation/Foundation.h>
+
+ NSString* const AudioInterruptionsDidStart = @"AudioInterruptionsStarted";
+ NSString* const AudioInterruptionsDidEnd = @"AudioInterruptionsEnded";
+
+ @implementation AppDelegate
+
+-(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary 
+ *)launchOptions
+ {
+   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+  
+   [[NSNotificationCenter defaultCenter] addObserver: self
+                                           selector: @selector(audioSessionInterrupted:)
+                                               name: AVAudioSessionInterruptionNotification
+                                             object: audioSession];
+  
+   NSError *setCategoryError = nil;
+   BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback 
+ error:&setCategoryError];
+  
+   NSError *activationError = nil;
+   success = [audioSession setActive:YES error:&activationError];
+ }
+
+ -(void)audioSessionInterrupted:(NSNotification*)note
+ {
+   if ([note.name isEqualToString:AVAudioSessionInterruptionNotification]) {
+     NSLog(@"Interruption notification");
+
+  if ([[note.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber 
+ numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
+      [[NSNotificationCenter defaultCenter] postNotificationName:AudioInterruptionsDidStart object:self 
+ userInfo:nil];
+     } else {
+       [[NSNotificationCenter defaultCenter] postNotificationName:AudioInterruptionsDidEnd object:self 
+ userInfo:nil];
+   }
+  }
+}
+```
