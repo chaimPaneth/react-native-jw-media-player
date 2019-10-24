@@ -17,9 +17,7 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-    if (!_playerView) {
-        _playerView = [[RNJWPlayerNativeView alloc] init];
-    }
+    _playerView = [[RNJWPlayerNativeView alloc] init];
     
     return _playerView;
 }
