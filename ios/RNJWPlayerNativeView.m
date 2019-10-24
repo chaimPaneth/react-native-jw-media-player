@@ -300,19 +300,45 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         JWConfig *config = [self setupConfig];
         
-        if (_playerStyle != nil) {
+        if (_playerStyle) {
             [self customStyle:config :_playerStyle];
+        } else if ([playlistItem objectForKey:@"playerStyle"]) {
+            [self customStyle:config :[playlistItem objectForKey:@"playerStyle"]];
         } else if (_playerColors != nil) {
             [self setupColors:config];
         }
             
         config.file = encodedUrl;
-        config.mediaId = [playlistItem objectForKey:@"mediaId"];
-        config.title = [playlistItem objectForKey:@"title"];
-        config.desc = [playlistItem objectForKey:@"desc"];
-        config.image = [playlistItem objectForKey:@"image"];
         
-        config.autostart = [[playlistItem objectForKey:@"autostart"] boolValue];
+        id mediaId = playlistItem[@"mediaId"];
+        if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
+            config.mediaId = mediaId;
+        }
+        
+        id title = playlistItem[@"title"];
+        if ((title != nil) && (title != (id)[NSNull null])) {
+            config.title = title;
+        }
+        
+        id desc = playlistItem[@"desc"];
+        if ((desc != nil) && (desc != (id)[NSNull null])) {
+            config.desc = desc;
+        }
+        
+        id image = playlistItem[@"image"];
+        if ((image != nil) && (image != (id)[NSNull null])) {
+            config.image = image;
+        }
+        
+        id autostart = playlistItem[@"autostart"];
+        if ((autostart != nil) && (autostart != (id)[NSNull null])) {
+            config.autostart = [autostart boolValue];
+        }
+        
+        id controls = playlistItem[@"controls"];
+        if ((controls != nil) && (controls != (id)[NSNull null])) {
+            config.controls = [controls boolValue];
+        }
         
         _proxy = [RNJWPlayerDelegateProxy new];
         _proxy.delegate = self;
@@ -352,10 +378,27 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
                                     NSUTF8StringEncoding];
             playListItem.file = encodedUrl;
-            playListItem.image = [item objectForKey:@"image"];
-            playListItem.title = [item objectForKey:@"title"];
-            playListItem.desc = [item objectForKey:@"desc"];
-            playListItem.mediaId = [item objectForKey:@"mediaId"];
+            
+            id mediaId = item[@"mediaId"];
+            if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
+                playListItem.mediaId = mediaId;
+            }
+            
+            id title = item[@"title"];
+            if ((title != nil) && (title != (id)[NSNull null])) {
+                playListItem.title = title;
+            }
+            
+            id desc = item[@"desc"];
+            if ((desc != nil) && (desc != (id)[NSNull null])) {
+                playListItem.desc = desc;
+            }
+            
+            id image = item[@"image"];
+            if ((image != nil) && (image != (id)[NSNull null])) {
+                playListItem.image = image;
+            }
+            
             [playlistArray addObject:playListItem];
         }
         
