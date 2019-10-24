@@ -246,8 +246,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> imp
             .url(String.format("file:///android_asset/%s.css", name))
             .build();
 
-    mPlayerConfig.setSkinConfig(skinConfig);
-    mPlayerView.setup(mPlayerConfig);
+    PlayerConfig config = mPlayerView.getConfig();
+    config.setSkinConfig(skinConfig);
+
+    mPlayerView.setup(config);
   }
 
   private void updateWakeLock(boolean enable) {
