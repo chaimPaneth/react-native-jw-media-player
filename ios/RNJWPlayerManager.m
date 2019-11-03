@@ -55,6 +55,7 @@ RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(playerStyle, NSString);
 RCT_EXPORT_VIEW_PROPERTY(colors, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(nativeFullScreen, BOOL);
 
 RCT_REMAP_METHOD(state,
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
@@ -144,8 +145,6 @@ RCT_EXPORT_METHOD(setControls: (BOOL)show) {
 RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
     if (_playerView != nil && playlistItem) {
         NSString *newFile = [playlistItem objectForKey:@"file"];
-        NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                                NSUTF8StringEncoding];
         
         if (newFile != nil && newFile.length > 0) {
             [_playerView reset];
@@ -154,11 +153,16 @@ RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
             
             if (_playerView.playerStyle != nil) {
                 [_playerView customStyle:config :_playerView.playerStyle];
-            } else if (_playerView.playerColors != nil) {
-                [_playerView setupColors:config];
             }
             
-            config.file = encodedUrl;
+            NSURL* url = [NSURL URLWithString:newFile];
+            if (url && url.scheme && url.host) {
+                config.file = newFile;
+            } else {
+                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                NSUTF8StringEncoding];
+                config.file = encodedUrl;
+            }
             
             id mediaId = playlistItem[@"mediaId"];
             if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
@@ -221,9 +225,15 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
             for (id item in playlist) {
                 JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
                 NSString *newFile = [item objectForKey:@"file"];
-                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                                        NSUTF8StringEncoding];
-                playListItem.file = encodedUrl;
+                
+                NSURL* url = [NSURL URLWithString:newFile];
+                if (url && url.scheme && url.host) {
+                    playListItem.file = newFile;
+                } else {
+                    NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                    NSUTF8StringEncoding];
+                    playListItem.file = encodedUrl;
+                }
                 
                 id mediaId = item[@"mediaId"];
                 if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
@@ -252,8 +262,6 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
             
             if (_playerView.playerStyle != nil) {
                 [_playerView customStyle:config :_playerView.playerStyle];
-            } else if (_playerView.playerColors != nil) {
-                [_playerView setupColors:config];
             }
             
             config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];

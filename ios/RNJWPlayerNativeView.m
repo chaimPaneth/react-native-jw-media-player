@@ -72,10 +72,19 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
                            alpha:1.0f];
 }
 
--(void)setColors: (NSDictionary*)colors
+-(void)setNativeFullScreen:(BOOL)nativeFullScreen
+{
+    _nativeFullScreen = nativeFullScreen;
+}
+
+-(void)setColors: (NSDictionary *)colors
 {
     if (colors != nil) {
         _playerColors = colors;
+        
+        if (_player != nil) {
+            [self setupColors:_player.config];
+        }
     }
 }
 
@@ -274,6 +283,10 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     if (self.player != nil) {
         self.player.view.frame = self.frame;
     }
+    
+    if (_initFrame.size.height == 0) {
+        _initFrame = self.frame;
+    }
 }
 
 -(BOOL)shouldAutorotate {
@@ -292,8 +305,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 -(void)setPlaylistItem:(NSDictionary *)playlistItem
 {
     NSString *newFile = [playlistItem objectForKey:@"file"];
-    NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                            NSUTF8StringEncoding];
     
     if (newFile != nil && newFile.length > 0) {
         [self reset];
@@ -304,11 +315,16 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             [self customStyle:config :_playerStyle];
         } else if ([playlistItem objectForKey:@"playerStyle"]) {
             [self customStyle:config :[playlistItem objectForKey:@"playerStyle"]];
-        } else if (_playerColors != nil) {
-            [self setupColors:config];
         }
-            
-        config.file = encodedUrl;
+        
+        NSURL* url = [NSURL URLWithString:newFile];
+        if (url && url.scheme && url.host) {
+            config.file = newFile;
+        } else {
+            NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+            NSUTF8StringEncoding];
+            config.file = encodedUrl;
+        }
         
         id mediaId = playlistItem[@"mediaId"];
         if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
@@ -375,9 +391,15 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             JWPlaylistItem *playListItem = [JWPlaylistItem new];
             
             NSString *newFile = [item objectForKey:@"file"];
-            NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                                    NSUTF8StringEncoding];
-            playListItem.file = encodedUrl;
+            
+            NSURL* url = [NSURL URLWithString:newFile];
+            if (url && url.scheme && url.host) {
+                playListItem.file = newFile;
+            } else {
+                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
+                NSUTF8StringEncoding];
+                playListItem.file = encodedUrl;
+            }
             
             id mediaId = item[@"mediaId"];
             if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
@@ -406,8 +428,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
-        } else if (_playerColors != nil) {
-            [self setupColors:config];
         }
         
         config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
@@ -560,15 +580,39 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     
 }
 
+-(void)explode
+{
+    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, [[UIScreen mainScreen] applicationFrame].size.height);
+    
+    self.frame = rect;
+    
+    [self setBackgroundColor:[UIColor blackColor]];
+}
+
+-(void)shrink
+{
+    self.frame = _initFrame;
+    
+    [self setBackgroundColor:[UIColor whiteColor]];
+}
+
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
 {
-    if([[event valueForKey:@"_fullscreen"] boolValue]){
+    if ([[event valueForKey:@"_fullscreen"] boolValue]) {
         if (self.onFullScreenRequested) {
             self.onFullScreenRequested(@{});
         }
-    }else{
+        
+        if (_nativeFullScreen) {
+            [self explode];
+        }
+    } else {
         if (self.onFullScreenExitRequested) {
             self.onFullScreenExitRequested(@{});
+        }
+        
+        if (_nativeFullScreen) {
+            [self shrink];
         }
     }
 }
