@@ -23,6 +23,8 @@
 @property(nonatomic, strong)NSString *mediaId;
 @property(nonatomic, strong)NSString *playerStyle;
 @property(nonatomic, strong)NSDictionary *playerColors;
+@property(nonatomic)BOOL nativeFullScreen;
+@property(nonatomic)CGRect initFrame;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;

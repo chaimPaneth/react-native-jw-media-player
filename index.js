@@ -59,6 +59,7 @@ export default class JWPlayer extends Component {
         rail: PropTypes.string
       })
     }),
+    nativeFullScreen: PropTypes.bool,
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
