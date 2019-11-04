@@ -153,6 +153,8 @@ RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
             
             if (_playerView.playerStyle != nil) {
                 [_playerView customStyle:config :_playerView.playerStyle];
+            } else if (_playerView.playerColors != nil) {
+                [_playerView setupColors:config];
             }
             
             NSURL* url = [NSURL URLWithString:newFile];
@@ -262,6 +264,8 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
             
             if (_playerView.playerStyle != nil) {
                 [_playerView customStyle:config :_playerView.playerStyle];
+            } else if (_playerView.playerColors != nil) {
+               [_playerView setupColors:config];
             }
             
             config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
