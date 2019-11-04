@@ -315,6 +315,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             [self customStyle:config :_playerStyle];
         } else if ([playlistItem objectForKey:@"playerStyle"]) {
             [self customStyle:config :[playlistItem objectForKey:@"playerStyle"]];
+        } else if (_playerColors != nil) {
+             [self setupColors:config];
         }
         
         NSURL* url = [NSURL URLWithString:newFile];
@@ -428,6 +430,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
+        } else if (_playerColors != nil) {
+            [self setupColors:config];
         }
         
         config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
