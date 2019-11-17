@@ -1,51 +1,18 @@
 {
-  "_from": "react-native-jw-media-player@0.1.17",
-  "_id": "react-native-jw-media-player@0.1.17",
-  "_inBundle": false,
-  "_integrity": "sha512-YqAMmbv0feDHNz6YylGnRrkKM4e0bkTKV+RIsqvinL+9sNsih/1e9xfZiN55rFZMHuBHc62Wovz56g7Wg/WJqA==",
-  "_location": "/react-native-jw-media-player",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "react-native-jw-media-player@0.1.17",
-    "name": "react-native-jw-media-player",
-    "escapedName": "react-native-jw-media-player",
-    "rawSpec": "0.1.17",
-    "saveSpec": null,
-    "fetchSpec": "0.1.17"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/react-native-jw-media-player/-/react-native-jw-media-player-0.1.17.tgz",
-  "_shasum": "3d5bb4a8573a5a6fdfc73f592fb4948cba39cb53",
-  "_spec": "react-native-jw-media-player@0.1.17",
-  "_where": "/Users/chaimpaneth/Projects/OUTorah-V2/OUTorah",
-  "author": {
-    "name": "chaimPaneth",
-    "email": "chaim@chaimpaneth.com",
-    "url": "chaimpaneth.com"
-  },
-  "bugs": {
-    "url": "https://github.com/chaimPaneth/react-native-jw-media-player/issues"
-  },
-  "bundleDependencies": false,
-  "deprecated": false,
+  "name": "react-native-jw-media-player",
+  "version": "0.1.18",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
-  "devDependencies": {
-    "babel-eslint": "^7.1.1",
-    "babel-preset-react-native-stage-0": "^1.0.1",
-    "eslint": "^3.14.1",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1",
-    "pre-commit": "^1.2.2"
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
   },
-  "homepage": "https://github.com/chaimPaneth/react-native-jw-media-player#readme",
+  "pre-commit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chaimPaneth/react-native-jw-media-player.git"
+  },
   "keywords": [
     "react",
     "react-native",
@@ -61,22 +28,22 @@
     "video",
     "sdk"
   ],
+  "author": "chaimPaneth <chaim@chaimpaneth.com> (chaimpaneth.com)",
   "license": "MIT",
-  "main": "index.js",
-  "name": "react-native-jw-media-player",
+  "homepage": "https://github.com/chaimPaneth/react-native-jw-media-player#readme",
   "peerDependencies": {
     "react-native": "^0.40.0",
     "react": "~15.4.0-rc.4"
   },
-  "pre-commit": [
-    "lint"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/chaimPaneth/react-native-jw-media-player.git"
-  },
-  "scripts": {
-    "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
-  },
-  "version": "0.1.17"
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "babel-preset-react-native-stage-0": "^1.0.1",
+    "eslint": "^3.14.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "eslint-plugin-react-native": "^2.2.1",
+    "pre-commit": "^1.2.2"
+  }
 }
