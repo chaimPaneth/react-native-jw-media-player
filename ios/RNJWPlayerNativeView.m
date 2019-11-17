@@ -1,6 +1,5 @@
 #import "RNJWPlayerNativeView.h"
 #import "RNJWPlayerDelegateProxy.h"
-#import "CustomJWPlaylistItem.h"
 #import <AVFoundation/AVFoundation.h>
 
 NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
