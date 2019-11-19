@@ -39,6 +39,8 @@ RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerReady, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onBeforeComplete, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onComplete, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);

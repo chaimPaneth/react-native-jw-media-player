@@ -648,6 +648,20 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     }
 }
 
+-(void)onRNJWPlayerBeforeComplete
+{
+    if (self.onBeforeComplete) {
+        self.onBeforeComplete(@{});
+    }
+}
+
+-(void)onRNJWPlayerComplete
+{
+    if (self.onComplete) {
+        self.onComplete(@{});
+    }
+}
+
 //-(void)onRN
 
 #pragma mark - RNJWPlayer Interruption handling
