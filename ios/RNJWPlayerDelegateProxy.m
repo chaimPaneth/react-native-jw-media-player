@@ -83,4 +83,14 @@
     [self.delegate onRNJWControlBarVisible:event];
 }
 
+- (void)onBeforeComplete
+{
+    [self.delegate onRNJWPlayerBeforeComplete];
+}
+
+- (void)onComplete
+{
+    [self.delegate onRNJWPlayerComplete];
+}
+
 @end
