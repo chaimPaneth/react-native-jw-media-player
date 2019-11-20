@@ -24,6 +24,8 @@
 @property(nonatomic, strong)NSString *playerStyle;
 @property(nonatomic, strong)NSDictionary *playerColors;
 @property(nonatomic)BOOL nativeFullScreen;
+@property(nonatomic)BOOL fullScreenOnLandscape;
+@property(nonatomic)BOOL landscapeOnFullScreen;
 @property(nonatomic)CGRect initFrame;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
