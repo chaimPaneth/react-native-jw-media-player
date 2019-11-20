@@ -60,6 +60,8 @@ export default class JWPlayer extends Component {
       })
     }),
     nativeFullScreen: PropTypes.bool,
+    fullScreenOnLandscape: PropTypes.bool,
+    landscapeOnFullScreen: PropTypes.bool,
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,

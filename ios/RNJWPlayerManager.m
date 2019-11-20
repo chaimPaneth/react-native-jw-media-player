@@ -58,6 +58,8 @@ RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(playerStyle, NSString);
 RCT_EXPORT_VIEW_PROPERTY(colors, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(nativeFullScreen, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(fullScreenOnLandscape, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(landscapeOnFullScreen, BOOL);
 
 RCT_REMAP_METHOD(state,
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
@@ -208,8 +210,8 @@ RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
                 
                 _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
                 
-                _playerView.player.forceFullScreenOnLandscape = YES;
-                _playerView.player.forceLandscapeOnFullScreen = YES;
+                [_playerView setFullScreenOnLandscape:_playerView.fullScreenOnLandscape];
+                [_playerView setLandscapeOnFullScreen:_playerView.landscapeOnFullScreen];
             });
         } else {
             RCTLogError(@"No file prop, expecting url or file path, got: %@", newFile);
@@ -285,8 +287,8 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
                 
                 _playerView.player.controls = YES;
                 
-                _playerView.player.forceFullScreenOnLandscape = YES;
-                _playerView.player.forceLandscapeOnFullScreen = YES;
+                [_playerView setFullScreenOnLandscape:_playerView.fullScreenOnLandscape];
+                [_playerView setLandscapeOnFullScreen:_playerView.landscapeOnFullScreen];
             });
         }
     } else {

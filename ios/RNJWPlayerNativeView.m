@@ -76,6 +76,24 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     _nativeFullScreen = nativeFullScreen;
 }
 
+-(void)setFullScreenOnLandscape:(BOOL)fullScreenOnLandscape
+{
+    _fullScreenOnLandscape = fullScreenOnLandscape;
+    
+    if (_player) {
+        _player.forceFullScreenOnLandscape = fullScreenOnLandscape;
+    }
+}
+
+-(void)setLandscapeOnFullScreen:(BOOL)landscapeOnFullScreen
+{
+    _landscapeOnFullScreen = landscapeOnFullScreen;
+    
+    if (_player) {
+        _player.forceLandscapeOnFullScreen = landscapeOnFullScreen;
+    }
+}
+
 -(void)setColors: (NSDictionary *)colors
 {
     if (colors != nil) {
@@ -364,8 +382,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
         
-        _player.forceFullScreenOnLandscape = YES;
-        _player.forceLandscapeOnFullScreen = YES;
+        [self setFullScreenOnLandscape:_fullScreenOnLandscape];
+        [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
         
         [self addSubview:self.player.view];
     }
@@ -444,9 +462,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         _player.controls = YES;
         
-        _player.forceFullScreenOnLandscape = YES;
-        _player.forceLandscapeOnFullScreen = YES;
-        
+        [self setFullScreenOnLandscape:_fullScreenOnLandscape];
+        [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
+                
         [self addSubview:self.player.view];
     }
 }
@@ -574,9 +592,9 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         }
     }else{
         if (self.onFullScreenExit){
-            [[UIDevice currentDevice] setValue:
-             [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
-                                        forKey:@"orientation"];
+            if (_nativeFullScreen) {
+                [[UIDevice currentDevice] setValue: [NSNumber numberWithInteger: UIInterfaceOrientationPortrait] forKey:@"orientation"];
+            }
             self.onFullScreenExit(@{});
         }
     }
