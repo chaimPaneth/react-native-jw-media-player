@@ -109,8 +109,10 @@ componentDidMount() {
   // Not Recommended - load the playlistItem into the player with loadPlaylistItem method
   /*
   setTimeout(() => {
+    // Available in iOS
     this.JWPlayer.loadPlaylistItem(playlistItem);
 
+    // Available in iOS
     // for playlist
     // const playlist = [playlistItem, playlistItem]
     // this.JWPlayer.loadPlaylist(playlistItem);
@@ -176,41 +178,43 @@ For running example project:
 
 ## Available props
 
-| Prop                     | Description                                                                                                                                                            | Type                                                |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| **`mediaId`**            | The JW media id.                                                                                                                                                       | `Int`                                               |
-| **`file`**               | The url of the file to play.                                                                                                                                           | `String`                                            |
-| **`title`**              | The title of the track.                                                                                                                                                | `String`                                            |
-| **`image`**              | The url of the player thumbnail.                                                                                                                                       | `String`                                            |
-| **`autostart`**          | Should the track auto start.                                                                                                                                           | `Boolean`                                           |
-| **`time`**               | should the player seek to a certain second.                                                                                                                            | `Int`                                               |
-| **`desc`**               | Description of the track.                                                                                                                                              | `String`                                            |
-| **`controls`**           | Should the control buttons show.                                                                                                                                       | `Boolean`                                           |
-| **`repeat`**             | Should the track repeat.                                                                                                                                               | `Boolean`                                           |
-| **`displayDescription`** | Should the player show the description.                                                                                                                                | `Boolean`                                           |
-| **`displayTitle`**       | Should the player show the title.                                                                                                                                      | `Boolean`                                           |
-| **`playlistItem`**       | An object of playlistItem shape.                                                                                                                                       | [PlaylistItem](#PlaylistItem)                       |
-| **`playlist`**           | An array of playlistItems.                                                                                                                                             | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
-| **`nextUpDisplay`**      | Should the player show the next up item in a playlist.                                                                                                                 | `Boolean`                                           |
-| **`playerStyle`**        | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section.                                                     | `String`                                            |
-| **`colors`**             | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section.                                                | `Object`                                            |
-| **`nativeFullScreen`**   | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
+| Prop                        | Description                                                                                                                                                            | Type                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **`mediaId`**               | The JW media id.                                                                                                                                                       | `Int`                                               |
+| **`file`**                  | The url of the file to play.                                                                                                                                           | `String`                                            |
+| **`title`**                 | The title of the track.                                                                                                                                                | `String`                                            |
+| **`image`**                 | The url of the player thumbnail.                                                                                                                                       | `String`                                            |
+| **`autostart`**             | Should the track auto start.                                                                                                                                           | `Boolean`                                           |
+| **`time`**                  | should the player seek to a certain second.                                                                                                                            | `Int`                                               |
+| **`desc`**                  | Description of the track.                                                                                                                                              | `String`                                            |
+| **`controls`**              | Should the control buttons show.                                                                                                                                       | `Boolean`                                           |
+| **`repeat`**                | Should the track repeat.                                                                                                                                               | `Boolean`                                           |
+| **`displayDescription`**    | Should the player show the description.                                                                                                                                | `Boolean`                                           |
+| **`displayTitle`**          | Should the player show the title.                                                                                                                                      | `Boolean`                                           |
+| **`playlistItem`**          | An object of playlistItem shape.                                                                                                                                       | [PlaylistItem](#PlaylistItem)                       |
+| **`playlist`**              | An array of playlistItems.                                                                                                                                             | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
+| **`nextUpDisplay`**         | Should the player show the next up item in a playlist.                                                                                                                 | `Boolean`                                           |
+| **`playerStyle`**           | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section.                                                     | `String`                                            |
+| **`colors`**                | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section.                                                | `Object`                                            |
+| **`nativeFullScreen`**      | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
+| **`fullScreenOnLandscape`** | `Available on iOS.` When this is true the player will go into full screen on rotate of phone to landscape                                                              | `Boolean`                                           |
+| **`landscapeOnFullScreen`** | `Available on iOS.` When this is true the player will go into landscape orientation when on full screen                                                                | `Boolean`                                           |
 
 ## Available methods
 
-| Func                   | Description                                                                                                                                                                             | Argument                      |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
-| **`play`**             | Starts playing.                                                                                                                                                                         | `none`                        |
-| **`pause`**            | Pauses playing.                                                                                                                                                                         | `none`                        |
-| **`stop`**             | Stops the player completely.                                                                                                                                                            | `none`                        |
-| **`state`**            | Returns the current state of the player `idle`, `buffering`, `playing`, `paused`.                                                                                                       | `none`                        |
-| **`position`**         | Returns the current position of the player in seconds.                                                                                                                                  | `none`                        |
-| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
-| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
-| **`setControls`**      | Sets the display of the control buttons on the player.                                                                                                                                  | `Boolean`                     |
-| **`loadPlaylist`**     | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
-| **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
+| Func                   | Description                                                                                                                                                                                                 | Argument                      |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                                     | `Int`                         |
+| **`play`**             | Starts playing.                                                                                                                                                                                             | `none`                        |
+| **`pause`**            | Pauses playing.                                                                                                                                                                                             | `none`                        |
+| **`stop`**             | Stops the player completely.                                                                                                                                                                                | `none`                        |
+| **`state`**            | Returns the current state of the player `idle`, `buffering`, `playing`, `paused`.                                                                                                                           | `none`                        |
+| **`position`**         | Returns the current position of the player in seconds.                                                                                                                                                      | `none`                        |
+| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                                                 | `none`                        |
+| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                                       | `Int`                         |
+| **`setControls`**      | Sets the display of the control buttons on the player.                                                                                                                                                      | `Boolean`                     |
+| **`loadPlaylist`**     | `Available in iOS.` Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
+| **`loadPlaylistItem`** | `Available in iOS.` Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
 
 ## Available callbacks
 

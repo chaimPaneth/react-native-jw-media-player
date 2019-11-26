@@ -306,6 +306,11 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     }
 }
 
+- (void)removeFromSuperview {
+    [self reset];
+    [super removeFromSuperview];
+}
+
 -(BOOL)shouldAutorotate {
     return NO;
 }
