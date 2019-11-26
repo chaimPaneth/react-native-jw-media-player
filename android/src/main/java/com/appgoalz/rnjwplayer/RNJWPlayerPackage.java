@@ -1,5 +1,5 @@
 
-package net.gamesofton.rnjwplayer;
+package com.appgoalz.rnjwplayer;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;

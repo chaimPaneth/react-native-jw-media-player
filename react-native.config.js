@@ -5,7 +5,7 @@ module.exports = {
     platforms: {
       ios: { podspecPath: path.join(__dirname, 'ios', 'react-native-jw-media-player.podspec') },
       android: {
-        packageImportPath: 'import net.gamesofton.rnjwplayer.RNJWPlayerPackage;',
+        packageImportPath: 'import com.appgoalz.rnjwplayer.RNJWPlayerPackage;',
         packageInstance: 'new RNJWPlayerPackage()',
       },
     },

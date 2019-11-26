@@ -135,11 +135,11 @@ export default class JWPlayer extends Component {
   }
 
   loadPlaylistItem(playlistItem) {
-    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylistItem(playlistItem);
+    if (Platform.OS === "ios" && RNJWPlayerManager) RNJWPlayerManager.loadPlaylistItem(playlistItem);
   }
 
   loadPlaylist(playlist) {
-    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylist(playlist);
+    if (Platform.OS === "ios" && RNJWPlayerManager) RNJWPlayerManager.loadPlaylist(playlist);
   }
 
   seekTo(time) {
