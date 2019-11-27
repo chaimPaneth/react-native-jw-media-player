@@ -107,49 +107,49 @@ export default class JWPlayer extends Component {
   };
 
   pause() {
-    if (RNJWPlayerManager) RNJWPlayerManager.pause();
+    if (RNJWPlayerManager) RNJWPlayerManager.pause(this.getRNJWPlayerBridgeHandle());
   }
 
   play() {
-    if (RNJWPlayerManager) RNJWPlayerManager.play();
+    if (RNJWPlayerManager) RNJWPlayerManager.play(this.getRNJWPlayerBridgeHandle());
   }
 
   stop() {
-    if (RNJWPlayerManager) RNJWPlayerManager.stop();
+    if (RNJWPlayerManager) RNJWPlayerManager.stop(this.getRNJWPlayerBridgeHandle());
   }
 
   toggleSpeed() {
-    if (RNJWPlayerManager) RNJWPlayerManager.toggleSpeed();
+    if (RNJWPlayerManager) RNJWPlayerManager.toggleSpeed(this.getRNJWPlayerBridgeHandle());
   }
 
   setSpeed(speed) {
-    if (RNJWPlayerManager) RNJWPlayerManager.setSpeed(speed);
+    if (RNJWPlayerManager) RNJWPlayerManager.setSpeed(this.getRNJWPlayerBridgeHandle(), speed);
   }
 
   setPlaylistIndex(index) {
-    if (RNJWPlayerManager) RNJWPlayerManager.setPlaylistIndex(index);
+    if (RNJWPlayerManager) RNJWPlayerManager.setPlaylistIndex(this.getRNJWPlayerBridgeHandle(), index);
   }
 
   setControls(show) {
-    if (RNJWPlayerManager) RNJWPlayerManager.setControls(show);
+    if (RNJWPlayerManager) RNJWPlayerManager.setControls(this.getRNJWPlayerBridgeHandle(), show);
   }
 
   loadPlaylistItem(playlistItem) {
-    if (Platform.OS === "ios" && RNJWPlayerManager) RNJWPlayerManager.loadPlaylistItem(playlistItem);
+    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylistItem(this.getRNJWPlayerBridgeHandle(), playlistItem);
   }
 
   loadPlaylist(playlist) {
-    if (Platform.OS === "ios" && RNJWPlayerManager) RNJWPlayerManager.loadPlaylist(playlist);
+    if (RNJWPlayerManager) RNJWPlayerManager.loadPlaylist(this.getRNJWPlayerBridgeHandle(), playlist);
   }
 
   seekTo(time) {
-    if (RNJWPlayerManager) RNJWPlayerManager.seekTo(time);
+    if (RNJWPlayerManager) RNJWPlayerManager.seekTo(this.getRNJWPlayerBridgeHandle(), time);
   }
 
   async position() {
     if (RNJWPlayerManager) {
       try {
-        var position = await RNJWPlayerManager.position();
+        var position = await RNJWPlayerManager.position(this.getRNJWPlayerBridgeHandle());
         return position;
       } catch (e) {
         console.error(e);
@@ -161,7 +161,7 @@ export default class JWPlayer extends Component {
   async playerState() {
     if (RNJWPlayerManager) {
       try {
-        var state = await RNJWPlayerManager.state();
+        var state = await RNJWPlayerManager.state(this.getRNJWPlayerBridgeHandle());
         return state;
       } catch (e) {
         console.error(e);
