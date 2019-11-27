@@ -109,10 +109,8 @@ componentDidMount() {
   // Not Recommended - load the playlistItem into the player with loadPlaylistItem method
   /*
   setTimeout(() => {
-    // Available in iOS
     this.JWPlayer.loadPlaylistItem(playlistItem);
-
-    // Available in iOS
+    
     // for playlist
     // const playlist = [playlistItem, playlistItem]
     // this.JWPlayer.loadPlaylist(playlistItem);
@@ -213,8 +211,8 @@ For running example project:
 | **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                                                 | `none`                        |
 | **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                                       | `Int`                         |
 | **`setControls`**      | Sets the display of the control buttons on the player.                                                                                                                                                      | `Boolean`                     |
-| **`loadPlaylist`**     | `Available in iOS.` Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
-| **`loadPlaylistItem`** | `Available in iOS.` Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
+| **`loadPlaylist`**     | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
+| **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
 
 ## Available callbacks
 

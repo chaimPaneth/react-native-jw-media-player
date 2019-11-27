@@ -7,8 +7,6 @@
 
 @interface RNJWPlayerManager ()
 
-@property(nonatomic, strong)RNJWPlayerNativeView *playerView;
-
 @end
 
 @implementation RNJWPlayerManager
@@ -17,9 +15,7 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-    _playerView = [[RNJWPlayerNativeView alloc] init];
-    
-    return _playerView;
+    return [[RNJWPlayerNativeView alloc] init];
 }
 
 RCT_EXPORT_VIEW_PROPERTY(onBeforePlay, RCTBubblingEventBlock);
@@ -62,246 +58,163 @@ RCT_EXPORT_VIEW_PROPERTY(fullScreenOnLandscape, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(landscapeOnFullScreen, BOOL);
 
 RCT_REMAP_METHOD(state,
+                 tag:(nonnull NSNumber *)reactTag
                  stateWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    if (_playerView != nil && _playerView.player != nil) {
-        resolve([NSNumber numberWithInt:[_playerView.player state]]);
-    } else {
-        NSError *error = [[NSError alloc] init];
-        reject(@"no_player", @"There is no player", error);
-    };
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            if (view.player) {
+                resolve([NSNumber numberWithInt:[view.player state]]);
+            } else {
+                NSError *error = [[NSError alloc] init];
+                reject(@"no_player", @"There is no player", error);
+            };
+        }
+    }];
 }
 
-RCT_EXPORT_METHOD(pause) {
-    if (_playerView != nil && _playerView.player != nil) {
-        [_playerView.player pause];
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+RCT_EXPORT_METHOD(pause:(nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player pause];
+        }
+    }];
 }
 
-RCT_EXPORT_METHOD(play) {
-    if (_playerView != nil && _playerView.player != nil) {
-        _playerView.player.config.controls = [_playerView.player controls];
-        [_playerView.player play];
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+RCT_EXPORT_METHOD(play:(nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            view.player.config.controls = [view.player controls];
+            [view.player play];
+        }
+    }];
+    
 }
 
-RCT_EXPORT_METHOD(stop) {
-    if (_playerView != nil && _playerView.player != nil) {
-        [_playerView.player stop];
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player stop];
+        }
+    }];
+    
 }
 
 RCT_REMAP_METHOD(position,
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    if (_playerView != nil && _playerView.player != nil) {
-        resolve([NSNumber numberWithInt:[_playerView.player position]]);
-    } else {
-        NSError *error = [[NSError alloc] init];
-        reject(@"no_player", @"There is no player", error);
-    };
-}
-
-RCT_EXPORT_METHOD(toggleSpeed) {
-    if (_playerView != nil && _playerView.player != nil) {
-        if ([_playerView.player playbackRate] < 2.0) {
-            _playerView.player.playbackRate = [_playerView.player playbackRate] + 0.5;
+                 tag:(nonnull NSNumber *)reactTag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
         } else {
-            _playerView.player.playbackRate = 0.5;
+            resolve([NSNumber numberWithInt:[view.player position]]);
         }
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+    }];
+    
 }
 
-RCT_EXPORT_METHOD(setSpeed: (double)speed) {
-    if (_playerView != nil && _playerView.player != nil) {
-        _playerView.player.playbackRate = speed;
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
-}
-
-RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)index) {
-    if (_playerView != nil && _playerView.player != nil) {
-        _playerView.player.playlistIndex = [index integerValue];
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
-}
-
-RCT_EXPORT_METHOD(setControls: (BOOL)show) {
-    if (_playerView != nil && _playerView.player != nil) {
-        _playerView.player.controls = show;
-        _playerView.player.config.controls = show;
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
-}
-
-RCT_EXPORT_METHOD(loadPlaylistItem: (nonnull NSDictionary *)playlistItem) {
-    if (_playerView != nil && playlistItem) {
-        NSString *newFile = [playlistItem objectForKey:@"file"];
-        
-        if (newFile != nil && newFile.length > 0) {
-            [_playerView reset];
-            
-            JWConfig *config = [_playerView setupConfig];
-            
-            if (_playerView.playerStyle != nil) {
-                [_playerView customStyle:config :_playerView.playerStyle];
-            } else if (_playerView.playerColors != nil) {
-                [_playerView setupColors:config];
-            }
-            
-            NSURL* url = [NSURL URLWithString:newFile];
-            if (url && url.scheme && url.host) {
-                config.file = newFile;
+RCT_EXPORT_METHOD(toggleSpeed:(nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            if ([view.player playbackRate] < 2.0) {
+                view.player.playbackRate = [view.player playbackRate] + 0.5;
             } else {
-                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                NSUTF8StringEncoding];
-                config.file = encodedUrl;
+                view.player.playbackRate = 0.5;
             }
-            
-            id mediaId = playlistItem[@"mediaId"];
-            if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
-                config.mediaId = mediaId;
-            }
-            
-            id title = playlistItem[@"title"];
-            if ((title != nil) && (title != (id)[NSNull null])) {
-                config.title = title;
-            }
-            
-            id desc = playlistItem[@"desc"];
-            if ((desc != nil) && (desc != (id)[NSNull null])) {
-                config.desc = desc;
-            }
-            
-            id image = playlistItem[@"image"];
-            if ((image != nil) && (image != (id)[NSNull null])) {
-                config.image = image;
-            }
-            
-            id autostart = playlistItem[@"autostart"];
-            if ((autostart != nil) && (autostart != (id)[NSNull null])) {
-                config.autostart = [autostart boolValue];
-            }
-            
-            id controls = playlistItem[@"controls"];
-            if ((controls != nil) && (controls != (id)[NSNull null])) {
-                config.controls = [controls boolValue];
-            }
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                _playerView.proxy = [RNJWPlayerDelegateProxy new];
-                _playerView.proxy.delegate = _playerView;
-                
-                _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
-                
-                [_playerView addSubview:_playerView.player.view];
-                
-                _playerView.player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-                
-                [_playerView setFullScreenOnLandscape:_playerView.fullScreenOnLandscape];
-                [_playerView setLandscapeOnFullScreen:_playerView.landscapeOnFullScreen];
-            });
+        }
+    }];
+    
+}
+
+RCT_EXPORT_METHOD(setSpeed: (nonnull NSNumber *)reactTag: (double)speed) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
-            RCTLogError(@"No file prop, expecting url or file path, got: %@", newFile);
+            view.player.playbackRate = speed;
         }
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+    }];
 }
 
-RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSArray *)playlist) {
-    if (_playerView != nil) {
-        if (playlist != nil && playlist.count > 0) {
-            [_playerView reset];
-            
-            NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
-            
-            for (id item in playlist) {
-                JWPlaylistItem *playListItem = [JWPlaylistItem new]; //CustomJWPlaylistItem
-                NSString *newFile = [item objectForKey:@"file"];
-                
-                NSURL* url = [NSURL URLWithString:newFile];
-                if (url && url.scheme && url.host) {
-                    playListItem.file = newFile;
-                } else {
-                    NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                    NSUTF8StringEncoding];
-                    playListItem.file = encodedUrl;
-                }
-                
-                id mediaId = item[@"mediaId"];
-                if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
-                    playListItem.mediaId = mediaId;
-                }
-                
-                id title = item[@"title"];
-                if ((title != nil) && (title != (id)[NSNull null])) {
-                    playListItem.title = title;
-                }
-                
-                id desc = item[@"desc"];
-                if ((desc != nil) && (desc != (id)[NSNull null])) {
-                    playListItem.desc = desc;
-                }
-                
-                id image = item[@"image"];
-                if ((image != nil) && (image != (id)[NSNull null])) {
-                    playListItem.image = image;
-                }
-                
-                [playlistArray addObject:playListItem];
-            }
-            
-            JWConfig *config = [_playerView setupConfig];
-            
-            if (_playerView.playerStyle != nil) {
-                [_playerView customStyle:config :_playerView.playerStyle];
-            } else if (_playerView.playerColors != nil) {
-               [_playerView setupColors:config];
-            }
-            
-            config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
-            config.controls = YES;
-            
-            config.playlist = playlistArray;
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                _playerView.proxy = [RNJWPlayerDelegateProxy new];
-                _playerView.proxy.delegate = _playerView;
-                
-                _playerView.player = [[JWPlayerController alloc] initWithConfig:config delegate:_playerView.proxy];
-                
-                [_playerView addSubview:_playerView.player.view];
-                
-                _playerView.player.controls = YES;
-                
-                [_playerView setFullScreenOnLandscape:_playerView.fullScreenOnLandscape];
-                [_playerView setLandscapeOnFullScreen:_playerView.landscapeOnFullScreen];
-            });
+RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            view.player.playlistIndex = [index integerValue];
         }
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+    }];
 }
 
-RCT_EXPORT_METHOD(seekTo: (nonnull NSNumber *)time) {
-    if (_playerView != nil && _playerView.player != nil) {
-        [_playerView.player seek:[time integerValue] ];
-    } else {
-        RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", _playerView);
-    };
+RCT_EXPORT_METHOD(setControls: (nonnull NSNumber *)reactTag: (BOOL)show) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            view.player.controls = show;
+            view.player.config.controls = show;
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(loadPlaylistItem :(nonnull NSNumber *)reactTag: (nonnull NSDictionary *)playlistItem) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view setPlaylistItem:playlistItem];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(loadPlaylist :(nonnull NSNumber *)reactTag: (nonnull NSArray *)playlist) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view setPlaylist:playlist];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(seekTo :(nonnull NSNumber *)reactTag: (nonnull NSNumber *)time) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player seek:[time integerValue] ];
+        }
+    }];
 }
 
 @end

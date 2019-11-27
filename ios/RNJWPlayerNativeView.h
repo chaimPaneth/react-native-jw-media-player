@@ -72,5 +72,7 @@
 -(void)customStyle: (JWConfig*)config :(NSString*)name;
 -(void)setupColors: (JWConfig*)config;
 -(void)reset;
+-(void)setPlaylistItem:(NSDictionary *)playlistItem;
+-(void)setPlaylist:(NSArray *)playlist;
 
 @end
