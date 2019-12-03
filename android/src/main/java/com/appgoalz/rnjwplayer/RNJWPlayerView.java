@@ -3,7 +3,6 @@ package com.appgoalz.rnjwplayer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -79,6 +78,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     String title = "";
     String desc = "";
     String mediaId = "";
+    String customStyle;
 
     Boolean autostart = true;
     Boolean controls = true;
@@ -146,46 +146,46 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     }
 
     public void removeListeners() {
-        this.mPlayer.removeOnReadyListener(this);
-        this.mPlayer.removeOnPlayListener(this);
-        this.mPlayer.removeOnPauseListener(this);
-        this.mPlayer.removeOnCompleteListener(this);
-        this.mPlayer.removeOnIdleListener(this);
-        this.mPlayer.removeOnErrorListener(this);
-        this.mPlayer.removeOnSetupErrorListener(this);
-        this.mPlayer.removeOnBufferListener(this);
-        this.mPlayer.removeOnTimeListener(this);
-        this.mPlayer.removeOnPlaylistListener(this);
-        this.mPlayer.removeOnPlaylistItemListener(this);
-        this.mPlayer.removeOnPlaylistCompleteListener(this);
-        //this.mPlayer.removeOnBeforePlayListener(this);
-        //this.mPlayer.removeOnBeforeCompleteListener(this);
-        this.mPlayer.removeOnControlsListener(this);
-        this.mPlayer.removeOnControlBarVisibilityListener(this);
-        this.mPlayer.removeOnDisplayClickListener(this);
-        this.mPlayer.removeOnFullscreenListener(this);
+        mPlayer.removeOnReadyListener(this);
+        mPlayer.removeOnPlayListener(this);
+        mPlayer.removeOnPauseListener(this);
+        mPlayer.removeOnCompleteListener(this);
+        mPlayer.removeOnIdleListener(this);
+        mPlayer.removeOnErrorListener(this);
+        mPlayer.removeOnSetupErrorListener(this);
+        mPlayer.removeOnBufferListener(this);
+        mPlayer.removeOnTimeListener(this);
+        mPlayer.removeOnPlaylistListener(this);
+        mPlayer.removeOnPlaylistItemListener(this);
+        mPlayer.removeOnPlaylistCompleteListener(this);
+//        mPlayer.removeOnBeforePlayListener(this);
+//        mPlayer.removeOnBeforeCompleteListener(this);
+        mPlayer.removeOnControlsListener(this);
+        mPlayer.removeOnControlBarVisibilityListener(this);
+        mPlayer.removeOnDisplayClickListener(this);
+        mPlayer.removeOnFullscreenListener(this);
     }
 
     public void setupPlayerView() {
-        this.mPlayer.addOnReadyListener(this);
-        this.mPlayer.addOnPlayListener(this);
-        this.mPlayer.addOnPauseListener(this);
-        this.mPlayer.addOnCompleteListener(this);
-        this.mPlayer.addOnIdleListener(this);
-        this.mPlayer.addOnErrorListener(this);
-        this.mPlayer.addOnSetupErrorListener(this);
-        this.mPlayer.addOnBufferListener(this);
-        this.mPlayer.addOnTimeListener(this);
-        this.mPlayer.addOnPlaylistListener(this);
-        this.mPlayer.addOnPlaylistItemListener(this);
-        this.mPlayer.addOnPlaylistCompleteListener(this);
-        //mPlayerView.mPlayer.addOnBeforePlayListener(this);
-        //mPlayerView.mPlayer.addOnBeforeCompleteListener(this);
-        this.mPlayer.addOnControlsListener(this);
-        this.mPlayer.addOnControlBarVisibilityListener(this);
-        this.mPlayer.addOnDisplayClickListener(this);
-        this.mPlayer.addOnFullscreenListener(this);
-        this.mPlayer.setFullscreenHandler(new FullscreenHandler() {
+        mPlayer.addOnReadyListener(this);
+        mPlayer.addOnPlayListener(this);
+        mPlayer.addOnPauseListener(this);
+        mPlayer.addOnCompleteListener(this);
+        mPlayer.addOnIdleListener(this);
+        mPlayer.addOnErrorListener(this);
+        mPlayer.addOnSetupErrorListener(this);
+        mPlayer.addOnBufferListener(this);
+        mPlayer.addOnTimeListener(this);
+        mPlayer.addOnPlaylistListener(this);
+        mPlayer.addOnPlaylistItemListener(this);
+        mPlayer.addOnPlaylistCompleteListener(this);
+//        mPlayer.addOnBeforePlayListener(this);
+//        mPlayer.addOnBeforeCompleteListener(this);
+        mPlayer.addOnControlsListener(this);
+        mPlayer.addOnControlBarVisibilityListener(this);
+        mPlayer.addOnDisplayClickListener(this);
+        mPlayer.addOnFullscreenListener(this);
+        mPlayer.setFullscreenHandler(new FullscreenHandler() {
             @Override
             public void onFullscreenRequested() {
                 WritableMap eventEnterFullscreen = Arguments.createMap();
@@ -204,7 +204,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         getId(),
                         "topFullScreenExit",
                         eventExitFullscreen);
-                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
 
             @Override
@@ -240,8 +240,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             }
         });
 
-        this.mPlayer.setControls(true);
-        this.mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+        mPlayer.setControls(true);
+        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
     }
 
     public void resetPlaylist() {
@@ -283,6 +283,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                         if (playlistItem.hasKey("playerStyle")) {
                             skinConfig = getCustomSkinConfig(playlistItem.getString("playerStyle"));
+                        } else if (customStyle != null && !customStyle.isEmpty()) {
+                            skinConfig = getCustomSkinConfig(customStyle);
                         } else {
                             skinConfig = new SkinConfig.Builder().build();
                         }
@@ -371,6 +373,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                 if (playlist.getMap(0).hasKey("playerStyle")) {
                     skinConfig = getCustomSkinConfig(playlistItem.getString("playerStyle"));
+                } else if (customStyle != null && !customStyle.isEmpty()) {
+                    skinConfig = getCustomSkinConfig(customStyle);
                 } else {
                     skinConfig = new SkinConfig.Builder().build();
                 }
