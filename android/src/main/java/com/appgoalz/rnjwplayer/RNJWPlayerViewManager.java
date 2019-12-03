@@ -162,7 +162,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
   @ReactProp(name = "playerStyle")
   public void setPlayerStyle(RNJWPlayerView view, String prop) {
     if (prop != null) {
-      view.setCustomStyle(prop); // Todo: - add local var for custom style
+      view.customStyle = prop;
     }
   }
 
