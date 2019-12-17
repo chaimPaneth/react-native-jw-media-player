@@ -24,7 +24,7 @@ Then add SDK dependencies:
 
 ##### iOS dependencies
 
-Follow official instruction [sdk ios installation](https://developer.jwplayer.com/sdk/ios/docs/developer-guide/intro/getting-started/) for installation via Cocoapods (only supported, other way wasn't tested).
+Follow official instructions [iOS sdk installation](https://developer.jwplayer.com/jwplayer/docs/ios-getting-started) for installation via Cocoapods (only supported, other way wasn't tested).
 
 Add `pod 'JWPlayer-SDK', '~> 3.5.0'` to your Podfile.
 Then run **pod install** from your `ios` directory.
@@ -33,19 +33,52 @@ In your `info.plist` properties file, create an string entry named `JWPlayerKey`
 
 ##### Android dependencies
 
-Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+Follow official instructions [Android sdk installation](https://developer.jwplayer.com/jwplayer/docs/android-getting-started)
+
+Insert the following lines inside the allProjects.dependencies block in `android/build.gradle`:
 
 ```
-    implementation 'com.longtailvideo.jwplayer:jwplayer-core:+'
-    implementation 'com.longtailvideo.jwplayer:jwplayer-common:+'
+    maven{
+        url 'https://mvn.jwplayer.com/content/repositories/releases/'
+    }
+```
+As so
+```
+allprojects {
+    repositories {
+        mavenLocal()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        // Add these lines
+        maven{
+            url 'https://mvn.jwplayer.com/content/repositories/releases/'
+        }
+    }
+}
 ```
 
 Add to AndroidManifest.xml in the Application tag above the Activity tag:
 
 ```
-<meta-data
-           android:name="JW_LICENSE_KEY"
-           android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
+    <meta-data
+        android:name="JW_LICENSE_KEY"
+        android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
+```
+
+JW uses some of google services in their sdk so if you get an error about any missing google services you can add this line to the depenedencies block in `android/app/build.gradle`:
+
+```
+    api 'com.google.android.gms:play-services-base:+'
 ```
 
 ### Manual installation
