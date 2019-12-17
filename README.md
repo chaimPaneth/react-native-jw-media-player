@@ -6,6 +6,14 @@
 
 ### Mostly automatic installation
 
+Since **React Native 0.60** and higher, [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) makes the installation process simpler.
+
+On iOS you have to run `cd ios/` && `pod install`. 
+
+On Android the package is automatically linked.
+
+### Using React Native Link (React Native 0.59 and lower)
+
 Link module with
 
 `$ react-native link react-native-jw-media-player`
