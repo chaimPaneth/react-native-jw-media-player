@@ -38,9 +38,9 @@ Follow official instructions [Android sdk installation](https://developer.jwplay
 Insert the following lines inside the allProjects.dependencies block in `android/build.gradle`:
 
 ```
-    maven{
-        url 'https://mvn.jwplayer.com/content/repositories/releases/'
-    }
+maven{
+    url 'https://mvn.jwplayer.com/content/repositories/releases/'
+}
 ```
 As so
 ```
@@ -70,15 +70,15 @@ allprojects {
 Add to AndroidManifest.xml in the Application tag above the Activity tag:
 
 ```
-    <meta-data
-        android:name="JW_LICENSE_KEY"
-        android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
+<meta-data
+    android:name="JW_LICENSE_KEY"
+    android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
 ```
 
 JW uses some of google services in their sdk so if you get an error about any missing google services you can add this line to the depenedencies block in `android/app/build.gradle`:
 
 ```
-    api 'com.google.android.gms:play-services-base:+'
+api 'com.google.android.gms:play-services-base:+'
 ```
 
 ### Manual installation
@@ -100,12 +100,12 @@ JW uses some of google services in their sdk so if you get an error about any mi
 
 2. Append the following lines to `android/settings.gradle`:
    ```
-   include ':react-native-jwplayer'
-   project(':react-native-jwplayer').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-jwplayer/android')
+    include ':react-native-jwplayer'
+    project(':react-native-jwplayer').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-jwplayer/android')
    ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
    ```
-     implementation project(':react-native-jwplayer')
+    implementation project(':react-native-jwplayer')
    ```
 4. Add [dependencies](#android-dependencies)
 
