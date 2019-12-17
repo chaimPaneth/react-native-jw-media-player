@@ -305,8 +305,9 @@ colors: PropTypes.shape({
 
 This package supports Background audio sessions just follow the jwplayer docs for background session.
 
-Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
 Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
+
+Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
 
 You need to edit the AppDelegate.h file in iOS
 Here is a complete example - iOS:
