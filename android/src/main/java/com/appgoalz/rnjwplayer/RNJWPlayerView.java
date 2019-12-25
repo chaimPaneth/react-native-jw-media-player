@@ -2,9 +2,19 @@ package com.appgoalz.rnjwplayer;
 
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.media.AudioManager;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -27,6 +37,7 @@ import com.longtailvideo.jwplayer.events.ControlBarVisibilityEvent;
 import com.longtailvideo.jwplayer.events.ControlsEvent;
 import com.longtailvideo.jwplayer.events.DisplayClickEvent;
 import com.longtailvideo.jwplayer.events.ErrorEvent;
+import com.longtailvideo.jwplayer.events.FirstFrameEvent;
 import com.longtailvideo.jwplayer.events.FullscreenEvent;
 import com.longtailvideo.jwplayer.events.IdleEvent;
 import com.longtailvideo.jwplayer.events.PauseEvent;
@@ -44,7 +55,9 @@ import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import static android.content.Context.BIND_AUTO_CREATE;
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.OnFullscreenListener,
@@ -65,8 +78,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         VideoPlayerEvents.OnControlsListener,
         VideoPlayerEvents.OnControlBarVisibilityListener,
         VideoPlayerEvents.OnDisplayClickListener,
+        VideoPlayerEvents.OnFirstFrameListener,
         AdvertisingEvents.OnBeforePlayListener,
-        AdvertisingEvents.OnBeforeCompleteListener {
+        AdvertisingEvents.OnBeforeCompleteListener,
+        AudioManager.OnAudioFocusChangeListener {
 
     public RNJWPlayer mPlayer = null;
 
@@ -93,11 +108,64 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     private static final String TAG = "RNJWPlayerView";
 
-    Activity mActivity;
+    static Activity mActivity;
+
+    Window mWindow;
+
+    private Handler mHandler;
+
+    public static AudioManager audioManager;
 
     private final ReactApplicationContext mAppContext;
 
     private ThemedReactContext mThemedReactContext;
+
+    /**
+     * Whether we have bound to a {@link MediaPlaybackService}.
+     */
+    private boolean mIsBound = false;
+
+    /**
+     * The {@link MediaPlaybackService} we are bound to. T
+     */
+    private MediaPlaybackService mMediaPlaybackService;
+
+    /**
+     * The {@link MediaSessionManager} handles the MediaSession logic, along with updates to the notification
+     */
+    private MediaSessionManager mMediaSessionManager;
+
+    /**
+     * The {@link MediaSessionManager} handles the Notification set and dismissal logic
+     */
+    private NotificationWrapper mNotificationWrapper;
+
+    /**
+     * The {@link ServiceConnection} serves as glue between this activity and the {@link MediaPlaybackService}.
+     */
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mIsBound = true;
+            mMediaPlaybackService = ((MediaPlaybackService.MediaPlaybackServiceBinder)service)
+                    .getService();
+            mMediaPlaybackService.setupMediaSession(mMediaSessionManager, mNotificationWrapper);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mMediaPlaybackService = null;
+        }
+    };
 
 //    public static  String type="";
 
@@ -131,6 +199,14 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         mAppContext = appContext;
         mThemedReactContext = reactContext;
         mActivity = getActivity();
+
+        if (mActivity != null) {
+            mWindow = mActivity.getWindow();
+        }
+
+        Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+
+        audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public ReactApplicationContext getAppContext() {
@@ -158,12 +234,16 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         mPlayer.removeOnPlaylistListener(this);
         mPlayer.removeOnPlaylistItemListener(this);
         mPlayer.removeOnPlaylistCompleteListener(this);
+        mPlayer.removeOnFirstFrameListener(this);
 //        mPlayer.removeOnBeforePlayListener(this);
 //        mPlayer.removeOnBeforeCompleteListener(this);
         mPlayer.removeOnControlsListener(this);
         mPlayer.removeOnControlBarVisibilityListener(this);
         mPlayer.removeOnDisplayClickListener(this);
         mPlayer.removeOnFullscreenListener(this);
+
+        audioManager = null;
+        doUnbindService();
     }
 
     public void setupPlayerView() {
@@ -179,6 +259,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         mPlayer.addOnPlaylistListener(this);
         mPlayer.addOnPlaylistItemListener(this);
         mPlayer.addOnPlaylistCompleteListener(this);
+        mPlayer.addOnFirstFrameListener(this);
 //        mPlayer.addOnBeforePlayListener(this);
 //        mPlayer.addOnBeforeCompleteListener(this);
         mPlayer.addOnControlsListener(this);
@@ -241,7 +322,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         });
 
         mPlayer.setControls(true);
-        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+//        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
     }
 
     public void resetPlaylist() {
@@ -300,7 +381,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                                 .stretching(STRETCHING_UNIFORM)
                                 .build();
 
-                        mPlayer = new RNJWPlayer(getNonBuggyContext(getReactContext(), getAppContext()), playerConfig);
+                        Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+
+                        mPlayer = new RNJWPlayer(simpleContext, playerConfig);
                         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
                         mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -308,6 +391,12 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         addView(mPlayer);
 
                         setupPlayerView();
+
+                        NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationWrapper = new NotificationWrapper(notificationManager);
+                        mMediaSessionManager = new MediaSessionManager(simpleContext,
+                                mPlayer,
+                                mNotificationWrapper);
 
                         if (playlistItem.hasKey("autostart")) {
                             mPlayer.getConfig().setAutostart(playlistItem.getBoolean("autostart"));
@@ -390,9 +479,17 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         .stretching(STRETCHING_UNIFORM)
                         .build();
 
-                mPlayer = new RNJWPlayer(getNonBuggyContext(getReactContext(), getAppContext()), playerConfig);
+                Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+
+                mPlayer = new RNJWPlayer(simpleContext, playerConfig);
 
                 setupPlayerView();
+
+                NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationWrapper = new NotificationWrapper(notificationManager);
+                mMediaSessionManager = new MediaSessionManager(simpleContext,
+                        mPlayer,
+                        mNotificationWrapper);
 
                 if (playlist.getMap(0).hasKey("autostart")) {
                     mPlayer.getConfig().setAutostart(playlist.getMap(0).getBoolean("autostart"));
@@ -401,6 +498,26 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 mPlayer.load(mPlayList);
                 mPlayer.play();
             }
+        }
+    }
+
+    private void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        mActivity.bindService(new Intent(RNJWPlayerView.mActivity,
+                        MediaPlaybackService.class),
+                mServiceConnection,
+                Context.BIND_AUTO_CREATE);
+
+    }
+
+    private void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            mActivity.unbindService(mServiceConnection);
+            mIsBound = false;
         }
     }
 
@@ -506,13 +623,30 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         WritableMap event = Arguments.createMap();
         event.putString("message", "onBuffer");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBuffer", event);
+
+        updateWakeLock(true);
     }
 
     @Override
     public void onPlay(PlayEvent playEvent) {
+        int result = 0;
+        if (audioManager != null) {
+            result = audioManager.requestAudioFocus(this,
+                    // Use the music stream.
+                    AudioManager.STREAM_MUSIC,
+                    // Request permanent focus.
+                    AudioManager.AUDIOFOCUS_GAIN);
+        }
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.e(TAG, "onBeforePlay: " + result);
+        }
+
+
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlay");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlay", event);
+
+        updateWakeLock(true);
     }
 
     @Override
@@ -520,6 +654,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlayerReady");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topOnPlayerReady", event);
+
+        updateWakeLock(true);
     }
 
     @Override
@@ -527,6 +663,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPause");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPause", event);
+
+        updateWakeLock(false);
     }
 
     @Override
@@ -534,6 +672,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         WritableMap event = Arguments.createMap();
         event.putString("message", "onComplete");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topComplete", event);
+
+        updateWakeLock(false);
     }
 
     @Override
@@ -547,6 +687,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         event.putString("message", "onError");
         event.putString("error", errorEvent.getException().toString());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerError", event);
+
+        updateWakeLock(false);
     }
 
     @Override
@@ -554,6 +696,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         WritableMap event = Arguments.createMap();
         event.putString("message", "onSetupError");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topSetupPlayerError", event);
+
+        updateWakeLock(false);
     }
 
     @Override
@@ -574,6 +718,58 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         event.putString("message", "onControlBarVisible");
         event.putBoolean("controls", controlBarVisibilityEvent.isVisible());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topControlBarVisible", event);
+
+        updateWakeLock(true);
     }
 
+    private Runnable mDelayedStopRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mPlayer.stop();
+        }
+    };
+
+    @Override
+    public void onFirstFrame(FirstFrameEvent firstFrameEvent) {
+        // Only bind to the service if media has begun playback
+        // You could also use onBeforePlay as your listener
+        // if you wanted to start the service and notification earlier
+        if (!mIsBound) {
+            doBindService();
+        }
+    }
+
+    @Override
+    public void onAudioFocusChange(int i) {
+        mHandler = new Handler();
+
+        switch (i) {
+        case AudioManager.AUDIOFOCUS_LOSS:
+            mPlayer.pause();
+            mHandler.postDelayed(mDelayedStopRunnable, TimeUnit.SECONDS.toMillis(30));
+            break;
+        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+            mPlayer.pause();
+            break;
+        case AudioManager.AUDIOFOCUS_GAIN:
+            Boolean autostart = mPlayer.getConfig().getAutostart();
+            if (autostart) {
+                mPlayer.play();
+            }
+            break;
+        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+            // Lower the volume, keep playing
+            break;
+        }
+    }
+
+    private void updateWakeLock(boolean enable) {
+        if (mWindow != null) {
+            if (enable) {
+                mWindow.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            } else {
+                mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        }
+    }
 }

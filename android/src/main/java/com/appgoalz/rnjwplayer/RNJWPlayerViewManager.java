@@ -1,6 +1,10 @@
 
 package com.appgoalz.rnjwplayer;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -307,6 +311,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   @Override
   public void onDropViewInstance(@Nonnull RNJWPlayerView view) {
+    view.removeListeners();
     view = null;
 
     super.onDropViewInstance(view);
