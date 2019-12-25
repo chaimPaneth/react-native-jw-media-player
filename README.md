@@ -75,7 +75,31 @@ Add to AndroidManifest.xml in the Application tag above the Activity tag:
     android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
 ```
 
-JW uses some of google services in their sdk so if you get an error about any missing google services you can add this line to the depenedencies block in `android/app/build.gradle`:
+... and These lines (This is needed for the controls bar in notification center).
+
+```
+<receiver android:name="androidx.media.session.MediaButtonReceiver">
+    <intent-filter>
+        <action android:name="android.intent.action.MEDIA_BUTTON" />
+    </intent-filter>
+</receiver>
+<service
+    android:name="com.appgoalz.rnjwplayer.MediaPlaybackService"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.intent.action.MEDIA_BUTTON" />
+    </intent-filter>
+</service>
+```
+
+Add this line to the dependencies block in `android/app/build.gradle`:
+
+```
+implementation 'androidx.media:media:1.1.0'
+
+```
+
+JW uses some of google services in their sdk so if you get an error about any missing google services you can add this line to the dependencies block in `android/app/build.gradle`:
 
 ```
 api 'com.google.android.gms:play-services-base:+'
