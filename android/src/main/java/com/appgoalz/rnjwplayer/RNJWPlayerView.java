@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -19,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -57,7 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.Context.BIND_AUTO_CREATE;
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.OnFullscreenListener,
@@ -81,7 +81,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         VideoPlayerEvents.OnFirstFrameListener,
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
-        AudioManager.OnAudioFocusChangeListener {
+        AudioManager.OnAudioFocusChangeListener,
+        LifecycleEventListener {
 
     public RNJWPlayer mPlayer = null;
 
@@ -197,9 +198,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public RNJWPlayerView(ThemedReactContext reactContext, ReactApplicationContext appContext) {
         super(getNonBuggyContext(reactContext, appContext));
         mAppContext = appContext;
-        mThemedReactContext = reactContext;
-        mActivity = getActivity();
+        appContext.addLifecycleEventListener(this);
 
+        mThemedReactContext = reactContext;
+
+        mActivity = getActivity();
         if (mActivity != null) {
             mWindow = mActivity.getWindow();
         }
@@ -370,11 +373,16 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                             skinConfig = new SkinConfig.Builder().build();
                         }
 
+                        boolean autostart = false;
+                        if (playlistItem.hasKey("autostart")) {
+                            autostart = playlistItem.getBoolean("autostart");
+                        }
+
                         PlayerConfig playerConfig = new PlayerConfig.Builder()
                                 .skinConfig(skinConfig)
                                 .repeat(false)
                                 .controls(true)
-                                .autostart(false)
+                                .autostart(autostart)
                                 .displayTitle(true)
                                 .displayDescription(true)
                                 .nextUpDisplay(true)
@@ -461,18 +469,23 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 SkinConfig skinConfig;
 
                 if (playlist.getMap(0).hasKey("playerStyle")) {
-                    skinConfig = getCustomSkinConfig(playlistItem.getString("playerStyle"));
+                    skinConfig = getCustomSkinConfig(playlist.getMap(0).getString("playerStyle"));
                 } else if (customStyle != null && !customStyle.isEmpty()) {
                     skinConfig = getCustomSkinConfig(customStyle);
                 } else {
                     skinConfig = new SkinConfig.Builder().build();
                 }
 
+                boolean autostart = false;
+                if (playlist.getMap(0).hasKey("autostart")) {
+                    autostart = playlist.getMap(0).getBoolean("autostart");
+                }
+
                 PlayerConfig playerConfig = new PlayerConfig.Builder()
                         .skinConfig(skinConfig)
                         .repeat(false)
                         .controls(true)
-                        .autostart(false)
+                        .autostart(autostart)
                         .displayTitle(true)
                         .displayDescription(true)
                         .nextUpDisplay(true)
@@ -771,5 +784,21 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
+    }
+
+    @Override
+    public void onHostResume() {
+        mPlayer.onResume();
+    }
+
+    @Override
+    public void onHostPause() {
+        mPlayer.onPause();
+    }
+
+    @Override
+    public void onHostDestroy() {
+        doUnbindService();
+        mPlayer.onDestroy();
     }
 }
