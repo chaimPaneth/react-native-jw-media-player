@@ -325,7 +325,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         });
 
         mPlayer.setControls(true);
-//        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
     }
 
     public void resetPlaylist() {
