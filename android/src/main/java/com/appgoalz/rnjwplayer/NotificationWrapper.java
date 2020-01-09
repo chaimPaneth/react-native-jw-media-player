@@ -51,6 +51,7 @@ public class NotificationWrapper {
                                            MediaSessionCompat mediaSession,
                                            long capabilities
 	) {
+		int appIcon = context.getResources().getIdentifier("ic_app_icon", "drawable", context.getPackageName());
 
 		// Media metadata
 		MediaControllerCompat controller = mediaSession.getController();
@@ -68,7 +69,7 @@ public class NotificationWrapper {
 			   .setStyle(new MediaStyle()
 								 .setMediaSession(mediaSession.getSessionToken()))
 			   .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-			   .setSmallIcon(R.drawable.ic_jw_developer)
+			   .setSmallIcon(appIcon > 0 ? appIcon : R.drawable.ic_jw_developer)
 			   .setDeleteIntent(getActionIntent(context, KeyEvent.KEYCODE_MEDIA_STOP));
 
 
