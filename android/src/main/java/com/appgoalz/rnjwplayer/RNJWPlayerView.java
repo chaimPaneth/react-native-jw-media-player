@@ -7,7 +7,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,8 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -28,6 +29,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
+import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.events.AudioTrackChangedEvent;
 import com.longtailvideo.jwplayer.events.AudioTracksEvent;
 import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
@@ -56,7 +58,6 @@ import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
@@ -81,9 +82,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         VideoPlayerEvents.OnFirstFrameListener,
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
-        AudioManager.OnAudioFocusChangeListener,
-        LifecycleEventListener {
-
+        AudioManager.OnAudioFocusChangeListener {
     public RNJWPlayer mPlayer = null;
 
     List<PlaylistItem> mPlayList = null;
@@ -113,9 +112,16 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     Window mWindow;
 
-    private Handler mHandler;
-
     public static AudioManager audioManager;
+
+    final Object focusLock = new Object();
+
+    AudioFocusRequest focusRequest;
+
+    boolean hasAudioFocus = false;
+    boolean playbackDelayed = false;
+    boolean playbackNowAuthorized = false;
+    boolean resumeOnFocusGain = true;
 
     private final ReactApplicationContext mAppContext;
 
@@ -168,8 +174,6 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         }
     };
 
-//    public static  String type="";
-
     private static boolean contextHasBug(Context context) {
         return context == null ||
                 context.getResources() == null ||
@@ -198,7 +202,6 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public RNJWPlayerView(ThemedReactContext reactContext, ReactApplicationContext appContext) {
         super(getNonBuggyContext(reactContext, appContext));
         mAppContext = appContext;
-        appContext.addLifecycleEventListener(this);
 
         mThemedReactContext = reactContext;
 
@@ -224,108 +227,126 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         return (Activity) getContext();
     }
 
-    public void removeListeners() {
-        mPlayer.removeOnReadyListener(this);
-        mPlayer.removeOnPlayListener(this);
-        mPlayer.removeOnPauseListener(this);
-        mPlayer.removeOnCompleteListener(this);
-        mPlayer.removeOnIdleListener(this);
-        mPlayer.removeOnErrorListener(this);
-        mPlayer.removeOnSetupErrorListener(this);
-        mPlayer.removeOnBufferListener(this);
-        mPlayer.removeOnTimeListener(this);
-        mPlayer.removeOnPlaylistListener(this);
-        mPlayer.removeOnPlaylistItemListener(this);
-        mPlayer.removeOnPlaylistCompleteListener(this);
-        mPlayer.removeOnFirstFrameListener(this);
-//        mPlayer.removeOnBeforePlayListener(this);
-//        mPlayer.removeOnBeforeCompleteListener(this);
-        mPlayer.removeOnControlsListener(this);
-        mPlayer.removeOnControlBarVisibilityListener(this);
-        mPlayer.removeOnDisplayClickListener(this);
-        mPlayer.removeOnFullscreenListener(this);
+    public void destroyPlayer() {
+        if (mPlayer != null) {
+            mPlayer.stop();
 
-        audioManager = null;
-        doUnbindService();
+            mPlayer.removeOnReadyListener(this);
+            mPlayer.removeOnPlayListener(this);
+            mPlayer.removeOnPauseListener(this);
+            mPlayer.removeOnCompleteListener(this);
+            mPlayer.removeOnIdleListener(this);
+            mPlayer.removeOnErrorListener(this);
+            mPlayer.removeOnSetupErrorListener(this);
+            mPlayer.removeOnBufferListener(this);
+            mPlayer.removeOnTimeListener(this);
+            mPlayer.removeOnPlaylistListener(this);
+            mPlayer.removeOnPlaylistItemListener(this);
+            mPlayer.removeOnPlaylistCompleteListener(this);
+            mPlayer.removeOnFirstFrameListener(this);
+            mPlayer.removeOnBeforePlayListener(this);
+            mPlayer.removeOnBeforeCompleteListener(this);
+            mPlayer.removeOnControlsListener(this);
+            mPlayer.removeOnControlBarVisibilityListener(this);
+            mPlayer.removeOnDisplayClickListener(this);
+            mPlayer.removeOnFullscreenListener(this);
+
+            mPlayer.onDestroy();
+            mPlayer = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (audioManager != null && focusRequest != null) {
+                    audioManager.abandonAudioFocusRequest(focusRequest);
+                }
+            } else {
+                if (audioManager != null) {
+                    audioManager.abandonAudioFocus(this);
+                }
+            }
+
+            audioManager = null;
+            doUnbindService();
+        }
     }
 
     public void setupPlayerView() {
-        mPlayer.addOnReadyListener(this);
-        mPlayer.addOnPlayListener(this);
-        mPlayer.addOnPauseListener(this);
-        mPlayer.addOnCompleteListener(this);
-        mPlayer.addOnIdleListener(this);
-        mPlayer.addOnErrorListener(this);
-        mPlayer.addOnSetupErrorListener(this);
-        mPlayer.addOnBufferListener(this);
-        mPlayer.addOnTimeListener(this);
-        mPlayer.addOnPlaylistListener(this);
-        mPlayer.addOnPlaylistItemListener(this);
-        mPlayer.addOnPlaylistCompleteListener(this);
-        mPlayer.addOnFirstFrameListener(this);
-//        mPlayer.addOnBeforePlayListener(this);
-//        mPlayer.addOnBeforeCompleteListener(this);
-        mPlayer.addOnControlsListener(this);
-        mPlayer.addOnControlBarVisibilityListener(this);
-        mPlayer.addOnDisplayClickListener(this);
-        mPlayer.addOnFullscreenListener(this);
-        mPlayer.setFullscreenHandler(new FullscreenHandler() {
-            @Override
-            public void onFullscreenRequested() {
-                WritableMap eventEnterFullscreen = Arguments.createMap();
-                eventEnterFullscreen.putString("message", "onFullscreen");
-                getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                        getId(),
-                        "topFullScreen",
-                        eventEnterFullscreen);
-            }
+        if (mPlayer != null) {
+            mPlayer.addOnReadyListener(this);
+            mPlayer.addOnPlayListener(this);
+            mPlayer.addOnPauseListener(this);
+            mPlayer.addOnCompleteListener(this);
+            mPlayer.addOnIdleListener(this);
+            mPlayer.addOnErrorListener(this);
+            mPlayer.addOnSetupErrorListener(this);
+            mPlayer.addOnBufferListener(this);
+            mPlayer.addOnTimeListener(this);
+            mPlayer.addOnPlaylistListener(this);
+            mPlayer.addOnPlaylistItemListener(this);
+            mPlayer.addOnPlaylistCompleteListener(this);
+            mPlayer.addOnFirstFrameListener(this);
+            mPlayer.addOnBeforePlayListener(this);
+            mPlayer.addOnBeforeCompleteListener(this);
+            mPlayer.addOnControlsListener(this);
+            mPlayer.addOnControlBarVisibilityListener(this);
+            mPlayer.addOnDisplayClickListener(this);
+            mPlayer.addOnFullscreenListener(this);
+            mPlayer.setFullscreenHandler(new FullscreenHandler() {
+                @Override
+                public void onFullscreenRequested() {
+                    WritableMap eventEnterFullscreen = Arguments.createMap();
+                    eventEnterFullscreen.putString("message", "onFullscreen");
+                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
+                            getId(),
+                            "topFullScreen",
+                            eventEnterFullscreen);
+                }
 
-            @Override
-            public void onFullscreenExitRequested() {
-                WritableMap eventExitFullscreen = Arguments.createMap();
-                eventExitFullscreen.putString("message", "onFullscreenExit");
-                getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                        getId(),
-                        "topFullScreenExit",
-                        eventExitFullscreen);
-//                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
+                @Override
+                public void onFullscreenExitRequested() {
+                    WritableMap eventExitFullscreen = Arguments.createMap();
+                    eventExitFullscreen.putString("message", "onFullscreenExit");
+                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
+                            getId(),
+                            "topFullScreenExit",
+                            eventExitFullscreen);
+                }
 
-            @Override
-            public void onResume() {
+                @Override
+                public void onResume() {
 
-            }
+                }
 
-            @Override
-            public void onPause() {
+                @Override
+                public void onPause() {
 
-            }
+                }
 
-            @Override
-            public void onDestroy() {
+                @Override
+                public void onDestroy() {
 
-            }
+                }
 
-            @Override
-            public void onAllowRotationChanged(boolean b) {
-                Log.e(TAG, "onAllowRotationChanged: "+b );
-            }
+                @Override
+                public void onAllowRotationChanged(boolean b) {
+                    Log.e(TAG, "onAllowRotationChanged: "+b );
+                }
 
-            @Override
-            public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+                @Override
+                public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
 //        View.setSystemUiVisibility(int).
 //        Log.e(TAG, "updateLayoutParams: "+layoutParams );
-            }
+                }
 
-            @Override
-            public void setUseFullscreenLayoutFlags(boolean b) {
+                @Override
+                public void setUseFullscreenLayoutFlags(boolean b) {
 //        View.setSystemUiVisibility(int).
 //        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
-            }
-        });
+                }
+            });
 
-        mPlayer.setControls(true);
-        mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+            mPlayer.setControls(true);
+            mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+        }
     }
 
     public void resetPlaylist() {
@@ -411,8 +432,15 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         }
 
                         mPlayer.load(newPlayListItem);
+
+                        if (autostart) {
+                            mPlayer.play();
+                        }
                     } else {
-                        mPlayer.play();
+                        boolean autostart = mPlayer.getConfig().getAutostart();
+                        if (autostart) {
+                            mPlayer.play();
+                        }
                     }
                 }
             }
@@ -509,7 +537,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 }
 
                 mPlayer.load(mPlayList);
-                mPlayer.play();
+
+                if (autostart) {
+                    mPlayer.play();
+                }
             }
         }
     }
@@ -535,9 +566,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     }
 
     public void setCustomStyle(String name) {
-        if (this.mPlayer != null) {
+        if (mPlayer != null) {
             PlayerConfig config = getCustomConfig(getCustomSkinConfig((name)));
-            this.mPlayer.setup(config);
+            mPlayer.setup(config);
         }
     }
 
@@ -610,13 +641,16 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     }
 
-    public void resetPlaylistItem()
-    {
+    public void resetPlaylistItem() {
         playlistItem = null;
     }
 
     @Override
     public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
+        if (!mIsBound) {
+            doBindService();
+        }
+
         currentPlayingIndex = playlistItemEvent.getIndex();
 
         WritableMap event = Arguments.createMap();
@@ -640,20 +674,62 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         updateWakeLock(true);
     }
 
+    public void requestAudioFocus() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (hasAudioFocus) {
+                return;
+            }
+
+            if (audioManager != null) {
+                AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC) // CONTENT_TYPE_SPEECH
+                        .build();
+                focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                        .setAudioAttributes(playbackAttributes)
+                        .setAcceptsDelayedFocusGain(true)
+//                    .setWillPauseWhenDucked(true)
+                        .setOnAudioFocusChangeListener(this)
+                        .build();
+
+                int res = audioManager.requestAudioFocus(focusRequest);
+                synchronized(focusLock) {
+                    if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+                        playbackNowAuthorized = false;
+                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                        playbackNowAuthorized = true;
+                        hasAudioFocus = true;
+                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
+                        playbackDelayed = true;
+                        playbackNowAuthorized = false;
+                    }
+                }
+                Log.e(TAG, "audioRequest: " + res);
+            }
+        }
+        else {
+            int result = 0;
+            if (audioManager != null) {
+                if (hasAudioFocus) {
+                    return;
+                }
+
+                result = audioManager.requestAudioFocus(this,
+                        // Use the music stream.
+                        AudioManager.STREAM_MUSIC,
+                        // Request permanent focus.
+                        AudioManager.AUDIOFOCUS_GAIN);
+            }
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                hasAudioFocus = true;
+            }
+            Log.e(TAG, "audioRequest: " + result);
+        }
+    }
+
     @Override
     public void onPlay(PlayEvent playEvent) {
-        int result = 0;
-        if (audioManager != null) {
-            result = audioManager.requestAudioFocus(this,
-                    // Use the music stream.
-                    AudioManager.STREAM_MUSIC,
-                    // Request permanent focus.
-                    AudioManager.AUDIOFOCUS_GAIN);
-        }
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.e(TAG, "onBeforePlay: " + result);
-        }
-
+        requestAudioFocus();
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlay");
@@ -735,44 +811,73 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         updateWakeLock(true);
     }
 
-    private Runnable mDelayedStopRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mPlayer.stop();
-        }
-    };
-
     @Override
     public void onFirstFrame(FirstFrameEvent firstFrameEvent) {
-        // Only bind to the service if media has begun playback
-        // You could also use onBeforePlay as your listener
-        // if you wanted to start the service and notification earlier
-        if (!mIsBound) {
-            doBindService();
+
+    }
+
+    public void lowerApiOnAudioFocus(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (resumeOnFocusGain) {
+                    boolean autostart = mPlayer.getConfig().getAutostart();
+                    if (autostart) {
+                        mPlayer.play();
+                    }
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                mPlayer.pause();
+                hasAudioFocus = false;
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                resumeOnFocusGain = true;
+                mPlayer.pause();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // ... pausing or ducking depends on your app
+                break;
         }
     }
 
-    @Override
-    public void onAudioFocusChange(int i) {
-        mHandler = new Handler();
-
-        switch (i) {
-        case AudioManager.AUDIOFOCUS_LOSS:
-            mPlayer.pause();
-            mHandler.postDelayed(mDelayedStopRunnable, TimeUnit.SECONDS.toMillis(30));
-            break;
-        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-            mPlayer.pause();
-            break;
-        case AudioManager.AUDIOFOCUS_GAIN:
-            Boolean autostart = mPlayer.getConfig().getAutostart();
-            if (autostart) {
-                mPlayer.play();
+    public void onAudioFocusChange(int focusChange) {
+        if (mPlayer != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                switch (focusChange) {
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                        if (playbackDelayed || resumeOnFocusGain) {
+                            synchronized(focusLock) {
+                                playbackDelayed = false;
+                                resumeOnFocusGain = false;
+                            }
+                            boolean autostart = mPlayer.getConfig().getAutostart();
+                            if (autostart) {
+                                mPlayer.play();
+                            }
+                        }
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                        synchronized(focusLock) {
+                            resumeOnFocusGain = false;
+                            playbackDelayed = false;
+                        }
+                        mPlayer.pause();
+                        hasAudioFocus = false;
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        synchronized(focusLock) {
+                            resumeOnFocusGain = mPlayer.getState() == PlayerState.PLAYING;
+                            playbackDelayed = false;
+                        }
+                        mPlayer.pause();
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        // ... pausing or ducking depends on your app
+                        break;
+                }
+            } else {
+                lowerApiOnAudioFocus(focusChange);
             }
-            break;
-        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-            // Lower the volume, keep playing
-            break;
         }
     }
 
@@ -784,21 +889,5 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
-    }
-
-    @Override
-    public void onHostResume() {
-        mPlayer.onResume();
-    }
-
-    @Override
-    public void onHostPause() {
-        mPlayer.onPause();
-    }
-
-    @Override
-    public void onHostDestroy() {
-        doUnbindService();
-        mPlayer.onDestroy();
     }
 }

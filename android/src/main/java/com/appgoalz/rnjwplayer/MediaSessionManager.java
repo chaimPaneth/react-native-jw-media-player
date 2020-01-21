@@ -188,10 +188,12 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 				break;
 		}
 
-		newPlaybackState.setState(playbackStateCompat, (long)mPlayer.getPosition(), PLAYBACK_RATE);
-		mMediaSessionCompat.setPlaybackState(newPlaybackState.build());
-		mNotificationWrapper
-				.createNotification(mPlayer.getContext(), mMediaSessionCompat, capabilities);
+		if (mPlayer != null) {
+			newPlaybackState.setState(playbackStateCompat, (long)mPlayer.getPosition(), mPlayer.getPlaybackRate()); // PLAYBACK_RATE
+			mMediaSessionCompat.setPlaybackState(newPlaybackState.build());
+			mNotificationWrapper
+					.createNotification(mPlayer.getContext(), mMediaSessionCompat, capabilities);
+		}
 	}
 
 	@Override
@@ -335,37 +337,51 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 
 		@Override
 		public void onPause() {
-			mPlayer.pause();
+			if (mPlayer != null) {
+				mPlayer.pause();
+			}
 		}
 
 		@Override
 		public void onPlay() {
-			mPlayer.play();
+			if (mPlayer != null) {
+				mPlayer.play();
+			}
 		}
 
 		@Override
 		public void onSeekTo(long pos) {
-			mPlayer.seek(pos);
+			if (mPlayer != null) {
+				mPlayer.seek(pos);
+			}
 		}
 
 		@Override
 		public void onSkipToNext() {
-			mPlayer.playlistItem(mPlayer.getPlaylistIndex() + 1);
+			if (mPlayer != null) {
+				mPlayer.playlistItem(mPlayer.getPlaylistIndex() + 1);
+			}
 		}
 
 		@Override
 		public void onSkipToPrevious() {
-			mPlayer.playlistItem(mPlayer.getPlaylistIndex() - 1);
+			if (mPlayer != null) {
+				mPlayer.playlistItem(mPlayer.getPlaylistIndex() - 1);
+			}
 		}
 
 		@Override
 		public void onStop() {
-			mPlayer.stop();
+			if (mPlayer != null) {
+				mPlayer.stop();
+			}
 		}
 
 		@Override
 		public void onSkipToQueueItem(long id) {
-			mPlayer.playlistItem((int)id);
+			if (mPlayer != null) {
+				mPlayer.playlistItem((int)id);
+			}
 		}
 	}
 

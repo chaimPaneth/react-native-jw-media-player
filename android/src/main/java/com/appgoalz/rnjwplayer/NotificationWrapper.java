@@ -67,7 +67,8 @@ public class NotificationWrapper {
 			   .setLargeIcon(description.getIconBitmap())
 			   .setOnlyAlertOnce(true)
 			   .setStyle(new MediaStyle()
-								 .setMediaSession(mediaSession.getSessionToken()))
+					   .setMediaSession(mediaSession.getSessionToken())
+					   .setShowActionsInCompactView(0))
 			   .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 			   .setSmallIcon(appIcon > 0 ? appIcon : R.drawable.ic_jw_developer)
 			   .setDeleteIntent(getActionIntent(context, KeyEvent.KEYCODE_MEDIA_STOP));
