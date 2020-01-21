@@ -16,7 +16,7 @@ Platform:
 npm manifest: 
   {
     "name": "react-native-jw-media-player",
-    "version": "0.1.23",
+    "version": "0.1.30",
     "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
     "main": "index.js",
     "scripts": {
