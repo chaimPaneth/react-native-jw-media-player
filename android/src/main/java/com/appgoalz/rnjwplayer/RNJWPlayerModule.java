@@ -124,6 +124,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayer != null) {
             playerView.mPlayer.pause();
+            playerView.resumeOnFocusGain = false;
           }
         }
       });
@@ -142,6 +143,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayer != null) {
             playerView.mPlayer.stop();
+            playerView.resumeOnFocusGain = false;
           }
         }
       });
@@ -298,6 +300,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
               playerView.mPlayer.setControls(controls);
 
               playerView.mPlayer.load(newPlayListItem);
+
+              if (autostart) {
+                playerView.mPlayer.play();
+              }
             }
           }
         }
@@ -383,7 +389,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
             playerView.mPlayer.getConfig().setControls(controls);
             playerView.mPlayer.setControls(controls);
             playerView.mPlayer.load(mPlayList);
-            playerView.mPlayer.play();
+
+            if (autostart) {
+              playerView.mPlayer.play();
+            }
           }
         }
       });
