@@ -75,7 +75,7 @@ Add to AndroidManifest.xml in the Application tag above the Activity tag:
     android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
 ```
 
-... and These lines (This is needed for the controls bar in notification center).
+... and these lines (This is needed for the controls bar in notification center).
 
 ```
 <receiver android:name="androidx.media.session.MediaButtonReceiver">
@@ -92,7 +92,7 @@ Add to AndroidManifest.xml in the Application tag above the Activity tag:
 </service>
 ```
 
-Add this line to the dependencies block in `android/app/build.gradle`:
+and this line to the dependencies block in `android/app/build.gradle` (also needed for the controls bar in notification center).
 
 ```
 implementation 'androidx.media:media:1.1.0'
