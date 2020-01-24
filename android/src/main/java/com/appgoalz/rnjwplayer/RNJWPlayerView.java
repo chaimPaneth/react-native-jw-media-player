@@ -7,16 +7,24 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.Activity;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.view.ViewPager;
+import android.text.Layout;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -84,6 +92,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         AdvertisingEvents.OnBeforeCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
     public RNJWPlayer mPlayer = null;
+    private ViewGroup mRootView;
+    private RNJWPlayer mFullscreenPlayer;
 
     List<PlaylistItem> mPlayList = null;
 
@@ -210,6 +220,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mWindow = mActivity.getWindow();
         }
 
+        mRootView = mActivity.findViewById(android.R.id.content);
+
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
         audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
@@ -290,62 +302,119 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mPlayer.addOnControlBarVisibilityListener(this);
             mPlayer.addOnDisplayClickListener(this);
             mPlayer.addOnFullscreenListener(this);
-            mPlayer.setFullscreenHandler(new FullscreenHandler() {
-                @Override
-                public void onFullscreenRequested() {
-                    WritableMap eventEnterFullscreen = Arguments.createMap();
-                    eventEnterFullscreen.putString("message", "onFullscreen");
-                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                            getId(),
-                            "topFullScreen",
-                            eventEnterFullscreen);
-                }
-
-                @Override
-                public void onFullscreenExitRequested() {
-                    WritableMap eventExitFullscreen = Arguments.createMap();
-                    eventExitFullscreen.putString("message", "onFullscreenExit");
-                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                            getId(),
-                            "topFullScreenExit",
-                            eventExitFullscreen);
-                }
-
-                @Override
-                public void onResume() {
-
-                }
-
-                @Override
-                public void onPause() {
-
-                }
-
-                @Override
-                public void onDestroy() {
-
-                }
-
-                @Override
-                public void onAllowRotationChanged(boolean b) {
-                    Log.e(TAG, "onAllowRotationChanged: "+b );
-                }
-
-                @Override
-                public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "updateLayoutParams: "+layoutParams );
-                }
-
-                @Override
-                public void setUseFullscreenLayoutFlags(boolean b) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
-                }
-            });
-
+            mPlayer.setFullscreenHandler(new AppViewFullscreenHandler(mPlayer));
             mPlayer.setControls(true);
             mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+        }
+    }
+
+    private class AppViewFullscreenHandler implements FullscreenHandler {
+        private ViewGroup mPlayerContainer;
+        private final RNJWPlayer mPlayer;
+        private View mDecorView;
+
+        public AppViewFullscreenHandler(RNJWPlayer player) {
+            mPlayerContainer = (ViewGroup) player.getParent()
+            mPlayer = player;
+        }
+
+        @Override
+        public void onFullscreenRequested() {
+            mDecorView = mActivity.getWindow().getDecorView();
+
+            // Hide system ui
+            mDecorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hides bottom bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN // hides top bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // prevents navigation bar from overriding
+                // exit-full-screen button. Swipe from side to access nav bar.
+            );
+
+            // Enter landscape mode for fullscreen videos
+            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+            // Destroy the player's rendering surface, we need to do this to prevent Android's
+            // MediaDecoders from crashing.
+            mPlayer.destroySurface();
+
+            mPlayerContainer = (ViewGroup) mPlayer.getParent();
+
+            // Remove the JWPlayerView from the list item.
+            mPlayerContainer.removeView(mPlayer);
+
+            // Initialize a new rendering surface.
+            mPlayer.initializeSurface();
+
+            // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
+            mRootView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRootView.addView(mPlayer, new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    ));
+                    mFullscreenPlayer = mPlayer;
+                }
+            });
+        }
+
+        @Override
+        public void onFullscreenExitRequested() {
+            mDecorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_VISIBLE // clear the hide system flags
+            );
+
+            // Enter portrait mode
+            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+            // Destroy the surface that is used for video output, we need to do this before
+            // we can detach the JWPlayerView from a ViewGroup.
+            mPlayer.destroySurface();
+
+            // Remove the player view from the root ViewGroup.
+            mRootView.removeView(mPlayer);
+
+            // After we've detached the JWPlayerView we can safely reinitialize the surface.
+            mPlayer.initializeSurface();
+
+            // As soon as the UI thread has finished processing the current message queue it
+            // should add the JWPlayerView back to the list item.
+            mPlayerContainer.post(new Runnable() {
+                @Override
+                public void run() {
+                    mPlayerContainer.addView(mPlayer, new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    ));
+                    mFullscreenPlayer = null;
+                }
+            });
+        }
+
+        @Override
+        public void onResume() {}
+
+        @Override
+        public void onPause() {}
+
+        @Override
+        public void onDestroy() {}
+
+        @Override
+        public void onAllowRotationChanged(boolean b) {
+            Log.e(TAG, "onAllowRotationChanged: " + b);
+        }
+
+        @Override
+        public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+ //        View.setSystemUiVisibility(int).
+ //        Log.e(TAG, "updateLayoutParams: "+layoutParams );
+        }
+
+        @Override
+        public void setUseFullscreenLayoutFlags(boolean b) {
+ //        View.setSystemUiVisibility(int).
+ //        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
         }
     }
 
