@@ -40,7 +40,6 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
     "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1",
-    "pre-commit": "^1.2.2"
+    "eslint-plugin-react-native": "^2.2.1"
   }
 }
