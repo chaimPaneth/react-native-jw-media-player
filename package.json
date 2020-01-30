@@ -1,6 +1,6 @@
 {
   "name": "react-native-jw-media-player",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
   "main": "index.js",
   "scripts": {
@@ -40,6 +40,6 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
     "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1"
+    "eslint-plugin-react-native": "^2.2.1",
   }
 }
