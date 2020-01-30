@@ -6,9 +6,6 @@
   "scripts": {
     "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
   },
-  "pre-commit": [
-    "lint"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chaimPaneth/react-native-jw-media-player.git"

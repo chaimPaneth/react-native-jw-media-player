@@ -55,6 +55,9 @@ import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import com.longtailvideo.jwplayer.media.ads.AdBreak;
+import com.longtailvideo.jwplayer.media.ads.AdSource;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -333,7 +336,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                 @Override
                 public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-//        View.setSystemUiVisibility(int).
+//        View.setSystemUiVisibilityisibility(int).
 //        Log.e(TAG, "updateLayoutParams: "+layoutParams );
                 }
 
@@ -397,6 +400,23 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         boolean autostart = false;
                         if (playlistItem.hasKey("autostart")) {
                             autostart = playlistItem.getBoolean("autostart");
+                        }
+
+                        if (playlistItem.hasKey("schedule")) {
+                            ReadableArray ad = playlistItem.getArray("schedule");
+
+                            List<AdBreak> adSchedule = new ArrayList();
+
+                            for (int i = 0; i < ad.size(); i++) {
+                                ReadableMap adBreakProp = ad.getMap(i);
+                                String offset = adBreakProp.getString("offset");
+                                if (adBreakProp.hasKey("tag")) {
+                                    AdBreak adBreak = new AdBreak(offset, AdSource.IMA, adBreakProp.getString("tag"));
+                                    adSchedule.add(adBreak);
+                                }
+                            }
+
+                            newPlayListItem.setAdSchedule(adSchedule);
                         }
 
                         PlayerConfig playerConfig = new PlayerConfig.Builder()
@@ -480,9 +500,26 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                             mediaId = playlistItem.getString("mediaId");
                         }
 
+                        List<AdBreak> adSchedule = new ArrayList();
+
+                        if (playlistItem.hasKey("advertisement")) {
+                            ReadableArray ad = playlistItem.getArray("advertisement");
+
+                            for (int i = 0; i < ad.size(); i++) {
+                                ReadableMap adBreakProp = ad.getMap(i);
+                                String offset = adBreakProp.hasKey("offset") ? adBreakProp.getString("offset") : "pre";
+                                if (adBreakProp.hasKey("tag")) {
+                                    AdBreak adBreak = new AdBreak(offset, AdSource.IMA, adBreakProp.getString("tag"));
+                                    adSchedule.add(adBreak);
+//                                    Log.e("LOGTAG", "Added offet:" + offset + ", tags:" + adBreakProp.getString("tag"));
+                                }
+                            }
+                        }
+
                         PlaylistItem newPlayListItem = new PlaylistItem.Builder()
                                 .file(file)
                                 .title(title)
+                                .adSchedule(adSchedule)
                                 .description(desc)
                                 .image(image)
                                 .mediaId(mediaId)
@@ -622,13 +659,14 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
-
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdPlay");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdStarted", event);
     }
 
 
     @Override
     public void onBeforeComplete(BeforeCompleteEvent beforeCompleteEvent) {
-
     }
 
     @Override

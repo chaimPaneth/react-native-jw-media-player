@@ -93,4 +93,9 @@
     [self.delegate onRNJWPlayerComplete];
 }
 
+- (void)onAdPlay:(JWAdEvent<JWAdStateChangeEvent> *)event
+{
+    [self.delegate onRNJWPlayerAdPlay:event];
+}
+
 @end

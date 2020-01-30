@@ -69,7 +69,13 @@ export default class JWPlayer extends Component {
       desc: PropTypes.string,
       time: PropTypes.number,
       mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired
+      autostart: PropTypes.bool.isRequired,
+      schedule: PropTypes.arrayOf(
+        PropTypes.shape({
+          tag: PropTypes.string,
+          offset: PropTypes.string,
+        })
+      ),
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -103,7 +109,8 @@ export default class JWPlayer extends Component {
     onTime: PropTypes.func,
     onFullScreen: PropTypes.func,
     onPlaylistItem: PropTypes.func,
-    onControlBarVisible: PropTypes.func
+    onControlBarVisible: PropTypes.func,
+    onAdPlay: PropTypes.func
   };
 
   pause() {

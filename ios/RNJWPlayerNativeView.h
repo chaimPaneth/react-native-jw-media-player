@@ -47,6 +47,8 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onControlBarVisible;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforeComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onComplete;
+@property(nonatomic, copy)RCTBubblingEventBlock onAdPlay;
+
 
 -(void)onRNJWReady;
 -(void)onRNJWPlaylist;
@@ -67,6 +69,7 @@
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
 -(void)onRNJWPlayerBeforeComplete;
 -(void)onRNJWPlayerComplete;
+-(void)onRNJWPlayerAdPlay:(JWAdEvent<JWAdStateChangeEvent> *)event;
 
 -(JWConfig*)setupConfig;
 -(void)customStyle: (JWConfig*)config :(NSString*)name;

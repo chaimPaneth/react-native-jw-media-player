@@ -379,9 +379,33 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         if ((controls != nil) && (controls != (id)[NSNull null])) {
             config.controls = [controls boolValue];
         }
+
+        NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
+        id ads = playlistItem[@"schedule"];
+        if(ads != nil) {
+            NSArray* adsAr = (NSArray*)ads;
+            if(adsAr.count > 0) {
+                for (id item in adsAr) {
+                    NSString *offset = [item objectForKey:@"offset"];
+                    NSString *tag = [item objectForKey:@"tag"];
+                    JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
+                    [adsArray addObject:adBreak];
+                }
+            }
+        }
+
+        if(adsArray.count > 0) {
+            JWAdConfig* advertising = [JWAdConfig new];
+            advertising.client = JWAdClientGoogima;
+
+            advertising.schedule = adsArray;
+            config.advertising = advertising;
+        }
         
         _proxy = [RNJWPlayerDelegateProxy new];
         _proxy.delegate = self;
+
+        
         
         _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
         
@@ -684,6 +708,14 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         self.onComplete(@{});
     }
 }
+
+-(void)onRNJWPlayerAdPlay:(JWAdEvent<JWAdStateChangeEvent>*)event
+{
+    if (self.onAdPlay) {
+        self.onAdPlay(@{});
+    }
+}
+
 
 //-(void)onRN
 
