@@ -298,11 +298,12 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   public void pause(RNJWPlayerView root) {
     root.mPlayer.pause();
-    root.resumeOnFocusGain = false; // Stops the player from refocusing audio after manually pausing
+    root.userPaused = true;
   }
 
   public void stop(RNJWPlayerView root) {
     root.mPlayer.stop();
+    root.userPaused = true;
   }
 
   public void toggleSpeed(RNJWPlayerView root) {
