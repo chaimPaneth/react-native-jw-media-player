@@ -27,6 +27,7 @@
 @property(nonatomic)BOOL fullScreenOnLandscape;
 @property(nonatomic)BOOL landscapeOnFullScreen;
 @property(nonatomic)CGRect initFrame;
+@property(nonatomic)BOOL userPaused;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;

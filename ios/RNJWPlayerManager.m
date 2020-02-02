@@ -86,6 +86,7 @@ RCT_EXPORT_METHOD(pause:(nonnull NSNumber *)reactTag) {
         if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
+            view.userPaused = YES;
             [view.player pause];
         }
     }];
@@ -110,6 +111,7 @@ RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag) {
         if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
+            view.userPaused = YES;
             [view.player stop];
         }
     }];

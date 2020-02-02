@@ -502,6 +502,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     if (self.onPlay) {
         self.onPlay(@{});
     }
+    
+    _userPaused = NO;
 }
 
 -(void)onRNJWPlayerPause
@@ -690,19 +692,13 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 #pragma mark - RNJWPlayer Interruption handling
 
 -(void)audioInterruptionsStarted:(NSNotification *)note {
-    if (self.onPause) {
-        self.onPause(@{});
-    }
-    
     [self.player pause];
 }
 
 -(void)audioInterruptionsEnded:(NSNotification *)note {
-    if (self.onPlay) {
-        self.onPlay(@{});
+    if (!_userPaused) {
+        [self.player play];
     }
-    
-    [self.player play];
 }
 
 @end
