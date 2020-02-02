@@ -622,7 +622,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
-
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onBeforePlay");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforePlay", event);
     }
 
 
