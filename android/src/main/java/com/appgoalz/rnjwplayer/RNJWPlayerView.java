@@ -121,7 +121,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     boolean hasAudioFocus = false;
     boolean playbackDelayed = false;
     boolean playbackNowAuthorized = false;
-    boolean resumeOnFocusGain = true;
+    boolean userPaused = false;
+    boolean wasInterrupted = false;
 
     private final ReactApplicationContext mAppContext;
 
@@ -738,6 +739,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlay", event);
 
         updateWakeLock(true);
+
+        userPaused = false;
+        wasInterrupted = false;
     }
 
     @Override
@@ -756,6 +760,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPause", event);
 
         updateWakeLock(false);
+
+        if (!wasInterrupted) {
+            userPaused = true;
+        }
     }
 
     @Override
@@ -821,7 +829,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public void lowerApiOnAudioFocus(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (resumeOnFocusGain) {
+                if (!userPaused) {
                     boolean autostart = mPlayer.getConfig().getAutostart();
                     if (autostart) {
                         mPlayer.play();
@@ -830,10 +838,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 mPlayer.pause();
+                wasInterrupted = true;
                 hasAudioFocus = false;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                resumeOnFocusGain = true;
+                wasInterrupted = true;
                 mPlayer.pause();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -847,10 +856,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        if (playbackDelayed || resumeOnFocusGain) {
+                        if (playbackDelayed || !userPaused) {
                             synchronized(focusLock) {
                                 playbackDelayed = false;
-                                resumeOnFocusGain = false;
                             }
                             boolean autostart = mPlayer.getConfig().getAutostart();
                             if (autostart) {
@@ -860,7 +868,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS:
                         synchronized(focusLock) {
-                            resumeOnFocusGain = false;
+                            wasInterrupted = true;
                             playbackDelayed = false;
                         }
                         mPlayer.pause();
@@ -868,7 +876,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                         synchronized(focusLock) {
-                            resumeOnFocusGain = mPlayer.getState() == PlayerState.PLAYING;
+                            wasInterrupted = true;
                             playbackDelayed = false;
                         }
                         mPlayer.pause();

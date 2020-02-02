@@ -124,7 +124,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayer != null) {
             playerView.mPlayer.pause();
-            playerView.resumeOnFocusGain = false;
+            playerView.userPaused = true;
           }
         }
       });
@@ -143,7 +143,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayer != null) {
             playerView.mPlayer.stop();
-            playerView.resumeOnFocusGain = false;
+            playerView.userPaused = true;
           }
         }
       });
