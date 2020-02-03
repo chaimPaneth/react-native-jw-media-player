@@ -3,9 +3,7 @@ package com.appgoalz.rnjwplayer;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.longtailvideo.jwplayer.JWPlayerView;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
