@@ -352,6 +352,14 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                     mFullscreenPlayer = mPlayer;
                 }
             });
+            
+            WritableMap eventEnterFullscreen = Arguments.createMap();
+            eventEnterFullscreen.putString("message", "onFullscreen");
+            getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
+                    getId(),
+                    "topFullScreen",
+                    eventEnterFullscreen);
+
         }
 
         @Override
