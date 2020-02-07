@@ -7,7 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.Activity;
 import android.content.pm.ActivityInfo;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
