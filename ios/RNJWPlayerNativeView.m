@@ -411,6 +411,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         
         _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
         
+        [_player setFullscreen:true];
+        
         [self setFullScreenOnLandscape:_fullScreenOnLandscape];
         [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
         
