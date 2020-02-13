@@ -18,9 +18,12 @@ public class RNJWPlayer extends JWPlayerView {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // Exit fullscreen or perform the action requested
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            this.setFullscreen(false,false);
-            return false;
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && this.getFullscreen()) {
+            if (event.getAction() == KeyEvent.ACTION_UP) {
+                this.setFullscreen(false,false);
+                return false;
+            }
+            return true;
         }
         return super.dispatchKeyEvent(event);
     }
