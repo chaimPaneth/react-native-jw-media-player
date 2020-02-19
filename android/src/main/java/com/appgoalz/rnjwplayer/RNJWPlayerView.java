@@ -784,7 +784,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public void onError(ErrorEvent errorEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onError");
-        event.putString("error", errorEvent.getException().toString());
+        Exception ex = errorEvent.getException();
+        if (ex != null) {
+            event.putString("error", ex.toString());
+            event.putString("description",  errorEvent.getMessage());
+        }
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerError", event);
 
         updateWakeLock(false);
