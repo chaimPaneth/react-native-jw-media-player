@@ -15,6 +15,7 @@ import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -393,6 +394,24 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
             if (autostart) {
               playerView.mPlayer.play();
             }
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void setFullscreen(final int reactTag, final boolean fullscreen) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.mPlayer.setFullscreen(fullscreen, fullscreen);
           }
         }
       });

@@ -400,7 +400,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         public void onPause() {}
 
         @Override
-        public void onDestroy() {}
+        public void onDestroy() {
+            this.onFullscreenExitRequested();
+        }
 
         @Override
         public void onAllowRotationChanged(boolean b) {
@@ -521,7 +523,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                         mPlayer.load(newPlayListItem);
                         mPlayer.setFullscreen(true, true);
-
+                        
                         if (autostart) {
                             mPlayer.play();
                         }
@@ -736,7 +738,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onBeforeComplete(BeforeCompleteEvent beforeCompleteEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onBeforeComplete");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforeComplete", event);
 
+        updateWakeLock(false);
     }
 
     @Override
@@ -770,7 +776,6 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onPlaylistComplete(PlaylistCompleteEvent playlistCompleteEvent) {
-
     }
 
     @Override
@@ -875,7 +880,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onFullscreen(FullscreenEvent fullscreenEvent) {
-
+        if (!fullscreenEvent.getFullscreen()) {
+            WritableMap event = Arguments.createMap();
+            event.putString("message", "onFullScreenExit");
+            getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topFullScreenExit", event);
+        }
     }
 
     @Override

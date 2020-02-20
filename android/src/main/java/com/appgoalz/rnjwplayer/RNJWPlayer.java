@@ -28,7 +28,6 @@ public class RNJWPlayer extends JWPlayerView {
         return super.dispatchKeyEvent(event);
     }
 
-
     @Override
     public void requestLayout() {
         super.requestLayout();

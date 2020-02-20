@@ -110,7 +110,8 @@ export default class JWPlayer extends Component {
     onFullScreen: PropTypes.func,
     onPlaylistItem: PropTypes.func,
     onControlBarVisible: PropTypes.func,
-    onAdPlay: PropTypes.func
+    onAdPlay: PropTypes.func,
+    setFullscreen: PropTypes.func
   };
 
   pause() {
@@ -151,6 +152,10 @@ export default class JWPlayer extends Component {
 
   seekTo(time) {
     if (RNJWPlayerManager) RNJWPlayerManager.seekTo(this.getRNJWPlayerBridgeHandle(), time);
+  }
+
+  setFullscreen(fullscreen) {
+    if (RNJWPlayerManager) RNJWPlayerManager.setFullscreen(this.getRNJWPlayerBridgeHandle(), fullscreen);
   }
 
   async position() {

@@ -151,6 +151,17 @@ RCT_EXPORT_METHOD(toggleSpeed:(nonnull NSNumber *)reactTag) {
     
 }
 
+RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (bool)fs) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player setFullscreen:fs];
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(setSpeed: (nonnull NSNumber *)reactTag: (double)speed) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
         RNJWPlayerNativeView *view = viewRegistry[reactTag];
