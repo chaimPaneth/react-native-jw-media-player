@@ -67,6 +67,7 @@ import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
@@ -539,7 +540,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     }
 
     public void setPlaylist(ReadableArray prop) {
-        if(playlist != prop) {
+        if (playlist != prop) {
             playlist = prop;
 
             if (playlist != null && playlist.size() > 0) {
@@ -582,7 +583,6 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                                 if (adBreakProp.hasKey("tag")) {	
                                     AdBreak adBreak = new AdBreak(offset, AdSource.IMA, adBreakProp.getString("tag"));	
                                     adSchedule.add(adBreak);	
-//                                    Log.e("LOGTAG", "Added offet:" + offset + ", tags:" + adBreakProp.getString("tag"));	
                                 }	
                             }	
                         }
@@ -617,6 +617,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                     autostart = playlist.getMap(0).getBoolean("autostart");
                 }
 
+                int nextUpOffset = -10;
+                if (playlist.getMap(0).hasKey("nextUpOffset")) {
+                    nextUpOffset = playlist.getMap(0).getInt("nextUpOffset");
+                }
+
                 PlayerConfig playerConfig = new PlayerConfig.Builder()
                         .skinConfig(skinConfig)
                         .repeat(false)
@@ -625,12 +630,18 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                         .displayTitle(true)
                         .displayDescription(true)
                         .nextUpDisplay(true)
+                        .nextUpOffset(nextUpOffset)
                         .stretching(STRETCHING_UNIFORM)
                         .build();
 
                 Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
                 mPlayer = new RNJWPlayer(simpleContext, playerConfig);
+                setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+                mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT));
+                addView(mPlayer);
 
                 setupPlayerView();
 
@@ -645,6 +656,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                 }
 
                 mPlayer.load(mPlayList);
+                mPlayer.setFullscreen(true, true);
 
                 if (autostart) {
                     mPlayer.play();
@@ -765,7 +777,12 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             doBindService();
         }
 
-        currentPlayingIndex = playlistItemEvent.getIndex();
+        int currentPlayingIndex = playlistItemEvent.getIndex();
+        ReadableMap playlistItem = playlist.getMap(currentPlayingIndex);
+
+        if (playlistItem.hasKey("nextUpOffset")) {
+            mPlayer.getConfig().setNextUpOffset(playlistItem.getInt("nextUpOffset"));
+        }
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlaylistItem");
@@ -910,7 +927,6 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public void onTime(TimeEvent timeEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onTime");
-        event.putDouble("position", timeEvent.getPosition());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topTime", event);
     }
 
