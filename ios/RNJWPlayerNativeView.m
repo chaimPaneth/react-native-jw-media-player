@@ -436,6 +436,8 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     if (playlist != nil && playlist.count > 0) {
         [self reset];
         
+        self.originalPlaylist = playlist;
+        
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [JWPlaylistItem new];
@@ -483,7 +485,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         }
         
         config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
-        
+        config.nextupOffset = [[playlist[0] objectForKey:@"nextUpOffset"] intValue];
         config.playlist = playlistArray;
         
         _proxy = [RNJWPlayerDelegateProxy new];
@@ -553,13 +555,23 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 -(void)onRNJWPlayerPlaylistItem:(JWEvent<JWPlaylistItemEvent> *)event
 {
+    NSNumber *index;
+    index = [NSNumber numberWithInteger: event.index];
+    NSNumber *nextUpOffset;
+    nextUpOffset = [[self.originalPlaylist objectAtIndex:event.index] valueForKey:@"nextUpOffset"];
+            
+    if (nextUpOffset != nil) {
+        self.player.config.nextupOffset = [nextUpOffset intValue];
+    }
+    
+//    NSLog(@"MEGA MEFA %@", nextUpOffset);
+
     if (self.onPlaylistItem) {
         NSError *error;
         NSString *file = @"";
         NSString *mediaId = @"";
         NSString *title = @"";
         NSString *desc = @"";
-        NSNumber *index;
         
         if (event.item.file != nil) {
             file = event.item.file;
@@ -576,8 +588,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         if (event.item.desc != nil) {
             desc = event.item.desc;
         }
-        
-        index = [NSNumber numberWithInteger: event.index];
         
         NSMutableDictionary *playListItemDict = [[NSMutableDictionary alloc] init];
         [playListItemDict setObject:file forKey:@"file"];

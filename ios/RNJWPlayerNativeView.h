@@ -10,6 +10,7 @@
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
 
+@property(nonatomic, strong)NSArray *originalPlaylist;
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
 @property(nonatomic)BOOL controls;
