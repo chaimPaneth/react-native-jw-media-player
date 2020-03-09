@@ -410,7 +410,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         public void onPause() {}
 
         @Override
-        public void onDestroy() {}
+        public void onDestroy() {
+            if (mFullscreenPlayer != null) {
+                onFullscreenExitRequested();
+            }
+        }
 
         @Override
         public void onAllowRotationChanged(boolean b) {
