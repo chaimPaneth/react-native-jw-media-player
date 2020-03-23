@@ -29,7 +29,7 @@ Follow official instructions [iOS sdk installation](https://developer.jwplayer.c
 Add `pod 'JWPlayer-SDK', '~> 3.5.0'` to your Podfile.
 Then run **pod install** from your `ios` directory.
 
-In your `info.plist` properties file, create an string entry named `JWPlayerKey`, and set its value to be your JW Player Beta license key. Make sure you enter this string exactly as you received it from JW Player, or as it appears in your JW Player Dashboard. The string is case-sensitive.
+In your `info.plist` properties file, create a string entry named `JWPlayerKey`, and set its value to be your JW Player Beta license key. Make sure you enter this string exactly as you received it from JW Player, or as it appears in your JW Player Dashboard. The string is case-sensitive.
 
 ##### Android dependencies
 
@@ -99,7 +99,7 @@ implementation 'androidx.media:media:1.1.0'
 
 ```
 
-JW uses some of google services in their sdk so if you get an error about any missing google services you can add this line to the dependencies block in `android/app/build.gradle`:
+JW uses some of google services in their sdk so if you get an error about any missing google services (e.g. `ERROR: Failed to resolve: com.google.android.gms:play-services-ads-identifier:16.0.0`) you can add this line to the dependencies block in `android/app/build.gradle`:
 
 ```
 api 'com.google.android.gms:play-services-base:+'
