@@ -5,7 +5,8 @@ import {
   Text,
   SafeAreaView,
   Dimensions,
-  Platform
+  Platform,
+  StatusBar
 } from "react-native";
 
 import JWPlayer from "react-native-jw-media-player";
@@ -77,6 +78,14 @@ export default class App extends Component {
     // console.log('onTime was called with: ', position, duration);
   }
 
+  onFullScreen() {
+    StatusBar.setHidden(true);
+  }
+
+  onFullScreenExit() {
+    StatusBar.setHidden(false);
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -95,14 +104,17 @@ export default class App extends Component {
               playlistItem={{
                 mediaId: "1",
                 file: "https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8",
-                autostart: false
+                autostart: false,
               }}
               onBeforePlay={() => this.onBeforePlay()}
               onPlay={() => this.onPlay()}
-              onSetupPlayerError={e => this.onSetupPlayerError(e)}
-              onPlayerError={e => this.onPlayerError(e)}
+              onSetupPlayerError={(e) => this.onSetupPlayerError(e)}
+              onPlayerError={(e) => this.onPlayerError(e)}
               onBuffer={() => this.onBuffer()}
-              onTime={time => this.onTime(time)}
+              onTime={(time) => this.onTime(time)}
+              nativeFullScreen={true} // when undefined or false you will need to handle the player styles in onFullScreen & onFullScreenExit callbacks
+              onFullScreen={() => this.onFullScreen()}
+              onFullScreenExit={() => this.onFullScreenExit()}
             />
           </View>
         </View>

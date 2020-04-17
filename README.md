@@ -1,5 +1,9 @@
 # react-native-jw-media-player
 
+### A react-native bridge for JWPlayer native SDK's
+
+<img width="200" alt="sample" src="./images/1.png">
+
 ## Getting started
 
 `npm i react-native-jw-media-player --save`
@@ -260,8 +264,10 @@ For running example project:
 | **`playerStyle`**           | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section.                                                     | `String`                                            |
 | **`colors`**                | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section.                                                | `Object`                                            |
 | **`nativeFullScreen`**      | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
-| **`fullScreenOnLandscape`** | `Available on iOS.` When this is true the player will go into full screen on rotate of phone to landscape                                                              | `Boolean`                                           |
-| **`landscapeOnFullScreen`** | `Available on iOS.` When this is true the player will go into landscape orientation when on full screen                                                                | `Boolean`                                           |
+| **`fullScreenOnLandscape`** | When this is true the player will go into full screen on rotate of phone to landscape                                                              | `Boolean`                                           |
+| **`landscapeOnFullScreen`** | When this is true the player will go into landscape orientation when on full screen                                                                | `Boolean`                                           |
+| **`portraitOnExitFullScreen`** | `Available on Android.` When this is true the player will go into portrait orientation when exiting full screen                                                                | `Boolean`                                           |
+| **`exitFullScreenOnPortrait`** | `Available on Android.` When this is true the player will exit full screen when the phone goes into portrait                                                                | `Boolean`                                           |
 
 ## Available methods
 
