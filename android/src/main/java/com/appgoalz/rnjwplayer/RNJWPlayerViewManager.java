@@ -191,6 +191,46 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
     view.setPlaylist(prop);
   }
 
+  @ReactProp(name = "nativeFullScreen")
+  public void setNativeFullScreen(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      view.nativeFullScreen = prop;
+    }
+  }
+
+  @ReactProp(name = "fullScreenOnLandscape")
+  public void setFullScreenOnLandscape(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      view.fullScreenOnLandscape = prop;
+      if (view.mPlayer != null) {
+        view.mPlayer.fullScreenOnLandscape = prop;
+      }
+    }
+  }
+
+  @ReactProp(name = "portraitOnExitFullScreen")
+  public void setPortraitOnExitFullScreen(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      view.portraitOnExitFullScreen = prop;
+    }
+  }
+
+  @ReactProp(name = "exitFullScreenOnPortrait")
+  public void setExitFullScreenOnPortrait(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      if (view.mPlayer != null) {
+        view.mPlayer.exitFullScreenOnPortrait = prop;
+      }
+    }
+  }
+
+  @ReactProp(name = "landscapeOnFullScreen")
+  public void setLandscapeOnFullScreen(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      view.landscapeOnFullScreen = prop;
+    }
+  }
+
   public Map getExportedCustomBubblingEventTypeConstants() {
     return MapBuilder.builder()
             .put(

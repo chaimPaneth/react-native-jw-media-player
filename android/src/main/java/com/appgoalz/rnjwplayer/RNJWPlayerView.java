@@ -7,13 +7,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,7 +30,6 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
-import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.events.AudioTrackChangedEvent;
 import com.longtailvideo.jwplayer.events.AudioTracksEvent;
 import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
@@ -84,6 +84,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         AdvertisingEvents.OnBeforeCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
     public RNJWPlayer mPlayer = null;
+    private RNJWPlayer mFullscreenPlayer;
+
+    private ViewGroup mRootView;
 
     List<PlaylistItem> mPlayList = null;
 
@@ -101,6 +104,11 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     Boolean displayTitle = false;
     Boolean displayDesc = false;
     Boolean nextUpDisplay = false;
+
+    Boolean nativeFullScreen = false;
+    Boolean landscapeOnFullScreen = false;
+    Boolean fullScreenOnLandscape = false;
+    Boolean portraitOnExitFullScreen = false;
 
     ReadableMap playlistItem; // PlaylistItem
     ReadableArray playlist; // List <PlaylistItem>
@@ -211,6 +219,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mWindow = mActivity.getWindow();
         }
 
+        mRootView = mActivity.findViewById(android.R.id.content);
+
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
         audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
@@ -292,8 +302,54 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mPlayer.addOnDisplayClickListener(this);
             mPlayer.addOnFullscreenListener(this);
             mPlayer.setFullscreenHandler(new FullscreenHandler() {
+                ViewGroup mPlayerContainer = (ViewGroup) mPlayer.getParent();
+                private View mDecorView;
+
                 @Override
                 public void onFullscreenRequested() {
+                    if (nativeFullScreen) {
+                        mDecorView = mActivity.getWindow().getDecorView();
+
+                        // Hide system ui
+                        mDecorView.setSystemUiVisibility(
+                                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hides bottom bar
+                                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hides top bar
+                                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // prevents navigation bar from overriding
+                                // exit-full-screen button. Swipe from side to access nav bar.
+                        );
+
+                        // Enter landscape mode for fullscreen videos
+                        if (landscapeOnFullScreen) {
+                            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                        }
+
+                        // Destroy the player's rendering surface, we need to do this to prevent Android's
+                        // MediaDecoders from crashing.
+                        mPlayer.destroySurface();
+
+                        mPlayerContainer = (ViewGroup) mPlayer.getParent();
+
+                        // Remove the JWPlayerView from the list item.
+                        if (mPlayerContainer != null) {
+                            mPlayerContainer.removeView(mPlayer);
+                        }
+
+                        // Initialize a new rendering surface.
+                        mPlayer.initializeSurface();
+
+                        // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
+                        mRootView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRootView.addView(mPlayer, new ViewGroup.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT
+                                ));
+                                mFullscreenPlayer = mPlayer;
+                            }
+                        });
+                    }
+
                     WritableMap eventEnterFullscreen = Arguments.createMap();
                     eventEnterFullscreen.putString("message", "onFullscreen");
                     getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
@@ -304,6 +360,41 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                 @Override
                 public void onFullscreenExitRequested() {
+                    if (nativeFullScreen) {
+                        mDecorView.setSystemUiVisibility(
+                                View.SYSTEM_UI_FLAG_VISIBLE // clear the hide system flags
+                        );
+
+                        // Enter portrait mode
+                        if (portraitOnExitFullScreen) {
+                            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        }
+
+                        // Destroy the surface that is used for video output, we need to do this before
+                        // we can detach the JWPlayerView from a ViewGroup.
+                        mPlayer.destroySurface();
+
+                        // Remove the player view from the root ViewGroup.
+                        mRootView.removeView(mPlayer);
+
+                        // After we've detached the JWPlayerView we can safely reinitialize the surface.
+                        mPlayer.initializeSurface();
+
+                        // As soon as the UI thread has finished processing the current message queue it
+                        // should add the JWPlayerView back to the list item.
+                        mPlayerContainer.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mPlayerContainer.addView(mPlayer, new ViewGroup.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT
+                                ));
+                                mPlayer.layout(mPlayerContainer.getLeft(), mPlayerContainer.getTop(), mPlayerContainer.getRight(), mPlayerContainer.getBottom());
+                                mFullscreenPlayer = null;
+                            }
+                        });
+                    }
+
                     WritableMap eventExitFullscreen = Arguments.createMap();
                     eventExitFullscreen.putString("message", "onFullscreenExit");
                     getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
@@ -324,7 +415,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
                 @Override
                 public void onDestroy() {
-
+                    if (mFullscreenPlayer != null) {
+                        onFullscreenExitRequested();
+                    }
                 }
 
                 @Override
