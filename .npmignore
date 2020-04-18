@@ -31,5 +31,7 @@ node_modules
 .idea
 .settings
 .project
+.classpath
 .prettierrc
 .eslintrc
+.history
