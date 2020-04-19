@@ -4,7 +4,7 @@
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint index.js demo/index.ios.js demo/index.android.js demo/src"
+    "lint": "eslint index.js example/index.js example/src"
   },
   "pre-commit": [
     "lint"
