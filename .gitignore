@@ -33,7 +33,7 @@ ios/Podfile.lock
 local.properties
 .classpath
 .project
-.settings
+.settings/
 
 # node.js
 #
