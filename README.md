@@ -232,16 +232,17 @@ For running example project:
 | Prop                     | Description                                 | Type      |
 | ------------------------ | ------------------------------------------- | --------- |
 | **`mediaId`**            | The JW media id.                            | `Int`     |
-| **`file`**               | The url of the file to play.                | `String`  |
-| **`title`**              | The title of the track.                     | `String`  |
-| **`image`**              | The url of the player thumbnail.            | `String`  |
-| **`autostart`**          | Should the track auto start.                | `Boolean` |
 | **`time`**               | should the player seek to a certain second. | `Int`     |
+| **`adVmap`**             | The url of ads VMAP xml.                    | `String`  |
 | **`desc`**               | Description of the track.                   | `String`  |
+| **`file`**               | The url of the file to play.                | `String`  |
+| **`image`**              | The url of the player thumbnail.            | `String`  |
+| **`title`**              | The title of the track.                     | `String`  |
+| **`autostart`**          | Should the track auto start.                | `Boolean` |
 | **`controls`**           | Should the control buttons show.            | `Boolean` |
-| **`repeat`**             | Should the track repeat.                    | `Boolean` |
 | **`displayDescription`** | Should the player show the description.     | `Boolean` |
 | **`displayTitle`**       | Should the player show the title.           | `Boolean` |
+| **`repeat`**             | Should the track repeat.                    | `Boolean` |
 
 ## Available props
 
