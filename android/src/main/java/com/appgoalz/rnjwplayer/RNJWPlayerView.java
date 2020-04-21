@@ -54,6 +54,7 @@ import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
+import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
@@ -97,6 +98,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     String desc = "";
     String mediaId = "";
     String customStyle;
+    String adVmap = "";
 
     Boolean autostart = true;
     Boolean controls = true;
@@ -493,6 +495,15 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                             autostart = playlistItem.getBoolean("autostart");
                         }
 
+                        if (playlistItem.hasKey("adVmap")) {
+                            adVmap = playlistItem.getString("adVmap");
+                        }
+
+                        List<PlaylistItem> playlist = new ArrayList<>();
+                        playlist.add(newPlayListItem);
+
+                        ImaVMAPAdvertising imaVMAPAdvertising = new ImaVMAPAdvertising(adVmap);
+
                         PlayerConfig playerConfig = new PlayerConfig.Builder()
                                 .skinConfig(skinConfig)
                                 .repeat(false)
@@ -502,6 +513,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                                 .displayDescription(true)
                                 .nextUpDisplay(true)
                                 .stretching(STRETCHING_UNIFORM)
+                                .playlist(playlist)
+                                .advertising(imaVMAPAdvertising)
                                 .build();
 
                         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
