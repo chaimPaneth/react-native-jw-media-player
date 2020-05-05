@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -30,6 +31,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
+import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.events.AudioTrackChangedEvent;
 import com.longtailvideo.jwplayer.events.AudioTracksEvent;
 import com.longtailvideo.jwplayer.events.BeforeCompleteEvent;
@@ -323,19 +325,16 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                             mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                         }
 
-                        // Destroy the player's rendering surface, we need to do this to prevent Android's
-                        // MediaDecoders from crashing.
-                        mPlayer.destroySurface();
-
                         mPlayerContainer = (ViewGroup) mPlayer.getParent();
+
+//                        mPlayer.destroySurface();
 
                         // Remove the JWPlayerView from the list item.
                         if (mPlayerContainer != null) {
                             mPlayerContainer.removeView(mPlayer);
                         }
 
-                        // Initialize a new rendering surface.
-                        mPlayer.initializeSurface();
+//                        mPlayer.initializeSurface();
 
                         // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
                         mRootView.post(new Runnable() {
@@ -345,6 +344,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                                         ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.MATCH_PARENT
                                 ));
+//                                if (mPlayer.getState() == PlayerState.PLAYING) { // Hack for blank screen
+//                                    mPlayer.pause();
+//                                    mPlayer.play();
+//                                }
                                 mFullscreenPlayer = mPlayer;
                             }
                         });
@@ -370,15 +373,12 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                             mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                         }
 
-                        // Destroy the surface that is used for video output, we need to do this before
-                        // we can detach the JWPlayerView from a ViewGroup.
-                        mPlayer.destroySurface();
+//                        mPlayer.destroySurface();
 
                         // Remove the player view from the root ViewGroup.
                         mRootView.removeView(mPlayer);
 
-                        // After we've detached the JWPlayerView we can safely reinitialize the surface.
-                        mPlayer.initializeSurface();
+//                        mPlayer.initializeSurface();
 
                         // As soon as the UI thread has finished processing the current message queue it
                         // should add the JWPlayerView back to the list item.
@@ -389,6 +389,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
                                         ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.MATCH_PARENT
                                 ));
+//                                if (mPlayer.getState() == PlayerState.PLAYING) { // Hack for blank screen
+//                                    mPlayer.pause();
+//                                    mPlayer.play();
+//                                }
                                 mPlayer.layout(mPlayerContainer.getLeft(), mPlayerContainer.getTop(), mPlayerContainer.getRight(), mPlayerContainer.getBottom());
                                 mFullscreenPlayer = null;
                             }
