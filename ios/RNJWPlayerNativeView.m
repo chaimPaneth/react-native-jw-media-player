@@ -174,6 +174,20 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     return self.player.config.file;
 }
 
+-(void)setAdVmap:(NSString *)adVmap
+{
+    if(adVmap != nil && adVmap.length > 0 && ![adVmap isEqualToString:_player.config.advertising.adVmap]) {
+        self.player.config.advertising = [JWAdConfig new];
+        self.player.config.advertising.client = JWAdClientGoogima;
+        self.player.config.advertising.adVmap = adVmap;
+    }
+}
+
+-(NSString *)adVmap
+{
+    return self.player.config.advertising.adVmap;
+}
+
 -(void)setMediaId:(NSString *)mediaId
 {
     if(mediaId != nil && mediaId.length > 0 && ![mediaId isEqualToString:_player.config.mediaId]) {
@@ -353,6 +367,13 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         id mediaId = playlistItem[@"mediaId"];
         if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
             config.mediaId = mediaId;
+        }
+        
+        id adVmap = playlistItem[@"adVmap"];
+        if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
+            config.advertising = [JWAdConfig new];
+            config.advertising.client = JWAdClientGoogima;
+            config.advertising.adVmap = adVmap;
         }
         
         id title = playlistItem[@"title"];
