@@ -913,6 +913,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     public void onTime(TimeEvent timeEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onTime");
+        event.putDouble("position", timeEvent.getPosition());
+        event.putDouble("duration", timeEvent.getDuration());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topTime", event);
     }
 
