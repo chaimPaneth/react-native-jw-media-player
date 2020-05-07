@@ -244,7 +244,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         return (Activity) getContext();
     }
 
-    public void destroyPlayer() {
+    public void destroyPlayer(Context applicationContext) {
         if (mPlayer != null) {
             mPlayer.stop();
 
@@ -284,7 +284,7 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             }
 
             audioManager = null;
-            doUnbindService();
+            doUnbindService(applicationContext);
         }
     }
 
@@ -672,10 +672,10 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     }
 
-    private void doUnbindService() {
+    private void doUnbindService(Context applicationContext) {
         if (mIsBound) {
             // Detach our existing connection.
-            mActivity.unbindService(mServiceConnection);
+            applicationContext.unbindService(mServiceConnection);
             mIsBound = false;
         }
     }
