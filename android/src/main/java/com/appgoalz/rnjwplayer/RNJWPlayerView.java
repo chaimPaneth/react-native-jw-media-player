@@ -49,6 +49,8 @@ import com.longtailvideo.jwplayer.events.PlaylistCompleteEvent;
 import com.longtailvideo.jwplayer.events.PlaylistEvent;
 import com.longtailvideo.jwplayer.events.PlaylistItemEvent;
 import com.longtailvideo.jwplayer.events.ReadyEvent;
+import com.longtailvideo.jwplayer.events.SeekEvent;
+import com.longtailvideo.jwplayer.events.SeekedEvent;
 import com.longtailvideo.jwplayer.events.SetupErrorEvent;
 import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
@@ -81,6 +83,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
         VideoPlayerEvents.OnControlBarVisibilityListener,
         VideoPlayerEvents.OnDisplayClickListener,
         VideoPlayerEvents.OnFirstFrameListener,
+        VideoPlayerEvents.OnSeekListener,
+        VideoPlayerEvents.OnSeekedListener,
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
@@ -247,6 +251,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mPlayer.removeOnReadyListener(this);
             mPlayer.removeOnPlayListener(this);
             mPlayer.removeOnPauseListener(this);
+            mPlayer.removeOnSeekListener(this);
+            mPlayer.removeOnSeekedListener(this);
             mPlayer.removeOnCompleteListener(this);
             mPlayer.removeOnIdleListener(this);
             mPlayer.removeOnErrorListener(this);
@@ -287,6 +293,8 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             mPlayer.addOnReadyListener(this);
             mPlayer.addOnPlayListener(this);
             mPlayer.addOnPauseListener(this);
+            mPlayer.addOnSeekListener(this);
+            mPlayer.addOnSeekedListener(this);
             mPlayer.addOnCompleteListener(this);
             mPlayer.addOnIdleListener(this);
             mPlayer.addOnErrorListener(this);
@@ -923,6 +931,23 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
     }
 
     @Override
+    public void onSeek(SeekEvent seekEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onSeek");
+        event.putDouble("position", seekEvent.getPosition());
+        event.putDouble("offset", seekEvent.getOffset());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topSeek", event);
+    }
+
+    @Override
+    public void onSeeked(SeekedEvent seekedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onSeeked");
+        event.putDouble("position", seekedEvent.getPosition());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topSeeked", event);
+    }
+
+    @Override
     public void onControls(ControlsEvent controlsEvent) {
 
     }
@@ -1016,4 +1041,5 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
             }
         }
     }
+
 }
