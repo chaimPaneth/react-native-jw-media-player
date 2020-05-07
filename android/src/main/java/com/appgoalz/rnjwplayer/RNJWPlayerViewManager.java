@@ -373,7 +373,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   @Override
   public void onDropViewInstance(@Nonnull RNJWPlayerView view) {
-    view.destroyPlayer();
+    view.destroyPlayer(mAppContext);
     view = null;
 
     super.onDropViewInstance(view);
