@@ -737,7 +737,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onBeforeComplete(BeforeCompleteEvent beforeCompleteEvent) {
-
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onBeforeComplete");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforeComplete", event);
     }
 
     @Override
@@ -771,7 +773,9 @@ public class RNJWPlayerView extends RelativeLayout implements VideoPlayerEvents.
 
     @Override
     public void onPlaylistComplete(PlaylistCompleteEvent playlistCompleteEvent) {
-
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onPlaylistComplete");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlaylistComplete", event);
     }
 
     @Override
