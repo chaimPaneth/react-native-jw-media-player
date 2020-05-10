@@ -32,17 +32,21 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onSeeked, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerReady, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onBeforeComplete, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onComplete, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdPlay, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdPause, RCTBubblingEventBlock);
 
 RCT_EXPORT_VIEW_PROPERTY(file, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mediaId, NSString);
 RCT_EXPORT_VIEW_PROPERTY(title, NSString);
 RCT_EXPORT_VIEW_PROPERTY(image, NSString);
 RCT_EXPORT_VIEW_PROPERTY(desc, NSString);
+RCT_EXPORT_VIEW_PROPERTY(adVmap, NSString);
 RCT_EXPORT_VIEW_PROPERTY(autostart, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(repeat, BOOL);
@@ -215,6 +219,17 @@ RCT_EXPORT_METHOD(seekTo :(nonnull NSNumber *)reactTag: (nonnull NSNumber *)time
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
             [view.player seek:[time integerValue] ];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fs) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player setFullscreen:fs];
         }
     }];
 }

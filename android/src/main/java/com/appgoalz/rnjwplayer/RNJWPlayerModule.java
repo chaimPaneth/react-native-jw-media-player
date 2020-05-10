@@ -401,6 +401,24 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void setFullscreen(final int reactTag, final boolean fullscreen) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.mPlayer.setFullscreen(fullscreen, fullscreen);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
   private int stateToInt(PlayerState playerState) {
     switch (playerState) {
       case IDLE:
