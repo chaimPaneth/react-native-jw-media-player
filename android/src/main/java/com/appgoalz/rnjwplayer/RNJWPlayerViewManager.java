@@ -1,10 +1,6 @@
 
 package com.appgoalz.rnjwplayer;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.os.Build;
-
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -254,6 +250,14 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onFullScreen")))
+            .put("topFullScreenExitRequested",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onFullScreenExitRequested")))
+            .put("topFullScreenRequested",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onFullScreenRequested")))
             .put("topFullScreenExit",
                     MapBuilder.of(
                             "phasedRegistrationNames",
@@ -266,6 +270,18 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onPlay")))
+            .put("topComplete",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onComplete")))
+            .put("topPlaylistComplete",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlaylistComplete")))
+            .put("topPlaylistItem",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlaylistItem")))
             .put("topSeek",
                     MapBuilder.of(
                             "phasedRegistrationNames",
@@ -274,34 +290,30 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onSeeked")))
-            .put("topComplete",
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onComplete")))
-            .put("topBeforeComplete",
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onBeforeComplete")))
-            .put("topPlaylistItem",
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onPlaylistItem")))
-            .put("topPlaylistComplete",
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onPlaylistComplete")))
             .put("topControlBarVisible",
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onControlBarVisible")))
+            .put("topOnPlayerReady",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlayerReady")))
             .put("topBeforePlay",
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onBeforePlay")))
-            .put("topOnPlayerReady", // TODO: - check if gets called
+            .put("topBeforeComplete",
                     MapBuilder.of(
                             "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onPlayerReady")))
+                            MapBuilder.of("bubbled", "onBeforeComplete")))
+            .put("topAdPlay",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onAdPlay")))
+            .put("topAdPause",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onAdPause")))
             .build();
   }
 

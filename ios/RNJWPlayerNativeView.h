@@ -50,11 +50,14 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExit;
 @property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExitRequested;
 @property(nonatomic, copy)RCTBubblingEventBlock onSeek;
+@property(nonatomic, copy)RCTBubblingEventBlock onSeeked;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylist;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerReady;
 @property(nonatomic, copy)RCTBubblingEventBlock onControlBarVisible;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforeComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onComplete;
+@property(nonatomic, copy)RCTBubblingEventBlock onAdPlay;
+@property(nonatomic, copy)RCTBubblingEventBlock onAdPause;
 
 -(void)onRNJWReady;
 -(void)onRNJWPlaylist;
@@ -72,9 +75,12 @@
 -(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
+-(void)onRNJWPlayerSeeked:(JWEvent<JWSeekEvent> *)event;
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
 -(void)onRNJWPlayerBeforeComplete;
 -(void)onRNJWPlayerComplete;
+-(void)onRNJWPlayerAdPlay:(JWAdEvent<JWAdStateChangeEvent> *)event;
+-(void)onRNJWPlayerAdPause:(JWAdEvent<JWAdStateChangeEvent> *)event;
 
 -(JWConfig*)setupConfig;
 -(void)customStyle: (JWConfig*)config :(NSString*)name;

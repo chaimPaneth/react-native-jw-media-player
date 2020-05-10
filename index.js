@@ -71,7 +71,13 @@ export default class JWPlayer extends Component {
       desc: PropTypes.string,
       time: PropTypes.number,
       mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired
+      autostart: PropTypes.bool.isRequired,
+      adSchedule: PropTypes.arrayOf(
+        PropTypes.shape({
+          tag: PropTypes.string,
+          offset: PropTypes.string,
+        })
+      ),
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -92,6 +98,7 @@ export default class JWPlayer extends Component {
     setSpeed: PropTypes.func,
     setPlaylistIndex: PropTypes.func,
     setControls: PropTypes.func,
+    setFullscreen: PropTypes.func,
     loadPlaylistItem: PropTypes.func,
     loadPlaylist: PropTypes.func,
     seekTo: PropTypes.func,
@@ -99,16 +106,21 @@ export default class JWPlayer extends Component {
     onBeforeComplete: PropTypes.func,
     onPlay: PropTypes.func,
     onPause: PropTypes.func,
-    onSeek: PropTypes.func,
-    onSeeked: PropTypes.func,
     onSetupPlayerError: PropTypes.func,
     onPlayerError: PropTypes.func,
     onBuffer: PropTypes.func,
-    onComplete : PropTypes.func,
     onTime: PropTypes.func,
+    onComplete : PropTypes.func,
+    onFullScreenRequested: PropTypes.func,
     onFullScreen: PropTypes.func,
+    onFullScreenExitRequested: PropTypes.func,
+    onFullScreenExit: PropTypes.func,
+    onSeek: PropTypes.func,
+    onSeeked: PropTypes.func,
     onPlaylistItem: PropTypes.func,
-    onControlBarVisible: PropTypes.func
+    onControlBarVisible: PropTypes.func,
+    onControlBarVisible: PropTypes.func,
+    onPlaylistComplete: PropTypes.func,
   };
 
   pause() {
@@ -149,6 +161,10 @@ export default class JWPlayer extends Component {
 
   seekTo(time) {
     if (RNJWPlayerManager) RNJWPlayerManager.seekTo(this.getRNJWPlayerBridgeHandle(), time);
+  }
+
+  setFullscreen(fullscreen) {
+    if (RNJWPlayerManager) RNJWPlayerManager.setFullscreen(this.getRNJWPlayerBridgeHandle(), fullscreen);
   }
 
   async position() {

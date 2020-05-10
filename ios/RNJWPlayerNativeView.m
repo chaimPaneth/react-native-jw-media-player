@@ -2,17 +2,24 @@
 #import "RNJWPlayerDelegateProxy.h"
 #import <AVFoundation/AVFoundation.h>
 
-NSString* const AudioInterruptionsStarted = @"AudioInterruptionsStarted";
-NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
-
 @implementation RNJWPlayerNativeView
 
 - (id)init {
     self = [super init];
     
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(audioSessionInterrupted:)
+                                                     name: AVAudioSessionInterruptionNotification
+                                                   object: audioSession];
+        
+        NSError *setCategoryError = nil;
+        BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
+        
+        NSError *activationError = nil;
+        success = [audioSession setActive:YES error:&activationError];
     }
     
     return self;
@@ -20,8 +27,7 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
-    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
+    [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
 }
 
 -(void)customStyle: (JWConfig*)config :(NSString*)name
@@ -329,15 +335,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     return NO;
 }
 
--(void)addObserevers
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsStarted];
-    [[NSNotificationCenter defaultCenter] removeObserver:AudioInterruptionsEnded];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsStarted:) name:AudioInterruptionsStarted object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioInterruptionsEnded:) name:AudioInterruptionsEnded object:nil];
-}
-
 -(void)setPlaylistItem:(NSDictionary *)playlistItem
 {
     NSString *newFile = [playlistItem objectForKey:@"file"];
@@ -399,6 +396,28 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
         id controls = playlistItem[@"controls"];
         if ((controls != nil) && (controls != (id)[NSNull null])) {
             config.controls = [controls boolValue];
+        }
+        
+        NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
+        id ads = playlistItem[@"adSchedule"];
+        if(ads != nil) {
+            NSArray* adsAr = (NSArray*)ads;
+            if(adsAr.count > 0) {
+                for (id item in adsAr) {
+                    NSString *offset = [item objectForKey:@"offset"];
+                    NSString *tag = [item objectForKey:@"tag"];
+                    JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
+                    [adsArray addObject:adBreak];
+                }
+            }
+        }
+
+        if(adsArray.count > 0) {
+            JWAdConfig* advertising = [JWAdConfig new];
+            advertising.client = JWAdClientGoogima;
+
+            advertising.schedule = adsArray;
+            config.advertising = advertising;
         }
         
         _proxy = [RNJWPlayerDelegateProxy new];
@@ -466,6 +485,28 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
                 playListItem.image = image;
             }
             
+            NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
+            id ads = item[@"adSchedule"];
+            if(ads != nil) {
+                NSArray* adsAr = (NSArray*)ads;
+                if(adsAr.count > 0) {
+                    for (id item in adsAr) {
+                        NSString *offset = [item objectForKey:@"offset"];
+                        NSString *tag = [item objectForKey:@"tag"];
+                        JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
+                        [adsArray addObject:adBreak];
+                    }
+                }
+            }
+
+            if(adsArray.count > 0) {
+                JWAdConfig* advertising = [JWAdConfig new];
+                advertising.client = JWAdClientGoogima;
+
+                advertising.schedule = adsArray;
+                playListItem.adSchedule = adsArray;
+            }
+            
             [playlistArray addObject:playListItem];
         }
         
@@ -477,7 +518,22 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
             [self setupColors:config];
         }
         
-        config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
+        if ([playlist[0] objectForKey:@"nextUpOffset"] != nil) {
+            config.nextupOffset = [[playlist[0] objectForKey:@"nextUpOffset"] intValue];
+        }
+        
+        if ([playlist[0] objectForKey:@"autostart"] != nil) {
+            config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
+        }
+        
+        if ([playlist[0] objectForKey:@"adVmap"] != nil) {
+            id adVmap = [playlist[0] objectForKey:@"adVmap"];
+            if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
+                config.advertising = [JWAdConfig new];
+                config.advertising.client = JWAdClientGoogima;
+                config.advertising.adVmap = adVmap;
+            }
+        }
         
         config.playlist = playlistArray;
         
@@ -495,6 +551,24 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     }
 }
 
+#pragma mark - RNJWPlayer utils
+
+-(void)explode
+{
+    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, [[UIScreen mainScreen] applicationFrame].size.height);
+    
+    self.frame = rect;
+    
+    [self setBackgroundColor:[UIColor blackColor]];
+}
+
+-(void)shrink
+{
+    self.frame = _initFrame;
+    
+    [self setBackgroundColor:[UIColor whiteColor]];
+}
+
 #pragma mark - RNJWPlayer Delegate
 
 -(void)onRNJWReady
@@ -508,13 +582,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
 {
     if (self.onPlaylist) {
         self.onPlaylist(@{});
-    }
-}
-
--(void)onRNJWPlayerBeforePlay
-{
-    if (self.onBeforePlay) {
-        self.onBeforePlay(@{});
     }
 }
 
@@ -634,22 +701,6 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     
 }
 
--(void)explode
-{
-    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, [[UIScreen mainScreen] applicationFrame].size.height);
-    
-    self.frame = rect;
-    
-    [self setBackgroundColor:[UIColor blackColor]];
-}
-
--(void)shrink
-{
-    self.frame = _initFrame;
-    
-    [self setBackgroundColor:[UIColor whiteColor]];
-}
-
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
 {
     if ([[event valueForKey:@"_fullscreen"] boolValue]) {
@@ -692,17 +743,17 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     }
 }
 
+-(void)onRNJWPlayerSeeked:(JWEvent<JWSeekEvent> *)event
+{
+    if (self.onSeeked) {
+        self.onSeeked(@{});
+    }
+}
+
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event
 {
     if (self.onControlBarVisible) {
         self.onControlBarVisible(@{@"controls": @(event.controls)});
-    }
-}
-
--(void)onRNJWPlayerBeforeComplete
-{
-    if (self.onBeforeComplete) {
-        self.onBeforeComplete(@{});
     }
 }
 
@@ -713,9 +764,50 @@ NSString* const AudioInterruptionsEnded = @"AudioInterruptionsEnded";
     }
 }
 
-//-(void)onRN
+#pragma mark - RNJWPlayer Ad events
+
+-(void)onRNJWPlayerBeforePlay
+{
+    if (self.onBeforePlay) {
+        self.onBeforePlay(@{});
+    }
+}
+
+-(void)onRNJWPlayerBeforeComplete
+{
+    if (self.onBeforeComplete) {
+        self.onBeforeComplete(@{});
+    }
+}
+
+-(void)onRNJWPlayerAdPlay:(JWAdEvent<JWAdStateChangeEvent>*)event
+{
+    if (self.onAdPlay) {
+        self.onAdPlay(@{});
+    }
+}
+
+-(void)onRNJWPlayerAdPause:(JWAdEvent<JWAdStateChangeEvent>*)event
+{
+    if (self.onAdPause) {
+        self.onAdPause(@{});
+    }
+}
 
 #pragma mark - RNJWPlayer Interruption handling
+
+-(void)audioSessionInterrupted:(NSNotification*)note
+{
+  if ([note.name isEqualToString:AVAudioSessionInterruptionNotification]) {
+    NSLog(@"Interruption notification");
+    
+    if ([[note.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
+        [self audioInterruptionsStarted:note];
+    } else {
+      [self audioInterruptionsEnded:note];
+    }
+  }
+}
 
 -(void)audioInterruptionsStarted:(NSNotification *)note {
     _wasInterrupted = YES;

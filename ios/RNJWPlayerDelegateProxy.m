@@ -8,11 +8,6 @@
     [self.delegate onRNJWReady];
 }
 
-- (void)onBeforePlay
-{
-    [self.delegate onRNJWPlayerBeforePlay];
-}
-
 - (void)onBuffer:(JWEvent<JWBufferEvent> *)event
 {
     [self.delegate onRNJWPlayerBuffer];
@@ -53,6 +48,16 @@
     [self.delegate onRNJWSetupPlayerError:event];
 }
 
+- (void)onSeek:(JWEvent<JWSeekEvent> *)event
+{
+    [self.delegate onRNJWPlayerSeek:event];
+}
+
+- (void)onSeeked:(JWEvent<JWSeekEvent> *)event
+{
+    [self.delegate onRNJWPlayerSeeked:event];
+}
+
 - (void)onFullscreen:(JWEvent<JWFullscreenEvent> *)event
 {
     [self.delegate onRNJWFullScreen:event];
@@ -73,14 +78,21 @@
     [self.delegate onRNJWFullScreenExitRequested:event];
 }
 
-- (void)onSeek:(JWEvent<JWSeekEvent> *)event
-{
-    [self.delegate onRNJWPlayerSeek:event];
-}
-
 - (void)onControlBarVisible:(JWEvent<JWControlsEvent> *)event
 {
     [self.delegate onRNJWControlBarVisible:event];
+}
+
+- (void)onComplete
+{
+    [self.delegate onRNJWPlayerComplete];
+}
+
+// Ad events
+
+- (void)onBeforePlay
+{
+    [self.delegate onRNJWPlayerBeforePlay];
 }
 
 - (void)onBeforeComplete
@@ -88,9 +100,16 @@
     [self.delegate onRNJWPlayerBeforeComplete];
 }
 
-- (void)onComplete
+- (void)onAdPlay:(JWAdEvent<JWAdStateChangeEvent> *)event
 {
-    [self.delegate onRNJWPlayerComplete];
+    [self.delegate onRNJWPlayerAdPlay:event];
 }
+
+- (void)onAdPause:(JWAdEvent<JWAdStateChangeEvent> *)event
+{
+    [self.delegate onRNJWPlayerAdPause:event];
+}
+
+// TODO: - add other ad events
 
 @end
