@@ -53,9 +53,9 @@
     [self.delegate onRNJWPlayerSeek:event];
 }
 
-- (void)onSeeked:(JWEvent<JWSeekEvent> *)event
+- (void)onSeeked
 {
-    [self.delegate onRNJWPlayerSeeked:event];
+    [self.delegate onRNJWPlayerSeeked];
 }
 
 - (void)onFullscreen:(JWEvent<JWFullscreenEvent> *)event

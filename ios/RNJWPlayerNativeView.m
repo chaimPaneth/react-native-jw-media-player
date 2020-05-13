@@ -739,11 +739,11 @@
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event
 {
     if (self.onSeek) {
-        self.onSeek(@{});
+        self.onSeek(@{@"position": @(event.position), @"offset": @(event.offset)});
     }
 }
 
--(void)onRNJWPlayerSeeked:(JWEvent<JWSeekEvent> *)event
+-(void)onRNJWPlayerSeeked
 {
     if (self.onSeeked) {
         self.onSeeked(@{});

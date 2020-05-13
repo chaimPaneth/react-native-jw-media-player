@@ -75,7 +75,7 @@
 -(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
--(void)onRNJWPlayerSeeked:(JWEvent<JWSeekEvent> *)event;
+-(void)onRNJWPlayerSeeked;
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
 -(void)onRNJWPlayerBeforeComplete;
 -(void)onRNJWPlayerComplete;
