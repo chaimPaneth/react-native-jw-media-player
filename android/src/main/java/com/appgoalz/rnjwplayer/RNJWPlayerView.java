@@ -668,7 +668,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
                         List<AdBreak> adSchedule = new ArrayList();
 
-                        if (playlistItem.hasKey("advertisement")) {
+                        if (playlistItem.hasKey("adSchedule")) {
                             ReadableArray ad = playlistItem.getArray("adSchedule");
 
                             for (int i = 0; i < ad.size(); i++) {
