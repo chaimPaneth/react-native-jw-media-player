@@ -142,7 +142,7 @@ api 'com.google.android.gms:play-services-base:+'
 ```javascript
 ...
 
-import JWPlayer from 'react-native-jw-media-player';
+import JWPlayer, { JWPlayerState } from 'react-native-jw-media-player';
 
 ...
 
@@ -185,6 +185,13 @@ componentDidMount() {
     // this.JWPlayer.loadPlaylist(playlistItem);
   }, 100)
   */
+}
+
+...
+
+async isPlaying() {
+  const playerState = await this.JWPlayer.playerState();
+  return playerState === JWPlayerState.JWPlayerStatePlaying;
 }
 
 ...
@@ -245,8 +252,29 @@ For running example project:
 | **`displayTitle`**       | Should the player show the title.           | `Boolean`                       |
 | **`repeat`**             | Should the track repeat.                    | `Boolean`                       |
 
-## Available props
+##### JWPlayerState
 
+#### **iOS**
+| State                        | Value |
+| ---------------------------- | ----- |
+| **`JWPlayerStatePlaying`**   | 0     |
+| **`JWPlayerStatePaused`**    | 1     |
+| **`JWPlayerStateBuffering`** | 2     |
+| **`JWPlayerStateIdle`**      | 3     |
+| **`JWPlayerStateComplete`**  | 4     |
+| **`JWPlayerStateError`**     | 5     |
+
+#### **Android**
+| State                        | Value |
+| ---------------------------- | ----- |
+| **`JWPlayerStateIdle`**      | 0     |
+| **`JWPlayerStateBuffering`** | 1     |
+| **`JWPlayerStatePlaying`**   | 2     |
+| **`JWPlayerStatePaused`**    | 3     |
+| **`JWPlayerStateComplete`**  | 4     |
+| **`JWPlayerStateError`**     | null  |
+
+## Available props
 | Prop                           | Description                                                                                                                                                            | Type                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | **`mediaId`**                  | The JW media id.                                                                                                                                                       | `Int`                                               |
@@ -279,7 +307,7 @@ For running example project:
 | **`play`**             | Starts playing.                                                                                                                                                                         | `none`                        |
 | **`pause`**            | Pauses playing.                                                                                                                                                                         | `none`                        |
 | **`stop`**             | Stops the player completely.                                                                                                                                                            | `none`                        |
-| **`playerState`**      | Returns promise that then returns the current state of the player: `0` (playing), `1` (paused), `2` (buffering), `3` (idle).                                                                                                       | `none`                        |
+| **`playerState`**      | Returns promise that then returns the current state of the player. Check out the [JWPlayerState](#JWPlayerState) Object.                                                                | `none`                        |
 | **`position`**         | Returns promise that then returns the current position of the player in seconds.                                                                                                        | `none`                        |
 | **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
 | **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
@@ -300,7 +328,7 @@ For running example project:
 | **`onPlay`**                    | Player started playing.                                                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onPause`**                   | Player paused playing.                                                                                                                                                                                                     | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onSeek`**                    | Seek event requested from user.                                                                                                                                                                                            | `{position: double, offset: double}`                                                                                                                                                                                                                                                                                            |
-| **`onSeeked`**                  | Player finished seeking to a new position.                                                                                                                                                                                 | On **iOS** `none`, On **Android** `{position: double}`                                                                                                                                                                                                                                                                                                            |
+| **`onSeeked`**                  | Player finished seeking to a new position.                                                                                                                                                                                 | On **iOS** `none`, On **Android** `{position: double}`                                                                                                                                                                                                                                                                          |
 | **`onSetupPlayerError`**        | Player faced and error while setting up the player.                                                                                                                                                                        | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onPlayerError`**             | Player faced an error after setting up the player but when attempting to start playing.                                                                                                                                    | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onBuffer`**                  | The player is buffering.                                                                                                                                                                                                   | `none`                                                                                                                                                                                                                                                                                                                          |
