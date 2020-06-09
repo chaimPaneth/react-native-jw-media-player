@@ -138,6 +138,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     Boolean landscapeOnFullScreen = false;
     Boolean fullScreenOnLandscape = false;
     Boolean portraitOnExitFullScreen = false;
+    Boolean enableBackgroundAudio = true;
 
     ReadableMap playlistItem; // PlaylistItem
     ReadableArray playlist; // List <PlaylistItem>
@@ -503,7 +504,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             });
 
             mPlayer.setControls(true);
-            mPlayer.setBackgroundAudio(true); // TODO: - add as prop
+            mPlayer.setBackgroundAudio(enableBackgroundAudio);
         }
     }
 
@@ -607,11 +608,14 @@ public class RNJWPlayerView extends RelativeLayout implements
 
                         setupPlayerView();
 
-                        NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationWrapper = new NotificationWrapper(notificationManager);
-                        mMediaSessionManager = new MediaSessionManager(simpleContext,
-                                mPlayer,
-                                mNotificationWrapper);
+
+                        if (playlistItem.hasKey("hideFromMediaCenter")) {
+                            NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+                            mNotificationWrapper = new NotificationWrapper(notificationManager);
+                            mMediaSessionManager = new MediaSessionManager(simpleContext,
+                                    mPlayer,
+                                    mNotificationWrapper);
+                        }
 
                         if (playlistItem.hasKey("autostart")) {
                             mPlayer.getConfig().setAutostart(playlistItem.getBoolean("autostart"));

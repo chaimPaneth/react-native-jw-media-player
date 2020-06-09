@@ -227,6 +227,13 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
     }
   }
 
+  @ReactProp(name = "enableBackgroundAudio")
+  public void setEnableBackgroundAudio(RNJWPlayerView view, Boolean prop) {
+    if (prop != null) {
+      view.enableBackgroundAudio = prop;
+    }
+  }
+
   public Map getExportedCustomBubblingEventTypeConstants() {
     return MapBuilder.builder()
             .put(
