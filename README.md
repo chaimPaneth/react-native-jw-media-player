@@ -236,25 +236,28 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                     | Description                                 | Type                            |
-| ------------------------ | ------------------------------------------- | ------------------------------- |
-| **`mediaId`**            | The JW media id.                            | `Int`                           |
-| **`time`**               | should the player seek to a certain second. | `Int`                           |
-| **`adVmap`**             | The url of ads VMAP xml.                    | `String`                        |
-| **`adSchedule`**         | Array of tags and and offsets for ads.      | `{tag: String, offset: String}` |
-| **`desc`**               | Description of the track.                   | `String`                        |
-| **`file`**               | The url of the file to play.                | `String`                        |
-| **`image`**              | The url of the player thumbnail.            | `String`                        |
-| **`title`**              | The title of the track.                     | `String`                        |
-| **`autostart`**          | Should the track auto start.                | `Boolean`                       |
-| **`controls`**           | Should the control buttons show.            | `Boolean`                       |
-| **`displayDescription`** | Should the player show the description.     | `Boolean`                       |
-| **`displayTitle`**       | Should the player show the title.           | `Boolean`                       |
-| **`repeat`**             | Should the track repeat.                    | `Boolean`                       |
+
+| Prop                      | Description                                                         | Type                            |
+| ------------------------- | ------------------------------------------------------------------- | ------------------------------- |
+| **`mediaId`**             | The JW media id.                                                    | `Int`                           |
+| **`time`**                | should the player seek to a certain second.                         | `Int`                           |
+| **`adVmap`**              | The url of ads VMAP xml.                                            | `String`                        |
+| **`adSchedule`**          | Array of tags and and offsets for ads.                              | `{tag: String, offset: String}` |
+| **`desc`**                | Description of the track.                                           | `String`                        |
+| **`file`**                | The url of the file to play.                                        | `String`                        |
+| **`image`**               | The url of the player thumbnail.                                    | `String`                        |
+| **`title`**               | The title of the track.                                             | `String`                        |
+| **`autostart`**           | Should the track auto start.                                        | `Boolean`                       |
+| **`controls`**            | Should the control buttons show.                                    | `Boolean`                       |
+| **`displayDescription`**  | Should the player show the description.                             | `Boolean`                       |
+| **`displayTitle`**        | Should the player show the title.                                   | `Boolean`                       |
+| **`repeat`**              | Should the track repeat.                                            | `Boolean`                       |
+| **`hideFromMediaCenter`** | `Available on Android` Should controls show up in the media center. | `Boolean`                       |
 
 ##### JWPlayerState
 
 #### **iOS**
+
 | State                        | Value |
 | ---------------------------- | ----- |
 | **`JWPlayerStatePlaying`**   | 0     |
@@ -265,6 +268,7 @@ For running example project:
 | **`JWPlayerStateError`**     | 5     |
 
 #### **Android**
+
 | State                        | Value |
 | ---------------------------- | ----- |
 | **`JWPlayerStateIdle`**      | 0     |
@@ -275,6 +279,7 @@ For running example project:
 | **`JWPlayerStateError`**     | null  |
 
 ## Available props
+
 | Prop                           | Description                                                                                                                                                            | Type                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | **`mediaId`**                  | The JW media id.                                                                                                                                                       | `Int`                                               |
@@ -296,6 +301,7 @@ For running example project:
 | **`nativeFullScreen`**         | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
 | **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                  | `Boolean`                                           |
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
+| **`enableBackgroundAudio`**    | `Available on Android.` Enable or disables background audio. Defaults to on                                                                                            | `Boolean`                                           |
 | **`portraitOnExitFullScreen`** | `Available on Android.` When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
 | **`exitFullScreenOnPortrait`** | `Available on Android.` When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
 

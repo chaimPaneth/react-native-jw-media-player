@@ -56,12 +56,13 @@ export default class JWPlayer extends Component {
       icons: PropTypes.string,
       timeslider: PropTypes.shape({
         progress: PropTypes.string,
-        rail: PropTypes.string
-      })
+        rail: PropTypes.string,
+      }),
     }),
     nativeFullScreen: PropTypes.bool,
     fullScreenOnLandscape: PropTypes.bool,
     landscapeOnFullScreen: PropTypes.bool,
+    enableBackgroundAudio: PropTypes.bool,
     portraitOnExitFullScreen: PropTypes.bool,
     exitFullScreenOnPortrait: PropTypes.bool,
     playlistItem: PropTypes.shape({
