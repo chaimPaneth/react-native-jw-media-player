@@ -3,7 +3,7 @@ declare module "react-native-jw-media-player" {
   import { ViewStyle } from "react-native";
 
   interface PlaylistItem {
-    mediaId: number;
+    mediaId?: number;
     time?: number;
     adVmap?: string;
     adSchedule?: { tag: string; offset: string };
