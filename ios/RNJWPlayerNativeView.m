@@ -184,7 +184,7 @@
 {
     if(adVmap != nil && adVmap.length > 0 && ![adVmap isEqualToString:_player.config.advertising.adVmap]) {
         self.player.config.advertising = [JWAdConfig new];
-        self.player.config.advertising.client = JWAdClientGoogima;
+        self.player.config.advertising.client = JWAdClientVast;
         self.player.config.advertising.adVmap = adVmap;
     }
 }
@@ -316,11 +316,11 @@
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    
+
     if (self.player != nil) {
         self.player.view.frame = self.frame;
     }
-    
+
     if (_initFrame.size.height == 0) {
         _initFrame = self.frame;
     }
@@ -338,12 +338,12 @@
 -(void)setPlaylistItem:(NSDictionary *)playlistItem
 {
     NSString *newFile = [playlistItem objectForKey:@"file"];
-    
+
     if (newFile != nil && newFile.length > 0) {
         [self reset];
-        
+
         JWConfig *config = [self setupConfig];
-        
+
         if (_playerStyle) {
             [self customStyle:config :_playerStyle];
         } else if ([playlistItem objectForKey:@"playerStyle"]) {
@@ -351,7 +351,7 @@
         } else if (_playerColors != nil) {
              [self setupColors:config];
         }
-        
+
         NSURL* url = [NSURL URLWithString:newFile];
         if (url && url.scheme && url.host) {
             config.file = newFile;
@@ -360,44 +360,44 @@
             NSUTF8StringEncoding];
             config.file = encodedUrl;
         }
-        
+
         id mediaId = playlistItem[@"mediaId"];
         if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
             config.mediaId = mediaId;
         }
-        
+
         id adVmap = playlistItem[@"adVmap"];
         if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
             config.advertising = [JWAdConfig new];
-            config.advertising.client = JWAdClientGoogima;
+            config.advertising.client = JWAdClientVast;
             config.advertising.adVmap = adVmap;
         }
-        
+
         id title = playlistItem[@"title"];
         if ((title != nil) && (title != (id)[NSNull null])) {
             config.title = title;
         }
-        
+
         id desc = playlistItem[@"desc"];
         if ((desc != nil) && (desc != (id)[NSNull null])) {
             config.desc = desc;
         }
-        
+
         id image = playlistItem[@"image"];
         if ((image != nil) && (image != (id)[NSNull null])) {
             config.image = image;
         }
-        
+
         id autostart = playlistItem[@"autostart"];
         if ((autostart != nil) && (autostart != (id)[NSNull null])) {
             config.autostart = [autostart boolValue];
         }
-        
+
         id controls = playlistItem[@"controls"];
         if ((controls != nil) && (controls != (id)[NSNull null])) {
             config.controls = [controls boolValue];
         }
-        
+
         NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
         id ads = playlistItem[@"adSchedule"];
         if(ads != nil) {
@@ -414,22 +414,22 @@
 
         if(adsArray.count > 0) {
             JWAdConfig* advertising = [JWAdConfig new];
-            advertising.client = JWAdClientGoogima;
+            advertising.client = JWAdClientVast;
 
             advertising.schedule = adsArray;
             config.advertising = advertising;
         }
-        
+
         _proxy = [RNJWPlayerDelegateProxy new];
         _proxy.delegate = self;
-        
+
         _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
+
         _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-        
+
         [self setFullScreenOnLandscape:_fullScreenOnLandscape];
         [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-        
+
         [self addSubview:self.player.view];
     }
 }
@@ -449,13 +449,13 @@
 {
     if (playlist != nil && playlist.count > 0) {
         [self reset];
-        
+
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [JWPlaylistItem new];
-            
+
             NSString *newFile = [item objectForKey:@"file"];
-            
+
             NSURL* url = [NSURL URLWithString:newFile];
             if (url && url.scheme && url.host) {
                 playListItem.file = newFile;
@@ -464,27 +464,27 @@
                 NSUTF8StringEncoding];
                 playListItem.file = encodedUrl;
             }
-            
+
             id mediaId = item[@"mediaId"];
             if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
                 playListItem.mediaId = mediaId;
             }
-            
+
             id title = item[@"title"];
             if ((title != nil) && (title != (id)[NSNull null])) {
                 playListItem.title = title;
             }
-            
+
             id desc = item[@"desc"];
             if ((desc != nil) && (desc != (id)[NSNull null])) {
                 playListItem.desc = desc;
             }
-            
+
             id image = item[@"image"];
             if ((image != nil) && (image != (id)[NSNull null])) {
                 playListItem.image = image;
             }
-            
+
             NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
             id ads = item[@"adSchedule"];
             if(ads != nil) {
@@ -501,36 +501,36 @@
 
             if(adsArray.count > 0) {
                 JWAdConfig* advertising = [JWAdConfig new];
-                advertising.client = JWAdClientGoogima;
+                advertising.client = JWAdClientVast;
 
                 advertising.schedule = adsArray;
                 playListItem.adSchedule = adsArray;
             }
-            
+
             [playlistArray addObject:playListItem];
         }
-        
+
         JWConfig *config = [self setupConfig];
-        
+
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
         } else if (_playerColors != nil) {
             [self setupColors:config];
         }
-        
+
         if ([playlist[0] objectForKey:@"nextUpOffset"] != nil) {
             config.nextupOffset = [[playlist[0] objectForKey:@"nextUpOffset"] intValue];
         }
-        
+
         if ([playlist[0] objectForKey:@"autostart"] != nil) {
             config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
         }
-        
+
         if ([playlist[0] objectForKey:@"adVmap"] != nil) {
             id adVmap = [playlist[0] objectForKey:@"adVmap"];
             if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
                 config.advertising = [JWAdConfig new];
-                config.advertising.client = JWAdClientGoogima;
+                config.advertising.client = JWAdClientVast;
                 config.advertising.adVmap = adVmap;
             }
         }
