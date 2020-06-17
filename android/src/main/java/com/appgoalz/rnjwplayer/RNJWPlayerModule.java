@@ -287,7 +287,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
               if (playlistItem.hasKey("adSchedule")) {
                 ReadableArray ad = playlistItem.getArray("adSchedule");
-                android.util.Log.d(TAG, "have adSchedule"+ad)
                 List<AdBreak> adSchedule = new ArrayList();
                 for (int i = 0; i < ad.size(); i++) {
                 ReadableMap adBreakProp = ad.getMap(i);
