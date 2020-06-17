@@ -16,6 +16,7 @@ import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 import com.longtailvideo.jwplayer.media.ads.AdBreak;
+import com.longtailvideo.jwplayer.media.ads.AdSource;
 
 import java.util.ArrayList;
 import java.util.List;
