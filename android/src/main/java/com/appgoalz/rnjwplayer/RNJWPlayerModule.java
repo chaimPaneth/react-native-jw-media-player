@@ -15,6 +15,7 @@ import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import com.longtailvideo.jwplayer.media.ads.AdBreak;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -282,6 +283,22 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
               if (playlistItem.hasKey("mediaId")) {
                 newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
+              }
+
+              if (playlistItem.hasKey("adSchedule")) {
+                ReadableArray ad = playlistItem.getArray("adSchedule");
+                android.util.Log.d(TAG, "have adSchedule"+ad)
+                List<AdBreak> adSchedule = new ArrayList();
+
+                for (int i = 0; i < ad.size(); i++) {
+                ReadableMap adBreakProp = ad.getMap(i);
+                String offset = adBreakProp.getString("offset");
+                if (adBreakProp.hasKey("tag")) {
+                  AdBreak adBreak = new AdBreak(offset, AdSource.IMA, adBreakProp.getString("tag"));
+                  adSchedule.add(adBreak);
+                  }
+                }
+                newPlayListItem.setAdSchedule(adSchedule);
               }
 
               boolean autostart = true;
