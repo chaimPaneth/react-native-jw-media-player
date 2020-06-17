@@ -34,6 +34,9 @@ allprojects {
         maven{
             url 'https://mvn.jwplayer.com/content/repositories/releases/'
         }
+        maven {
+            url 'https://maven.google.com'
+        }
         mavenLocal()
         jcenter()
         maven {
