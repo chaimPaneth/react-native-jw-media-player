@@ -4,8 +4,9 @@ declare module "react-native-jw-media-player" {
 
   interface PlaylistItem {
     mediaId?: number;
-    time?: number;
+    startTime?: number;
     adVmap?: string;
+    adClient?: string;
     adSchedule?: { tag: string; offset: string };
     desc?: string;
     file?: string;
@@ -23,7 +24,6 @@ declare module "react-native-jw-media-player" {
     title?: string;
     image?: string;
     autostart?: boolean;
-    time?: string;
     desc?: string;
     controls?: boolean;
     repeat?: boolean;
@@ -31,9 +31,9 @@ declare module "react-native-jw-media-player" {
     displayTitle?: boolean;
     playlistItem?: PlaylistItem;
     playlist?: PlaylistItem[];
-    nestUpDisplay: boolean;
+    nextUpDisplay: boolean;
     style?: ViewStyle;
-    playerStyle?: any;
+    playerStyle?: string;
     colors?: any;
     nativeFullScreen?: boolean;
     fullScreenOnLandscape?: boolean;
