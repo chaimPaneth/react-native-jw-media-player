@@ -31,25 +31,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     mReactContext = reactContext;
   }
 
-  private void setCustomStyle(RNJWPlayer player, String name) {
-    SkinConfig skinConfig = new SkinConfig.Builder()
-              .name(name)
-              .url(String.format("file:///android_asset/%s.css", name))
-              .build();
-
-    PlayerConfig config = player.getConfig();
-    config.setSkinConfig(skinConfig);
-
-    player.setup(config);
-  }
-
-  public SkinConfig getCustomSkinConfig(String name) {
-    return new SkinConfig.Builder()
-            .name(name)
-            .url(String.format("file:///android_asset/%s.css", name))
-            .build();
-  }
-
   @Override
   public String getName() {
     return "RNJWPlayerModule";
@@ -255,57 +236,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       uiManager.addUIBlock(new UIBlock() {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playlistItem != null && playerView != null && playerView.mPlayer != null) {
-            if (playlistItem.hasKey("file")) {
-              String newFile = playlistItem.getString("file");
-
-              PlaylistItem newPlayListItem = new PlaylistItem();
-
-              newPlayListItem.setFile(newFile);
-
-              if (playlistItem.hasKey("playerStyle")) {
-                setCustomStyle(playerView.mPlayer, playlistItem.getString("playerStyle"));
-              }
-
-              if (playlistItem.hasKey("title")) {
-                newPlayListItem.setTitle(playlistItem.getString("title"));
-              }
-
-              if (playlistItem.hasKey("desc")) {
-                newPlayListItem.setDescription(playlistItem.getString("desc"));
-              }
-
-              if (playlistItem.hasKey("image")) {
-                newPlayListItem.setImage(playlistItem.getString("image"));
-              }
-
-              if (playlistItem.hasKey("mediaId")) {
-                newPlayListItem.setMediaId(playlistItem.getString("mediaId"));
-              }
-
-              boolean autostart = true;
-              boolean controls = true;
-
-              if (playlistItem.hasKey("autostart")) {
-                autostart = playlistItem.getBoolean("autostart");
-              }
-
-              if (playlistItem.hasKey("controls")) {
-                controls = playlistItem.getBoolean("controls");
-              }
-
-              playerView.mPlayer.getConfig().setAutostart(autostart);
-              playerView.mPlayer.getConfig().setControls(controls);
-              playerView.mPlayer.setControls(controls);
-
-              playerView.mPlayer.load(newPlayListItem);
-
-              if (autostart) {
-                playerView.mPlayer.play();
-              }
-            }
-          }
+          playerView.setPlaylistItem(playlistItem);
         }
       });
     } catch (IllegalViewOperationException e) {
@@ -320,80 +251,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       uiManager.addUIBlock(new UIBlock() {
         public void execute(NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playlist != null && playlist.size() > 0 && playerView != null && playerView.mPlayer != null) {
-
-            List<PlaylistItem> mPlayList = new ArrayList<>();
-            ReadableMap playlistItem;
-            String file = "";
-            String image = "";
-            String title = "";
-            String desc = "";
-            String mediaId = "";
-            Boolean autostart = true;
-            Boolean controls = true;
-
-            int j = 0;
-            while (playlist.size() > j) {
-              playlistItem = playlist.getMap(j);
-
-              if (playlistItem != null) {
-
-                if (playlistItem.hasKey("file")) {
-                  file = playlistItem.getString("file");
-                }
-
-                if (playlistItem.hasKey("title")) {
-                  title = playlistItem.getString("title");
-                }
-
-                if (playlistItem.hasKey("desc")) {
-                  desc = playlistItem.getString("desc");
-                }
-
-                if (playlistItem.hasKey("image")) {
-                  image = playlistItem.getString("image");
-                }
-
-                if (playlistItem.hasKey("mediaId")) {
-                  mediaId = playlistItem.getString("mediaId");
-                }
-
-                if (playlistItem.hasKey("autostart")) {
-                  autostart = playlistItem.getBoolean("autostart");
-                }
-
-                if (playlistItem.hasKey("controls")) {
-                  controls = playlistItem.getBoolean("controls");
-                }
-
-                PlaylistItem newPlayListItem = new PlaylistItem.Builder()
-                        .file(file)
-                        .title(title)
-                        .description(desc)
-                        .image(image)
-                        .mediaId(mediaId)
-                        .build();
-
-                mPlayList.add(newPlayListItem);
-              }
-
-              j++;
-            }
-
-            if (playlist.getMap(0).hasKey("playerStyle")) {
-              setCustomStyle(playerView.mPlayer, playlist.getMap(0).getString("playerStyle"));
-            }
-
-            playerView.mPlayer.getConfig().setAutostart(autostart);
-            playerView.mPlayer.getConfig().setControls(controls);
-            playerView.mPlayer.setControls(controls);
-            playerView.mPlayer.load(mPlayList);
-
-            if (autostart) {
-              playerView.mPlayer.play();
-            }
-          }
+          playerView.setPlaylist(playlist);
         }
       });
     } catch (IllegalViewOperationException e) {

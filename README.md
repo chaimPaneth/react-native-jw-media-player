@@ -236,22 +236,23 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                     | Description                                                                               | Type                            |
-| ------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------- |
-| **`mediaId`**            | The JW media id.                                                                          | `Int`                           |
-| **`time`**               | should the player seek to a certain second.                                               | `Int`                           |
-| **`adVmap`**             | The url of ads VMAP xml.                                                                  | `String`                        |
-| **`adSchedule`**         | Array of tags and and offsets for ads.                                                    | `{tag: String, offset: String}` |
-| **`adClient`**           | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast | `String`                        |
-| **`desc`**               | Description of the track.                                                                 | `String`                        |
-| **`file`**               | The url of the file to play.                                                              | `String`                        |
-| **`image`**              | The url of the player thumbnail.                                                          | `String`                        |
-| **`title`**              | The title of the track.                                                                   | `String`                        |
-| **`autostart`**          | Should the track auto start.                                                              | `Boolean`                       |
-| **`controls`**           | Should the control buttons show.                                                          | `Boolean`                       |
-| **`displayDescription`** | Should the player show the description.                                                   | `Boolean`                       |
-| **`displayTitle`**       | Should the player show the title.                                                         | `Boolean`                       |
-| **`repeat`**             | Should the track repeat.                                                                  | `Boolean`                       |
+| Prop                         | Description                                                                                                                                                                                    | Type                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| **`mediaId`**                | The JW media id.                                                                                                                                                                               | `Int`                           |
+| **`time`**                   | should the player seek to a certain second.                                                                                                                                                    | `Int`                           |
+| **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                       | `String`                        |
+| **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                         | `{tag: String, offset: String}` |
+| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                      | `String`                        |
+| **`desc`**                   | Description of the track.                                                                                                                                                                      | `String`                        |
+| **`file`**                   | The url of the file to play.                                                                                                                                                                   | `String`                        |
+| **`image`**                  | The url of the player thumbnail.                                                                                                                                                               | `String`                        |
+| **`title`**                  | The title of the track.                                                                                                                                                                        | `String`                        |
+| **`autostart`**              | Should the track auto start.                                                                                                                                                                   | `Boolean`                       |
+| **`controls`**               | Should the control buttons show.                                                                                                                                                               | `Boolean`                       |
+| **`displayDescription`**     | Should the player show the description.                                                                                                                                                        | `Boolean`                       |
+| **`displayTitle`**           | Should the player show the title.                                                                                                                                                              | `Boolean`                       |
+| **`repeat`**                 | Should the track repeat.                                                                                                                                                                       | `Boolean`                       |
+| **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
@@ -379,8 +380,10 @@ colors: PropTypes.shape({
 
 ### Background Audio
 
-This package supports Background audio sessions just follow the JWPlayer docs for background session.
+This package supports Background audio sessions by setting the `backgroundAudioEnabled` prop on the [PlaylistItem](#PlaylistItem), just follow the JWPlayer docs for background session.
 
 Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
 
-Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
+Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section. 
+
+For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.

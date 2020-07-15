@@ -87,6 +87,7 @@ export default class JWPlayer extends Component {
       adVmap: PropTypes.string,
       adClient: PropTypes.string,
       startTime: PropTypes.number,
+      backgroundAudioEnabled: PropTypes.bool,
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -105,6 +106,7 @@ export default class JWPlayer extends Component {
         adVmap: PropTypes.string,
         adClient: PropTypes.string,
         startTime: PropTypes.number,
+        backgroundAudioEnabled: PropTypes.bool,
       })
     ),
     onPlayerReady: PropTypes.func,
