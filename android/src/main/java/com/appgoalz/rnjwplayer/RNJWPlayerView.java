@@ -25,7 +25,9 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
@@ -60,12 +62,12 @@ import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
-import com.longtailvideo.jwplayer.media.ads.AdvertisingBase;
 import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
@@ -507,19 +509,23 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    public void resetPlaylist() {
-        playlist = null;
-    }
-
     public void setPlaylistItem(ReadableMap prop) {
-        if(playlistItem != prop) {
+        if (playlistItem != prop) {
             playlistItem = prop;
 
-            if (playlistItem != null) {
-                if (playlistItem.hasKey("file")) {
-                    final ArrayList<ReadableMap> playlist = new ArrayList<>();
-                    playlist.add(playlistItem);
-                    this.setPlaylist((ReadableArray) playlist);
+            if (playlistItem != null && playlistItem.hasKey("file")) {
+                mPlayList = new ArrayList<>();
+
+                PlaylistItem newPlayListItem = this.getPlaylistItem((playlistItem));
+                mPlayList.add(newPlayListItem);
+
+                this.setupPlayerWithFirstItem(playlistItem);
+            }
+        } else {
+            if (mPlayer != null && mPlayer.getConfig().getFile() != null) {
+                boolean autostart = mPlayer.getConfig().getAutostart();
+                if (autostart) {
+                    mPlayer.play();
                 }
             }
         }
@@ -550,7 +556,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             startTime = playlistItem.getDouble("startTime");
         }
 
-        List<AdBreak> adSchedule = new ArrayList();
+        ArrayList<AdBreak> adSchedule = new ArrayList<>();
 
         if (playlistItem.hasKey("adSchedule")) {
             ReadableArray ad = playlistItem.getArray("adSchedule");
@@ -571,9 +577,12 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .description(desc)
                 .image(image)
                 .mediaId(mediaId)
-                .startTime(startTime)
                 .adSchedule(adSchedule)
                 .build();
+
+        if (startTime != null) {
+            newPlayListItem.setStartTime(startTime);
+        }
 
         return newPlayListItem;
     }
@@ -597,103 +606,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                     j++;
                 }
 
-                SkinConfig skinConfig;
-
-                if (playlist.getMap(0).hasKey("playerStyle")) {
-                    skinConfig = getCustomSkinConfig(playlist.getMap(0).getString("playerStyle"));
-                } else if (customStyle != null && !customStyle.isEmpty()) {
-                    skinConfig = getCustomSkinConfig(customStyle);
-                } else {
-                    skinConfig = new SkinConfig.Builder().build();
-                }
-
-                boolean autostart = false;
-                if (playlist.getMap(0).hasKey("autostart")) {
-                    autostart = playlist.getMap(0).getBoolean("autostart");
-                }
-
-                int nextUpOffset = -10;
-                if (playlist.getMap(0).hasKey("nextUpOffset")) {
-                    nextUpOffset = playlist.getMap(0).getInt("nextUpOffset");
-                }
-
-
-                if (playlist.getMap(0).hasKey("adVmap")) {
-                    adVmap = playlist.getMap(0).getString("adVmap");
-                }
-
-                ImaVMAPAdvertising imaVMAPAdvertising = new ImaVMAPAdvertising(adVmap);
-
-                AdSource client;
-
-                if (playlist.getMap(0).hasKey("adClient")) {
-                    switch (playlist.getMap(0).getInt("adClient")) {
-                        case 1:
-                            client = AdSource.IMA;
-                            break;
-                        case 2:
-                            client = AdSource.IMA_DAI;
-                            break;
-                        case 3:
-                            client = AdSource.FW;
-                            break;
-                        default:
-                            client = AdSource.VAST;
-                            break;
-                    }
-                } else {
-                    client = AdSource.VAST;
-                }
-
-                imaVMAPAdvertising.setClient(client);
-
-                PlayerConfig playerConfig = new PlayerConfig.Builder()
-                        .skinConfig(skinConfig)
-                        .repeat(false)
-                        .controls(true)
-                        .autostart(autostart)
-                        .displayTitle(true)
-                        .displayDescription(true)
-                        .nextUpDisplay(true)
-                        .nextUpOffset(nextUpOffset)
-                        .advertising(imaVMAPAdvertising)
-                        .stretching(STRETCHING_UNIFORM)
-                        .build();
-
-                Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
-
-                mPlayer = new RNJWPlayer(simpleContext, playerConfig);
-                setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-                mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT));
-                addView(mPlayer);
-
-                if (playlist.getMap(0).hasKey("backgroundAudioEnabled")) {
-                    backgroundAudioEnabled = playlist.getMap(0).getBoolean("backgroundAudioEnabled");
-                }
-
-                setupPlayerView(backgroundAudioEnabled);
-
-                if (backgroundAudioEnabled) {
-                    audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
-
-                    NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationWrapper = new NotificationWrapper(notificationManager);
-                    mMediaSessionManager = new MediaSessionManager(simpleContext,
-                            mPlayer,
-                            mNotificationWrapper);
-                }
-
-                if (playlist.getMap(0).hasKey("autostart")) {
-                    mPlayer.getConfig().setAutostart(playlist.getMap(0).getBoolean("autostart"));
-                }
-
-                mPlayer.load(mPlayList);
-
-                if (autostart) {
-                    mPlayer.play();
-                }
+                this.setupPlayerWithFirstItem(playlist.getMap(0));
             }
         } else {
             if (mPlayer != null && mPlayer.getConfig().getFile() != null) {
@@ -702,6 +615,105 @@ public class RNJWPlayerView extends RelativeLayout implements
                     mPlayer.play();
                 }
             }
+        }
+    }
+
+    private void setupPlayerWithFirstItem(ReadableMap prop) {
+        SkinConfig skinConfig;
+
+        if (prop.hasKey("playerStyle")) {
+            skinConfig = getCustomSkinConfig(prop.getString("playerStyle"));
+        } else if (customStyle != null && !customStyle.isEmpty()) {
+            skinConfig = getCustomSkinConfig(customStyle);
+        } else {
+            skinConfig = new SkinConfig.Builder().build();
+        }
+
+        boolean autostart = false;
+        if (prop.hasKey("autostart")) {
+            autostart = prop.getBoolean("autostart");
+        }
+
+        int nextUpOffset = -10;
+        if (prop.hasKey("nextUpOffset")) {
+            nextUpOffset = prop.getInt("nextUpOffset");
+        }
+
+        if (prop.hasKey("adVmap")) {
+            adVmap = prop.getString("adVmap");
+        }
+
+        ImaVMAPAdvertising imaVMAPAdvertising = new ImaVMAPAdvertising(adVmap);
+
+        AdSource client;
+
+        if (prop.hasKey("adClient")) {
+            switch (prop.getInt("adClient")) {
+                case 1:
+                    client = AdSource.IMA;
+                    break;
+                case 2:
+                    client = AdSource.IMA_DAI;
+                    break;
+                case 3:
+                    client = AdSource.FW;
+                    break;
+                default:
+                    client = AdSource.VAST;
+                    break;
+            }
+        } else {
+            client = AdSource.VAST;
+        }
+
+        imaVMAPAdvertising.setClient(client);
+
+        PlayerConfig playerConfig = new PlayerConfig.Builder()
+                .skinConfig(skinConfig)
+                .repeat(false)
+                .controls(true)
+                .autostart(autostart)
+                .displayTitle(true)
+                .displayDescription(true)
+                .nextUpDisplay(true)
+                .nextUpOffset(nextUpOffset)
+                .advertising(imaVMAPAdvertising)
+                .stretching(STRETCHING_UNIFORM)
+                .build();
+
+        Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+
+        mPlayer = new RNJWPlayer(simpleContext, playerConfig);
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+        mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+        addView(mPlayer);
+
+        if (prop.hasKey("backgroundAudioEnabled")) {
+            backgroundAudioEnabled = prop.getBoolean("backgroundAudioEnabled");
+        }
+
+        setupPlayerView(backgroundAudioEnabled);
+
+        if (backgroundAudioEnabled) {
+            audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
+
+            NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationWrapper = new NotificationWrapper(notificationManager);
+            mMediaSessionManager = new MediaSessionManager(simpleContext,
+                    mPlayer,
+                    mNotificationWrapper);
+        }
+
+        if (prop.hasKey("autostart")) {
+            mPlayer.getConfig().setAutostart(prop.getBoolean("autostart"));
+        }
+
+        mPlayer.load(mPlayList);
+
+        if (autostart) {
+            mPlayer.play();
         }
     }
 
@@ -912,7 +924,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
-        if (!mIsBound) {
+        if (!mIsBound && backgroundAudioEnabled) {
             doBindService();
         }
 
