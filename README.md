@@ -236,21 +236,31 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                     | Description                                 | Type                            |
-| ------------------------ | ------------------------------------------- | ------------------------------- |
-| **`mediaId`**            | The JW media id.                            | `Int`                           |
-| **`time`**               | should the player seek to a certain second. | `Int`                           |
-| **`adVmap`**             | The url of ads VMAP xml.                    | `String`                        |
-| **`adSchedule`**         | Array of tags and and offsets for ads.      | `{tag: String, offset: String}` |
-| **`desc`**               | Description of the track.                   | `String`                        |
-| **`file`**               | The url of the file to play.                | `String`                        |
-| **`image`**              | The url of the player thumbnail.            | `String`                        |
-| **`title`**              | The title of the track.                     | `String`                        |
-| **`autostart`**          | Should the track auto start.                | `Boolean`                       |
-| **`controls`**           | Should the control buttons show.            | `Boolean`                       |
-| **`displayDescription`** | Should the player show the description.     | `Boolean`                       |
-| **`displayTitle`**       | Should the player show the title.           | `Boolean`                       |
-| **`repeat`**             | Should the track repeat.                    | `Boolean`                       |
+| Prop                         | Description                                                                                                                                                                                    | Type                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| **`mediaId`**                | The JW media id.                                                                                                                                                                               | `Int`                           |
+| **`time`**                   | should the player seek to a certain second.                                                                                                                                                    | `Int`                           |
+| **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                       | `String`                        |
+| **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                         | `{tag: String, offset: String}` |
+| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                      | `String`                        |
+| **`desc`**                   | Description of the track.                                                                                                                                                                      | `String`                        |
+| **`file`**                   | The url of the file to play.                                                                                                                                                                   | `String`                        |
+| **`image`**                  | The url of the player thumbnail.                                                                                                                                                               | `String`                        |
+| **`title`**                  | The title of the track.                                                                                                                                                                        | `String`                        |
+| **`autostart`**              | Should the track auto start.                                                                                                                                                                   | `Boolean`                       |
+| **`controls`**               | Should the control buttons show.                                                                                                                                                               | `Boolean`                       |
+| **`displayDescription`**     | Should the player show the description.                                                                                                                                                        | `Boolean`                       |
+| **`displayTitle`**           | Should the player show the title.                                                                                                                                                              | `Boolean`                       |
+| **`repeat`**                 | Should the track repeat.                                                                                                                                                                       | `Boolean`                       |
+| **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
+
+##### JWPlayerAdClients
+  | Client                     | Value |
+  | -------------------------- | ----- |
+  | **`JWAdClientGoogima`**    | 1     |
+  | **`JWAdClientGoogimaDAI`** | 2     |
+  | **`JWAdClientFreewheel`**  | 3     |
+  | **`JWAdClientVast`**       | 4     |
 
 ##### JWPlayerState
 
@@ -282,7 +292,7 @@ For running example project:
 | **`title`**                    | The title of the track.                                                                                                                                                | `String`                                            |
 | **`image`**                    | The url of the player thumbnail.                                                                                                                                       | `String`                                            |
 | **`autostart`**                | Should the track auto start.                                                                                                                                           | `Boolean`                                           |
-| **`time`**                     | should the player seek to a certain second.                                                                                                                            | `Int`                                               |
+| **`startTime`**                | The player should start from a certain second.                                                                                                                         | `Double`                                            |
 | **`desc`**                     | Description of the track.                                                                                                                                              | `String`                                            |
 | **`controls`**                 | Should the control buttons show.                                                                                                                                       | `Boolean`                                           |
 | **`repeat`**                   | Should the track repeat.                                                                                                                                               | `Boolean`                                           |
@@ -327,12 +337,12 @@ For running example project:
 | **`onComplete`**                | Right after media playing is completed.                                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onPlay`**                    | Player started playing.                                                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onPause`**                   | Player paused playing.                                                                                                                                                                                                     | `none`                                                                                                                                                                                                                                                                                                                          |
-| **`onSeek`**                    | Seek event requested from user.                                                                                                                                                                                            | `{position: double, offset: double}`                                                                                                                                                                                                                                                                                            |
-| **`onSeeked`**                  | Player finished seeking to a new position.                                                                                                                                                                                 | On **iOS** `none`, On **Android** `{position: double}`                                                                                                                                                                                                                                                                          |
+| **`onSeek`**                    | Seek event requested from user.                                                                                                                                                                                            | `{position: Double, offset: Double}`                                                                                                                                                                                                                                                                                            |
+| **`onSeeked`**                  | Player finished seeking to a new position.                                                                                                                                                                                 | On **iOS** `none`, On **Android** `{position: Double}`                                                                                                                                                                                                                                                                          |
 | **`onSetupPlayerError`**        | Player faced and error while setting up the player.                                                                                                                                                                        | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onPlayerError`**             | Player faced an error after setting up the player but when attempting to start playing.                                                                                                                                    | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onBuffer`**                  | The player is buffering.                                                                                                                                                                                                   | `none`                                                                                                                                                                                                                                                                                                                          |
-| **`onTime`**                    | Interval callback for every millisecond playing.                                                                                                                                                                           | `{time: double, duration: double}`                                                                                                                                                                                                                                                                                              |
+| **`onTime`**                    | Interval callback for every millisecond playing.                                                                                                                                                                           | `{time: Double, duration: Double}`                                                                                                                                                                                                                                                                                              |
 | **`onFullScreenRequested`**     | User clicked on the fullscreen icon. Use this to resize the container view for the player, if your not using `nativeFullScreen` prop. (Make use of https://github.com/yamill/react-native-orientation for fullscreen mode) | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onFullScreen`**              | Player went into fullscreen. Use this to resize the container view for the player, if your not using `nativeFullScreen` prop. (Make use of https://github.com/yamill/react-native-orientation for fullscreen mode)         | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onFullScreenExitRequested`** | User clicked on the fullscreen icon to exit.                                                                                                                                                                               | `none`                                                                                                                                                                                                                                                                                                                          |
@@ -370,57 +380,10 @@ colors: PropTypes.shape({
 
 ### Background Audio
 
-This package supports Background audio sessions just follow the jwplayer docs for background session.
+This package supports Background audio sessions by setting the `backgroundAudioEnabled` prop on the [PlaylistItem](#PlaylistItem), just follow the JWPlayer docs for background session.
 
 Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
 
-Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
+Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section. 
 
-**From version 0.1.44 you don't have to manually put in the below code and background audio works as is.**
-
-You need to edit the AppDelegate.h file in iOS (Only for library versions 0.1.43 and lower).
-
-Here is a complete example - iOS:
-```
- #import <AVFoundation/AVFoundation.h>
- #import <Foundation/Foundation.h>
-
- NSString* const AudioInterruptionsDidStart = @"AudioInterruptionsStarted";
- NSString* const AudioInterruptionsDidEnd = @"AudioInterruptionsEnded";
-
- @implementation AppDelegate
-
--(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary 
- *)launchOptions
- {
-   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-  
-   [[NSNotificationCenter defaultCenter] addObserver: self
-                                           selector: @selector(audioSessionInterrupted:)
-                                               name: AVAudioSessionInterruptionNotification
-                                             object: audioSession];
-  
-   NSError *setCategoryError = nil;
-   BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback 
- error:&setCategoryError];
-  
-   NSError *activationError = nil;
-   success = [audioSession setActive:YES error:&activationError];
- }
-
- -(void)audioSessionInterrupted:(NSNotification*)note
- {
-   if ([note.name isEqualToString:AVAudioSessionInterruptionNotification]) {
-     NSLog(@"Interruption notification");
-
-  if ([[note.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber 
- numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
-      [[NSNotificationCenter defaultCenter] postNotificationName:AudioInterruptionsDidStart object:self 
- userInfo:nil];
-     } else {
-       [[NSNotificationCenter defaultCenter] postNotificationName:AudioInterruptionsDidEnd object:self 
- userInfo:nil];
-   }
-  }
-}
-```
+For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.

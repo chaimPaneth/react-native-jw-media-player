@@ -4,31 +4,64 @@
 
 @implementation RNJWPlayerNativeView
 
-- (id)init {
-    self = [super init];
-    
-    if (self) {
-        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        
-        [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector: @selector(audioSessionInterrupted:)
-                                                     name: AVAudioSessionInterruptionNotification
-                                                   object: audioSession];
-        
-        NSError *setCategoryError = nil;
-        BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
-        
-        NSError *activationError = nil;
-        success = [audioSession setActive:YES error:&activationError];
-    }
-    
-    return self;
-}
+#pragma mark - RNJWPlayer allocation
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+    @try {
+       [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+    } @catch(id anException) {
+       
+    }
 }
+
+-(void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    if (self.player != nil) {
+        self.player.view.frame = self.frame;
+    }
+    
+    if (_initFrame.size.height == 0) {
+        _initFrame = self.frame;
+    }
+}
+
+- (void)removeFromSuperview {
+    [self reset];
+    [super removeFromSuperview];
+}
+
+-(JWConfig*)setupConfig
+{
+    JWConfig *config = [JWConfig new];
+    
+    config.controls = YES;
+    config.repeat = NO;
+    config.displayDescription = YES;
+    config.displayTitle = YES;
+    
+    return config;
+}
+
+- (void)initializeAudioSession
+{
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(audioSessionInterrupted:)
+                                                 name: AVAudioSessionInterruptionNotification
+                                               object: audioSession];
+    
+    NSError *setCategoryError = nil;
+    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
+    
+    NSError *activationError = nil;
+    success = [audioSession setActive:YES error:&activationError];
+}
+
+#pragma mark - RNJWPlayer styling
 
 -(void)customStyle: (JWConfig*)config :(NSString*)name
 {
@@ -75,29 +108,6 @@
                            green:((float) g / 255.0f)
                             blue:((float) b / 255.0f)
                            alpha:1.0f];
-}
-
--(void)setNativeFullScreen:(BOOL)nativeFullScreen
-{
-    _nativeFullScreen = nativeFullScreen;
-}
-
--(void)setFullScreenOnLandscape:(BOOL)fullScreenOnLandscape
-{
-    _fullScreenOnLandscape = fullScreenOnLandscape;
-    
-    if (_player) {
-        _player.forceFullScreenOnLandscape = fullScreenOnLandscape;
-    }
-}
-
--(void)setLandscapeOnFullScreen:(BOOL)landscapeOnFullScreen
-{
-    _landscapeOnFullScreen = landscapeOnFullScreen;
-    
-    if (_player) {
-        _player.forceLandscapeOnFullScreen = landscapeOnFullScreen;
-    }
 }
 
 -(void)setColors: (NSDictionary *)colors
@@ -147,22 +157,35 @@
     }
 }
 
--(JWConfig*)setupConfig
-{
-    JWConfig *config = [JWConfig new];
-    
-    config.controls = YES;
-    config.repeat = NO;
-    config.displayDescription = YES;
-    config.displayTitle = YES;
-    
-    return config;
-}
-
 -(void)setPlayerStyle:(NSString *)playerStyle
 {
     if (playerStyle != nil) {
         _playerStyle = playerStyle;
+    }
+}
+
+#pragma mark - RNJWPlayer props
+
+-(void)setNativeFullScreen:(BOOL)nativeFullScreen
+{
+    _nativeFullScreen = nativeFullScreen;
+}
+
+-(void)setFullScreenOnLandscape:(BOOL)fullScreenOnLandscape
+{
+    _fullScreenOnLandscape = fullScreenOnLandscape;
+    
+    if (_player) {
+        _player.forceFullScreenOnLandscape = fullScreenOnLandscape;
+    }
+}
+
+-(void)setLandscapeOnFullScreen:(BOOL)landscapeOnFullScreen
+{
+    _landscapeOnFullScreen = landscapeOnFullScreen;
+    
+    if (_player) {
+        _player.forceLandscapeOnFullScreen = landscapeOnFullScreen;
     }
 }
 
@@ -313,24 +336,6 @@
     return self.player.config.nextUpDisplay;
 }
 
--(void)layoutSubviews
-{
-    [super layoutSubviews];
-    
-    if (self.player != nil) {
-        self.player.view.frame = self.frame;
-    }
-    
-    if (_initFrame.size.height == 0) {
-        _initFrame = self.frame;
-    }
-}
-
-- (void)removeFromSuperview {
-    [self reset];
-    [super removeFromSuperview];
-}
-
 -(BOOL)shouldAutorotate {
     return NO;
 }
@@ -340,103 +345,8 @@
     NSString *newFile = [playlistItem objectForKey:@"file"];
     
     if (newFile != nil && newFile.length > 0) {
-        [self reset];
-        
-        JWConfig *config = [self setupConfig];
-        
-        if (_playerStyle) {
-            [self customStyle:config :_playerStyle];
-        } else if ([playlistItem objectForKey:@"playerStyle"]) {
-            [self customStyle:config :[playlistItem objectForKey:@"playerStyle"]];
-        } else if (_playerColors != nil) {
-             [self setupColors:config];
-        }
-        
-        NSURL* url = [NSURL URLWithString:newFile];
-        if (url && url.scheme && url.host) {
-            config.file = newFile;
-        } else {
-            NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-            NSUTF8StringEncoding];
-            config.file = encodedUrl;
-        }
-        
-        id mediaId = playlistItem[@"mediaId"];
-        if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
-            config.mediaId = mediaId;
-        }
-        
-        id adVmap = playlistItem[@"adVmap"];
-        if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
-            config.advertising = [JWAdConfig new];
-            config.advertising.client = JWAdClientGoogima;
-            config.advertising.adVmap = adVmap;
-        }
-        
-        id title = playlistItem[@"title"];
-        if ((title != nil) && (title != (id)[NSNull null])) {
-            config.title = title;
-        }
-        
-        id desc = playlistItem[@"desc"];
-        if ((desc != nil) && (desc != (id)[NSNull null])) {
-            config.desc = desc;
-        }
-        
-        id image = playlistItem[@"image"];
-        if ((image != nil) && (image != (id)[NSNull null])) {
-            config.image = image;
-        }
-        
-        id autostart = playlistItem[@"autostart"];
-        if ((autostart != nil) && (autostart != (id)[NSNull null])) {
-            config.autostart = [autostart boolValue];
-        }
-        
-        id controls = playlistItem[@"controls"];
-        if ((controls != nil) && (controls != (id)[NSNull null])) {
-            config.controls = [controls boolValue];
-        }
-        
-        NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
-        id ads = playlistItem[@"adSchedule"];
-        if(ads != nil) {
-            NSArray* adsAr = (NSArray*)ads;
-            if(adsAr.count > 0) {
-                for (id item in adsAr) {
-                    NSString *offset = [item objectForKey:@"offset"];
-                    NSString *tag = [item objectForKey:@"tag"];
-                    JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
-                    [adsArray addObject:adBreak];
-                }
-            }
-        }
-
-        if(adsArray.count > 0) {
-            JWAdConfig* advertising = [JWAdConfig new];
-            advertising.client = JWAdClientGoogima;
-
-            advertising.schedule = adsArray;
-            config.advertising = advertising;
-        }
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.controls = [[playlistItem objectForKey:@"controls"] boolValue];
-        
-        [self setFullScreenOnLandscape:_fullScreenOnLandscape];
-        [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-        
-        [self addSubview:self.player.view];
+        [self setPlaylist:@[playlistItem]];
     }
-}
-
--(void)resetPlaylistItem
-{
-    self.playlistItem = nil;
 }
 
 -(void)reset
@@ -445,72 +355,80 @@
     _proxy = nil;
 }
 
+-(JWPlaylistItem*)getPlaylistItem:item
+{
+    JWPlaylistItem *playListItem = [JWPlaylistItem new];
+    
+    NSString *newFile = [item objectForKey:@"file"];
+    
+    NSURL* url = [NSURL URLWithString:newFile];
+    if (url && url.scheme && url.host) {
+        playListItem.file = newFile;
+    } else {
+        NSString* encodedUrl = [newFile stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+        playListItem.file = encodedUrl;
+    }
+    
+    id mediaId = item[@"mediaId"];
+    if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
+        playListItem.mediaId = mediaId;
+    }
+    
+    id title = item[@"title"];
+    if ((title != nil) && (title != (id)[NSNull null])) {
+        playListItem.title = title;
+    }
+    
+    id desc = item[@"desc"];
+    if ((desc != nil) && (desc != (id)[NSNull null])) {
+        playListItem.desc = desc;
+    }
+    
+    id image = item[@"image"];
+    if ((image != nil) && (image != (id)[NSNull null])) {
+        playListItem.image = image;
+    }
+    
+    id startTime = item[@"startTime"];
+    if ((startTime != nil) && (startTime != (id)[NSNull null])) {
+        playListItem.startTime = [startTime floatValue];
+    }
+    
+    NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
+    id ads = item[@"adSchedule"];
+    if(ads != nil) {
+        NSArray* adsAr = (NSArray*)ads;
+        if(adsAr.count > 0) {
+            for (id item in adsAr) {
+                NSString *offset = [item objectForKey:@"offset"];
+                NSString *tag = [item objectForKey:@"tag"];
+                JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
+                [adsArray addObject:adBreak];
+            }
+        }
+    }
+
+    if(adsArray.count > 0) {
+        playListItem.adSchedule = adsArray;
+    }
+    
+    return playListItem;
+}
+
 -(void)setPlaylist:(NSArray *)playlist
 {
     if (playlist != nil && playlist.count > 0) {
-        [self reset];
-        
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
-            JWPlaylistItem *playListItem = [JWPlaylistItem new];
-            
-            NSString *newFile = [item objectForKey:@"file"];
-            
-            NSURL* url = [NSURL URLWithString:newFile];
-            if (url && url.scheme && url.host) {
-                playListItem.file = newFile;
-            } else {
-                NSString* encodedUrl = [newFile stringByAddingPercentEscapesUsingEncoding:
-                NSUTF8StringEncoding];
-                playListItem.file = encodedUrl;
-            }
-            
-            id mediaId = item[@"mediaId"];
-            if ((mediaId != nil) && (mediaId != (id)[NSNull null])) {
-                playListItem.mediaId = mediaId;
-            }
-            
-            id title = item[@"title"];
-            if ((title != nil) && (title != (id)[NSNull null])) {
-                playListItem.title = title;
-            }
-            
-            id desc = item[@"desc"];
-            if ((desc != nil) && (desc != (id)[NSNull null])) {
-                playListItem.desc = desc;
-            }
-            
-            id image = item[@"image"];
-            if ((image != nil) && (image != (id)[NSNull null])) {
-                playListItem.image = image;
-            }
-            
-            NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
-            id ads = item[@"adSchedule"];
-            if(ads != nil) {
-                NSArray* adsAr = (NSArray*)ads;
-                if(adsAr.count > 0) {
-                    for (id item in adsAr) {
-                        NSString *offset = [item objectForKey:@"offset"];
-                        NSString *tag = [item objectForKey:@"tag"];
-                        JWAdBreak *adBreak = [JWAdBreak adBreakWithTag:tag offset:offset];
-                        [adsArray addObject:adBreak];
-                    }
-                }
-            }
-
-            if(adsArray.count > 0) {
-                JWAdConfig* advertising = [JWAdConfig new];
-                advertising.client = JWAdClientGoogima;
-
-                advertising.schedule = adsArray;
-                playListItem.adSchedule = adsArray;
-            }
-            
+            JWPlaylistItem *playListItem = [self getPlaylistItem:item];
             [playlistArray addObject:playListItem];
         }
         
         JWConfig *config = [self setupConfig];
+        
+        if ([playlist[0] objectForKey:@"playerStyle"] != nil) {
+            _playerStyle = [playlist[0] objectForKey:@"playerStyle"];
+        }
         
         if (_playerStyle != nil) {
             [self customStyle:config :_playerStyle];
@@ -526,28 +444,75 @@
             config.autostart = [[playlist[0] objectForKey:@"autostart"] boolValue];
         }
         
+        JWAdConfig* advertising = [JWAdConfig new];
+        
+        id adClient = [playlist[0] objectForKey:@"adClient"];
+        if ((adClient != nil) && (adClient != (id)[NSNull null])) {
+            switch ([adClient intValue]) {
+                case 1:
+                    advertising.client = JWAdClientGoogima;
+                    break;
+                case 2:
+                    advertising.client = JWAdClientGoogimaDAI;
+                    break;
+                case 3:
+                    advertising.client = JWAdClientFreewheel;
+                    break;
+                    
+                default:
+                    advertising.client = JWAdClientVast;
+                    break;
+            }
+        } else {
+            advertising.client = JWAdClientVast;
+        }
+
+        config.advertising = advertising;
+        
         if ([playlist[0] objectForKey:@"adVmap"] != nil) {
             id adVmap = [playlist[0] objectForKey:@"adVmap"];
             if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
-                config.advertising = [JWAdConfig new];
-                config.advertising.client = JWAdClientGoogima;
                 config.advertising.adVmap = adVmap;
             }
         }
         
-        config.playlist = playlistArray;
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.controls = YES;
-        
-        [self setFullScreenOnLandscape:_fullScreenOnLandscape];
-        [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-                
-        [self addSubview:self.player.view];
+        if (_player == nil || ![_player.config.playlist isEqualToArray:playlistArray]) {
+            [self reset];
+            
+            config.playlist = playlistArray;
+            
+            _proxy = [RNJWPlayerDelegateProxy new];
+            _proxy.delegate = self;
+            
+            _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+            
+            _player.controls = YES;
+            
+            [self setFullScreenOnLandscape:_fullScreenOnLandscape];
+            [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
+            
+            if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
+                bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
+                if (backgroundAudioEnabled == true) {
+                    [self initializeAudioSession];
+                }
+            }
+                    
+            [self addSubview:self.player.view];
+        } else {
+             [self continuePlaying];
+        }
+    } else {
+        [self continuePlaying];
+    }
+}
+
+-(void)continuePlaying
+{
+    if (_player != nil && [_player config].file != nil) {
+        if ([_player config].autostart) {
+            [_player play];
+        }
     }
 }
 
