@@ -387,3 +387,5 @@ Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide
 Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section. 
 
 For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.
+
+#### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
