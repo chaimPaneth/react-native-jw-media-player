@@ -6,20 +6,13 @@
 
 #pragma mark - RNJWPlayer allocation
 
-- (id)init
-{
-    self = [super init];
-    
-    if (self) {
-        [self initializeAudioSession];
-    }
-    
-    return self;
-}
-
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+    @try {
+       [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+    } @catch(id anException) {
+       
+    }
 }
 
 -(void)layoutSubviews
@@ -352,8 +345,6 @@
     NSString *newFile = [playlistItem objectForKey:@"file"];
     
     if (newFile != nil && newFile.length > 0) {
-        [self reset];
-        
         [self setPlaylist:@[playlistItem]];
     }
 }
@@ -427,8 +418,6 @@
 -(void)setPlaylist:(NSArray *)playlist
 {
     if (playlist != nil && playlist.count > 0) {
-        [self reset];
-        
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [self getPlaylistItem:item];
@@ -487,19 +476,43 @@
             }
         }
         
-        config.playlist = playlistArray;
-        
-        _proxy = [RNJWPlayerDelegateProxy new];
-        _proxy.delegate = self;
-        
-        _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
-        
-        _player.controls = YES;
-        
-        [self setFullScreenOnLandscape:_fullScreenOnLandscape];
-        [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-                
-        [self addSubview:self.player.view];
+        if (_player == nil || ![_player.config.playlist isEqualToArray:playlistArray]) {
+            [self reset];
+            
+            config.playlist = playlistArray;
+            
+            _proxy = [RNJWPlayerDelegateProxy new];
+            _proxy.delegate = self;
+            
+            _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
+            
+            _player.controls = YES;
+            
+            [self setFullScreenOnLandscape:_fullScreenOnLandscape];
+            [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
+            
+            if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
+                bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
+                if (backgroundAudioEnabled == true) {
+                    [self initializeAudioSession];
+                }
+            }
+                    
+            [self addSubview:self.player.view];
+        } else {
+             [self continuePlaying];
+        }
+    } else {
+        [self continuePlaying];
+    }
+}
+
+-(void)continuePlaying
+{
+    if (_player != nil && [_player config].file != nil) {
+        if ([_player config].autostart) {
+            [_player play];
+        }
     }
 }
 
