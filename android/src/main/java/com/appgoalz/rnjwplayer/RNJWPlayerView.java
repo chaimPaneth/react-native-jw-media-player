@@ -588,7 +588,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     public void setPlaylist(ReadableArray prop) {
-        if (playlist != prop && Arrays.deepEquals(new ReadableArray[]{playlist}, new ReadableArray[]{prop})) {
+        if (playlist != prop && !Arrays.deepEquals(new ReadableArray[]{playlist}, new ReadableArray[]{prop})) {
             playlist = prop;
 
             if (playlist != null && playlist.size() > 0) {
