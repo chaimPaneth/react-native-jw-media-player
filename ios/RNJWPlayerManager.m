@@ -60,6 +60,8 @@ RCT_EXPORT_VIEW_PROPERTY(colors, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(nativeFullScreen, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(fullScreenOnLandscape, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(landscapeOnFullScreen, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(portraitOnExitFullScreen, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(exitFullScreenOnPortrait, BOOL);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
@@ -230,6 +232,39 @@ RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fs) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
             [view.player setFullscreen:fs];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(showAirPlayButton: (nonnull NSNumber *)reactTag: (double)x: (double)y) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view showAirPlayButton:x :y];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(hideAirPlayButton: (nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view hideAirPlayButton];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setUpCastController: (nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view setUpCastController];
         }
     }];
 }

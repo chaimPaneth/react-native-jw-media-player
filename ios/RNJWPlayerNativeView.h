@@ -10,10 +10,13 @@
 
 @class RNJWPlayerDelegateProxy;
 
-@interface RNJWPlayerNativeView : UIView
+@interface RNJWPlayerNativeView : UIView<JWCastingDelegate>
 
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
+@property(nonatomic, strong)JWCastController *castController;
+@property(nonatomic)BOOL isCasting;
+@property(nonatomic, strong)NSArray<JWCastingDevice *> *availableDevices;
 
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
@@ -31,6 +34,8 @@
 @property(nonatomic)BOOL nativeFullScreen;
 @property(nonatomic)BOOL fullScreenOnLandscape;
 @property(nonatomic)BOOL landscapeOnFullScreen;
+@property(nonatomic)BOOL portraitOnExitFullScreen;
+@property(nonatomic)BOOL exitFullScreenOnPortrait;
 @property(nonatomic)CGRect initFrame;
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
@@ -72,8 +77,6 @@
 -(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event;
 -(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event;
--(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
--(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
 -(void)onRNJWPlayerSeeked;
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
@@ -88,5 +91,8 @@
 -(void)reset;
 -(void)setPlaylistItem:(NSDictionary *)playlistItem;
 -(void)setPlaylist:(NSArray *)playlist;
+-(void)setUpCastController;
+-(void)showAirPlayButton:(CGFloat)x :(CGFloat)y;
+-(void)hideAirPlayButton;
 
 @end

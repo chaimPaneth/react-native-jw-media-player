@@ -1,15 +1,28 @@
 #import "RNJWPlayerNativeView.h"
 #import "RNJWPlayerDelegateProxy.h"
 #import <AVFoundation/AVFoundation.h>
+#import <GoogleCast/GoogleCast.h>
+#import <AVKit/AVKit.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 @implementation RNJWPlayerNativeView
 
 #pragma mark - RNJWPlayer allocation
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotated:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     @try {
-       [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
     } @catch(id anException) {
        
     }
@@ -189,10 +202,19 @@
     }
 }
 
+-(void)setPortraitOnExitFullScreen:(BOOL)portraitOnExitFullScreen
+{
+    _portraitOnExitFullScreen = portraitOnExitFullScreen;
+}
+
+-(void)setExitFullScreenOnPortrait:(BOOL)exitFullScreenOnPortrait
+{
+    _exitFullScreenOnPortrait = exitFullScreenOnPortrait;
+}
+
 -(void)setFile:(NSString *)file
 {
-    NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-                            NSUTF8StringEncoding];
+    NSString* encodedUrl = [file stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     if (file != nil && file.length > 0 && ![encodedUrl isEqualToString:_player.config.file]) {
         self.player.config.file = encodedUrl;
     }
@@ -418,6 +440,13 @@
 -(void)setPlaylist:(NSArray *)playlist
 {
     if (playlist != nil && playlist.count > 0) {
+        if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
+            bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
+            if (backgroundAudioEnabled == true) {
+                [self initializeAudioSession];
+            }
+        }
+        
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [self getPlaylistItem:item];
@@ -488,13 +517,34 @@
             
             _player.controls = YES;
             
+            if ([playlist[0] objectForKey:@"fullScreenOnLandscape"] != nil) {
+                id fullScreenOnLandscape = [playlist[0] objectForKey:@"fullScreenOnLandscape"];
+                if ((fullScreenOnLandscape != nil) && (fullScreenOnLandscape != (id)[NSNull null])) {
+                    _fullScreenOnLandscape = [fullScreenOnLandscape boolValue];
+                }
+            }
+            
+            if ([playlist[0] objectForKey:@"landscapeOnFullScreen"] != nil) {
+                id landscapeOnFullScreen = [playlist[0] objectForKey:@"landscapeOnFullScreen"];
+                if ((landscapeOnFullScreen != nil) && (landscapeOnFullScreen != (id)[NSNull null])) {
+                    _landscapeOnFullScreen = [landscapeOnFullScreen boolValue];
+                }
+            }
+            
+            if ([playlist[0] objectForKey:@"nativeFullScreen"] != nil) {
+                id nativeFullScreen = [playlist[0] objectForKey:@"nativeFullScreen"];
+                if ((nativeFullScreen != nil) && (nativeFullScreen != (id)[NSNull null])) {
+                    _nativeFullScreen = [nativeFullScreen boolValue];
+                }
+            }
+            
             [self setFullScreenOnLandscape:_fullScreenOnLandscape];
             [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
             
-            if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
-                bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
-                if (backgroundAudioEnabled == true) {
-                    [self initializeAudioSession];
+            if ([playlist[0] objectForKey:@"enableCasting"] != nil) {
+                BOOL enableCasting = [[playlist[0] objectForKey:@"enableCasting"] boolValue];
+                if (enableCasting) {
+                    [self setUpCastController];
                 }
             }
                     
@@ -520,8 +570,7 @@
 
 -(void)explode
 {
-    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, [[UIScreen mainScreen] applicationFrame].size.height);
-    
+    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
     self.frame = rect;
     
     [self setBackgroundColor:[UIColor blackColor]];
@@ -532,6 +581,18 @@
     self.frame = _initFrame;
     
     [self setBackgroundColor:[UIColor whiteColor]];
+}
+
+- (void)rotated:(NSNotification *)notification {
+    if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Landscape");
+    }
+
+    if (UIDeviceOrientationIsPortrait(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Portrait");
+    }
+    
+    [self layoutSubviews];
 }
 
 #pragma mark - RNJWPlayer Delegate
@@ -643,9 +704,7 @@
 -(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event
 {
     if (self.onTime) {
-        NSLog(@"position: %@",@(event.position));
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
-        //        [[NSUserDefaults standardUserDefaults] setObject:@(event.position) forKey:@"PlayerTime"];
     }
 }
 
@@ -653,11 +712,14 @@
 {
     if(event && [[event valueForKey:@"_fullscreen"] boolValue]){
         if (self.onFullScreen) {
+            if (_nativeFullScreen && _landscapeOnFullScreen) {
+                [[UIDevice currentDevice] setValue: [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft] forKey:@"orientation"];
+            }
             self.onFullScreen(@{});
         }
-    }else{
-        if (self.onFullScreenExit){
-            if (_nativeFullScreen) {
+    } else {
+        if (self.onFullScreenExit) {
+            if (_nativeFullScreen && _portraitOnExitFullScreen) {
                 [[UIDevice currentDevice] setValue: [NSNumber numberWithInteger: UIInterfaceOrientationPortrait] forKey:@"orientation"];
             }
             self.onFullScreenExit(@{});
@@ -684,20 +746,6 @@
         if (_nativeFullScreen) {
             [self shrink];
         }
-    }
-}
-
--(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event
-{
-    if (self.onFullScreenExitRequested) {
-        self.onFullScreenExitRequested(@{});
-    }
-}
-
--(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event
-{
-    if (self.onFullScreenExit){
-        self.onFullScreenExit(@{});
     }
 }
 
@@ -784,5 +832,130 @@
         [self.player play];
     }
 }
+
+#pragma mark - RNJWPlayer Casting
+
+- (void)setUpCastController
+{
+    _castController = [[JWCastController alloc] initWithPlayer:_player];
+    _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
+    _castController.delegate = self;
+    [_castController scanForDevices];
+}
+
+- (void)onCastingDevicesAvailable:(NSArray<JWCastingDevice *> *)devices
+{
+    _availableDevices = devices;
+    [self presentCastingOptions];
+}
+
+-(void)onUserSelectedDevice:(NSInteger)index
+{
+    JWCastingDevice *chosenDevice = _availableDevices[index];
+    [_castController connectToDevice:chosenDevice];
+}
+
+-(void)onConnectedToCastingDevice:(JWCastingDevice *)device
+{
+    [_castController cast];
+}
+
+- (void)onCasting
+{
+    _isCasting = YES;
+}
+
+- (void)onCastingEnded:(NSError *)error
+{
+    _isCasting = NO;
+}
+
+- (void)onCastingFailed:(NSError *)error
+{
+    _isCasting = NO;
+}
+
+- (void)presentCastingOptions
+{
+    __weak RNJWPlayerNativeView *weakSelf = self;
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    if (self.castController.connectedDevice == nil) {
+        alertController.title = @"Connect to";
+        
+        [self.castController.availableDevices enumerateObjectsUsingBlock:^(JWCastingDevice  *_Nonnull device, NSUInteger idx, BOOL * _Nonnull stop) {
+            UIAlertAction *deviceSelected = [UIAlertAction actionWithTitle:device.name
+                                                                     style:UIAlertActionStyleDefault
+                                                                   handler:^(UIAlertAction * _Nonnull action) {
+                                                                       [weakSelf.castController connectToDevice:device];
+                                                                   }];
+            [alertController addAction:deviceSelected];
+        }];
+    } else {
+        alertController.title = self.castController.connectedDevice.name;
+        alertController.message = @"Select an action";
+        
+        UIAlertAction *disconnect = [UIAlertAction actionWithTitle:@"Disconnect"
+                                                             style:UIAlertActionStyleDestructive
+                                                           handler:^(UIAlertAction * _Nonnull action) {
+                                                               [weakSelf.castController disconnect];
+                                                           }];
+        [alertController addAction:disconnect];
+        
+        UIAlertAction *castControl;
+        if (_isCasting) {
+            castControl = [UIAlertAction actionWithTitle:@"Stop Casting"
+                                                   style:UIAlertActionStyleDefault
+                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                     [weakSelf.castController stopCasting];
+                                                 }];
+        } else {
+            castControl = [UIAlertAction actionWithTitle:@"Cast"
+                                                   style:UIAlertActionStyleDefault
+                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                     [weakSelf.castController cast];
+                                                 }];
+        }
+        [alertController addAction:castControl];
+    }
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel"
+                            style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {}];
+    [alertController addAction:cancel];
+    
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    [rootViewController presentViewController:alertController animated:YES completion:^{}];
+}
+
+- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y
+{
+	UIView *buttonView = nil;
+	CGRect buttonFrame = CGRectMake(x, y, 44, 44);
+	
+	// It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
+	if (@available(iOS 11.0, *)) {
+		AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
+		airplayButton.activeTintColor = [UIColor blueColor];
+		airplayButton.tintColor = [UIColor grayColor];
+		buttonView = airplayButton;
+	} else {
+		// If you still support previous iOS versions, you can use MPVolumeView
+		MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
+		airplayButton.showsVolumeSlider = NO;
+		buttonView = airplayButton;
+	}
+
+    [buttonView setTag:101];
+
+	[self addSubview:buttonView];
+}
+
+- (void)hideAirPlayButton
+{
+    if ([self viewWithTag:101] != nil)
+        [[self viewWithTag:101] removeFromSuperview];
+}
+
 
 @end

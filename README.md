@@ -253,6 +253,7 @@ For running example project:
 | **`displayTitle`**           | Should the player show the title.                                                                                                                                                              | `Boolean`                       |
 | **`repeat`**                 | Should the track repeat.                                                                                                                                                                       | `Boolean`                       |
 | **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
+| **`enableCasting`** | This will enable the casting controller. check out the [docs](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting) for additional info. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `Boolean`                       |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
@@ -306,7 +307,7 @@ For running example project:
 | **`nativeFullScreen`**         | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
 | **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                  | `Boolean`                                           |
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
-| **`portraitOnExitFullScreen`** | `Available on Android.` When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
+| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
 | **`exitFullScreenOnPortrait`** | `Available on Android.` When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
 
 ## Available methods
@@ -325,7 +326,8 @@ For running example project:
 | **`setFullScreen`**    | Set full screen.                                                                                                                                                                        | `Boolean`                     |
 | **`loadPlaylist`**     | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
 | **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
-
+| **`showAirPlayButton`** | Show an AirPlay button in the player. *(Available on iOS)* | `{x: Double, y: Double}` |
+| **`hideAirPlayButton`** | Hides the AirPlay button in the player. *(Available on iOS)* | `none` |
 ## Available callbacks
 
 | Func                            | Description                                                                                                                                                                                                                | Argument                                                                                                                                                                                                                                                                                                                        |

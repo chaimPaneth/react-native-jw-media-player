@@ -68,16 +68,6 @@
     [self.delegate onRNJWFullScreenRequested:event];
 }
 
-- (void)onFullscreenExit:(JWEvent<JWFullscreenEvent> *)event
-{
-    [self.delegate onRNJWFullScreenExit:event];
-}
-
-- (void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event
-{
-    [self.delegate onRNJWFullScreenExitRequested:event];
-}
-
 - (void)onControlBarVisible:(JWEvent<JWControlsEvent> *)event
 {
     [self.delegate onRNJWControlBarVisible:event];
