@@ -15,5 +15,11 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
   s.source_files = 'RNJWPlayer*.{h,m}'
   s.dependency   'JWPlayer-SDK'
+  s.dependency   'google-cast-sdk', '~> 4.3'
   s.dependency   'React'
+  
+  s.info_plist = {
+    'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
+    'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.'
+  }
 end
