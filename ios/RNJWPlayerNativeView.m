@@ -817,10 +817,12 @@
 
 - (void)setUpCastController
 {
-    _castController = [[JWCastController alloc] initWithPlayer:_player];
-    _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
-    _castController.delegate = self;
-    [_castController scanForDevices];
+    if (_player) {
+        _castController = [[JWCastController alloc] initWithPlayer:_player];
+        _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
+        _castController.delegate = self;
+        [_castController scanForDevices];
+    }
 }
 
 - (void)onCastingDevicesAvailable:(NSArray<JWCastingDevice *> *)devices
