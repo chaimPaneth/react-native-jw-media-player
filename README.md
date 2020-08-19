@@ -253,7 +253,6 @@ For running example project:
 | **`displayTitle`**           | Should the player show the title.                                                                                                                                                              | `Boolean`                       |
 | **`repeat`**                 | Should the track repeat.                                                                                                                                                                       | `Boolean`                       |
 | **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
-| **`enableCasting`** | This will enable the casting controller. check out the [docs](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting) for additional info. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `Boolean`                       |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
@@ -308,7 +307,8 @@ For running example project:
 | **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                  | `Boolean`                                           |
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
 | **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
-| **`exitFullScreenOnPortrait`** | `Available on Android.` When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
+| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
+| **`enableCasting`** | This will enable the casting controller. check out the [docs](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting) for additional info. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `Boolean`                       |
 
 ## Available methods
 

@@ -228,12 +228,12 @@ export default class JWPlayer extends Component {
   }
 
   showAirPlayButton(x, y) {
-    if (RNJWPlayerManager)
+    if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y);
   }
 
   hideAirPlayButton() {
-    if (RNJWPlayerManager)
+    if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
   }
 
