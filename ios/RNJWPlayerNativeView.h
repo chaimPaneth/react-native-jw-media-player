@@ -31,6 +31,7 @@
 @property(nonatomic, strong)NSString *mediaId;
 @property(nonatomic, strong)NSString *playerStyle;
 @property(nonatomic, strong)NSDictionary *playerColors;
+@property(nonatomic)BOOL enableCasting;
 @property(nonatomic)BOOL nativeFullScreen;
 @property(nonatomic)BOOL fullScreenOnLandscape;
 @property(nonatomic)BOOL landscapeOnFullScreen;

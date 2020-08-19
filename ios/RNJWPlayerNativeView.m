@@ -179,6 +179,14 @@
 
 #pragma mark - RNJWPlayer props
 
+-(void)setEnableCasting:(BOOL)enableCasting
+{
+    _enableCasting = enableCasting;
+    if (enableCasting) {
+        [self setUpCastController];
+    }
+}
+
 -(void)setNativeFullScreen:(BOOL)nativeFullScreen
 {
     _nativeFullScreen = nativeFullScreen;
@@ -517,36 +525,8 @@
             
             _player.controls = YES;
             
-            if ([playlist[0] objectForKey:@"fullScreenOnLandscape"] != nil) {
-                id fullScreenOnLandscape = [playlist[0] objectForKey:@"fullScreenOnLandscape"];
-                if ((fullScreenOnLandscape != nil) && (fullScreenOnLandscape != (id)[NSNull null])) {
-                    _fullScreenOnLandscape = [fullScreenOnLandscape boolValue];
-                }
-            }
-            
-            if ([playlist[0] objectForKey:@"landscapeOnFullScreen"] != nil) {
-                id landscapeOnFullScreen = [playlist[0] objectForKey:@"landscapeOnFullScreen"];
-                if ((landscapeOnFullScreen != nil) && (landscapeOnFullScreen != (id)[NSNull null])) {
-                    _landscapeOnFullScreen = [landscapeOnFullScreen boolValue];
-                }
-            }
-            
-            if ([playlist[0] objectForKey:@"nativeFullScreen"] != nil) {
-                id nativeFullScreen = [playlist[0] objectForKey:@"nativeFullScreen"];
-                if ((nativeFullScreen != nil) && (nativeFullScreen != (id)[NSNull null])) {
-                    _nativeFullScreen = [nativeFullScreen boolValue];
-                }
-            }
-            
             [self setFullScreenOnLandscape:_fullScreenOnLandscape];
             [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-            
-            if ([playlist[0] objectForKey:@"enableCasting"] != nil) {
-                BOOL enableCasting = [[playlist[0] objectForKey:@"enableCasting"] boolValue];
-                if (enableCasting) {
-                    [self setUpCastController];
-                }
-            }
                     
             [self addSubview:self.player.view];
         } else {
