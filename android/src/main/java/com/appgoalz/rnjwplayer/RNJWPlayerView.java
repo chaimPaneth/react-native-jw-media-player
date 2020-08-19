@@ -8,12 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -21,15 +23,20 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.mediarouter.app.MediaRouteButton;
+
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.events.AdPauseEvent;
@@ -67,7 +74,6 @@ import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
@@ -148,6 +154,12 @@ public class RNJWPlayerView extends RelativeLayout implements
     ReadableMap playlistItem; // PlaylistItem
     ReadableArray playlist; // List <PlaylistItem>
     Number currentPlayingIndex;
+
+    private CastContext mCastContext;
+    Boolean enableCasting;
+
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
 
     private static final String TAG = "RNJWPlayerView";
 
@@ -275,6 +287,27 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
 
         mRootView = mActivity.findViewById(android.R.id.content);
+    }
+
+    private boolean doesPackageExist(String targetPackage) {
+        try {
+            getActivity().getPackageManager().getPackageInfo(targetPackage, PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    // Without the Google API's Chromecast won't work
+    private boolean isGoogleApiAvailable(Context context) {
+        boolean isOldPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD);
+        boolean isNewPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW);
+
+        boolean isPlaystoreInstalled = isNewPlayStoreInstalled||isOldPlayStoreInstalled;
+
+        boolean isGoogleApiAvailable = GoogleApiAvailability.getInstance()
+                .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
+        return isPlaystoreInstalled && isGoogleApiAvailable;
     }
 
     public ReactApplicationContext getAppContext() {
@@ -690,6 +723,10 @@ public class RNJWPlayerView extends RelativeLayout implements
                 LinearLayout.LayoutParams.MATCH_PARENT));
         addView(mPlayer);
 
+        if (enableCasting) {
+            setUpCasting();
+        }
+
         if (prop.hasKey("backgroundAudioEnabled")) {
             backgroundAudioEnabled = prop.getBoolean("backgroundAudioEnabled");
         }
@@ -714,6 +751,17 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         if (autostart) {
             mPlayer.play();
+        }
+    }
+
+    void setUpCasting() {
+        mCastContext = CastContext.getSharedInstance(mAppContext);
+
+        if (isGoogleApiAvailable(getContext())) {
+            MediaRouteButton mMediaRouteButton = new MediaRouteButton(getContext());
+            CastButtonFactory.setUpMediaRouteButton(mAppContext, mMediaRouteButton);
+            addView(mMediaRouteButton);
+            bringChildToFront(mMediaRouteButton);
         }
     }
 
@@ -1178,4 +1226,5 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     }
     */
+
 }
