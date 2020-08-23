@@ -277,6 +277,42 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void showCastButton(final int reactTag, final int x, final int y) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.showCastButton(x, y);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void hideCastButton(final int reactTag) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.hideCastButton();
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
   private int stateToInt(PlayerState playerState) {
     switch (playerState) {
       case IDLE:

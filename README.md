@@ -308,7 +308,6 @@ For running example project:
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
 | **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
 | **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
-| **`enableCasting`** | This will enable the casting controller. check out the [docs](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting) for additional info. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `Boolean`                       |
 
 ## Available methods
 
@@ -328,6 +327,9 @@ For running example project:
 | **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
 | **`showAirPlayButton`** | Show an AirPlay button in the player. *(Available on iOS)* | `{x: Double, y: Double}` |
 | **`hideAirPlayButton`** | Hides the AirPlay button in the player. *(Available on iOS)* | `none` |
+| **`showCastButton`** | This will enable the casting controller and show a cast button. check out the [docs](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting) for additional info. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `{x: Double, y: Double}`                       |
+| **`hideCastButton`** | Hides the cast button in the player. | `none` |
+
 ## Available callbacks
 
 | Func                            | Description                                                                                                                                                                                                                | Argument                                                                                                                                                                                                                                                                                                                        |

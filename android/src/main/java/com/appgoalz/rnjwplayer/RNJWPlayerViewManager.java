@@ -230,14 +230,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
     }
   }
 
-  @ReactProp(name = "enableCasting")
-  public void setEnableCasting(RNJWPlayerView view, Boolean prop) {
-    view.enableCasting = prop;
-    if (prop) {
-      view.setUpCasting();
-    }
-  }
-
   public Map getExportedCustomBubblingEventTypeConstants() {
     return MapBuilder.builder()
             .put(

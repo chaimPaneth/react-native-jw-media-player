@@ -88,7 +88,6 @@ export default class JWPlayer extends Component {
       adClient: PropTypes.string,
       startTime: PropTypes.number,
       backgroundAudioEnabled: PropTypes.bool,
-      enableCasting: PropTypes.bool,
     }),
     playlist: PropTypes.arrayOf(
       PropTypes.shape({
@@ -108,7 +107,6 @@ export default class JWPlayer extends Component {
         adClient: PropTypes.string,
         startTime: PropTypes.number,
         backgroundAudioEnabled: PropTypes.bool,
-        enableCasting: PropTypes.bool,
       })
     ),
     onPlayerReady: PropTypes.func,
@@ -122,6 +120,8 @@ export default class JWPlayer extends Component {
     setFullscreen: PropTypes.func,
     showAirPlayButton: PropTypes.func,
     hideAirPlayButton: PropTypes.func,
+    showCastButton: PropTypes.func,
+    hideCastButton: PropTypes.func,
     loadPlaylistItem: PropTypes.func,
     loadPlaylist: PropTypes.func,
     seekTo: PropTypes.func,
@@ -235,6 +235,16 @@ export default class JWPlayer extends Component {
   hideAirPlayButton() {
     if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
+  }
+
+  showCastButton(x, y) {
+    if (RNJWPlayerManager)
+      RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y);
+  }
+
+  hideCastButton() {
+    if (RNJWPlayerManager)
+      RNJWPlayerManager.hideCastButton(this.getRNJWPlayerBridgeHandle());
   }
 
   async playerState() {

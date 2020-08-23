@@ -57,12 +57,12 @@ RCT_EXPORT_VIEW_PROPERTY(playlistItem, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(playlist, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(playerStyle, NSString);
 RCT_EXPORT_VIEW_PROPERTY(colors, NSDictionary);
-RCT_EXPORT_VIEW_PROPERTY(enableCasting, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(fullScreenOnLandscape, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(nativeFullScreen, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(landscapeOnFullScreen, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(portraitOnExitFullScreen, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(exitFullScreenOnPortrait, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(nativeControls, BOOL);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber *)reactTag
@@ -259,13 +259,24 @@ RCT_EXPORT_METHOD(hideAirPlayButton: (nonnull NSNumber *)reactTag) {
     }];
 }
 
-RCT_EXPORT_METHOD(setUpCastController: (nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(showCastButton: (nonnull NSNumber *)reactTag: (double)x: (double)y) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
         RNJWPlayerNativeView *view = viewRegistry[reactTag];
         if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
-            [view setUpCastController];
+            [view showCastButton:x :y];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(hideCastButton: (nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view hideCastButton];
         }
     }];
 }

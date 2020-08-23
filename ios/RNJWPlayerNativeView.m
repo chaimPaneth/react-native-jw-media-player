@@ -1,5 +1,4 @@
 #import "RNJWPlayerNativeView.h"
-#import "RNJWPlayerDelegateProxy.h"
 #import <AVFoundation/AVFoundation.h>
 #import <GoogleCast/GoogleCast.h>
 #import <AVKit/AVKit.h>
@@ -39,6 +38,13 @@
     if (_initFrame.size.height == 0) {
         _initFrame = self.frame;
     }
+    
+    if (_nativeControlsView) {
+        CGRect controlsFrame = CGRectMake(0, _player.view.frame.size.height - 124, _player.view.frame.size.width, 124);
+        _nativeControlsView.frame = controlsFrame;
+        [_player.view bringSubviewToFront:_nativeControlsView];
+        [_nativeControlsView layoutSubviews];
+    }
 }
 
 - (void)removeFromSuperview {
@@ -50,7 +56,9 @@
 {
     JWConfig *config = [JWConfig new];
     
-    config.controls = YES;
+    if (!_nativeControls) {
+        config.controls = YES;
+    }
     config.repeat = NO;
     config.displayDescription = YES;
     config.displayTitle = YES;
@@ -179,11 +187,12 @@
 
 #pragma mark - RNJWPlayer props
 
--(void)setEnableCasting:(BOOL)enableCasting
+-(void)setNativeControls:(BOOL)controls
 {
-    _enableCasting = enableCasting;
-    if (enableCasting) {
-        [self setUpCastController];
+    _nativeControls = controls;
+    if (_player != nil && _nativeControls) {
+        _nativeControlsView = [[RNJWPlayerControls alloc] init];
+        [_nativeControlsView initialize:_player];
     }
 }
 
@@ -310,8 +319,10 @@
 -(void)setControls:(BOOL)controls
 {
     if(controls != self.player.controls) {
-        self.player.config.controls = controls;
-        self.player.controls = controls;
+        if (!_nativeControls) {
+            self.player.config.controls = controls;
+            self.player.controls = controls;
+        }
     }
 }
 
@@ -523,7 +534,9 @@
             
             _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
             
-            _player.controls = YES;
+            if (!_nativeControls) {
+                _player.controls = YES;
+            }
             
             [self setFullScreenOnLandscape:_fullScreenOnLandscape];
             [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
@@ -686,6 +699,10 @@
     if (self.onTime) {
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
     }
+    
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView onTime:event];
+    }
 }
 
 -(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event
@@ -706,6 +723,9 @@
         }
     }
     
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView onFullScreen:event];
+    }
 }
 
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
@@ -747,6 +767,10 @@
 {
     if (self.onControlBarVisible) {
         self.onControlBarVisible(@{@"controls": @(event.controls)});
+    }
+    
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView toggleControlsViewVisible:event.controls];
     }
 }
 
@@ -813,7 +837,38 @@
     }
 }
 
-#pragma mark - RNJWPlayer Casting
+#pragma mark - RNJWPlayer AirPlay
+
+- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y
+{
+    UIView *buttonView = nil;
+    CGRect buttonFrame = CGRectMake(x, y, 44, 44);
+    
+    // It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
+    if (@available(iOS 11.0, *)) {
+        AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
+        airplayButton.activeTintColor = [UIColor blueColor];
+        airplayButton.tintColor = [UIColor grayColor];
+        buttonView = airplayButton;
+    } else {
+        // If you still support previous iOS versions, you can use MPVolumeView
+        MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
+        airplayButton.showsVolumeSlider = NO;
+        buttonView = airplayButton;
+    }
+
+    [buttonView setTag:101];
+
+    [self addSubview:buttonView];
+}
+
+- (void)hideAirPlayButton
+{
+    if ([self viewWithTag:101] != nil)
+        [[self viewWithTag:101] removeFromSuperview];
+}
+
+#pragma mark - RNJWPlayer Chrome Casting
 
 - (void)setUpCastController
 {
@@ -825,44 +880,157 @@
     }
 }
 
-- (void)onCastingDevicesAvailable:(NSArray<JWCastingDevice *> *)devices
+- (void)showCastButton:(CGFloat)x :(CGFloat)y
 {
-    _availableDevices = devices;
-    [self presentCastingOptions];
+    [self setUpCastController];
+    [self setUpCastingButton:x :y];
 }
 
--(void)onUserSelectedDevice:(NSInteger)index
+- (void)hideCastButton
 {
-    JWCastingDevice *chosenDevice = _availableDevices[index];
-    [_castController connectToDevice:chosenDevice];
+    if ([self viewWithTag:102] != nil)
+        [[self viewWithTag:102] removeFromSuperview];
 }
 
--(void)onConnectedToCastingDevice:(JWCastingDevice *)device
+#pragma Mark - Casting delegate methods
+
+- (void)onCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices;
 {
-    [_castController cast];
+    self.availableDevices = devices;
+    if(devices.count > 0) {
+        [self.castingButton setEnabled:YES];
+        [self updateForCastDeviceDisconnection];
+    } else if(devices.count == 0) {
+        [self updateForCastDevicesUnavailable];
+    }
+}
+
+- (void)onConnectedToCastingDevice:(JWCastingDevice *)device
+{
+    [self updateForCastDeviceConnection];
+}
+
+- (void)onDisconnectedFromCastingDevice:(NSError *)error
+{
+    [self updateForCastDeviceDisconnection];
+}
+
+- (void)onConnectionTemporarilySuspended
+{
+    [self updateWhenConnectingToCastDevice];
+}
+
+- (void)onConnectionRecovered
+{
+    [self updateForCastDeviceConnection];
+}
+
+- (void)onConnectionFailed:(NSError *)error
+{
+    if(error) {
+        NSLog(@"Connection Error: %@", error);
+    }
+    [self updateForCastDeviceDisconnection];
 }
 
 - (void)onCasting
 {
-    _isCasting = YES;
+    [self updateForCasting];
 }
 
 - (void)onCastingEnded:(NSError *)error
 {
-    _isCasting = NO;
+    if(error) {
+        NSLog(@"Casting Error: %@", error);
+    }
+    [self updateForCastingEnd];
 }
 
 - (void)onCastingFailed:(NSError *)error
 {
-    _isCasting = NO;
+    if(error) {
+        NSLog(@"Casting Error: %@", error);
+    }
+    [self updateForCastingEnd];
 }
 
-- (void)presentCastingOptions
+#pragma Mark - Casting Status Helpers
+
+- (void)updateWhenConnectingToCastDevice
+{
+    [self.castingButton setTintColor:[UIColor whiteColor]];
+    [self.castingButton.imageView startAnimating];
+}
+
+- (void)updateForCastDeviceConnection
+{
+    [self.castingButton.imageView stopAnimating];
+    [self.castingButton setImage:[[UIImage imageNamed:@"cast_on"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                        forState:UIControlStateNormal];
+    [self.castingButton setTintColor:[UIColor blueColor]];
+}
+
+- (void)updateForCastDevicesUnavailable
+{
+    [self.castingButton.imageView stopAnimating];
+    [self.castingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                        forState:UIControlStateNormal];
+    [self.castingButton setTintColor:[UIColor grayColor]];
+    [self.castingButton setEnabled:NO];
+}
+
+- (void)updateForCastDeviceDisconnection
+{
+    [self.castingButton.imageView stopAnimating];
+    [self.castingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                        forState:UIControlStateNormal];
+    [self.castingButton setTintColor:[UIColor whiteColor]];
+}
+
+- (void)updateForCasting
+{
+    self.isCasting = YES;
+    [self.castingButton setTintColor:[UIColor greenColor]];
+}
+
+- (void)updateForCastingEnd
+{
+    self.isCasting = NO;
+    [self.castingButton setTintColor:[UIColor blueColor]];
+}
+
+#pragma Mark - Cast Button
+
+- (void)setUpCastingButton:(CGFloat)x :(CGFloat)y
+{
+//    if (self.castingButton == nil) {
+        CGRect castingButtonFrame = CGRectMake(x, y, 22, 22);
+        self.castingButton = [[UIButton alloc]initWithFrame:castingButtonFrame];
+        [self.castingButton addTarget:self action:@selector(castButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.castingButton setTag:102];
+        [self prepareCastingButtonAnimation];
+        [self addSubview:self.castingButton];
+        [self updateForCastDevicesUnavailable];
+//    }
+}
+
+- (void)prepareCastingButtonAnimation
+{
+    NSArray *connectingImages = @[[[UIImage imageNamed:@"cast_connecting0"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                  [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                  [[UIImage imageNamed:@"cast_connecting2"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                  [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    self.castingButton.imageView.animationImages = connectingImages;
+    self.castingButton.imageView.animationDuration = 2;
+}
+
+- (void)castButtonTapped
 {
     __weak RNJWPlayerNativeView *weakSelf = self;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
+//    alertController.popoverPresentationController.barButtonItem = self.castingItem;
     
     if (self.castController.connectedDevice == nil) {
         alertController.title = @"Connect to";
@@ -872,6 +1040,7 @@
                                                                      style:UIAlertActionStyleDefault
                                                                    handler:^(UIAlertAction * _Nonnull action) {
                                                                        [weakSelf.castController connectToDevice:device];
+                                                                       [weakSelf updateWhenConnectingToCastDevice];
                                                                    }];
             [alertController addAction:deviceSelected];
         }];
@@ -887,7 +1056,7 @@
         [alertController addAction:disconnect];
         
         UIAlertAction *castControl;
-        if (_isCasting) {
+        if (self.isCasting) {
             castControl = [UIAlertAction actionWithTitle:@"Stop Casting"
                                                    style:UIAlertActionStyleDefault
                                                  handler:^(UIAlertAction * _Nonnull action) {
@@ -909,35 +1078,5 @@
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     [rootViewController presentViewController:alertController animated:YES completion:^{}];
 }
-
-- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y
-{
-	UIView *buttonView = nil;
-	CGRect buttonFrame = CGRectMake(x, y, 44, 44);
-	
-	// It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
-	if (@available(iOS 11.0, *)) {
-		AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
-		airplayButton.activeTintColor = [UIColor blueColor];
-		airplayButton.tintColor = [UIColor grayColor];
-		buttonView = airplayButton;
-	} else {
-		// If you still support previous iOS versions, you can use MPVolumeView
-		MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
-		airplayButton.showsVolumeSlider = NO;
-		buttonView = airplayButton;
-	}
-
-    [buttonView setTag:101];
-
-	[self addSubview:buttonView];
-}
-
-- (void)hideAirPlayButton
-{
-    if ([self viewWithTag:101] != nil)
-        [[self viewWithTag:101] removeFromSuperview];
-}
-
 
 @end

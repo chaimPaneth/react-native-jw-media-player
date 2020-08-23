@@ -6,6 +6,7 @@
 
 #import <JWPlayer_iOS_SDK/JWPlayerController.h>
 #import <UIKit/UIKit.h>
+#import "RNJWPlayerControls.h"
 #import "RNJWPlayerDelegateProxy.h"
 
 @class RNJWPlayerDelegateProxy;
@@ -14,6 +15,8 @@
 
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
+
+@property (nonatomic) UIButton *castingButton;
 @property(nonatomic, strong)JWCastController *castController;
 @property(nonatomic)BOOL isCasting;
 @property(nonatomic, strong)NSArray<JWCastingDevice *> *availableDevices;
@@ -31,7 +34,6 @@
 @property(nonatomic, strong)NSString *mediaId;
 @property(nonatomic, strong)NSString *playerStyle;
 @property(nonatomic, strong)NSDictionary *playerColors;
-@property(nonatomic)BOOL enableCasting;
 @property(nonatomic)BOOL nativeFullScreen;
 @property(nonatomic)BOOL fullScreenOnLandscape;
 @property(nonatomic)BOOL landscapeOnFullScreen;
@@ -41,6 +43,8 @@
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 @property(nonatomic, strong)NSString *adVmap;
+@property(nonatomic, strong)RNJWPlayerControls *nativeControlsView;
+@property(nonatomic)BOOL nativeControls;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
@@ -92,7 +96,8 @@
 -(void)reset;
 -(void)setPlaylistItem:(NSDictionary *)playlistItem;
 -(void)setPlaylist:(NSArray *)playlist;
--(void)setUpCastController;
+-(void)showCastButton:(CGFloat)x :(CGFloat)y;
+-(void)hideCastButton;
 -(void)showAirPlayButton:(CGFloat)x :(CGFloat)y;
 -(void)hideAirPlayButton;
 
