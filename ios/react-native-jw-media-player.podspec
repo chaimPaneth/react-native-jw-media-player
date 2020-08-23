@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
   s.source_files = 'RNJWPlayer*.{h,m}'
+  s.resources    = "Assets/*.png"
   s.dependency   'JWPlayer-SDK'
   s.dependency   'google-cast-sdk', '~> 4.3'
   s.dependency   'React'

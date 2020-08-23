@@ -15,7 +15,6 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -26,7 +25,6 @@ import android.widget.RelativeLayout;
 import androidx.mediarouter.app.MediaRouteButton;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -156,7 +154,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     Number currentPlayingIndex;
 
     private CastContext mCastContext;
-    Boolean enableCasting;
+    private MediaRouteButton mMediaRouteButton;
 
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
@@ -723,10 +721,6 @@ public class RNJWPlayerView extends RelativeLayout implements
                 LinearLayout.LayoutParams.MATCH_PARENT));
         addView(mPlayer);
 
-        if (enableCasting) {
-            setUpCasting();
-        }
-
         if (prop.hasKey("backgroundAudioEnabled")) {
             backgroundAudioEnabled = prop.getBoolean("backgroundAudioEnabled");
         }
@@ -754,15 +748,23 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    void setUpCasting() {
+    void showCastButton(int x, int y) {
         mCastContext = CastContext.getSharedInstance(mAppContext);
 
         if (isGoogleApiAvailable(getContext())) {
-            MediaRouteButton mMediaRouteButton = new MediaRouteButton(getContext());
+            mMediaRouteButton = new MediaRouteButton(getContext());
             CastButtonFactory.setUpMediaRouteButton(mAppContext, mMediaRouteButton);
+
+            mMediaRouteButton.setX(x);
+            mMediaRouteButton.setY(y);
+
             addView(mMediaRouteButton);
             bringChildToFront(mMediaRouteButton);
         }
+    }
+
+    void hideCastButton() {
+        if (mMediaRouteButton != null) removeView(mMediaRouteButton);
     }
 
     // Styling

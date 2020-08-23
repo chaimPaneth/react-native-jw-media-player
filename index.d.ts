@@ -18,7 +18,6 @@ declare module "react-native-jw-media-player" {
     displayTitle?: boolean;
     repeat?: boolean;
     backgroundAudioEnabled: boolean;
-    enableCasting: boolean;
   }
   interface PropsType {
     mediaId?: number;
@@ -74,6 +73,8 @@ declare module "react-native-jw-media-player" {
     setPlaylistIndex(index: number): void;
     showAirPlayButton(x: number, y: number): void;
     hideAirPlayButton(): void;
+    showCastButton(x: number, y: number): void;
+    hideCastButton(): void;
     setControls(shouldDisplayControl: boolean): void;
     setFullscreen(shouldDisplayInFullScreen: boolean): void;
     loadPlaylist(playlist: PlaylistItem[]): void;
