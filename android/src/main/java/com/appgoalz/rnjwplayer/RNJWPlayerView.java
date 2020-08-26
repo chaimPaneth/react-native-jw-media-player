@@ -223,17 +223,16 @@ public class RNJWPlayerView extends RelativeLayout implements
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
         // supporting component replacement by other applications).
-        mActivity.bindService(new Intent(RNJWPlayerView.mActivity,
+        getAppContext().bindService(new Intent(RNJWPlayerView.mActivity,
                         MediaPlaybackService.class),
                 mServiceConnection,
                 Context.BIND_AUTO_CREATE);
-
     }
 
     private void doUnbindService() {
         if (mIsBound) {
             // Detach our existing connection.
-            mActivity.unbindService(mServiceConnection);
+            getAppContext().unbindService(mServiceConnection);
             mIsBound = false;
         }
     }
@@ -1016,7 +1015,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             eventExitFullscreen.putString("message", "onFullscreenExit");
             getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
                     getId(),
-                    "topFullScreen",
+                    "topFullScreenExit",
                     eventExitFullscreen);
         }
     }
