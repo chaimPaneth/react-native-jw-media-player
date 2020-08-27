@@ -58,6 +58,8 @@
     
     if (!_nativeControls) {
         config.controls = YES;
+    } else {
+        config.controls = NO;
     }
     config.repeat = NO;
     config.displayDescription = YES;
@@ -322,6 +324,9 @@
         if (!_nativeControls) {
             self.player.config.controls = controls;
             self.player.controls = controls;
+        } else {
+            self.player.config.controls = NO;
+            self.player.controls = NO;
         }
     }
 }
@@ -536,6 +541,11 @@
             
             if (!_nativeControls) {
                 _player.controls = YES;
+                _player.config.controls = YES;
+            } else {
+                _player.controls = NO;
+                _player.config.controls = NO;
+                [self setNativeControls:YES];
             }
             
             [self setFullScreenOnLandscape:_fullScreenOnLandscape];
@@ -841,41 +851,54 @@
 
 - (void)showAirPlayButton:(CGFloat)x :(CGFloat)y
 {
-    UIView *buttonView = nil;
-    CGRect buttonFrame = CGRectMake(x, y, 44, 44);
-    
-    // It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
-    if (@available(iOS 11.0, *)) {
-        AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
-        airplayButton.activeTintColor = [UIColor blueColor];
-        airplayButton.tintColor = [UIColor grayColor];
-        buttonView = airplayButton;
+    if ([self viewWithTag:101] == nil) {
+        UIView *buttonView = nil;
+        CGRect buttonFrame = CGRectMake(x, y, 44, 44);
+        
+        // It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
+        if (@available(iOS 11.0, *)) {
+            AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
+            airplayButton.activeTintColor = [UIColor blueColor];
+            airplayButton.tintColor = [UIColor grayColor];
+            buttonView = airplayButton;
+        } else {
+            // If you still support previous iOS versions, you can use MPVolumeView
+            MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
+            airplayButton.showsVolumeSlider = NO;
+            buttonView = airplayButton;
+        }
+
+        [buttonView setTag:101];
+
+        [self addSubview:buttonView];
     } else {
-        // If you still support previous iOS versions, you can use MPVolumeView
-        MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
-        airplayButton.showsVolumeSlider = NO;
-        buttonView = airplayButton;
+        [[self viewWithTag:101] setHidden:NO];
     }
-
-    [buttonView setTag:101];
-
-    [self addSubview:buttonView];
 }
 
 - (void)hideAirPlayButton
 {
     if ([self viewWithTag:101] != nil)
-        [[self viewWithTag:101] removeFromSuperview];
+        [[self viewWithTag:101] setHidden:YES];
 }
 
 #pragma mark - RNJWPlayer Chrome Casting
 
 - (void)setUpCastController
 {
-    if (_player) {
+    if (_player && _castController == nil) {
         _castController = [[JWCastController alloc] initWithPlayer:_player];
         _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
         _castController.delegate = self;
+//        [_castController scanForDevices];
+    }
+    
+    [self scanForCastDevices];
+}
+
+- (void)scanForCastDevices
+{
+    if (_castController != nil) {
         [_castController scanForDevices];
     }
 }
@@ -888,8 +911,8 @@
 
 - (void)hideCastButton
 {
-    if ([self viewWithTag:102] != nil)
-        [[self viewWithTag:102] removeFromSuperview];
+    if (self.castingButton != nil)
+        [self.castingButton setHidden:YES];
 }
 
 #pragma Mark - Casting delegate methods
@@ -898,7 +921,7 @@
 {
     self.availableDevices = devices;
     if(devices.count > 0) {
-        [self.castingButton setEnabled:YES];
+//        [self.castingButton setEnabled:YES];
         [self updateForCastDeviceDisconnection];
     } else if(devices.count == 0) {
         [self updateForCastDevicesUnavailable];
@@ -976,7 +999,7 @@
     [self.castingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                         forState:UIControlStateNormal];
     [self.castingButton setTintColor:[UIColor grayColor]];
-    [self.castingButton setEnabled:NO];
+//    [self.castingButton setEnabled:NO];
 }
 
 - (void)updateForCastDeviceDisconnection
@@ -1003,15 +1026,21 @@
 
 - (void)setUpCastingButton:(CGFloat)x :(CGFloat)y
 {
-//    if (self.castingButton == nil) {
+    if (self.castingButton == nil) {
+        
+//        self.castingButton = [[GCKUICastButton alloc] initWithFrame:CGRectMake(x, y, 24, 24)];
+//        [self addSubview:self.castingButton];
+//        [self bringSubviewToFront:self.castingButton];
+        
         CGRect castingButtonFrame = CGRectMake(x, y, 22, 22);
         self.castingButton = [[UIButton alloc]initWithFrame:castingButtonFrame];
         [self.castingButton addTarget:self action:@selector(castButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.castingButton setTag:102];
         [self prepareCastingButtonAnimation];
         [self addSubview:self.castingButton];
         [self updateForCastDevicesUnavailable];
-//    }
+    } else {
+        [self.castingButton setHidden:NO];
+    }
 }
 
 - (void)prepareCastingButtonAnimation
@@ -1033,17 +1062,21 @@
 //    alertController.popoverPresentationController.barButtonItem = self.castingItem;
     
     if (self.castController.connectedDevice == nil) {
-        alertController.title = @"Connect to";
-        
-        [self.castController.availableDevices enumerateObjectsUsingBlock:^(JWCastingDevice  *_Nonnull device, NSUInteger idx, BOOL * _Nonnull stop) {
-            UIAlertAction *deviceSelected = [UIAlertAction actionWithTitle:device.name
-                                                                     style:UIAlertActionStyleDefault
-                                                                   handler:^(UIAlertAction * _Nonnull action) {
-                                                                       [weakSelf.castController connectToDevice:device];
-                                                                       [weakSelf updateWhenConnectingToCastDevice];
-                                                                   }];
-            [alertController addAction:deviceSelected];
-        }];
+        if (self.castController.availableDevices.count > 0) {
+            alertController.title = @"Connect to";
+            
+            [self.castController.availableDevices enumerateObjectsUsingBlock:^(JWCastingDevice  *_Nonnull device, NSUInteger idx, BOOL * _Nonnull stop) {
+                UIAlertAction *deviceSelected = [UIAlertAction actionWithTitle:device.name
+                                                                         style:UIAlertActionStyleDefault
+                                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                                           [weakSelf.castController connectToDevice:device];
+                                                                           [weakSelf updateWhenConnectingToCastDevice];
+                                                                       }];
+                [alertController addAction:deviceSelected];
+            }];
+        } else {
+            alertController.title = @"No available devices";
+        }
     } else {
         alertController.title = self.castController.connectedDevice.name;
         alertController.message = @"Select an action";
@@ -1071,6 +1104,7 @@
         }
         [alertController addAction:castControl];
     }
+    
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel"
                             style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {}];
     [alertController addAction:cancel];

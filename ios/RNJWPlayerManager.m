@@ -281,4 +281,15 @@ RCT_EXPORT_METHOD(hideCastButton: (nonnull NSNumber *)reactTag) {
     }];
 }
 
+RCT_EXPORT_METHOD(setVolume: (nonnull NSNumber *)reactTag :(nonnull NSNumber *)volume) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player setVolume:[volume floatValue]];
+        }
+    }];
+}
+
 @end

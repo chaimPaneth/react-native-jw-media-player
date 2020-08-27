@@ -27,7 +27,7 @@ NSString * const DefaultTimeString = @"00:00";
     [_player.view addSubview:self];
     
     _indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    _indicatorView.color = [UIColor colorWithRed:234/255 green:52/255 blue:76/255 alpha:1];
+    _indicatorView.color = [UIColor whiteColor];
     [_player.view addSubview: _indicatorView];
     [_player.view bringSubviewToFront: _indicatorView];
     [self constraintToCenter:_indicatorView toView:_player.view];
@@ -64,9 +64,15 @@ NSString * const DefaultTimeString = @"00:00";
     [_rewindButton addTarget:self action:@selector(rewindButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [_forwardButton addTarget:self action:@selector(forwardButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    _timeLabel = [[UILabel alloc] init];
-    [_timeLabel setTextColor:UIColor.whiteColor];
-    [self addSubview:_timeLabel];
+    _timeElapsedLabel = [[UILabel alloc] init];
+    [_timeElapsedLabel setTextColor:UIColor.whiteColor];
+    [_timeElapsedLabel setFont:[UIFont systemFontOfSize:14]];
+    [self addSubview:_timeElapsedLabel];
+    
+    _timeRemainingLabel = [[UILabel alloc] init];
+    [_timeRemainingLabel setTextColor:UIColor.whiteColor];
+    [_timeRemainingLabel setFont:[UIFont systemFontOfSize:14]];
+    [self addSubview:_timeRemainingLabel];
     
     _timeSlider = [[UISlider alloc] init];
     [_timeSlider setMinimumTrackTintColor:UIColor.grayColor];
@@ -83,7 +89,8 @@ NSString * const DefaultTimeString = @"00:00";
 
 - (void)resetPlayerUI {
     [self.playbackButton setSelected:NO];
-    self.timeLabel.text = DefaultTimeString;
+    self.timeElapsedLabel.text = DefaultTimeString;
+    self.timeRemainingLabel.text = DefaultTimeString;
     self.timeSlider.value = 0;
 }
 
@@ -158,13 +165,16 @@ NSString * const DefaultTimeString = @"00:00";
         CGFloat videoDuration = _player.duration;
         
         int newPosition = round(sender.value * videoDuration);
+        int newRemaining = round(videoDuration - newPosition);
         if (videoDuration < 0) {
             // Seek video to input position
             [_player seek:MAX(0, abs(newPosition))];
-            _timeLabel.text = [NSString stringWithFormat:@"%@-%@", LIVEString, [self timeFormatted: newPosition]];
+            _timeElapsedLabel.text = [NSString stringWithFormat:@"%@-%@", LIVEString, [self timeFormatted: newPosition]];
+            [_timeRemainingLabel setHidden:YES];
         } else {
             [_player seek:newPosition];
-            _timeLabel.text = [self timeFormatted: newPosition];
+            _timeElapsedLabel.text = [self timeFormatted: newPosition];
+            _timeRemainingLabel.text = [NSString stringWithFormat:@"%@%@", @"-", [self timeFormatted: newRemaining]];
         }
     }
 }
@@ -212,17 +222,20 @@ NSString * const DefaultTimeString = @"00:00";
             [_timeSlider setEnabled: YES];
             [_rewindButton setHidden:NO];
             [_forwardButton setHidden:NO];
+            [_timeRemainingLabel setHidden:NO];
             
             float progress = event.position / event.duration;
             _timeSlider.value = progress;
-            _timeLabel.text = [self timeFormatted: event.position];
+            _timeElapsedLabel.text = [self timeFormatted: event.position];
+            _timeRemainingLabel.text = [NSString stringWithFormat:@"%@%@", @"-", [self timeFormatted: event.duration - event.position]];
         } else {
             [_rewindButton setHidden:YES];
             [_forwardButton setHidden:YES];
+            [_timeRemainingLabel setHidden:YES];
             
             if (_player.duration == 0) {
                 [_timeSlider setHidden:YES];
-                _timeLabel.text = LIVEString;
+                _timeElapsedLabel.text = LIVEString;
             } else {
                 [_timeSlider setHidden:NO];
                 
@@ -230,7 +243,7 @@ NSString * const DefaultTimeString = @"00:00";
                 float absDuration = fabs(_player.duration);
                 float progress = absPosition / absDuration;
                 self.timeSlider.value = progress;
-                _timeLabel.text = [NSString stringWithFormat:@"%@-%@", LIVEString, [self timeFormatted: absPosition]];
+                _timeElapsedLabel.text = [NSString stringWithFormat:@"%@-%@", LIVEString, [self timeFormatted: absPosition]];
             }
         }
     }
@@ -260,7 +273,7 @@ NSString * const DefaultTimeString = @"00:00";
 
 - (void)toggleControlsViewVisible:(BOOL)visible
 {
-    self.alpha = visible ? 1 : 0;
+    [self setAlpha:visible ? 1 : 0];
     [self toggleControlsView:visible];
 }
 
@@ -296,27 +309,34 @@ NSString * const DefaultTimeString = @"00:00";
 {
     [super layoutSubviews];
     
-    CGRect playbackButtonFrame = CGRectMake(self.frame.size.width / 2 - 15, self.frame.size.height / 2 - 15, 30, 30);
+    CGRect playbackButtonFrame = CGRectMake(self.frame.size.width / 2 - 15, self.frame.size.height / 2, 30, 30);
     _playbackButton.frame = playbackButtonFrame;
     
-    CGRect rewindButtonFrame = CGRectMake(self.frame.size.width / 2 - 55, self.frame.size.height / 2 - 15, 30, 30);
+    CGRect rewindButtonFrame = CGRectMake(self.frame.size.width / 2 - 55, self.frame.size.height / 2, 30, 30);
     _rewindButton.frame = rewindButtonFrame;
     
-    CGRect forwardButtonFrame = CGRectMake(self.frame.size.width / 2 + 25, self.frame.size.height / 2 - 15, 30, 30);
+    CGRect forwardButtonFrame = CGRectMake(self.frame.size.width / 2 + 25, self.frame.size.height / 2, 30, 30);
     _forwardButton.frame = forwardButtonFrame;
     
-    CGRect audioButtonFrame = CGRectMake(self.frame.size.width - 86, self.frame.size.height / 2 - 15, 30, 30);
+    CGRect audioButtonFrame = CGRectMake(self.frame.size.width - 86, self.frame.size.height / 2, 30, 30);
     _audioButton.frame = audioButtonFrame;
     
-    CGRect fullscreenButtonFrame = CGRectMake(self.frame.size.width - 46, self.frame.size.height / 2 - 15, 30, 30);
+    CGRect fullscreenButtonFrame = CGRectMake(self.frame.size.width - 46, self.frame.size.height / 2, 30, 30);
     _fullscreenButton.frame = fullscreenButtonFrame;
     
-    CGRect timeLabelFrame = CGRectMake(16, self.frame.size.height / 2 - 15, 60, 30);
-    _timeLabel.frame = timeLabelFrame;
+    CGRect timeElapsedLabelFrame = CGRectMake(16, 31, 60, 30);
+    _timeElapsedLabel.frame = timeElapsedLabelFrame;
     
-    CGRect timeSliderLabelFrame = CGRectMake(16, 16, _player.view.frame.size.width - 32, 5);
+    CGRect timeRemainingLabelFrame = CGRectMake(self.frame.size.width - 61, 31, 60, 30);
+    _timeRemainingLabel.frame = timeRemainingLabelFrame;
+    
+    CGRect timeSliderLabelFrame = CGRectMake(16, 16, self.frame.size.width - 32, 5);
     _timeSlider.frame = timeSliderLabelFrame;
     [_timeSlider setThumbImage:[self makeRoundedImage:[self imageFromColor:UIColor.whiteColor] radius:4] forState:UIControlStateNormal];
+    
+    self.layer.cornerRadius = 15;
+    self.backgroundColor = [UIColor colorWithRed:255/255 green:255/255 blue:255/255 alpha:0.3];
+    self.frame = CGRectMake(10, _player.view.frame.size.height - 126, _player.view.frame.size.width - 20, 116);
 }
 
 - (UIImage *)imageFromColor:(UIColor *)color {

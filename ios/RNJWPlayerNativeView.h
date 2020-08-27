@@ -6,6 +6,7 @@
 
 #import <JWPlayer_iOS_SDK/JWPlayerController.h>
 #import <UIKit/UIKit.h>
+#import <GoogleCast/GoogleCast.h>
 #import "RNJWPlayerControls.h"
 #import "RNJWPlayerDelegateProxy.h"
 
@@ -15,7 +16,7 @@
 
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
-
+//GCKUICastButton
 @property (nonatomic) UIButton *castingButton;
 @property(nonatomic, strong)JWCastController *castController;
 @property(nonatomic)BOOL isCasting;
