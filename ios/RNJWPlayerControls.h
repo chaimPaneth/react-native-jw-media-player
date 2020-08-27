@@ -16,7 +16,8 @@
 @property (nonatomic) UIButton *forwardButton;
 @property (nonatomic) UIButton *audioButton;
 @property (nonatomic) UIButton *fullscreenButton;
-@property (nonatomic) UILabel *timeLabel;
+@property (nonatomic) UILabel *timeElapsedLabel;
+@property (nonatomic) UILabel *timeRemainingLabel;
 @property (nonatomic) UISlider *timeSlider;
 @property (nonatomic) UIActivityIndicatorView *indicatorView;
 

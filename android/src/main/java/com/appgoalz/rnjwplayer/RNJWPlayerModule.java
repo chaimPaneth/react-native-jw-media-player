@@ -1,6 +1,8 @@
 
 package com.appgoalz.rnjwplayer;
 
+import android.media.AudioManager;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -11,13 +13,7 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
-import com.longtailvideo.jwplayer.configuration.PlayerConfig;
-import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.core.PlayerState;
-import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
@@ -305,6 +301,29 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayer != null) {
             playerView.hideCastButton();
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void setVolume(final int reactTag, final int volume) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            int maxValue = playerView.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            if (volume <= maxValue) {
+              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+            } else {
+              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxValue, 0);
+            }
           }
         }
       });

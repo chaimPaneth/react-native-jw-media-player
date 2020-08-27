@@ -233,7 +233,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
         // supporting component replacement by other applications).
-        mActivity.bindService(new Intent(RNJWPlayerView.mActivity,
+        getAppContext().bindService(new Intent(RNJWPlayerView.mActivity,
                         MediaPlaybackService.class),
                 mServiceConnection,
                 Context.BIND_AUTO_CREATE);
@@ -243,7 +243,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     private void doUnbindService() {
         if (mIsBound) {
             // Detach our existing connection.
-            mActivity.unbindService(mServiceConnection);
+            getAppContext().unbindService(mServiceConnection);
             mIsBound = false;
         }
     }
@@ -748,23 +748,38 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
+    float dipToPix(int dip) {
+        Resources r = getResources();
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                r.getDisplayMetrics()
+        );
+    }
+
     void showCastButton(int x, int y) {
-        mCastContext = CastContext.getSharedInstance(mAppContext);
-
         if (isGoogleApiAvailable(getContext())) {
-            mMediaRouteButton = new MediaRouteButton(getContext());
-            CastButtonFactory.setUpMediaRouteButton(mAppContext, mMediaRouteButton);
+            if (mMediaRouteButton == null) {
+                mMediaRouteButton = new MediaRouteButton(getReactContext());
+                CastButtonFactory.setUpMediaRouteButton(getReactContext(), mMediaRouteButton);
 
-            mMediaRouteButton.setX(x);
-            mMediaRouteButton.setY(y);
+                mMediaRouteButton.setX(dipToPix(x));
+                mMediaRouteButton.setY(dipToPix(y));
 
-            addView(mMediaRouteButton);
-            bringChildToFront(mMediaRouteButton);
+                addView(mMediaRouteButton);
+                bringChildToFront(mMediaRouteButton);
+            } else {
+                mMediaRouteButton.setVisibility(VISIBLE);
+            }
+
+            if (mCastContext == null) {
+                mCastContext = CastContext.getSharedInstance(getReactContext());
+            }
         }
     }
 
     void hideCastButton() {
-        if (mMediaRouteButton != null) removeView(mMediaRouteButton);
+        if (mMediaRouteButton != null)  mMediaRouteButton.setVisibility(GONE);
     }
 
     // Styling
@@ -1066,7 +1081,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             eventExitFullscreen.putString("message", "onFullscreenExit");
             getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
                     getId(),
-                    "topFullScreen",
+                    "topFullScreenExit",
                     eventExitFullscreen);
         }
     }
