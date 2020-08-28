@@ -440,3 +440,5 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 | **`onConnectionFailed`**               | Connection to cast device failed.                     | `{error: Error}`                                  |
 | **`onCastingEnded`**                   | Casting ended.                                        | `{error: Error}`                                  |
 | **`onCastingFailed`**                  | Casting failed.                                       | `{error: Error}`                                  |
+
+#### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
