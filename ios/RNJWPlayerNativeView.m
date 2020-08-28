@@ -1,15 +1,26 @@
 #import "RNJWPlayerNativeView.h"
-#import "RNJWPlayerDelegateProxy.h"
 #import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 @implementation RNJWPlayerNativeView
 
 #pragma mark - RNJWPlayer allocation
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotated:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     @try {
-       [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
     } @catch(id anException) {
        
     }
@@ -26,6 +37,13 @@
     if (_initFrame.size.height == 0) {
         _initFrame = self.frame;
     }
+    
+    if (_nativeControlsView) {
+        CGRect controlsFrame = CGRectMake(0, _player.view.frame.size.height - 124, _player.view.frame.size.width, 124);
+        _nativeControlsView.frame = controlsFrame;
+        [_player.view bringSubviewToFront:_nativeControlsView];
+        [_nativeControlsView layoutSubviews];
+    }
 }
 
 - (void)removeFromSuperview {
@@ -37,7 +55,11 @@
 {
     JWConfig *config = [JWConfig new];
     
-    config.controls = YES;
+    if (!_nativeControls) {
+        config.controls = YES;
+    } else {
+        config.controls = NO;
+    }
     config.repeat = NO;
     config.displayDescription = YES;
     config.displayTitle = YES;
@@ -166,6 +188,15 @@
 
 #pragma mark - RNJWPlayer props
 
+-(void)setNativeControls:(BOOL)controls
+{
+    _nativeControls = controls;
+    if (_player != nil && _nativeControls) {
+        _nativeControlsView = [[RNJWPlayerControls alloc] init];
+        [_nativeControlsView initialize:_player];
+    }
+}
+
 -(void)setNativeFullScreen:(BOOL)nativeFullScreen
 {
     _nativeFullScreen = nativeFullScreen;
@@ -189,10 +220,19 @@
     }
 }
 
+-(void)setPortraitOnExitFullScreen:(BOOL)portraitOnExitFullScreen
+{
+    _portraitOnExitFullScreen = portraitOnExitFullScreen;
+}
+
+-(void)setExitFullScreenOnPortrait:(BOOL)exitFullScreenOnPortrait
+{
+    _exitFullScreenOnPortrait = exitFullScreenOnPortrait;
+}
+
 -(void)setFile:(NSString *)file
 {
-    NSString* encodedUrl = [file stringByAddingPercentEscapesUsingEncoding:
-                            NSUTF8StringEncoding];
+    NSString* encodedUrl = [file stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     if (file != nil && file.length > 0 && ![encodedUrl isEqualToString:_player.config.file]) {
         self.player.config.file = encodedUrl;
     }
@@ -280,8 +320,13 @@
 -(void)setControls:(BOOL)controls
 {
     if(controls != self.player.controls) {
-        self.player.config.controls = controls;
-        self.player.controls = controls;
+        if (!_nativeControls) {
+            self.player.config.controls = controls;
+            self.player.controls = controls;
+        } else {
+            self.player.config.controls = NO;
+            self.player.controls = NO;
+        }
     }
 }
 
@@ -418,6 +463,13 @@
 -(void)setPlaylist:(NSArray *)playlist
 {
     if (playlist != nil && playlist.count > 0) {
+        if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
+            bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
+            if (backgroundAudioEnabled == true) {
+                [self initializeAudioSession];
+            }
+        }
+        
         NSMutableArray <JWPlaylistItem *> *playlistArray = [[NSMutableArray alloc] init];
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [self getPlaylistItem:item];
@@ -486,17 +538,17 @@
             
             _player = [[JWPlayerController alloc] initWithConfig:config delegate:_proxy];
             
-            _player.controls = YES;
+            if (!_nativeControls) {
+                _player.controls = YES;
+                _player.config.controls = YES;
+            } else {
+                _player.controls = NO;
+                _player.config.controls = NO;
+                [self setNativeControls:YES];
+            }
             
             [self setFullScreenOnLandscape:_fullScreenOnLandscape];
             [self setLandscapeOnFullScreen:_landscapeOnFullScreen];
-            
-            if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
-                bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
-                if (backgroundAudioEnabled == true) {
-                    [self initializeAudioSession];
-                }
-            }
                     
             [self addSubview:self.player.view];
         } else {
@@ -520,8 +572,7 @@
 
 -(void)explode
 {
-    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, [[UIScreen mainScreen] applicationFrame].size.height);
-    
+    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
     self.frame = rect;
     
     [self setBackgroundColor:[UIColor blackColor]];
@@ -532,6 +583,18 @@
     self.frame = _initFrame;
     
     [self setBackgroundColor:[UIColor whiteColor]];
+}
+
+- (void)rotated:(NSNotification *)notification {
+    if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Landscape");
+    }
+
+    if (UIDeviceOrientationIsPortrait(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Portrait");
+    }
+    
+    [self layoutSubviews];
 }
 
 #pragma mark - RNJWPlayer Delegate
@@ -643,9 +706,11 @@
 -(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event
 {
     if (self.onTime) {
-        NSLog(@"position: %@",@(event.position));
         self.onTime(@{@"position": @(event.position), @"duration": @(event.duration)});
-        //        [[NSUserDefaults standardUserDefaults] setObject:@(event.position) forKey:@"PlayerTime"];
+    }
+    
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView onTime:event];
     }
 }
 
@@ -653,17 +718,23 @@
 {
     if(event && [[event valueForKey:@"_fullscreen"] boolValue]){
         if (self.onFullScreen) {
+            if (_nativeFullScreen && _landscapeOnFullScreen) {
+                [[UIDevice currentDevice] setValue: [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft] forKey:@"orientation"];
+            }
             self.onFullScreen(@{});
         }
-    }else{
-        if (self.onFullScreenExit){
-            if (_nativeFullScreen) {
+    } else {
+        if (self.onFullScreenExit) {
+            if (_nativeFullScreen && _portraitOnExitFullScreen) {
                 [[UIDevice currentDevice] setValue: [NSNumber numberWithInteger: UIInterfaceOrientationPortrait] forKey:@"orientation"];
             }
             self.onFullScreenExit(@{});
         }
     }
     
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView onFullScreen:event];
+    }
 }
 
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event
@@ -687,20 +758,6 @@
     }
 }
 
--(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event
-{
-    if (self.onFullScreenExitRequested) {
-        self.onFullScreenExitRequested(@{});
-    }
-}
-
--(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event
-{
-    if (self.onFullScreenExit){
-        self.onFullScreenExit(@{});
-    }
-}
-
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event
 {
     if (self.onSeek) {
@@ -719,6 +776,35 @@
 {
     if (self.onControlBarVisible) {
         self.onControlBarVisible(@{@"controls": @(event.controls)});
+    }
+    
+    if (_nativeControls && _nativeControlsView) {
+        [_nativeControlsView toggleControlsViewVisible:event.controls];
+    }
+    
+    if (_autoHideAirPlay) {
+        if (event.controls && [self viewWithTag:101] != nil) {
+            CGRect frame = [self viewWithTag:101].frame;
+            [self showAirPlayButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideAirPlay];
+        } else {
+            [self hideAirPlayButton];
+        }
+    }
+    
+    if (_autoHideChromeCast) {
+        if (event.controls) {
+            if (self.castingButton != nil) {
+                CGRect frame = self.castingButton.frame;
+                [self showCastButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideChromeCast :NO];
+            }
+            
+            if (self.customCastingButton != nil) {
+                CGRect frame = self.customCastingButton.frame;
+                [self showCastButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideChromeCast :YES];
+            }
+        } else {
+            [self hideCastButton];
+        }
     }
 }
 
@@ -783,6 +869,417 @@
     if (!_userPaused) {
         [self.player play];
     }
+}
+
+#pragma mark - RNJWPlayer AirPlay
+
+- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide
+{
+    if ([self viewWithTag:101] == nil) {
+        _autoHideAirPlay = autoHide;
+        
+        UIView *buttonView = nil;
+        CGRect buttonFrame = CGRectMake(x, y, width ? width : 44, height ? height : 44);
+        
+        // It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
+        if (@available(iOS 11.0, *)) {
+            AVRoutePickerView *airplayButton = [[AVRoutePickerView alloc] initWithFrame:buttonFrame];
+            airplayButton.activeTintColor = [UIColor blueColor];
+            airplayButton.tintColor = [UIColor grayColor];
+            buttonView = airplayButton;
+        } else {
+            // If you still support previous iOS versions, you can use MPVolumeView
+            MPVolumeView *airplayButton = [[MPVolumeView alloc] initWithFrame:buttonFrame];
+            airplayButton.showsVolumeSlider = NO;
+            buttonView = airplayButton;
+        }
+
+        [buttonView setTag:101];
+
+        [self addSubview:buttonView];
+    } else {
+        [[self viewWithTag:101] setHidden:NO];
+    }
+}
+
+- (void)hideAirPlayButton
+{
+    if ([self viewWithTag:101] != nil)
+        [[self viewWithTag:101] setHidden:YES];
+}
+
+#pragma mark - RNJWPlayer Chrome Casting
+
+- (void)showCastButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide :(BOOL)customButton
+{
+    [self setUpCastingButton:x :y :width ? width : 24 :height ? height : 24 :autoHide :customButton];
+    [self setUpCastController];
+}
+
+- (void)setUpCastingButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide :(BOOL)customButton
+{
+    if (customButton) {
+        if (self.customCastingButton == nil) {
+            _autoHideChromeCast = autoHide;
+            self.customCastingButton = [[UIButton alloc] initWithFrame:CGRectMake(x, y, width, height)];
+            [self.customCastingButton addTarget:self action:@selector(castButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self prepareCastingButtonAnimation];
+            [self addSubview:self.customCastingButton];
+            [self updateForCastDevicesUnavailable];
+        } else {
+            [self.customCastingButton setHidden:NO];
+        }
+    } else {
+        if (self.castingButton == nil) {
+            _autoHideChromeCast = autoHide;
+            self.castingButton = [[GCKUICastButton alloc] initWithFrame:CGRectMake(x, y, width, height)];
+            self.castingButton.tintColor = [UIColor grayColor];
+            [self addSubview:self.castingButton];
+            [self bringSubviewToFront:self.castingButton];
+        } else {
+            [self.castingButton setHidden:NO];
+        }
+    }
+}
+
+- (void)setUpCastController
+{
+    if (_player && _castController == nil) {
+        _castController = [[JWCastController alloc] initWithPlayer:_player];
+        _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
+        _castController.delegate = _proxy;
+    }
+    
+    [self scanForDevices];
+}
+
+- (void)scanForDevices
+{
+    if (_castController != nil) {
+        [_castController scanForDevices];
+    }
+}
+
+- (void)hideCastButton
+{
+    if (self.castingButton != nil) {
+        [self.castingButton setHidden:YES];
+    }
+    
+    if (self.customCastingButton != nil) {
+        [self.customCastingButton setHidden:YES];
+    }
+}
+
+- (void)prepareCastingButtonAnimation
+{
+    if (self.customCastingButton != nil) {
+        NSArray *connectingImages = @[[[UIImage imageNamed:@"cast_connecting0"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting2"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+        self.customCastingButton.imageView.animationImages = connectingImages;
+        self.customCastingButton.imageView.animationDuration = 2;
+    }
+}
+
+- (void)castButtonTapped
+{
+    __weak RNJWPlayerNativeView *weakSelf = self;
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+//    alertController.popoverPresentationController.barButtonItem = self.castingItem;
+    
+    if (self.castController.connectedDevice == nil) {
+        if (self.castController.availableDevices.count > 0) {
+            alertController.title = @"Connect to";
+            
+            [self.castController.availableDevices enumerateObjectsUsingBlock:^(JWCastingDevice  *_Nonnull device, NSUInteger idx, BOOL * _Nonnull stop) {
+                UIAlertAction *deviceSelected = [UIAlertAction actionWithTitle:device.name
+                                                                         style:UIAlertActionStyleDefault
+                                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                                           [weakSelf.castController connectToDevice:device];
+                                                                           [weakSelf updateWhenConnectingToCastDevice];
+                                                                       }];
+                [alertController addAction:deviceSelected];
+            }];
+        } else {
+            alertController.title = @"No available devices";
+        }
+    } else {
+        alertController.title = self.castController.connectedDevice.name;
+        alertController.message = @"Select an action";
+        
+        UIAlertAction *disconnect = [UIAlertAction actionWithTitle:@"Disconnect"
+                                                             style:UIAlertActionStyleDestructive
+                                                           handler:^(UIAlertAction * _Nonnull action) {
+                                                               [weakSelf.castController disconnect];
+                                                           }];
+        [alertController addAction:disconnect];
+        
+        UIAlertAction *castControl;
+        if (self.isCasting) {
+            castControl = [UIAlertAction actionWithTitle:@"Stop Casting"
+                                                   style:UIAlertActionStyleDefault
+                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                     [weakSelf.castController stopCasting];
+                                                 }];
+        } else {
+            castControl = [UIAlertAction actionWithTitle:@"Cast"
+                                                   style:UIAlertActionStyleDefault
+                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                     [weakSelf.castController cast];
+                                                 }];
+        }
+        [alertController addAction:castControl];
+    }
+    
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel"
+                            style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {}];
+    [alertController addAction:cancel];
+    
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    [rootViewController presentViewController:alertController animated:YES completion:^{}];
+}
+
+#pragma Mark - Casting methods
+
+- (void)presentCastInstructionsViewControllerOnceWithCastButton
+{
+    [GCKCastContext.sharedInstance presentCastInstructionsViewControllerOnceWithCastButton:self.castingButton];
+}
+
+- (void)presentCastDialog
+{
+    [GCKCastContext.sharedInstance presentCastDialog];
+}
+
+- (void)startDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] startDiscovery];
+}
+
+- (void)stopDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] stopDiscovery];
+}
+
+- (BOOL)discoveryActive
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryActive];
+}
+
+- (BOOL)hasDiscoveredDevices
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] hasDiscoveredDevices];
+}
+
+- (GCKDiscoveryState)discoveryState
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryState];
+}
+
+- (void)setPassiveScan:(BOOL)passive
+{
+    [[GCKCastContext.sharedInstance discoveryManager] setPassiveScan:passive];
+}
+
+- (GCKCastState)castState
+{
+    return [GCKCastContext.sharedInstance castState];
+}
+
+- (NSUInteger)deviceCount
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] deviceCount];
+}
+
+- (NSArray <JWCastingDevice *>*)availableDevices
+{
+    return _castController.availableDevices;
+}
+
+- (JWCastingDevice*)connectedDevice
+{
+    return _castController.connectedDevice;
+}
+
+- (void)connectToDevice:(JWCastingDevice*)device
+{
+    return [_castController connectToDevice:device];
+}
+
+- (void)cast
+{
+    return [_castController cast];
+}
+
+- (void)stopCasting
+{
+    return [_castController stopCasting];
+}
+
+#pragma Mark - Casting delegate methods
+
+- (void)onRNJWCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices
+{
+    self.availableDevices = devices;
+    if(devices.count > 0) {
+//        [self.castingButton setEnabled:YES];
+        [self updateForCastDeviceDisconnection];
+    } else if(devices.count == 0) {
+        [self updateForCastDevicesUnavailable];
+    }
+    
+    if (self.onCastingDevicesAvailable) {
+        NSMutableArray *devicesInfo = [[NSMutableArray alloc] init];
+
+        for (JWCastingDevice *device in devices) {
+            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                
+            [dict setObject:device.name forKey:@"name"];
+            [dict setObject:device.identifier forKey:@"identifier"];
+
+            [devicesInfo addObject:dict];
+        }
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:devicesInfo options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onCastingDevicesAvailable(@{@"devices": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
+}
+
+- (void)onRNJWConnectedToCastingDevice:(JWCastingDevice *)device
+{
+    [self updateForCastDeviceConnection];
+    
+    if (self.onConnectedToCastingDevice) {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            
+        [dict setObject:device.name forKey:@"name"];
+        [dict setObject:device.identifier forKey:@"identifier"];
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onConnectedToCastingDevice(@{@"device": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
+}
+
+- (void)onRNJWDisconnectedFromCastingDevice:(NSError *)error
+{
+    [self updateForCastDeviceDisconnection];
+    
+    if (self.onDisconnectedFromCastingDevice) {
+        self.onDisconnectedFromCastingDevice(@{@"error": error});
+    }
+}
+
+- (void)onRNJWConnectionTemporarilySuspended
+{
+    [self updateWhenConnectingToCastDevice];
+    
+    if (self.onConnectionTemporarilySuspended) {
+        self.onConnectionTemporarilySuspended(@{});
+    }
+}
+
+- (void)onRNJWConnectionRecovered
+{
+    [self updateForCastDeviceConnection];
+    
+    if (self.onConnectionRecovered) {
+        self.onConnectionRecovered(@{});
+    }
+}
+
+- (void)onRNJWConnectionFailed:(NSError *)error
+{
+    [self updateForCastDeviceDisconnection];
+    
+    if (self.onConnectionFailed) {
+        self.onConnectionFailed(@{@"error": error});
+    }
+}
+
+- (void)onRNJWCasting
+{
+    [self updateForCasting];
+    
+    if (self.onCasting) {
+        self.onCasting(@{});
+    }
+}
+
+- (void)onRNJWCastingEnded:(NSError *)error
+{
+    [self updateForCastingEnd];
+    
+    if (self.onCastingEnded) {
+        self.onCastingEnded(@{@"error": error});
+    }
+}
+
+- (void)onRNJWCastingFailed:(NSError *)error
+{
+    [self updateForCastingEnd];
+    
+    if (self.onCastingFailed) {
+        self.onCastingFailed(@{@"error": error});
+    }
+}
+
+#pragma Mark - Casting Status Helpers
+
+- (void)updateWhenConnectingToCastDevice
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor whiteColor]];
+        [self.customCastingButton.imageView startAnimating];
+}
+
+- (void)updateForCastDeviceConnection
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_on"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor blueColor]];
+}
+
+- (void)updateForCastDevicesUnavailable
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor grayColor]];
+//    [self.customCastingButton setEnabled:NO];
+}
+
+- (void)updateForCastDeviceDisconnection
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor whiteColor]];
+}
+
+- (void)updateForCasting
+{
+    self.isCasting = YES;
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor greenColor]];
+}
+
+- (void)updateForCastingEnd
+{
+    self.isCasting = NO;
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor blueColor]];
 }
 
 @end
