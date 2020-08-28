@@ -1,6 +1,7 @@
 #import "RNJWPlayerDelegateProxy.h"
 
 @implementation RNJWPlayerDelegateProxy
+
 #pragma mark - RNJWPlayer Delegate
 
 - (void)onReady:(JWEvent<JWReadyEvent> *)event
@@ -101,5 +102,52 @@
 }
 
 // TODO: - add other ad events
+
+#pragma Mark - Casting delegate methods
+
+- (void)onCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices;
+{
+    [self.delegate onRNJWCastingDevicesAvailable:devices];
+}
+
+- (void)onConnectedToCastingDevice:(JWCastingDevice *)device
+{
+    [self.delegate onRNJWConnectedToCastingDevice:device];
+}
+
+- (void)onDisconnectedFromCastingDevice:(NSError *)error
+{
+    [self.delegate onRNJWDisconnectedFromCastingDevice:error];
+}
+
+- (void)onConnectionTemporarilySuspended
+{
+    [self.delegate onRNJWConnectionTemporarilySuspended];
+}
+
+- (void)onConnectionRecovered
+{
+    [self.delegate onRNJWConnectionRecovered];
+}
+
+- (void)onConnectionFailed:(NSError *)error
+{
+    [self.delegate onRNJWConnectionFailed:error];
+}
+
+- (void)onCasting
+{
+    [self.delegate onRNJWCasting];
+}
+
+- (void)onCastingEnded:(NSError *)error
+{
+    [self.delegate onRNJWCastingEnded:error];
+}
+
+- (void)onCastingFailed:(NSError *)error
+{
+    [self.delegate onRNJWCastingFailed:error];
+}
 
 @end

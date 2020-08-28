@@ -122,6 +122,11 @@ export default class JWPlayer extends Component {
     hideAirPlayButton: PropTypes.func,
     showCastButton: PropTypes.func,
     hideCastButton: PropTypes.func,
+    setUpCastController: PropTypes.func,
+    presentCastDialog: PropTypes.func,
+    connectedDevice: PropTypes.func,
+    availableDevices: PropTypes.func,
+    castState: PropTypes.func,
     loadPlaylistItem: PropTypes.func,
     loadPlaylist: PropTypes.func,
     seekTo: PropTypes.func,
@@ -227,9 +232,9 @@ export default class JWPlayer extends Component {
     }
   }
 
-  showAirPlayButton(x, y) {
+  showAirPlayButton(x, y, width = 44, hight = 44, autoHide = true) {
     if (RNJWPlayerManager && Platform.OS === 'ios')
-      RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y);
+      RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
   }
 
   hideAirPlayButton() {
@@ -237,14 +242,71 @@ export default class JWPlayer extends Component {
       RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
   }
 
-  showCastButton(x, y) {
-    if (RNJWPlayerManager)
-      RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y);
+  showCastButton(x, y, width = 24, hight = 24, autoHide = true, customButton = false) {
+    if (RNJWPlayerManager) {
+      if (Platform.OS === 'ios') {
+          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide, customButton);
+      } else {
+          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
+      }
+    }
   }
 
   hideCastButton() {
     if (RNJWPlayerManager)
       RNJWPlayerManager.hideCastButton(this.getRNJWPlayerBridgeHandle());
+  }
+
+  setUpCastController() {
+    if (RNJWPlayerManager)
+      RNJWPlayerManager.setUpCastController(this.getRNJWPlayerBridgeHandle());
+  }
+
+  presentCastDialog() {
+    if (RNJWPlayerManager)
+      RNJWPlayerManager.presentCastDialog(this.getRNJWPlayerBridgeHandle());
+  }
+
+  async connectedDevice() {
+    if (RNJWPlayerManager) {
+      try {
+        var connectedDevice = await RNJWPlayerManager.connectedDevice(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return connectedDevice;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  async availableDevices() {
+    if (RNJWPlayerManager) {
+      try {
+        var availableDevices = await RNJWPlayerManager.availableDevices(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return availableDevices;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  async castState() {
+    if (RNJWPlayerManager) {
+      try {
+        var castState = await RNJWPlayerManager.castState(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return castState;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
   }
 
   async playerState() {

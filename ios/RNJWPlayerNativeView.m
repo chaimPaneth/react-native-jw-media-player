@@ -1,6 +1,5 @@
 #import "RNJWPlayerNativeView.h"
 #import <AVFoundation/AVFoundation.h>
-#import <GoogleCast/GoogleCast.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -782,6 +781,31 @@
     if (_nativeControls && _nativeControlsView) {
         [_nativeControlsView toggleControlsViewVisible:event.controls];
     }
+    
+    if (_autoHideAirPlay) {
+        if (event.controls && [self viewWithTag:101] != nil) {
+            CGRect frame = [self viewWithTag:101].frame;
+            [self showAirPlayButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideAirPlay];
+        } else {
+            [self hideAirPlayButton];
+        }
+    }
+    
+    if (_autoHideChromeCast) {
+        if (event.controls) {
+            if (self.castingButton != nil) {
+                CGRect frame = self.castingButton.frame;
+                [self showCastButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideChromeCast :NO];
+            }
+            
+            if (self.customCastingButton != nil) {
+                CGRect frame = self.customCastingButton.frame;
+                [self showCastButton:frame.origin.x :frame.origin.y :frame.size.width :frame.size.height :_autoHideChromeCast :YES];
+            }
+        } else {
+            [self hideCastButton];
+        }
+    }
 }
 
 -(void)onRNJWPlayerComplete
@@ -849,11 +873,13 @@
 
 #pragma mark - RNJWPlayer AirPlay
 
-- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y
+- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide
 {
     if ([self viewWithTag:101] == nil) {
+        _autoHideAirPlay = autoHide;
+        
         UIView *buttonView = nil;
-        CGRect buttonFrame = CGRectMake(x, y, 44, 44);
+        CGRect buttonFrame = CGRectMake(x, y, width ? width : 44, height ? height : 44);
         
         // It's highly recommended to use the AVRoutePickerView in order to avoid AirPlay issues after iOS 11.
         if (@available(iOS 11.0, *)) {
@@ -884,173 +910,77 @@
 
 #pragma mark - RNJWPlayer Chrome Casting
 
+- (void)showCastButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide :(BOOL)customButton
+{
+    [self setUpCastingButton:x :y :width ? width : 24 :height ? height : 24 :autoHide :customButton];
+    [self setUpCastController];
+}
+
+- (void)setUpCastingButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide :(BOOL)customButton
+{
+    if (customButton) {
+        if (self.customCastingButton == nil) {
+            _autoHideChromeCast = autoHide;
+            self.customCastingButton = [[UIButton alloc] initWithFrame:CGRectMake(x, y, width, height)];
+            [self.customCastingButton addTarget:self action:@selector(castButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self prepareCastingButtonAnimation];
+            [self addSubview:self.customCastingButton];
+            [self updateForCastDevicesUnavailable];
+        } else {
+            [self.customCastingButton setHidden:NO];
+        }
+    } else {
+        if (self.castingButton == nil) {
+            _autoHideChromeCast = autoHide;
+            self.castingButton = [[GCKUICastButton alloc] initWithFrame:CGRectMake(x, y, width, height)];
+            self.castingButton.tintColor = [UIColor grayColor];
+            [self addSubview:self.castingButton];
+            [self bringSubviewToFront:self.castingButton];
+        } else {
+            [self.castingButton setHidden:NO];
+        }
+    }
+}
+
 - (void)setUpCastController
 {
     if (_player && _castController == nil) {
         _castController = [[JWCastController alloc] initWithPlayer:_player];
         _castController.chromeCastReceiverAppID = kGCKDefaultMediaReceiverApplicationID;
-        _castController.delegate = self;
-//        [_castController scanForDevices];
+        _castController.delegate = _proxy;
     }
     
-    [self scanForCastDevices];
+    [self scanForDevices];
 }
 
-- (void)scanForCastDevices
+- (void)scanForDevices
 {
     if (_castController != nil) {
         [_castController scanForDevices];
     }
 }
 
-- (void)showCastButton:(CGFloat)x :(CGFloat)y
-{
-    [self setUpCastController];
-    [self setUpCastingButton:x :y];
-}
-
 - (void)hideCastButton
 {
-    if (self.castingButton != nil)
+    if (self.castingButton != nil) {
         [self.castingButton setHidden:YES];
-}
-
-#pragma Mark - Casting delegate methods
-
-- (void)onCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices;
-{
-    self.availableDevices = devices;
-    if(devices.count > 0) {
-//        [self.castingButton setEnabled:YES];
-        [self updateForCastDeviceDisconnection];
-    } else if(devices.count == 0) {
-        [self updateForCastDevicesUnavailable];
     }
-}
-
-- (void)onConnectedToCastingDevice:(JWCastingDevice *)device
-{
-    [self updateForCastDeviceConnection];
-}
-
-- (void)onDisconnectedFromCastingDevice:(NSError *)error
-{
-    [self updateForCastDeviceDisconnection];
-}
-
-- (void)onConnectionTemporarilySuspended
-{
-    [self updateWhenConnectingToCastDevice];
-}
-
-- (void)onConnectionRecovered
-{
-    [self updateForCastDeviceConnection];
-}
-
-- (void)onConnectionFailed:(NSError *)error
-{
-    if(error) {
-        NSLog(@"Connection Error: %@", error);
-    }
-    [self updateForCastDeviceDisconnection];
-}
-
-- (void)onCasting
-{
-    [self updateForCasting];
-}
-
-- (void)onCastingEnded:(NSError *)error
-{
-    if(error) {
-        NSLog(@"Casting Error: %@", error);
-    }
-    [self updateForCastingEnd];
-}
-
-- (void)onCastingFailed:(NSError *)error
-{
-    if(error) {
-        NSLog(@"Casting Error: %@", error);
-    }
-    [self updateForCastingEnd];
-}
-
-#pragma Mark - Casting Status Helpers
-
-- (void)updateWhenConnectingToCastDevice
-{
-    [self.castingButton setTintColor:[UIColor whiteColor]];
-    [self.castingButton.imageView startAnimating];
-}
-
-- (void)updateForCastDeviceConnection
-{
-    [self.castingButton.imageView stopAnimating];
-    [self.castingButton setImage:[[UIImage imageNamed:@"cast_on"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-                        forState:UIControlStateNormal];
-    [self.castingButton setTintColor:[UIColor blueColor]];
-}
-
-- (void)updateForCastDevicesUnavailable
-{
-    [self.castingButton.imageView stopAnimating];
-    [self.castingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-                        forState:UIControlStateNormal];
-    [self.castingButton setTintColor:[UIColor grayColor]];
-//    [self.castingButton setEnabled:NO];
-}
-
-- (void)updateForCastDeviceDisconnection
-{
-    [self.castingButton.imageView stopAnimating];
-    [self.castingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-                        forState:UIControlStateNormal];
-    [self.castingButton setTintColor:[UIColor whiteColor]];
-}
-
-- (void)updateForCasting
-{
-    self.isCasting = YES;
-    [self.castingButton setTintColor:[UIColor greenColor]];
-}
-
-- (void)updateForCastingEnd
-{
-    self.isCasting = NO;
-    [self.castingButton setTintColor:[UIColor blueColor]];
-}
-
-#pragma Mark - Cast Button
-
-- (void)setUpCastingButton:(CGFloat)x :(CGFloat)y
-{
-    if (self.castingButton == nil) {
-        
-//        self.castingButton = [[GCKUICastButton alloc] initWithFrame:CGRectMake(x, y, 24, 24)];
-//        [self addSubview:self.castingButton];
-//        [self bringSubviewToFront:self.castingButton];
-        
-        CGRect castingButtonFrame = CGRectMake(x, y, 22, 22);
-        self.castingButton = [[UIButton alloc]initWithFrame:castingButtonFrame];
-        [self.castingButton addTarget:self action:@selector(castButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self prepareCastingButtonAnimation];
-        [self addSubview:self.castingButton];
-        [self updateForCastDevicesUnavailable];
-    } else {
-        [self.castingButton setHidden:NO];
+    
+    if (self.customCastingButton != nil) {
+        [self.customCastingButton setHidden:YES];
     }
 }
 
 - (void)prepareCastingButtonAnimation
 {
-    NSArray *connectingImages = @[[[UIImage imageNamed:@"cast_connecting0"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
-                                  [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
-                                  [[UIImage imageNamed:@"cast_connecting2"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
-                                  [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-    self.castingButton.imageView.animationImages = connectingImages;
-    self.castingButton.imageView.animationDuration = 2;
+    if (self.customCastingButton != nil) {
+        NSArray *connectingImages = @[[[UIImage imageNamed:@"cast_connecting0"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting2"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate],
+                                      [[UIImage imageNamed:@"cast_connecting1"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+        self.customCastingButton.imageView.animationImages = connectingImages;
+        self.customCastingButton.imageView.animationDuration = 2;
+    }
 }
 
 - (void)castButtonTapped
@@ -1111,6 +1041,245 @@
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     [rootViewController presentViewController:alertController animated:YES completion:^{}];
+}
+
+#pragma Mark - Casting methods
+
+- (void)presentCastInstructionsViewControllerOnceWithCastButton
+{
+    [GCKCastContext.sharedInstance presentCastInstructionsViewControllerOnceWithCastButton:self.castingButton];
+}
+
+- (void)presentCastDialog
+{
+    [GCKCastContext.sharedInstance presentCastDialog];
+}
+
+- (void)startDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] startDiscovery];
+}
+
+- (void)stopDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] stopDiscovery];
+}
+
+- (BOOL)discoveryActive
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryActive];
+}
+
+- (BOOL)hasDiscoveredDevices
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] hasDiscoveredDevices];
+}
+
+- (GCKDiscoveryState)discoveryState
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryState];
+}
+
+- (void)setPassiveScan:(BOOL)passive
+{
+    [[GCKCastContext.sharedInstance discoveryManager] setPassiveScan:passive];
+}
+
+- (GCKCastState)castState
+{
+    return [GCKCastContext.sharedInstance castState];
+}
+
+- (NSUInteger)deviceCount
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] deviceCount];
+}
+
+- (NSArray <JWCastingDevice *>*)availableDevices
+{
+    return _castController.availableDevices;
+}
+
+- (JWCastingDevice*)connectedDevice
+{
+    return _castController.connectedDevice;
+}
+
+- (void)connectToDevice:(JWCastingDevice*)device
+{
+    return [_castController connectToDevice:device];
+}
+
+- (void)cast
+{
+    return [_castController cast];
+}
+
+- (void)stopCasting
+{
+    return [_castController stopCasting];
+}
+
+#pragma Mark - Casting delegate methods
+
+- (void)onRNJWCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices
+{
+    self.availableDevices = devices;
+    if(devices.count > 0) {
+//        [self.castingButton setEnabled:YES];
+        [self updateForCastDeviceDisconnection];
+    } else if(devices.count == 0) {
+        [self updateForCastDevicesUnavailable];
+    }
+    
+    if (self.onCastingDevicesAvailable) {
+        NSMutableArray *devicesInfo = [[NSMutableArray alloc] init];
+
+        for (JWCastingDevice *device in devices) {
+            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                
+            [dict setObject:device.name forKey:@"name"];
+            [dict setObject:device.identifier forKey:@"identifier"];
+
+            [devicesInfo addObject:dict];
+        }
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:devicesInfo options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onCastingDevicesAvailable(@{@"devices": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
+}
+
+- (void)onRNJWConnectedToCastingDevice:(JWCastingDevice *)device
+{
+    [self updateForCastDeviceConnection];
+    
+    if (self.onConnectedToCastingDevice) {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            
+        [dict setObject:device.name forKey:@"name"];
+        [dict setObject:device.identifier forKey:@"identifier"];
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onConnectedToCastingDevice(@{@"device": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
+}
+
+- (void)onRNJWDisconnectedFromCastingDevice:(NSError *)error
+{
+    [self updateForCastDeviceDisconnection];
+    
+    if (self.onDisconnectedFromCastingDevice) {
+        self.onDisconnectedFromCastingDevice(@{@"error": error});
+    }
+}
+
+- (void)onRNJWConnectionTemporarilySuspended
+{
+    [self updateWhenConnectingToCastDevice];
+    
+    if (self.onConnectionTemporarilySuspended) {
+        self.onConnectionTemporarilySuspended(@{});
+    }
+}
+
+- (void)onRNJWConnectionRecovered
+{
+    [self updateForCastDeviceConnection];
+    
+    if (self.onConnectionRecovered) {
+        self.onConnectionRecovered(@{});
+    }
+}
+
+- (void)onRNJWConnectionFailed:(NSError *)error
+{
+    [self updateForCastDeviceDisconnection];
+    
+    if (self.onConnectionFailed) {
+        self.onConnectionFailed(@{@"error": error});
+    }
+}
+
+- (void)onRNJWCasting
+{
+    [self updateForCasting];
+    
+    if (self.onCasting) {
+        self.onCasting(@{});
+    }
+}
+
+- (void)onRNJWCastingEnded:(NSError *)error
+{
+    [self updateForCastingEnd];
+    
+    if (self.onCastingEnded) {
+        self.onCastingEnded(@{@"error": error});
+    }
+}
+
+- (void)onRNJWCastingFailed:(NSError *)error
+{
+    [self updateForCastingEnd];
+    
+    if (self.onCastingFailed) {
+        self.onCastingFailed(@{@"error": error});
+    }
+}
+
+#pragma Mark - Casting Status Helpers
+
+- (void)updateWhenConnectingToCastDevice
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor whiteColor]];
+        [self.customCastingButton.imageView startAnimating];
+}
+
+- (void)updateForCastDeviceConnection
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_on"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor blueColor]];
+}
+
+- (void)updateForCastDevicesUnavailable
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor grayColor]];
+//    [self.customCastingButton setEnabled:NO];
+}
+
+- (void)updateForCastDeviceDisconnection
+{
+    if (self.customCastingButton != nil)
+        [self.customCastingButton.imageView stopAnimating];
+        [self.customCastingButton setImage:[[UIImage imageNamed:@"cast_off"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                            forState:UIControlStateNormal];
+        [self.customCastingButton setTintColor:[UIColor whiteColor]];
+}
+
+- (void)updateForCasting
+{
+    self.isCasting = YES;
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor greenColor]];
+}
+
+- (void)updateForCastingEnd
+{
+    self.isCasting = NO;
+    if (self.customCastingButton != nil)
+        [self.customCastingButton setTintColor:[UIColor blueColor]];
 }
 
 @end
