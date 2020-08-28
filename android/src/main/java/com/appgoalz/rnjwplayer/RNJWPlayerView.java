@@ -8,12 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -21,15 +24,27 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.mediarouter.app.MediaRouteButton;
+import androidx.mediarouter.app.MediaRouteChooserDialog;
+import androidx.mediarouter.media.MediaRouter;
+
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.Session;
+import com.google.android.gms.cast.framework.SessionManager;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.events.AdPauseEvent;
@@ -67,7 +82,6 @@ import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
@@ -114,7 +128,8 @@ public class RNJWPlayerView extends RelativeLayout implements
 //        AdvertisingEvents.OnAdTimeListener,
 //        AdvertisingEvents.OnAdViewableImpressionListener,
 
-        AudioManager.OnAudioFocusChangeListener {
+        AudioManager.OnAudioFocusChangeListener,
+        LifecycleEventListener {
     public RNJWPlayer mPlayer = null;
     private RNJWPlayer mFullscreenPlayer;
 
@@ -148,6 +163,17 @@ public class RNJWPlayerView extends RelativeLayout implements
     ReadableMap playlistItem; // PlaylistItem
     ReadableArray playlist; // List <PlaylistItem>
     Number currentPlayingIndex;
+
+    private CastContext mCastContext;
+    private CastSession mCastSession;
+    private SessionManager mSessionManager;
+    private final SessionManagerListener mSessionManagerListener =
+            new SessionManagerListenerImpl();
+    private MediaRouteButton mMediaRouteButton;
+    private boolean mAutoHide;
+
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
 
     private static final String TAG = "RNJWPlayerView";
 
@@ -223,7 +249,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
         // supporting component replacement by other applications).
-        mActivity.bindService(new Intent(RNJWPlayerView.mActivity,
+        getAppContext().bindService(new Intent(RNJWPlayerView.mActivity,
                         MediaPlaybackService.class),
                 mServiceConnection,
                 Context.BIND_AUTO_CREATE);
@@ -233,7 +259,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     private void doUnbindService() {
         if (mIsBound) {
             // Detach our existing connection.
-            mActivity.unbindService(mServiceConnection);
+            getAppContext().unbindService(mServiceConnection);
             mIsBound = false;
         }
     }
@@ -275,6 +301,29 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
 
         mRootView = mActivity.findViewById(android.R.id.content);
+
+        getReactContext().addLifecycleEventListener(this);
+    }
+
+    private boolean doesPackageExist(String targetPackage) {
+        try {
+            getActivity().getPackageManager().getPackageInfo(targetPackage, PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    // Without the Google API's Chromecast won't work
+    private boolean isGoogleApiAvailable(Context context) {
+        boolean isOldPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD);
+        boolean isNewPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW);
+
+        boolean isPlaystoreInstalled = isNewPlayStoreInstalled||isOldPlayStoreInstalled;
+
+        boolean isGoogleApiAvailable = GoogleApiAvailability.getInstance()
+                .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
+        return isPlaystoreInstalled && isGoogleApiAvailable;
     }
 
     public ReactApplicationContext getAppContext() {
@@ -322,6 +371,8 @@ public class RNJWPlayerView extends RelativeLayout implements
 
             mPlayer.onDestroy();
             mPlayer = null;
+
+            getReactContext().removeLifecycleEventListener(this);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (audioManager != null && focusRequest != null) {
@@ -717,6 +768,97 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
+    float dipToPix(float dip) {
+        Resources r = getResources();
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                r.getDisplayMetrics()
+        );
+    }
+
+    void showCastButton(float x, float y, Number width, Number height, boolean autoHide) {
+        if (isGoogleApiAvailable(getContext())) {
+            if (mMediaRouteButton == null) {
+                mAutoHide = autoHide;
+
+                mMediaRouteButton = new MediaRouteButton(getReactContext());
+                CastButtonFactory.setUpMediaRouteButton(getReactContext(), mMediaRouteButton);
+
+                mMediaRouteButton.setX(dipToPix(x));
+                mMediaRouteButton.setY(dipToPix(y));
+
+                if (width != null) {
+                    mMediaRouteButton.setMinimumWidth(width.intValue());
+                }
+
+                if (height != null) {
+                    mMediaRouteButton.setMinimumHeight(height.intValue());
+                }
+
+                addView(mMediaRouteButton);
+                bringChildToFront(mMediaRouteButton);
+            } else {
+                mMediaRouteButton.setVisibility(VISIBLE);
+            }
+
+            setUpCastController();
+        }
+    }
+
+    void hideCastButton() {
+        if (mMediaRouteButton != null)  mMediaRouteButton.setVisibility(GONE);
+    }
+
+    void presentCastDialog() {
+        MediaRouteChooserDialog dialog = new MediaRouteChooserDialog(getReactContext());
+        dialog.show();
+    }
+
+    void setUpCastController() {
+        if (mCastContext == null) {
+            mCastContext = CastContext.getSharedInstance(getReactContext());
+            mSessionManager = mCastContext.getSessionManager();
+        }
+    }
+
+    int castState() {
+        if (mCastContext != null) {
+            return mCastContext.getCastState();
+        }
+
+        return -1;
+    }
+
+    CastDevice connectedDevice() {
+        if (mCastContext != null) {
+            return mCastContext.getSessionManager().getCurrentCastSession().getCastDevice();
+        }
+
+        return null;
+    }
+
+    List<CastDevice> availableDevice() {
+        if (mCastContext != null) {
+            MediaRouter router =
+                    MediaRouter.getInstance(getReactContext());
+            List<MediaRouter.RouteInfo> routes = router.getRoutes();
+
+            List<CastDevice> devices = new ArrayList<>();
+
+            for (MediaRouter.RouteInfo routeInfo : routes) {
+                CastDevice device = CastDevice.getFromBundle(routeInfo.getExtras());
+                if (device != null) {
+                    devices.add(device);
+                }
+            }
+
+            return devices;
+        }
+
+        return null;
+    }
+
     // Styling
 
     public void setCustomStyle(String name) {
@@ -1016,7 +1158,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             eventExitFullscreen.putString("message", "onFullscreenExit");
             getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
                     getId(),
-                    "topFullScreen",
+                    "topFullScreenExit",
                     eventExitFullscreen);
         }
     }
@@ -1066,6 +1208,14 @@ public class RNJWPlayerView extends RelativeLayout implements
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topControlBarVisible", event);
 
         updateWakeLock(true);
+
+        if (mAutoHide && mMediaRouteButton != null) {
+            if (controlBarVisibilityEvent.isVisible()) {
+                hideCastButton();
+            } else {
+                showCastButton(mMediaRouteButton.getX(), mMediaRouteButton.getY(), mMediaRouteButton.getWidth(), mMediaRouteButton.getHeight(), mAutoHide);
+            }
+        }
     }
 
     @Override
@@ -1178,4 +1328,72 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     }
     */
+
+    private class SessionManagerListenerImpl implements SessionManagerListener {
+        @Override
+        public void onSessionStarting(Session session) {
+
+        }
+
+        @Override
+        public void onSessionStarted(Session session, String s) {
+
+        }
+
+        @Override
+        public void onSessionStartFailed(Session session, int i) {
+
+        }
+
+        @Override
+        public void onSessionEnding(Session session) {
+
+        }
+
+        @Override
+        public void onSessionEnded(Session session, int i) {
+
+        }
+
+        @Override
+        public void onSessionResuming(Session session, String s) {
+
+        }
+
+        @Override
+        public void onSessionResumed(Session session, boolean b) {
+
+        }
+
+        @Override
+        public void onSessionResumeFailed(Session session, int i) {
+
+        }
+
+        @Override
+        public void onSessionSuspended(Session session, int i) {
+
+        }
+    }
+
+    // LifecycleEvents
+
+    @Override
+    public void onHostResume() {
+        mCastSession = mSessionManager.getCurrentCastSession();
+        mSessionManager.addSessionManagerListener(mSessionManagerListener);
+    }
+
+    @Override
+    public void onHostPause() {
+        mSessionManager.removeSessionManagerListener(mSessionManagerListener);
+        mCastSession = null;
+    }
+
+    @Override
+    public void onHostDestroy() {
+
+    }
 }
+
+

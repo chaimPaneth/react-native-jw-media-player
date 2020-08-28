@@ -6,6 +6,8 @@
 
 #import <JWPlayer_iOS_SDK/JWPlayerController.h>
 #import <UIKit/UIKit.h>
+#import <GoogleCast/GoogleCast.h>
+#import "RNJWPlayerControls.h"
 #import "RNJWPlayerDelegateProxy.h"
 
 @class RNJWPlayerDelegateProxy;
@@ -14,6 +16,14 @@
 
 @property(nonatomic, strong)JWPlayerController *player;
 @property(nonatomic, strong)RNJWPlayerDelegateProxy *proxy;
+
+@property(nonatomic, strong)JWCastController *castController;
+@property(nonatomic)BOOL isCasting;
+@property(nonatomic, strong)NSArray<JWCastingDevice *> *availableDevices;
+@property (nonatomic) GCKUICastButton *castingButton;
+@property (nonatomic) UIButton *customCastingButton;
+@property(nonatomic)BOOL autoHideAirPlay;
+@property(nonatomic)BOOL autoHideChromeCast;
 
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
@@ -31,10 +41,14 @@
 @property(nonatomic)BOOL nativeFullScreen;
 @property(nonatomic)BOOL fullScreenOnLandscape;
 @property(nonatomic)BOOL landscapeOnFullScreen;
+@property(nonatomic)BOOL portraitOnExitFullScreen;
+@property(nonatomic)BOOL exitFullScreenOnPortrait;
 @property(nonatomic)CGRect initFrame;
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 @property(nonatomic, strong)NSString *adVmap;
+@property(nonatomic, strong)RNJWPlayerControls *nativeControlsView;
+@property(nonatomic)BOOL nativeControls;
 
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
@@ -59,6 +73,16 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onAdPlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onAdPause;
 
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingDevicesAvailable;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectedToCastingDevice;
+@property(nonatomic, copy)RCTBubblingEventBlock onDisconnectedFromCastingDevice;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionTemporarilySuspended;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionRecovered;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionFailed;
+@property(nonatomic, copy)RCTBubblingEventBlock onCasting;
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingEnded;
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingFailed;
+
 -(void)onRNJWReady;
 -(void)onRNJWPlaylist;
 -(void)onRNJWPlayerBeforePlay;
@@ -72,8 +96,6 @@
 -(void)onRNJWPlayerTime:(JWEvent<JWTimeEvent> *)event;
 -(void)onRNJWFullScreen:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWFullScreenRequested:(JWEvent<JWFullscreenEvent> *)event;
--(void)onRNJWFullScreenExit:(JWEvent<JWFullscreenEvent> *)event;
--(void)onRNJWFullScreenExitRequested:(JWEvent<JWFullscreenEvent> *)event;
 -(void)onRNJWPlayerSeek:(JWEvent<JWSeekEvent> *)event;
 -(void)onRNJWPlayerSeeked;
 -(void)onRNJWControlBarVisible:(JWEvent<JWControlsEvent> *)event;
@@ -88,5 +110,24 @@
 -(void)reset;
 -(void)setPlaylistItem:(NSDictionary *)playlistItem;
 -(void)setPlaylist:(NSArray *)playlist;
+- (void)showCastButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide :(BOOL)customButton;
+-(void)hideCastButton;
+- (void)setUpCastController;
+- (void)presentCastDialog;
+- (GCKCastState)castState;
+- (JWCastingDevice*)connectedDevice;
+- (NSArray <JWCastingDevice *>*)availableDevices;
+- (void)showAirPlayButton:(CGFloat)x :(CGFloat)y :(CGFloat)width :(CGFloat)height :(BOOL)autoHide;
+-(void)hideAirPlayButton;
+
+- (void)onRNJWCastingDevicesAvailable:(NSArray <JWCastingDevice *> *)devices;
+- (void)onRNJWConnectedToCastingDevice:(JWCastingDevice *)device;
+- (void)onRNJWDisconnectedFromCastingDevice:(NSError *)error;
+- (void)onRNJWConnectionTemporarilySuspended;
+- (void)onRNJWConnectionRecovered;
+- (void)onRNJWConnectionFailed:(NSError *)error;
+- (void)onRNJWCasting;
+- (void)onRNJWCastingEnded:(NSError *)error;
+- (void)onRNJWCastingFailed:(NSError *)error;
 
 @end

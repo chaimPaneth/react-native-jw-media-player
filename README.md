@@ -236,22 +236,22 @@ For running example project:
 5. Add your iOS api key for JWPlayer into `Info.plist`
 
 ##### PlaylistItem
-| Prop                         | Description                                                                                                                                                                                    | Type                            |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| **`mediaId`**                | The JW media id.                                                                                                                                                                               | `Int`                           |
-| **`time`**                   | should the player seek to a certain second.                                                                                                                                                    | `Int`                           |
-| **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                       | `String`                        |
-| **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                         | `{tag: String, offset: String}` |
-| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                      | `String`                        |
-| **`desc`**                   | Description of the track.                                                                                                                                                                      | `String`                        |
-| **`file`**                   | The url of the file to play.                                                                                                                                                                   | `String`                        |
-| **`image`**                  | The url of the player thumbnail.                                                                                                                                                               | `String`                        |
-| **`title`**                  | The title of the track.                                                                                                                                                                        | `String`                        |
-| **`autostart`**              | Should the track auto start.                                                                                                                                                                   | `Boolean`                       |
-| **`controls`**               | Should the control buttons show.                                                                                                                                                               | `Boolean`                       |
-| **`displayDescription`**     | Should the player show the description.                                                                                                                                                        | `Boolean`                       |
-| **`displayTitle`**           | Should the player show the title.                                                                                                                                                              | `Boolean`                       |
-| **`repeat`**                 | Should the track repeat.                                                                                                                                                                       | `Boolean`                       |
+| Prop                         | Description                                                                                                                                                                                      | Type                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+| **`mediaId`**                | The JW media id.                                                                                                                                                                                 | `Int`                           |
+| **`time`**                   | should the player seek to a certain second.                                                                                                                                                      | `Int`                           |
+| **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                         | `String`                        |
+| **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                           | `{tag: String, offset: String}` |
+| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                        | `String`                        |
+| **`desc`**                   | Description of the track.                                                                                                                                                                        | `String`                        |
+| **`file`**                   | The url of the file to play.                                                                                                                                                                     | `String`                        |
+| **`image`**                  | The url of the player thumbnail.                                                                                                                                                                 | `String`                        |
+| **`title`**                  | The title of the track.                                                                                                                                                                          | `String`                        |
+| **`autostart`**              | Should the track auto start.                                                                                                                                                                     | `Boolean`                       |
+| **`controls`**               | Should the control buttons show.                                                                                                                                                                 | `Boolean`                       |
+| **`displayDescription`**     | Should the player show the description.                                                                                                                                                          | `Boolean`                       |
+| **`displayTitle`**           | Should the player show the title.                                                                                                                                                                | `Boolean`                       |
+| **`repeat`**                 | Should the track repeat.                                                                                                                                                                         | `Boolean`                       |
 | **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
 
 ##### JWPlayerAdClients
@@ -306,8 +306,8 @@ For running example project:
 | **`nativeFullScreen`**         | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
 | **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                  | `Boolean`                                           |
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
-| **`portraitOnExitFullScreen`** | `Available on Android.` When this is true the player will go into portrait orientation when exiting full screen                                                        | `Boolean`                                           |
-| **`exitFullScreenOnPortrait`** | `Available on Android.` When this is true the player will exit full screen when the phone goes into portrait                                                           | `Boolean`                                           |
+| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                                                | `Boolean`                                           |
+| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                                                   | `Boolean`                                           |
 
 ## Available methods
 
@@ -388,4 +388,55 @@ Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embeddi
 
 For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.
 
-#### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
+### Casting
+
+###### iOS
+
+Edit your `Info.plist` with the following values:
+
+```
+'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
+'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
+'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
+'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.'
+```
+
+Enable *Access WiFi Information* capability under `Signing & Capabilities`
+
+#### Available methods
+
+| Func                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Argument                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **`showAirPlayButton`** | Show an AirPlay button in the player. The autoHide variable will auto manage visibility to when the player controls are visible or not. *(Available on iOS)*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `{x: Double, y: Double, width: Double, height: Double, autoHide: Boolean}`                        |
+| **`hideAirPlayButton`** | Hides the AirPlay button in the player. *(Available on iOS)*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `none`                                                                                            |
+| **`showCastButton`**    | This will enable the casting controller and show a cast button. You will need to follow the additional instruction to enable [Chrome Casting](#Casting). Check out the docs [iOS](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting), [Android](https://developer.jwplayer.com/jwplayer/docs/android-enable-casting-to-chromecast-devices) for additional info. **Note** When not using a custom cast button we make use of the default cast button provided by the Cast SDK and on iOS it will be invisible if there are no available casting devices. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `{x: Double, y: Double, width: Double, height: Double, autoHide: Boolean, customButton: Boolean}` |
+| **`hideCastButton`**    | Hides the cast button in the player.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `none`                                                                                            |
+| **`castState`**    | Gets the cast state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `int` check out [GCKCastState](#GCKCastState)                                                                                            |
+
+##### GCKCastState
+```
+typedef NS_ENUM(NSUInteger, GCKCastState) {
+  /** No Cast session is established, and no Cast devices are available. */
+  GCKCastStateNoDevicesAvailable = 0,
+  /** No Cast session is establishd, and Cast devices are available. */
+  GCKCastStateNotConnected = 1,
+  /** A Cast session is being established. */
+  GCKCastStateConnecting = 2,
+  /** A Cast session is established. */
+  GCKCastStateConnected = 3,
+};
+```
+
+#### Available callbacks
+
+| Func                                   | Description                                           | Argument                                          |
+| -------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| **`onCastingDevicesAvailable`**        | Casting were devices discovered and became available. | `{devices: [{name: string, identifier: string}}]` |
+| **`onConnectedToCastingDevice`**       | Connected to cast device.                             | `{device: {name: string, identifier: string}}`    |
+| **`onDisconnectedFromCastingDevice`**  | Disconnected from cast device.                        | `{error: Error}`                                  |
+| **`onConnectionTemporarilySuspended`** | Disconnected temporarily from cast device.            | `none`                                            |
+| **`onConnectionRecovered`**            | Connection to cast device recovered                   | `none`                                            |
+| **`onCasting`**                        | Started casting                                       | `none`                                            |
+| **`onConnectionFailed`**               | Connection to cast device failed.                     | `{error: Error}`                                  |
+| **`onCastingEnded`**                   | Casting ended.                                        | `{error: Error}`                                  |
+| **`onCastingFailed`**                  | Casting failed.                                       | `{error: Error}`                                  |

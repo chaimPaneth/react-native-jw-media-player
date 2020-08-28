@@ -2,6 +2,7 @@
 package com.appgoalz.rnjwplayer;
 
 import androidx.annotation.Nullable;
+import androidx.mediarouter.app.MediaRouteButton;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -10,6 +11,8 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -136,7 +139,7 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   @ReactProp(name = "colors")
   public void setColors(RNJWPlayerView view, ReadableMap prop) {
-    if (prop != null) {
+    if (prop != null && view.mPlayer != null) {
       if (prop.hasKey("icons")) {
         view.mPlayer.getConfig().getSkinConfig().setControlBarIcons("#" + prop.getString("icons"));
       }

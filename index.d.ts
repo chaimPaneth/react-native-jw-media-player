@@ -2,6 +2,10 @@ declare module "react-native-jw-media-player" {
   import React from "react";
   import { ViewStyle } from "react-native";
 
+  interface CastingDevice {
+    name?: string;
+    identifier?: string;
+  }
   interface PlaylistItem {
     mediaId?: number;
     startTime?: number;
@@ -71,6 +75,15 @@ declare module "react-native-jw-media-player" {
     position(): Promise<number>;
     toggleSpeed(): void;
     setPlaylistIndex(index: number): void;
+    showAirPlayButton(x: number, y: number, width: number, height: number, autoHide: boolean): void;
+    hideAirPlayButton(): void;
+    showCastButton(x: number, y: number, width: number, height: number, autoHide: boolean, customButton?: boolean): void;
+    hideCastButton(): void;
+    setUpCastController(): void;
+    presentCastDialog(): void;
+    connectedDevice(): Promise<CastingDevice | null>;
+    availableDevices(): Promise<CastingDevice[] | null>;
+    castState(): Promise<number | null>;
     setControls(shouldDisplayControl: boolean): void;
     setFullscreen(shouldDisplayInFullScreen: boolean): void;
     loadPlaylist(playlist: PlaylistItem[]): void;
