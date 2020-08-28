@@ -3,16 +3,20 @@ package com.appgoalz.rnjwplayer;
 
 import android.media.AudioManager;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.google.android.gms.cast.CastDevice;
 import com.longtailvideo.jwplayer.core.PlayerState;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
@@ -274,7 +278,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void showCastButton(final int reactTag, final int x, final int y) {
+  public void setVolume(final int reactTag, final int volume) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -282,7 +286,30 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            playerView.showCastButton(x, y);
+            int maxValue = playerView.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            if (volume <= maxValue) {
+              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+            } else {
+              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxValue, 0);
+            }
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void showCastButton(final int reactTag, final float x, final float y, final float width, final float height, final boolean autoHide) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.showCastButton(x, y, width, height, autoHide);
           }
         }
       });
@@ -310,7 +337,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void setVolume(final int reactTag, final int volume) {
+  public void setUpCastController(final int reactTag) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -318,12 +345,112 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            int maxValue = playerView.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            if (volume <= maxValue) {
-              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+            playerView.setUpCastController();
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void presentCastDialog(final int reactTag) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.presentCastDialog();
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void connectedDevice(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            if (playerView.connectedDevice() != null) {
+              String name = playerView.connectedDevice().getFriendlyName();
+              String id = playerView.connectedDevice().getDeviceId();
+
+              WritableMap map = Arguments.createMap();
+              map.putString("name", name);
+              map.putString("identifier", id);
+              promise.resolve(map);
             } else {
-              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxValue, 0);
+              promise.reject("RNJW Casting Error", "No connected device.");
             }
+          } else {
+            promise.reject("RNJW Error", "Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void availableDevices(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            if (playerView.availableDevice() != null) {
+              WritableArray deviceArray = Arguments.createArray();
+
+              for (CastDevice device : playerView.availableDevice()) {
+                String name = device.getFriendlyName();
+                String id = device.getDeviceId();
+
+                WritableMap map = Arguments.createMap();
+                map.putString("name", name);
+                map.putString("identifier", id);
+
+                deviceArray.pushMap(map);
+              }
+
+              promise.resolve(deviceArray);
+            } else {
+              promise.reject("RNJW Casting Error", "No connected device.");
+            }
+          } else {
+            promise.reject("RNJW Error", "Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void castState(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            promise.resolve(playerView.castState());
+          } else {
+            promise.reject("RNJW Error", "Player is null");
           }
         }
       });

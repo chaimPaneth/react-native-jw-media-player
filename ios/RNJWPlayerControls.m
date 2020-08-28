@@ -30,7 +30,6 @@ NSString * const DefaultTimeString = @"00:00";
     _indicatorView.color = [UIColor whiteColor];
     [_player.view addSubview: _indicatorView];
     [_player.view bringSubviewToFront: _indicatorView];
-    [self constraintToCenter:_indicatorView toView:_player.view];
     
     _playbackButton = [[UIButton alloc] init];
     [_playbackButton setTintColor:UIColor.whiteColor];
@@ -63,15 +62,19 @@ NSString * const DefaultTimeString = @"00:00";
     [_playbackButton addTarget:self action:@selector(playbackButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [_rewindButton addTarget:self action:@selector(rewindButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [_forwardButton addTarget:self action:@selector(forwardButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [_fullscreenButton addTarget:self action:@selector(fullscreenButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [_audioButton addTarget:self action:@selector(toggleMuteButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [_timeSlider addTarget:self action:@selector(timeSliderValueChanged:) forControlEvents:UIControlEventValueChanged];
     
     _timeElapsedLabel = [[UILabel alloc] init];
     [_timeElapsedLabel setTextColor:UIColor.whiteColor];
-    [_timeElapsedLabel setFont:[UIFont systemFontOfSize:14]];
+    [_timeElapsedLabel setFont:[UIFont systemFontOfSize:12]];
     [self addSubview:_timeElapsedLabel];
     
     _timeRemainingLabel = [[UILabel alloc] init];
     [_timeRemainingLabel setTextColor:UIColor.whiteColor];
-    [_timeRemainingLabel setFont:[UIFont systemFontOfSize:14]];
+    [_timeRemainingLabel setFont:[UIFont systemFontOfSize:12]];
+    [_timeRemainingLabel setTextAlignment:NSTextAlignmentRight];
     [self addSubview:_timeRemainingLabel];
     
     _timeSlider = [[UISlider alloc] init];
@@ -252,22 +255,22 @@ NSString * const DefaultTimeString = @"00:00";
 - (void)onFullScreen:(JWEvent<JWFullscreenEvent> *)event
 {
     if (_player != nil) {
-        if (event.fullscreen) {
-            UIView *fullscreenView = _player.view;//UIApplication.sharedApplication.keyWindow;
-            [self removeFromSuperview];
-            [fullscreenView addSubview: self];
-            [self constraintToFlexibleBottom:self toView:fullscreenView];
-            [_indicatorView removeFromSuperview];
-            [fullscreenView addSubview:_indicatorView];
-            [self constraintToCenter:_indicatorView toView:fullscreenView];
-        } else {
-            [self removeFromSuperview];
-            [_player.view addSubview:self];
-            [self constraintToFlexibleBottom:self toView:_player.view];
-            [_indicatorView removeFromSuperview];
-            [_player.view addSubview:_indicatorView];
-            [self constraintToCenter:_indicatorView toView:_player.view];
-        }
+//        if (event.fullscreen) {
+//            UIView *fullscreenView = _player.view;//UIApplication.sharedApplication.keyWindow;
+//            [self removeFromSuperview];
+//            [fullscreenView addSubview: self];
+//            [self constraintToFlexibleBottom:self toView:fullscreenView];
+//            [_indicatorView removeFromSuperview];
+//            [fullscreenView addSubview:_indicatorView];
+//            [self constraintToCenter:_indicatorView toView:fullscreenView];
+//        } else {
+//            [self removeFromSuperview];
+//            [_player.view addSubview:self];
+//            [self constraintToFlexibleBottom:self toView:_player.view];
+//            [_indicatorView removeFromSuperview];
+//            [_player.view addSubview:_indicatorView];
+//            [self constraintToCenter:_indicatorView toView:_player.view];
+//        }
     }
 }
 
@@ -281,8 +284,8 @@ NSString * const DefaultTimeString = @"00:00";
 
 - (void)constraintToFlexibleBottom:(UIView*)view toView:(UIView*)toView
 {
-    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-    [rootViewController view].translatesAutoresizingMaskIntoConstraints = false;
+    view.translatesAutoresizingMaskIntoConstraints = false;
+    toView.translatesAutoresizingMaskIntoConstraints = false;
     
     NSArray<NSLayoutConstraint *> *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[thisView]|" options:0 metrics:nil views:@{@"thisView": view}];
     
@@ -294,15 +297,8 @@ NSString * const DefaultTimeString = @"00:00";
 
 - (void)constraintToCenter:(UIView*)view toView:(UIView*)toView
 {
-    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-    [rootViewController view].translatesAutoresizingMaskIntoConstraints = false;
-    
-    NSArray<NSLayoutConstraint *> *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[thisView]|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:@{@"thisView": view}];
-    
-    NSArray<NSLayoutConstraint *> *verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[thisView]|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:@{@"thisView": view}];
-    
-    [toView addConstraints:horizontalConstraints];
-    [toView addConstraints:verticalConstraints];
+    [toView addConstraint:[NSLayoutConstraint constraintWithItem:toView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
+    [toView addConstraint:[NSLayoutConstraint constraintWithItem:toView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0]];
 }
 
 - (void)layoutSubviews
@@ -324,19 +320,22 @@ NSString * const DefaultTimeString = @"00:00";
     CGRect fullscreenButtonFrame = CGRectMake(self.frame.size.width - 46, self.frame.size.height / 2, 30, 30);
     _fullscreenButton.frame = fullscreenButtonFrame;
     
-    CGRect timeElapsedLabelFrame = CGRectMake(16, 31, 60, 30);
+    CGRect timeElapsedLabelFrame = CGRectMake(16, 18, 60, 30);
     _timeElapsedLabel.frame = timeElapsedLabelFrame;
     
-    CGRect timeRemainingLabelFrame = CGRectMake(self.frame.size.width - 61, 31, 60, 30);
+    CGRect timeRemainingLabelFrame = CGRectMake(self.frame.size.width - 76, 18, 60, 30);
     _timeRemainingLabel.frame = timeRemainingLabelFrame;
     
-    CGRect timeSliderLabelFrame = CGRectMake(16, 16, self.frame.size.width - 32, 5);
+    CGRect timeSliderLabelFrame = CGRectMake(16, 10, self.frame.size.width - 32, 5);
     _timeSlider.frame = timeSliderLabelFrame;
     [_timeSlider setThumbImage:[self makeRoundedImage:[self imageFromColor:UIColor.whiteColor] radius:4] forState:UIControlStateNormal];
     
+    CGPoint center = _player.view.center;
+    _indicatorView.center = center;
+    
     self.layer.cornerRadius = 15;
-    self.backgroundColor = [UIColor colorWithRed:255/255 green:255/255 blue:255/255 alpha:0.3];
-    self.frame = CGRectMake(10, _player.view.frame.size.height - 126, _player.view.frame.size.width - 20, 116);
+    self.backgroundColor = [UIColor colorWithRed:255/255 green:255/255 blue:255/255 alpha:0.2];
+    self.frame = CGRectMake(10, _player.view.frame.size.height - 100, _player.view.frame.size.width - 20, 90);
 }
 
 - (UIImage *)imageFromColor:(UIColor *)color {
