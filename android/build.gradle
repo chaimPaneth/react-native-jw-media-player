@@ -50,5 +50,6 @@ dependencies {
     implementation 'com.longtailvideo.jwplayer:jwplayer-ima:+'
     implementation 'com.longtailvideo.jwplayer:jwplayer-chromecast:+'
     implementation 'androidx.mediarouter:mediarouter:1.1.0'
+    implementation 'androidx.media:media:1.1.0'
 }
 
