@@ -1410,11 +1410,8 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onHostResume() {
-        if (mCastSession != null) {
-            mCastSession = mSessionManager.getCurrentCastSession();
-        }
-
         if (mSessionManager != null) {
+            mCastSession = mSessionManager.getCurrentCastSession();
             mSessionManager.addSessionManagerListener(mSessionManagerListener);
         }
 

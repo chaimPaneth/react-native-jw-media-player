@@ -57,6 +57,7 @@ public class MediaPlaybackService extends Service {
 		return false;
 	}
 
+
 	public void setupMediaSession(MediaSessionManager mediaSessionManager,
 								  NotificationWrapper notificationWrapper) {
 
