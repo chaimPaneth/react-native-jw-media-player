@@ -399,6 +399,7 @@ Edit your `Info.plist` with the following values:
 'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
 'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
 'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.'
+'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
 ```
 
 Enable *Access WiFi Information* capability under `Signing & Capabilities`
