@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
     'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
     'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
     'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.'
+    'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
   }
   
 end

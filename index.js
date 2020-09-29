@@ -342,6 +342,7 @@ export default class JWPlayer extends Component {
       nextUpDisplay,
       playlistItem,
       playlist,
+      style,
     } = nextProps;
 
     if (
@@ -355,7 +356,8 @@ export default class JWPlayer extends Component {
       repeat !== this.props.repeat ||
       displayTitle !== this.props.displayTitle ||
       displayDesc !== this.props.displayDesc ||
-      nextUpDisplay !== this.props.nextUpDisplay
+      nextUpDisplay !== this.props.nextUpDisplay ||
+      style !== this.props.style
     ) {
       return true;
     }
@@ -371,6 +373,10 @@ export default class JWPlayer extends Component {
     if (playlistItem) {
       if (this.props.playlistItem) {
         if (playlistItem.mediaId !== this.props.playlistItem.mediaId) {
+          return true;
+        }
+
+        if (playlistItem.controls !== this.props.playlistItem.controls) {
           return true;
         }
       } else {

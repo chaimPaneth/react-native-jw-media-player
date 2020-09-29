@@ -406,7 +406,7 @@
     
     NSString *newFile = [item objectForKey:@"file"];
     
-    NSURL* url = [NSURL URLWithString:newFile];
+    NSURL* url = [NSURL URLWithString: newFile];
     if (url && url.scheme && url.host) {
         playListItem.file = newFile;
     } else {
