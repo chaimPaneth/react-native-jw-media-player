@@ -438,6 +438,23 @@
     if ((startTime != nil) && (startTime != (id)[NSNull null])) {
         playListItem.startTime = [startTime floatValue];
     }
+
+    NSMutableArray <JWTrack *> *tracksArray = [[NSMutableArray alloc] init];
+    id tracksItem = item[@"tracks"];
+    if(tracksItem != nil) {
+        NSArray* tracksItemArray = (NSArray*)tracksItem;
+        if(tracksItemArray.count > 0) {
+            for (id item in tracksItemArray) {
+                NSString *file = [item objectForKey:@"file"];
+                NSString *label = [item objectForKey:@"label"];
+                JWTrack *trackItem = [JWTrack trackWithFile:file label:label];
+                [tracksArray addObject:trackItem];
+            }
+        }
+    }
+    if (tracksArray.count > 0) {
+        playListItem.tracks = tracksArray;
+    }
     
     NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
     id ads = item[@"adSchedule"];
