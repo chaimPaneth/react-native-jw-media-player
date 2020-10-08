@@ -84,6 +84,8 @@ import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
 import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import com.longtailvideo.jwplayer.media.captions.Caption;
+import com.longtailvideo.jwplayer.media.captions.CaptionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -618,6 +620,23 @@ public class RNJWPlayerView extends RelativeLayout implements
             startTime = playlistItem.getDouble("startTime");
         }
 
+        ArrayList<Caption> tracks = new ArrayList<>();
+
+        if (playlistItem.hasKey("tracks")) {
+            ReadableArray track = playlistItem.getArray("tracks");
+            if (track != null) {
+                for (int i = 0; i < track.size(); i++) {
+                    ReadableMap trackProp = track.getMap(i);
+                    if (trackProp != null && trackProp.hasKey("file")) {
+                        String file = trackProp.getString("file");
+                        String label = trackProp.getString("label");
+                        Caption caption = new Caption(file, CaptionType.CAPTIONS, label, false);
+                        tracks.add(caption);
+                    }
+                }
+            }
+        }
+
         ArrayList<AdBreak> adSchedule = new ArrayList<>();
 
         if (playlistItem.hasKey("adSchedule")) {
@@ -640,6 +659,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .image(image)
                 .mediaId(mediaId)
                 .adSchedule(adSchedule)
+                .track(tracks)
                 .build();
 
         if (startTime != null) {
