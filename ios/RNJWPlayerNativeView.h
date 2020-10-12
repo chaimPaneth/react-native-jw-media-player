@@ -24,6 +24,7 @@
 @property (nonatomic) UIButton *customCastingButton;
 @property(nonatomic)BOOL autoHideAirPlay;
 @property(nonatomic)BOOL autoHideChromeCast;
+@property(nonatomic, strong) NSArray<JWTrack *> *tracks;
 
 @property(nonatomic, strong)NSString *file;
 @property(nonatomic)BOOL autostart;
