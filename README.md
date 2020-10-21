@@ -168,7 +168,17 @@ const playlistItem = {
   controls: true,
   repeat: false,
   displayDescription: true,
-  displayTitle: true
+  displayTitle: true,
+  tracks: [
+    {
+      file: 'http://file.com/english.vtt',
+      label: 'en'
+    },
+    {
+      file: 'http://file.com/spanish.srt',
+      label: 'es'
+    }
+  ]
 }
 
 ...
@@ -242,9 +252,10 @@ For running example project:
 | **`time`**                   | should the player seek to a certain second.                                                                                                                                                      | `Int`                           |
 | **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                         | `String`                        |
 | **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                           | `{tag: String, offset: String}` |
-| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                        | `Int`                        |
+| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                        | `Int`                           |
 | **`desc`**                   | Description of the track.                                                                                                                                                                        | `String`                        |
 | **`file`**                   | The url of the file to play.                                                                                                                                                                     | `String`                        |
+| **`tracks`**                 | Array of caption tracks.                                                                                                                                                                         | `{file: String, label: String}` |
 | **`image`**                  | The url of the player thumbnail.                                                                                                                                                                 | `String`                        |
 | **`title`**                  | The title of the track.                                                                                                                                                                          | `String`                        |
 | **`autostart`**              | Should the track auto start.                                                                                                                                                                     | `Boolean`                       |
