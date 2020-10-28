@@ -659,7 +659,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .image(image)
                 .mediaId(mediaId)
                 .adSchedule(adSchedule)
-                .track(tracks)
+                .tracks(tracks)
                 .build();
 
         if (startTime != null) {
