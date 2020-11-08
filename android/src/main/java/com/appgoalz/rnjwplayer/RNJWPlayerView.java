@@ -862,7 +862,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     CastDevice connectedDevice() {
-        if (mCastContext != null) {
+        if (mCastContext != null && mCastContext.getSessionManager() != null && mCastContext.getSessionManager().getCurrentCastSession() != null) {
             return mCastContext.getSessionManager().getCurrentCastSession().getCastDevice();
         }
 
@@ -1431,8 +1431,11 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onHostResume() {
         if (mSessionManager != null) {
-            mCastSession = mSessionManager.getCurrentCastSession();
             mSessionManager.addSessionManagerListener(mSessionManagerListener);
+            
+            if (mCastSession == null) {
+            	mCastSession = mSessionManager.getCurrentCastSession();
+        	}
         }
 
         if (connectedDevice() != null) {
