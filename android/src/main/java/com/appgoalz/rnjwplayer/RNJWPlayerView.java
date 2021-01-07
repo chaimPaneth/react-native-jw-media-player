@@ -157,6 +157,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     Boolean autostart = true;
     Boolean controls = true;
     Boolean repeat = false;
+    Boolean mute = false;
     Boolean displayTitle = false;
     Boolean displayDesc = false;
     Boolean nextUpDisplay = false;
