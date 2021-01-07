@@ -136,6 +136,17 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
       }
     }
   }
+  
+  @ReactProp(name = "mute")
+  public void setMute(RNJWPlayerView view, Boolean prop) {
+    if(view.mute!=prop) {
+      view.mute = prop;
+
+      if (view.mPlayer != null) {
+        view.mPlayer.getConfig().setMute(view.mute);
+      }
+    }
+  }
 
   @ReactProp(name = "colors")
   public void setColors(RNJWPlayerView view, ReadableMap prop) {
