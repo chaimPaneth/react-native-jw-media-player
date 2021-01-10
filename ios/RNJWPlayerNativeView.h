@@ -30,6 +30,7 @@
 @property(nonatomic)BOOL autostart;
 @property(nonatomic)BOOL controls;
 @property(nonatomic)BOOL repeat;
+@property(nonatomic)BOOL mute;
 @property(nonatomic)BOOL displayTitle;
 @property(nonatomic)BOOL displayDesc;
 @property(nonatomic)BOOL nextUpDisplay;
