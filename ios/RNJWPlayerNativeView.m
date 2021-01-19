@@ -347,6 +347,18 @@
     return self.player.config.repeat;
 }
 
+-(void)setMute:(BOOL)mute
+{
+    if(self.player.volume > 0) {
+        self.player.volume = 0;
+    }
+}
+
+-(BOOL)mute
+{
+    return self.player.volume == 0;
+}
+
 -(void)setDisplayDesc:(BOOL)displayDesc
 {
     if(displayDesc != self.player.config.displayDescription) {
