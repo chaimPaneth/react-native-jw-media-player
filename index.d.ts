@@ -45,6 +45,7 @@ declare module "react-native-jw-media-player" {
     landscapeOnFullScreen: boolean;
     portraitOnExitFullScreen: boolean;
     exitFullScreenOnPortrait: boolean;
+    stretching?: string;
     onPlaylist?: (playerlist: playlistItem[]) => void;
     onPlayerReady?: () => void;
     onBeforePlay?: () => void;

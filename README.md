@@ -12,7 +12,7 @@
 
 Since **React Native 0.60** and higher, [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) makes the installation process simpler.
 
-On iOS you have to run `cd ios/` && `pod install`. 
+On iOS you have to run `cd ios/` && `pod install`.
 
 On Android the package is automatically linked.
 
@@ -189,7 +189,7 @@ componentDidMount() {
   /*
   setTimeout(() => {
     this.JWPlayer.loadPlaylistItem(playlistItem);
-    
+
     // for playlist
     // const playlist = [playlistItem, playlistItem]
     // this.JWPlayer.loadPlaylist(playlistItem);
@@ -264,6 +264,7 @@ For running example project:
 | **`displayTitle`**           | Should the player show the title.                                                                                                                                                                | `Boolean`                       |
 | **`repeat`**                 | Should the track repeat.                                                                                                                                                                         | `Boolean`                       |
 | **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
+| **`stretching`**             | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                                                                                   | `String`                        |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
@@ -319,6 +320,7 @@ For running example project:
 | **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
 | **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                                                | `Boolean`                                           |
 | **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                                                   | `Boolean`                                           |
+| **`stretching`**               | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                                                         | `String`                                            |
 
 ## Available methods
 
@@ -366,11 +368,11 @@ For running example project:
 For setting a custom style on the player:
 
   1. Check out the [JW player guide](https://developer.jwplayer.com/jw-player/docs/developer-guide/customization/css-skinning/skins_reference/) for adding a custom css file on your player.
-  
+
   2. Put your custom css file in the root folder of your native files.
-  
+
   3. Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
-  
+
   4. build & run.
 
 ##### Colors
@@ -389,13 +391,29 @@ colors: PropTypes.shape({
 })
 ```
 
+### Stretching
+
+`uniform`: (default) Fits JW Player dimensions while maintaining aspect ratio
+
+`exactFit`: Will fit JW Player dimensions without maintaining aspect ratio
+
+`fill`: Will zoom and crop video to fill dimensions, maintaining aspect ratio
+
+`none`: Displays the actual size of the video file. (Black borders)
+
+##### Examples:
+
+![Stretching Example](https://files.readme.io/ce19994-stretch-options.png)
+
+(image from JW Player docs - here use `exactFit` instead of `exactfit`)
+
 ### Background Audio
 
 This package supports Background audio sessions by setting the `backgroundAudioEnabled` prop on the [PlaylistItem](#PlaylistItem), just follow the JWPlayer docs for background session.
 
 Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
 
-Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section. 
+Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
 
 For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.
 
