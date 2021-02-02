@@ -182,6 +182,17 @@ RCT_EXPORT_METHOD(setSpeed: (nonnull NSNumber *)reactTag: (double)speed) {
     }];
 }
 
+RCT_EXPORT_METHOD(setCurrentCaptions: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player setCurrentCaptions:[index integerValue] + 1];
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
         RNJWPlayerNativeView *view = viewRegistry[reactTag];

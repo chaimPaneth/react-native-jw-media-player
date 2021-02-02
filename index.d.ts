@@ -74,6 +74,7 @@ declare module "react-native-jw-media-player" {
     playerState(): Promise<number | null>;
     position(): Promise<number>;
     toggleSpeed(): void;
+    setCurrentCaptions(index: number): void;
     setPlaylistIndex(index: number): void;
     showAirPlayButton(x: number, y: number, width: number, height: number, autoHide: boolean): void;
     hideAirPlayButton(): void;
