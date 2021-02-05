@@ -7,74 +7,79 @@ declare module "react-native-jw-media-player" {
     identifier?: string;
   }
   interface PlaylistItem {
-    mediaId?: number;
-    startTime?: number;
+    file: string;
+    image?: string;
+    title?: string;
+    desc?: string
+    mediaId?: string;
+    autostart?: boolean
+    adSchedule?: { tag: string; offset: string };
     adVmap?: string;
     adClient?: string;
-    adSchedule?: { tag: string; offset: string };
-    desc?: string;
-    file?: string;
-    image?: string;
-    title?: string;
-    autostart?: boolean;
-    controls?: boolean;
-    displayDescription?: boolean;
-    displayTitle?: boolean;
-    repeat?: boolean;
-    backgroundAudioEnabled: boolean;
+    startTime?: number;
+    backgroundAudioEnabled?: boolean;
   }
   interface PropsType {
-    mediaId?: number;
     file?: string;
-    title?: string;
     image?: string;
-    autostart?: boolean;
+    title?: string;
     desc?: string;
+    mediaId?: string
+    autostart?: boolean;
     controls?: boolean;
     repeat?: boolean;
-    displayDescription?: boolean;
+    mute?: boolean
     displayTitle?: boolean;
-    playlistItem?: PlaylistItem;
-    playlist?: PlaylistItem[];
-    nextUpDisplay: boolean;
-    style?: ViewStyle;
+    displayDescription?: boolean;
+    nextUpDisplay?: boolean;
     playerStyle?: string;
-    colors?: any;
+    colors?: {
+      icons?: string;
+      timeslider: { progress: string; rail: string };
+    };
     nativeFullScreen?: boolean;
     fullScreenOnLandscape?: boolean;
-    landscapeOnFullScreen: boolean;
-    portraitOnExitFullScreen: boolean;
-    exitFullScreenOnPortrait: boolean;
-    onPlaylist?: (playerlist: playlistItem[]) => void;
-    onPlayerReady?: () => void;
-    onBeforePlay?: () => void;
-    onBeforeComplete?: () => void;
-    onComplete?: () => void;
-    onPlay?: () => void;
-    onPause?: () => void;
+    landscapeOnFullScreen?: boolean;
+    portraitOnExitFullScreen?: boolean;
+    exitFullScreenOnPortrait?: boolean;
+    playlistItem?: PlaylistItem;
+    playlist?: PlaylistItem[];
+    onPlayerReady?: (event: any) => void;
+    onPlaylist?: (playlist: PlaylistItem[]) => void;
+    onBeforePlay?: (event: any) => void;
+    onBeforeComplete?: (event: any) => void;
+    onPlay?: (event: any) => void;
+    onPause?: (event: any) => void;
+    onSetupPlayerError?: (setupPlayerError: { error: string }) => void;
+    onPlayerError?: (playerError: { error: string }) => void;
+    onBuffer?: (event: any) => void;
+    onTime?: (event: any) => void;
+    onComplete?: (event: any) => void;
+    onFullScreenRequested?: (event: any) => void;
+    onFullScreen?: (event: any) => void;
+    onFullScreenExitRequested?: (event: any) => void;
+    onFullScreenExit?: (event: any) => void;
     onSeek?: (seek: { position: number; offset: number }) => void;
     onSeeked?: (seeked?: { position: number }) => void;
-    onSetupPlayerError: (setupPlayerError: { error: string }) => void;
-    onPlayerError: (playerError: { error: string }) => void;
-    onBuffer: () => void;
-    onTime: () => void;
-    onFullScreenRequested: () => void;
-    onFullScreen: () => void;
-    onFullScreenExitRequested: () => void;
-    onFullScreenExit: () => void;
-    onPlaylistComplete: () => void;
-    onPlaylistItem: (playlistItem: any) => void;
+    onPlaylistItem?: (playlistItem: PlaylistItem) => void;
+    onControlBarVisible?: (event: any) => void;
+    onPlaylistComplete?: (event: any) => void;
+    style?: ViewStyle
   }
 
   export default class JWPlayer extends React.Component<PropsType> {
-    seekTo(index: number): void;
-    play(): void;
     pause(): void;
+    play(): void;
     stop(): void;
-    playerState(): Promise<number | null>;
-    position(): Promise<number>;
     toggleSpeed(): void;
+    setSpeed(speed: number): void;
     setPlaylistIndex(index: number): void;
+    setControls(shouldDisplayControl: boolean): void;
+    loadPlaylist(playlist: PlaylistItem[]): void;
+    loadPlaylistItem(playlistItem: PlaylistItem): void;
+    seekTo(time: number): void;
+    setFullscreen(shouldDisplayInFullScreen: boolean): void;
+    position(): Promise<number>;
     showAirPlayButton(x: number, y: number, width: number, height: number, autoHide: boolean): void;
     hideAirPlayButton(): void;
     showCastButton(x: number, y: number, width: number, height: number, autoHide: boolean, customButton?: boolean): void;
@@ -84,9 +89,6 @@ declare module "react-native-jw-media-player" {
     connectedDevice(): Promise<CastingDevice | null>;
     availableDevices(): Promise<CastingDevice[] | null>;
     castState(): Promise<number | null>;
-    setControls(shouldDisplayControl: boolean): void;
-    setFullscreen(shouldDisplayInFullScreen: boolean): void;
-    loadPlaylist(playlist: PlaylistItem[]): void;
-    loadPlaylistItem(playlistItem: PlaylistItem): void;
+    playerState(): Promise<number | null>;
   }
 }
