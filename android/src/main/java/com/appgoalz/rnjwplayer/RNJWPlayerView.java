@@ -766,6 +766,8 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
+        this.destroyPlayer();
+        
         mPlayer = new RNJWPlayer(simpleContext, playerConfig);
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
