@@ -55,6 +55,7 @@ export default class JWPlayer extends Component {
     autostart: PropTypes.bool,
     controls: PropTypes.bool,
     repeat: PropTypes.bool,
+    mute: PropTypes.bool,
     displayTitle: PropTypes.bool,
     displayDesc: PropTypes.bool,
     nextUpDisplay: PropTypes.bool,
@@ -337,6 +338,7 @@ export default class JWPlayer extends Component {
       autostart,
       controls,
       repeat,
+      mute,
       displayTitle,
       displayDesc,
       nextUpDisplay,
@@ -354,6 +356,7 @@ export default class JWPlayer extends Component {
       autostart !== this.props.autostart ||
       controls !== this.props.controls ||
       repeat !== this.props.repeat ||
+      mute !== this.props.mute ||
       displayTitle !== this.props.displayTitle ||
       displayDesc !== this.props.displayDesc ||
       nextUpDisplay !== this.props.nextUpDisplay ||

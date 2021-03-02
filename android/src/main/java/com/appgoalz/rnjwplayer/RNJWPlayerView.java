@@ -157,6 +157,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     Boolean autostart = true;
     Boolean controls = true;
     Boolean repeat = false;
+    Boolean mute = false;
     Boolean displayTitle = false;
     Boolean displayDesc = false;
     Boolean nextUpDisplay = false;
@@ -765,6 +766,8 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
+        this.destroyPlayer();
+        
         mPlayer = new RNJWPlayer(simpleContext, playerConfig);
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
