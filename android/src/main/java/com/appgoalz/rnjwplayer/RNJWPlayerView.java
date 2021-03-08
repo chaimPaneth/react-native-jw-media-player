@@ -152,6 +152,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     String mediaId = "";
     String customStyle;
     String adVmap = "";
+    String stretching = STRETCHING_UNIFORM;
     Double startTime;
 
     Boolean autostart = true;
@@ -751,6 +752,10 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         imaVMAPAdvertising.setClient(client);
 
+        if (prop.hasKey("stretching")) {
+            stretching = prop.getString("stretching");
+        }
+
         PlayerConfig playerConfig = new PlayerConfig.Builder()
                 .skinConfig(skinConfig)
                 .repeat(false)
@@ -761,7 +766,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .nextUpDisplay(true)
                 .nextUpOffset(nextUpOffset)
                 .advertising(imaVMAPAdvertising)
-                .stretching(STRETCHING_UNIFORM)
+                .stretching(stretching)
                 .build();
 
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
@@ -918,7 +923,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .displayTitle(true)
                 .displayDescription(true)
                 .nextUpDisplay(true)
-                .stretching(STRETCHING_UNIFORM)
+                .stretching(stretching)
                 .build();
     }
 
