@@ -14,6 +14,11 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_EXACT_FIT;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_FILL;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_NONE;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -238,6 +243,19 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
   public void setLandscapeOnFullScreen(RNJWPlayerView view, Boolean prop) {
     if (prop != null) {
       view.landscapeOnFullScreen = prop;
+    }
+  }
+
+  @ReactProp(name = "stretching")
+  public void setStretching(RNJWPlayerView view, String prop) {
+    if (prop.equals("exactFit")) {
+      view.stretching = STRETCHING_EXACT_FIT;
+    } else if (prop.equals("fill")) {
+      view.stretching = STRETCHING_FILL;
+    } else if (prop.equals("none")) {
+      view.stretching = STRETCHING_NONE;
+    } else {
+      view.stretching = STRETCHING_UNIFORM;
     }
   }
 

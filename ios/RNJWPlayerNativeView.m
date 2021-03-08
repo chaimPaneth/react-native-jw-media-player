@@ -63,7 +63,8 @@
     config.repeat = NO;
     config.displayDescription = YES;
     config.displayTitle = YES;
-    
+    config.stretching = JWStretchingUniform;
+
     return config;
 }
 
@@ -87,8 +88,6 @@
 
 -(void)customStyle: (JWConfig*)config :(NSString*)name
 {
-    config.stretching = JWStretchingUniform;
-    
     JWSkinStyling *skinStyling = [JWSkinStyling new];
     config.skin = skinStyling;
     
@@ -146,8 +145,6 @@
 -(void)setupColors: (JWConfig *)config
 {
     if (_playerColors != nil) {
-        config.stretching = JWStretchingUniform;
-        
         JWSkinStyling *skinStyling = [JWSkinStyling new];
         config.skin = skinStyling;
         
@@ -223,6 +220,19 @@
 -(void)setPortraitOnExitFullScreen:(BOOL)portraitOnExitFullScreen
 {
     _portraitOnExitFullScreen = portraitOnExitFullScreen;
+}
+
+-(void)setStretching:(NSString *)stretching
+{
+    if ([stretching isEqualToString:@"exactFit"]) {
+        self.player.config.stretching = JWStretchingExactFit;
+    } else if ([stretching isEqualToString:@"fill"]) {
+        self.player.config.stretching = JWStretchingFill;
+    } else if ([stretching isEqualToString:@"none"]) {
+        self.player.config.stretching = JWStretchingNone;
+    } else {
+        self.player.config.stretching = JWStretchingUniform;
+    }
 }
 
 -(void)setExitFullScreenOnPortrait:(BOOL)exitFullScreenOnPortrait
