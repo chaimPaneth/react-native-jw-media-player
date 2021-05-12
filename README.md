@@ -411,9 +411,9 @@ colors: PropTypes.shape({
 
 This package supports Background audio sessions by setting the `backgroundAudioEnabled` prop on the [PlaylistItem](#PlaylistItem), just follow the JWPlayer docs for background session.
 
-Here for Android https://developer.jwplayer.com/sdk/android/docs/developer-guide/interaction/audio/ although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
+Here for Android https://developer.jwplayer.com/jwplayer/docs/android-audiotrack#background-audio although this package handles background audio playing in android as is and you shouldn't have to make any additional changes.
 
-Here for iOS https://developer.jwplayer.com/sdk/ios/docs/developer-guide/embedding/features/ under Background Audio section.
+Here for iOS https://developer.jwplayer.com/jwplayer/docs/ios-behavior#background-audio under Background Audio section.
 
 For iOS you will have to enable `audio` in **Signing & Capabilities** under `background modes`.
 
