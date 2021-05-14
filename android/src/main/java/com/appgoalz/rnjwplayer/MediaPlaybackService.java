@@ -1,12 +1,17 @@
 package com.appgoalz.rnjwplayer;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 /**
@@ -24,6 +29,26 @@ public class MediaPlaybackService extends Service {
 	 * The MediaSession used to control this service.
 	 */
 	private MediaSessionManager mMediaSessionManager;
+
+	public static String getNotificationChannel(Context context) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(
+					NotificationWrapper.NOTIFICATION_CHANNEL_ID,
+					"MusicService",
+					NotificationManager.IMPORTANCE_DEFAULT
+			);
+			channel.setShowBadge(false);
+			channel.setSound(null, null);
+			((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+		}
+		return NotificationWrapper.NOTIFICATION_CHANNEL_ID;
+	}
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		startForeground(NotificationWrapper.NOTIFICATION_ID, new NotificationCompat.Builder(this, getNotificationChannel(this)).build());
+	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -44,6 +69,7 @@ public class MediaPlaybackService extends Service {
 		if (mMediaSessionManager != null) {
 			mMediaSessionManager.release();
 		}
+		stopForeground(true);
 	}
 
 	@Override
