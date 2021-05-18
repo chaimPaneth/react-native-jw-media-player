@@ -20,7 +20,9 @@ import androidx.media.app.NotificationCompat.MediaStyle;
 
 public class NotificationWrapper {
 
-	private final String NOTIFICATION_CHANNEL_ID = "NotificationBarController";
+	public static final String NOTIFICATION_CHANNEL_NAME = "Notification Bar Video Controls";
+	public static final String NOTIFICATION_CHANNEL_DESC = "All notifications";
+	public static final String NOTIFICATION_CHANNEL_ID = "NotificationBarController";
 	public static final int NOTIFICATION_ID = 1969;
 	private NotificationManager mNotificationManager;
 	private NotificationChannel mNotificationChannel;
@@ -34,14 +36,23 @@ public class NotificationWrapper {
 
 	}
 
+	public static String getNotificationChannel(Context context) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+			NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, importance);
+			channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+			channel.setShowBadge(false);
+			channel.setSound(null, null);
+			((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+		}
+		return NotificationWrapper.NOTIFICATION_CHANNEL_ID;
+	}
+
 	@RequiresApi(Build.VERSION_CODES.O)
 	private void createNotificationChannel() {
-		CharSequence channelNameDisplayedToUser = "Notification Bar Video Controls";
 		int importance = NotificationManager.IMPORTANCE_LOW;
-		mNotificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-													   channelNameDisplayedToUser,
-													   importance);
-		mNotificationChannel.setDescription("All notifications");
+		mNotificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, importance);
+		mNotificationChannel.setDescription(NOTIFICATION_CHANNEL_DESC);
 		mNotificationChannel.setShowBadge(false);
 		mNotificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 		mNotificationManager.createNotificationChannel(mNotificationChannel);
