@@ -1,6 +1,6 @@
 {
   "name": "react-native-jw-media-player",
-  "version": "0.1.54",
+  "version": "0.1.55",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -33,18 +33,7 @@
   "license": "MIT",
   "homepage": "https://github.com/chaimPaneth/react-native-jw-media-player#readme",
   "peerDependencies": {
-    "react-native": "^0.40.0",
-    "react": "~15.4.0-rc.4"
-  },
-  "devDependencies": {
-    "babel-eslint": "^7.1.1",
-    "babel-preset-react-native-stage-0": "^1.0.1",
-    "eslint": "^3.14.1",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1",
-    "pre-commit": "^1.2.2"
+    "react": "^16.13.1",
+    "react-native": "^0.63.2"
   }
 }
