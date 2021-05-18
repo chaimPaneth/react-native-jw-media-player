@@ -160,7 +160,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.setCurrentAudioTrack(index);
+            playerView.mPlayer.playlistItem(index);
           }
         }
       });
