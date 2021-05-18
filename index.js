@@ -72,6 +72,7 @@ export default class JWPlayer extends Component {
     landscapeOnFullScreen: PropTypes.bool,
     portraitOnExitFullScreen: PropTypes.bool,
     exitFullScreenOnPortrait: PropTypes.bool,
+    stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
     playlistItem: PropTypes.shape({
       file: PropTypes.string.isRequired,
       image: PropTypes.string,
@@ -345,6 +346,7 @@ export default class JWPlayer extends Component {
       playlistItem,
       playlist,
       style,
+      stretching,
     } = nextProps;
 
     if (
@@ -360,7 +362,8 @@ export default class JWPlayer extends Component {
       displayTitle !== this.props.displayTitle ||
       displayDesc !== this.props.displayDesc ||
       nextUpDisplay !== this.props.nextUpDisplay ||
-      style !== this.props.style
+      style !== this.props.style ||
+      stretching !== this.props.stretching
     ) {
       return true;
     }

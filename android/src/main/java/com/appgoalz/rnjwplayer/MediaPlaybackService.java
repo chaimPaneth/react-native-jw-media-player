@@ -7,6 +7,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 /**
@@ -24,6 +25,12 @@ public class MediaPlaybackService extends Service {
 	 * The MediaSession used to control this service.
 	 */
 	private MediaSessionManager mMediaSessionManager;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		startForeground(NotificationWrapper.NOTIFICATION_ID, new NotificationCompat.Builder(this, NotificationWrapper.getNotificationChannel(this)).build());
+	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -44,6 +51,7 @@ public class MediaPlaybackService extends Service {
 		if (mMediaSessionManager != null) {
 			mMediaSessionManager.release();
 		}
+		stopForeground(true);
 	}
 
 	@Override
