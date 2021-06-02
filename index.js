@@ -132,6 +132,10 @@ export default class JWPlayer extends Component {
     loadPlaylistItem: PropTypes.func,
     loadPlaylist: PropTypes.func,
     seekTo: PropTypes.func,
+    getAudioTracks: PropTypes.func,
+    getCurrentAudioTrack: PropTypes.func,
+    setCurrentAudioTrack: PropTypes.func,
+    onAudioTracks: PropTypes.func,
     onBeforePlay: PropTypes.func,
     onBeforeComplete: PropTypes.func,
     onPlay: PropTypes.func,
@@ -322,6 +326,48 @@ export default class JWPlayer extends Component {
         console.error(e);
         return null;
       }
+    }
+  }
+
+  async getAudioTracks() {
+    if (RNJWPlayerManager) {
+      try {
+        var audioTracks = await RNJWPlayerManager.getAudioTracks(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        // iOS sends autoSelect as 0 or 1 instead of a boolean
+        // couldn't figure out how to send autoSelect as a boolean from Objective C
+        return audioTracks.map((audioTrack) => {
+          audioTrack.autoSelect = !!audioTrack.autoSelect;
+          return audioTrack;
+        });
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  async getCurrentAudioTrack() {
+    if (RNJWPlayerManager) {
+      try {
+        var currentAudioTrack = await RNJWPlayerManager.getCurrentAudioTrack(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return currentAudioTrack;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  setCurrentAudioTrack(index) {
+    if (RNJWPlayerManager) {
+      RNJWPlayerManager.setCurrentAudioTrack(
+        this.getRNJWPlayerBridgeHandle(),
+        index
+      );
     }
   }
 

@@ -53,6 +53,7 @@
 @property(nonatomic, strong)RNJWPlayerControls *nativeControlsView;
 @property(nonatomic)BOOL nativeControls;
 
+@property(nonatomic, copy)RCTBubblingEventBlock onAudioTracks;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforePlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlay;
 @property(nonatomic, copy)RCTBubblingEventBlock onPause;
@@ -86,6 +87,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onCastingEnded;
 @property(nonatomic, copy)RCTBubblingEventBlock onCastingFailed;
 
+-(void)onRNJWPlayerAudioTracks;
 -(void)onRNJWReady;
 -(void)onRNJWPlaylist;
 -(void)onRNJWPlayerBeforePlay;

@@ -324,20 +324,24 @@ For running example project:
 
 ## Available methods
 
-| Func                   | Description                                                                                                                                                                             | Argument                      |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
-| **`play`**             | Starts playing.                                                                                                                                                                         | `none`                        |
-| **`pause`**            | Pauses playing.                                                                                                                                                                         | `none`                        |
-| **`stop`**             | Stops the player completely.                                                                                                                                                            | `none`                        |
-| **`playerState`**      | Returns promise that then returns the current state of the player. Check out the [JWPlayerState](#JWPlayerState) Object.                                                                | `none`                        |
-| **`position`**         | Returns promise that then returns the current position of the player in seconds.                                                                                                        | `none`                        |
-| **`toggleSpeed`**      | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
-| **`setPlaylistIndex`** | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
-| **`setControls`**      | Sets the display of the control buttons on the player.                                                                                                                                  | `Boolean`                     |
-| **`setFullScreen`**    | Set full screen.                                                                                                                                                                        | `Boolean`                     |
-| **`loadPlaylist`**     | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
-| **`loadPlaylistItem`** | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
+| Func                       | Description                                                                                                                                                                             | Argument                      |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **`seekTo`**               | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
+| **`play`**                 | Starts playing.                                                                                                                                                                         | `none`                        |
+| **`pause`**                | Pauses playing.                                                                                                                                                                         | `none`                        |
+| **`stop`**                 | Stops the player completely.                                                                                                                                                            | `none`                        |
+| **`playerState`**          | Returns promise that then returns the current state of the player. Check out the [JWPlayerState](#JWPlayerState) Object.                                                                | `none`                        |
+| **`position`**             | Returns promise that then returns the current position of the player in seconds.                                                                                                        | `none`                        |
+| **`toggleSpeed`**          | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
+| **`setCurrentCaptions`**   | Turns off captions when argument is 0. Setting argument to another integer, sets captions to track at playlistItem.tracks[integer - 1]                                                  | `Int`                         |
+| **`setPlaylistIndex`**     | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
+| **`setControls`**          | Sets the display of the control buttons on the player.                                                                                                                                  | `Boolean`                     |
+| **`setFullScreen`**        | Set full screen.                                                                                                                                                                        | `Boolean`                     |
+| **`loadPlaylist`**         | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
+| **`loadPlaylistItem`**     | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
+| **`getAudioTracks`**       | Returns promise that returns an array of [AudioTracks](#AudioTrack)                                                                                                                     | `none`                        |
+| **`getCurrentAudioTrack`** | Returns promise that returns the index of the current audio track in array returned by getAudioTracks                                                                                   | `none`                        |
+| **`setCurrentAudioTrack`** | Sets the current audio track to the audio track at the specified index in the array returned by getAudioTracks                                                                          | `Int`                         |
 
 ## Available callbacks
 
@@ -345,6 +349,7 @@ For running example project:
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`onPlaylist`**                | A new playlist is loaded.                                                                                                                                                                                                  | `[playlistItem]` see [PlaylistItem](#PlaylistItem)                                                                                                                                                                                                                                                                              |
 | **`onPlayerReady`**             | The player has finished setting up and is ready to play.                                                                                                                                                                   | `none`                                                                                                                                                                                                                                                                                                                          |
+| **`onAudioTracks`**             | The list of available audio tracks is updated (happens shortly after a playlist item starts playing).                                                                                                                      | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onBeforePlay`**              | Right before playing.                                                                                                                                                                                                      | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onBeforeComplete`**          | Right before playing completed and is starting to play.                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onComplete`**                | Right after media playing is completed.                                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
@@ -390,6 +395,28 @@ colors: PropTypes.shape({
   })
 })
 ```
+
+### AudioTrack
+
+Each AudioTrack object has the following keys:
+
+`autoSelect`: boolean
+
+`defaultTrack`: boolean
+
+`groupId`: string
+
+`name`: string
+
+`language`: string
+
+A video file can include multiple audio tracks. The onAudioTracks event is fired when the list of available AudioTracks is updated (happens shortly after a playlist item starts playing).
+
+Once the AudioTracks list is available, use getAudioTracks to return an array of available AudioTracks.
+
+Then use getCurrentAudioTrack or setCurrentAudioTrack(index) to view or change the current AudioTrack.
+
+This is all handled automatically if using the default player controls, but these functions are helpful if you're implementing custom controls.
 
 ### Stretching
 

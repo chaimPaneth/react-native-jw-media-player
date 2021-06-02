@@ -18,6 +18,9 @@ import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.google.android.gms.cast.CastDevice;
 import com.longtailvideo.jwplayer.core.PlayerState;
+import com.longtailvideo.jwplayer.media.audio.AudioTrack;
+
+import java.util.List;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
@@ -476,3 +479,73 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     }
   }
 }
+
+  @ReactMethod
+  public void getAudioTracks(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            List<AudioTrack> audioTrackList = playerView.mPlayer.getAudioTracks();
+            WritableArray audioTracks = Arguments.createArray();
+            for (int i = 0; i < audioTrackList.size(); i++) {
+              WritableMap audioTrack = Arguments.createMap();
+              AudioTrack track = audioTrackList.get(i);
+              audioTrack.putString("name", track.getName());
+              audioTrack.putString("language", track.getLanguage());
+              audioTrack.putString("groupId", track.getGroupId());
+              audioTrack.putBoolean("defaultTrack", track.isDefaultTrack());
+              audioTrack.putBoolean("autoSelect", track.isAutoSelect());
+              audioTracks.pushMap(audioTrack);
+            }
+            promise.resolve(audioTracks);
+          } else {
+            promise.reject("RNJW Error", "Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      promise.reject("RNJW Error", e);
+    }
+  }
+
+  @ReactMethod
+  public void getCurrentAudioTrack(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            promise.resolve(playerView.mPlayer.getCurrentAudioTrack());
+          } else {
+            promise.reject("RNJW Error", "Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      promise.reject("RNJW Error", e);
+    }
+  }
+
+  @ReactMethod
+  public void setCurrentAudioTrack(final int reactTag, final int index) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.mPlayer.setCurrentAudioTrack(index);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }

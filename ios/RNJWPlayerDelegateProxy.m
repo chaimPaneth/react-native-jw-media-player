@@ -79,6 +79,11 @@
     [self.delegate onRNJWPlayerComplete];
 }
 
+- (void)onAudioTracks:(JWEvent<JWLevelsEvent> *)event
+{
+    [self.delegate onRNJWPlayerAudioTracks];
+}
+
 // Ad events
 
 - (void)onBeforePlay

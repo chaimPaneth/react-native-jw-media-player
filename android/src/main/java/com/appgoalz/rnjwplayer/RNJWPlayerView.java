@@ -94,6 +94,7 @@ import java.util.List;
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerView extends RelativeLayout implements
+        VideoPlayerEvents.OnAudioTracksListener,
         VideoPlayerEvents.OnFullscreenListener,
         VideoPlayerEvents.OnReadyListener,
         VideoPlayerEvents.OnPlayListener,
@@ -407,6 +408,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     public void setupPlayerView(Boolean backgroundAudioEnabled) {
         if (mPlayer != null) {
             // VideoPlayerEvents
+            mPlayer.addOnAudioTracksListener(this);
             mPlayer.addOnReadyListener(this);
             mPlayer.addOnPlayListener(this);
             mPlayer.addOnPauseListener(this);
@@ -1067,7 +1069,9 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
-
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAudioTracks");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAudioTracks", event);
     }
 
     @Override

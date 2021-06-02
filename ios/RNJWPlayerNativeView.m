@@ -854,6 +854,13 @@
     }
 }
 
+-(void)onRNJWPlayerAudioTracks
+{
+    if (self.onAudioTracks) {
+        self.onAudioTracks(@{});
+    }
+}
+
 #pragma mark - RNJWPlayer Ad events
 
 -(void)onRNJWPlayerBeforePlay

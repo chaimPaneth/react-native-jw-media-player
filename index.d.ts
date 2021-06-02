@@ -2,6 +2,13 @@ declare module "react-native-jw-media-player" {
   import React from "react";
   import { ViewStyle } from "react-native";
 
+  interface AudioTrack {
+    autoSelect: boolean;
+    defaultTrack: boolean;
+    groupId: string;
+    language: string;
+    name: string;
+  }
   interface CastingDevice {
     name?: string;
     identifier?: string;
@@ -45,6 +52,7 @@ declare module "react-native-jw-media-player" {
     playlistItem?: PlaylistItem;
     playlist?: PlaylistItem[];
     stretching?: string;
+    onAudioTracks?: (event: any) => void;
     onPlayerReady?: (event: any) => void;
     onPlaylist?: (playlist: PlaylistItem[]) => void;
     onBeforePlay?: (event: any) => void;
@@ -73,6 +81,10 @@ declare module "react-native-jw-media-player" {
     play(): void;
     stop(): void;
     toggleSpeed(): void;
+    getAudioTracks(): Promise<AudioTrack[] | null>;
+    getCurrentAudioTrack(): Promise<number | null>;
+    setCurrentAudioTrack(index: number): void;
+    setCurrentCaptions(index: number): void;
     setSpeed(speed: number): void;
     setPlaylistIndex(index: number): void;
     setControls(shouldDisplayControl: boolean): void;

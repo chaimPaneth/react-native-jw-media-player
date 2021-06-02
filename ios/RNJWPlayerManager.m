@@ -18,6 +18,7 @@ RCT_EXPORT_MODULE()
     return [[RNJWPlayerNativeView alloc] init];
 }
 
+RCT_EXPORT_VIEW_PROPERTY(onAudioTracks, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onBeforePlay, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlay, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPause, RCTBubblingEventBlock);
@@ -257,6 +258,70 @@ RCT_EXPORT_METHOD(setVolume: (nonnull NSNumber *)reactTag :(nonnull NSNumber *)v
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
         } else {
             [view.player setVolume:[volume floatValue]];
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(getAudioTracks,
+                 tag:(nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 eject:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            NSArray *audioTracks = [view.player audioTracks];
+            NSMutableArray *results = [[NSMutableArray alloc] init];
+            for (int i = 0; i < audioTracks.count; i++) {
+                NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                id audioTrack = [audioTracks objectAtIndex:0];
+                [dict setObject:audioTrack[@"language"] forKey:@"language"];
+                [dict setObject:audioTrack[@"autoselect"] forKey:@"autoSelect"];
+                [dict setObject:audioTrack[@"defaulttrack"] forKey:@"defaultTrack"];
+                [dict setObject:audioTrack[@"name"] forKey:@"name"];
+                [dict setObject:audioTrack[@"groupid"] forKey:@"groupId"];
+                [results addObject:dict];
+            }
+            resolve(results);
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(getCurrentAudioTrack,
+                 tag:(nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            if (view.player) {
+                resolve([NSNumber numberWithInt:[view.player currentAudioTrack]]);
+            } else {
+                NSError *error = [[NSError alloc] init];
+                reject(@"no_player", @"There is no player", error);
+            };
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setCurrentAudioTrack: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            [view.player setCurrentAudioTrack:[index integerValue]];
         }
     }];
 }
