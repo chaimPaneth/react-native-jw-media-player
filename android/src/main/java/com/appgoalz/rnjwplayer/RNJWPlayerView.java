@@ -94,7 +94,6 @@ import java.util.List;
 import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerView extends RelativeLayout implements
-        VideoPlayerEvents.OnAudioTracksListener,
         VideoPlayerEvents.OnFullscreenListener,
         VideoPlayerEvents.OnReadyListener,
         VideoPlayerEvents.OnPlayListener,

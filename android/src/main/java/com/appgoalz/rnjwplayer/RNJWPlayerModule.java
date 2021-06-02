@@ -478,7 +478,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         return 0;
     }
   }
-}
 
   @ReactMethod
   public void getAudioTracks(final int reactTag, final Promise promise) {
@@ -549,3 +548,4 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
       throw e;
     }
   }
+}
