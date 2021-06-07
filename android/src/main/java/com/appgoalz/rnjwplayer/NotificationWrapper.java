@@ -38,7 +38,7 @@ public class NotificationWrapper {
 
 	public static String getNotificationChannel(Context context) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+			int importance = NotificationManager.IMPORTANCE_LOW;
 			NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, importance);
 			channel.setDescription(NOTIFICATION_CHANNEL_DESC);
 			channel.setShowBadge(false);
