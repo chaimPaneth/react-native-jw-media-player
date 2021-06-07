@@ -52,6 +52,7 @@ public class MediaPlaybackService extends Service {
 			mMediaSessionManager.release();
 		}
 		stopForeground(true);
+		stopSelf();
 	}
 
 	@Override
