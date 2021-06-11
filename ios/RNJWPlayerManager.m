@@ -279,7 +279,7 @@ RCT_REMAP_METHOD(getAudioTracks,
             NSMutableArray *results = [[NSMutableArray alloc] init];
             for (int i = 0; i < audioTracks.count; i++) {
                 NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-                id audioTrack = [audioTracks objectAtIndex:0];
+                id audioTrack = [audioTracks objectAtIndex:i];
                 [dict setObject:audioTrack[@"language"] forKey:@"language"];
                 [dict setObject:audioTrack[@"autoselect"] forKey:@"autoSelect"];
                 [dict setObject:audioTrack[@"defaulttrack"] forKey:@"defaultTrack"];
