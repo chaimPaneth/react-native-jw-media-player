@@ -26,6 +26,8 @@ public class MediaPlaybackService extends Service {
 	 */
 	private MediaSessionManager mMediaSessionManager;
 
+	private NotificationWrapper mNotificationWrapper;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -70,6 +72,7 @@ public class MediaPlaybackService extends Service {
 	public void setupMediaSession(MediaSessionManager mediaSessionManager,
 								  NotificationWrapper notificationWrapper) {
 
+		mNotificationWrapper = notificationWrapper;
 		if (mMediaSessionManager != null) {
 			mMediaSessionManager.release();
 		}
@@ -96,5 +99,17 @@ public class MediaPlaybackService extends Service {
 		MediaPlaybackService getService() {
 			return MediaPlaybackService.this;
 		}
+	}
+
+	@Override
+	public void onTaskRemoved(Intent rootIntent) {
+		super.onTaskRemoved(rootIntent);
+
+		if (mNotificationWrapper != null) {
+			mNotificationWrapper.cancelNotification();
+		}
+
+		stopForeground(true);
+		stopSelf();
 	}
 }
