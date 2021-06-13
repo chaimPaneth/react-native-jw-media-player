@@ -1475,7 +1475,16 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onHostDestroy() {
+        if (mSessionManager != null) {
+            mSessionManager.removeSessionManagerListener(mSessionManagerListener);
+        }
 
+        mCastSession = null;
+        mCastClientListener = null;
+        mApiClient = null;
+        mCastContext = null;
+
+        this.destroyPlayer();
     }
 }
 
