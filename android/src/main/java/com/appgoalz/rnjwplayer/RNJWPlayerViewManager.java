@@ -2,7 +2,6 @@
 package com.appgoalz.rnjwplayer;
 
 import androidx.annotation.Nullable;
-import androidx.mediarouter.app.MediaRouteButton;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -11,18 +10,16 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.google.android.gms.cast.framework.CastButtonFactory;
-import com.google.android.gms.cast.framework.CastContext;
-
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_EXACT_FIT;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_FILL;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_NONE;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_EXACT_FIT;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_FILL;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_NONE;
+import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
