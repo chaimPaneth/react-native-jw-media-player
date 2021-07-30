@@ -10,32 +10,16 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
-      <meta-data
-        android:name="JW_LICENSE_KEY"
-        android:value="API_KEY_FOUND_IN_JW_DASHBOARD" />
-      <receiver android:name="androidx.media.session.MediaButtonReceiver">
-      <intent-filter>
-          <action android:name="android.intent.action.MEDIA_BUTTON" />
-      </intent-filter>
-      </receiver>
-      <service
-          android:name="com.appgoalz.rnjwplayer.MediaPlaybackService"
-          android:exported="false">
-          <intent-filter>
-              <action android:name="android.intent.action.MEDIA_BUTTON" />
-          </intent-filter>
-      </service>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+        android:launchMode="singleTask"
         android:windowSoftInputMode="adjustResize">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
-
 </manifest>

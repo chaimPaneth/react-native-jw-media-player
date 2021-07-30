@@ -4,6 +4,6 @@
 #import "RCTViewManager.h"
 #endif
 
-@interface RNJWPlayerManager : RCTViewManager
+@interface RNJWPlayerViewManager : RCTViewManager
 
 @end
