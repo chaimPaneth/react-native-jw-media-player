@@ -10,12 +10,12 @@ import PropTypes from "prop-types";
 
 const RNJWPlayerManager =
   Platform.OS === "ios"
-    ? NativeModules.RNJWPlayerManager
+    ? NativeModules.RNJWPlayerViewManager
     : NativeModules.RNJWPlayerModule;
 
 const RCT_RNJWPLAYER_REF = "rnjwplayer";
 
-const RNJWPlayer = requireNativeComponent("RNJWPlayer", null);
+const RNJWPlayer = requireNativeComponent("RNJWPlayerView", null);
 
 const JWPlayerStateIOS = {
   JWPlayerStatePlaying: 0,
@@ -47,70 +47,56 @@ export const JWPlayerAdClients = {
 
 export default class JWPlayer extends Component {
   static propTypes = {
-    file: PropTypes.string,
-    image: PropTypes.string,
-    title: PropTypes.string,
-    desc: PropTypes.string,
-    mediaId: PropTypes.string,
-    autostart: PropTypes.bool,
-    controls: PropTypes.bool,
-    repeat: PropTypes.bool,
-    mute: PropTypes.bool,
-    displayTitle: PropTypes.bool,
-    displayDesc: PropTypes.bool,
-    nextUpDisplay: PropTypes.bool,
-    playerStyle: PropTypes.string,
-    colors: PropTypes.shape({
-      icons: PropTypes.string,
-      timeslider: PropTypes.shape({
-        progress: PropTypes.string,
-        rail: PropTypes.string,
-      }),
-    }),
-    nativeFullScreen: PropTypes.bool,
-    fullScreenOnLandscape: PropTypes.bool,
-    landscapeOnFullScreen: PropTypes.bool,
-    portraitOnExitFullScreen: PropTypes.bool,
-    exitFullScreenOnPortrait: PropTypes.bool,
-    stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
-    playlistItem: PropTypes.shape({
-      file: PropTypes.string.isRequired,
+    config: PropTypes.shape({
+      file: PropTypes.string,
       image: PropTypes.string,
       title: PropTypes.string,
       desc: PropTypes.string,
-      mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      adSchedule: PropTypes.arrayOf(
-        PropTypes.shape({
-          tag: PropTypes.string,
-          offset: PropTypes.string,
-        })
-      ),
-      adVmap: PropTypes.string,
-      adClient: PropTypes.string,
-      startTime: PropTypes.number,
+      mediaId: PropTypes.string,
+      autostart: PropTypes.bool,
+      controls: PropTypes.bool,
+      repeat: PropTypes.bool,
+      mute: PropTypes.bool,
+      displayTitle: PropTypes.bool,
+      displayDesc: PropTypes.bool,
+      nextUpDisplay: PropTypes.bool,
+      // playerStyle: PropTypes.string,
+      colors: PropTypes.shape({
+        buttons: PropTypes.string,
+        timeslider: PropTypes.shape({
+          thumb: PropTypes.string,
+          rail: PropTypes.string,
+          slider: PropTypes.string,
+        }),
+      }),
+      nativeFullScreen: PropTypes.bool,
+      fullScreenOnLandscape: PropTypes.bool,
+      landscapeOnFullScreen: PropTypes.bool,
+      portraitOnExitFullScreen: PropTypes.bool,
+      exitFullScreenOnPortrait: PropTypes.bool,
       backgroundAudioEnabled: PropTypes.bool,
+      // stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
+      playlist: PropTypes.arrayOf(
+        PropTypes.shape({
+          file: PropTypes.string.isRequired,
+          image: PropTypes.string,
+          title: PropTypes.string,
+          desc: PropTypes.string,
+          mediaId: PropTypes.string.isRequired,
+          autostart: PropTypes.bool.isRequired,
+          adSchedule: PropTypes.arrayOf(
+            PropTypes.shape({
+              tag: PropTypes.string,
+              offset: PropTypes.string,
+            })
+          ),
+          adVmap: PropTypes.string,
+          adClient: PropTypes.string,
+          startTime: PropTypes.number,
+          // backgroundAudioEnabled: PropTypes.bool,
+        })
+      )
     }),
-    playlist: PropTypes.arrayOf(
-      PropTypes.shape({
-        file: PropTypes.string.isRequired,
-        image: PropTypes.string,
-        title: PropTypes.string,
-        desc: PropTypes.string,
-        mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired,
-        adSchedule: PropTypes.arrayOf(
-          PropTypes.shape({
-            tag: PropTypes.string,
-            offset: PropTypes.string,
-          })
-        ),
-        adVmap: PropTypes.string,
-        adClient: PropTypes.string,
-        startTime: PropTypes.number,
-        backgroundAudioEnabled: PropTypes.bool,
-      })
-    ),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
     play: PropTypes.func,
@@ -232,6 +218,11 @@ export default class JWPlayer extends Component {
         return null;
       }
     }
+  }
+
+  togglePIP() {
+    if (RNJWPlayerManager)
+      RNJWPlayerManager.togglePIP(this.getRNJWPlayerBridgeHandle());
   }
 
   showAirPlayButton(x, y, width = 44, hight = 44, autoHide = true) {
