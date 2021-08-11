@@ -95,7 +95,7 @@ export default class JWPlayer extends Component {
           startTime: PropTypes.number,
           // backgroundAudioEnabled: PropTypes.bool,
         })
-      )
+      ),
     }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
@@ -226,21 +226,50 @@ export default class JWPlayer extends Component {
   }
 
   showAirPlayButton(x, y, width = 44, hight = 44, autoHide = true) {
-    if (RNJWPlayerManager && Platform.OS === 'ios')
-      RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
+    if (RNJWPlayerManager && Platform.OS === "ios")
+      RNJWPlayerManager.showAirPlayButton(
+        this.getRNJWPlayerBridgeHandle(),
+        x,
+        y,
+        width,
+        hight,
+        autoHide
+      );
   }
 
   hideAirPlayButton() {
-    if (RNJWPlayerManager && Platform.OS === 'ios')
+    if (RNJWPlayerManager && Platform.OS === "ios")
       RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
   }
 
-  showCastButton(x, y, width = 24, hight = 24, autoHide = true, customButton = false) {
+  showCastButton(
+    x,
+    y,
+    width = 24,
+    hight = 24,
+    autoHide = true,
+    customButton = false
+  ) {
     if (RNJWPlayerManager) {
-      if (Platform.OS === 'ios') {
-          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide, customButton);
+      if (Platform.OS === "ios") {
+        RNJWPlayerManager.showCastButton(
+          this.getRNJWPlayerBridgeHandle(),
+          x,
+          y,
+          width,
+          hight,
+          autoHide,
+          customButton
+        );
       } else {
-          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
+        RNJWPlayerManager.showCastButton(
+          this.getRNJWPlayerBridgeHandle(),
+          x,
+          y,
+          width,
+          hight,
+          autoHide
+        );
       }
     }
   }

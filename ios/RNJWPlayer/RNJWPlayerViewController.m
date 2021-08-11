@@ -356,6 +356,16 @@
         [configBuilder repeatContent:repeatContent];
     }
     
+//    if (config[@"playerSize"] != nil && (config[@"playerSize"] != (id)[NSNull null])) {
+//        id playerSize = config[@"playerSize"];
+//        id width = playerSize[@"width"];
+//        id height = playerSize[@"height"];
+//
+//        if (width != nil && width != (id)[NSNull null] && height != nil && height != (id)[NSNull null]) {
+//            _playerViewController.preferredContentSize = CGSizeMake([width doubleValue], [height doubleValue]);
+//        }
+//    }
+    
 //            preload
 //            JWRelatedContentConfiguration
 //            [configBuilder related:(JWRelatedContentConfiguration * _Nonnull)]
@@ -364,10 +374,9 @@
 //    [window.rootViewController presentViewController:_playerViewController animated:NO completion:nil];
     
     [window.rootViewController presentViewController:_playerViewController animated:NO completion:^{
-        CGRect f = self.frame;
-        f.origin = self.superview.frame.origin;
-        
-        self->_playerViewController.view.frame = f;
+//        if (config[@"playerSize"] == nil || (config[@"playerSize"] == (id)[NSNull null])) {
+            self->_playerViewController.view.frame = self.superview.frame;
+//        }
     }];
     
     JWPlayerConfiguration* configuration = [configBuilder buildAndReturnError:&error];
@@ -378,7 +387,7 @@
     _playerViewController.playerView.delegate = self;
 
     _playerViewController.playerView.player.delegate = self;
-//    _playerViewController.playerView.player.playbackStateDelegate = self; // this causes issue
+    _playerViewController.playerView.player.playbackStateDelegate = self; // this causes issue
     _playerViewController.playerView.player.adDelegate = self;
     _playerViewController.playerView.player.avDelegate = self;
 }
@@ -502,14 +511,12 @@
     }
 }
 
-//- (JWFullScreenViewController * _Nullable)playerViewControllerWillGoFullScreen:(JWPlayerViewController * _Nonnull)controller {
-//
-//}
-
-//- (void)playerViewControllerWillGoFullScreen:(JWPlayerViewController *)controller
-//{
-//
-//}
+- (JWFullScreenViewController * _Nullable)playerViewControllerWillGoFullScreen:(JWPlayerViewController * _Nonnull)controller {
+    if (self.onFullScreenRequested) {
+        self.onFullScreenRequested(@{});
+    }
+    return nil;
+}
 
 - (void)playerViewControllerDidGoFullScreen:(JWPlayerViewController *)controller
 {

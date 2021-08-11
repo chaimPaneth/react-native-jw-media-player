@@ -230,10 +230,7 @@
         [self initializeAudioSession];
     }
     
-    CGRect f = self.frame;
-    f.origin = self.superview.frame.origin;
-    
-    _playerView = [[JWPlayerView new] initWithFrame:self.frame];
+    _playerView = [[JWPlayerView new] initWithFrame:self.superview.frame];
     
     _playerView.delegate = self;
     _playerView.player.delegate = self;
