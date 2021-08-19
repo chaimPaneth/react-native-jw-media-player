@@ -222,6 +222,13 @@
 
 -(void)setConfig:(NSDictionary*)config
 {
+    id license = config[@"license"];
+    if ((license != nil) && (license != (id)[NSNull null])) {
+        [JWPlayerKitLicense setLicenseKey:license];
+    } else {
+        NSLog(@"JW SDK License key not set.");
+    }
+    
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
     

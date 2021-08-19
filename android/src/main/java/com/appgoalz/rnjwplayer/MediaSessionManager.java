@@ -6,22 +6,23 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.longtailvideo.jwplayer.JWPlayerView;
-import com.longtailvideo.jwplayer.core.PlayerState;
-import com.longtailvideo.jwplayer.events.AdCompleteEvent;
-import com.longtailvideo.jwplayer.events.AdErrorEvent;
-import com.longtailvideo.jwplayer.events.AdPlayEvent;
-import com.longtailvideo.jwplayer.events.AdSkippedEvent;
-import com.longtailvideo.jwplayer.events.BufferEvent;
-import com.longtailvideo.jwplayer.events.ErrorEvent;
-import com.longtailvideo.jwplayer.events.PauseEvent;
-import com.longtailvideo.jwplayer.events.PlayEvent;
-import com.longtailvideo.jwplayer.events.PlaylistCompleteEvent;
-import com.longtailvideo.jwplayer.events.PlaylistEvent;
-import com.longtailvideo.jwplayer.events.PlaylistItemEvent;
-import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
-import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
-import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import com.jwplayer.pub.api.PlayerState;
+import com.jwplayer.pub.api.events.AdCompleteEvent;
+import com.jwplayer.pub.api.events.AdErrorEvent;
+import com.jwplayer.pub.api.events.AdPlayEvent;
+import com.jwplayer.pub.api.events.AdSkippedEvent;
+import com.jwplayer.pub.api.events.BufferEvent;
+import com.jwplayer.pub.api.events.ErrorEvent;
+import com.jwplayer.pub.api.events.EventType;
+import com.jwplayer.pub.api.events.PauseEvent;
+import com.jwplayer.pub.api.events.PlayEvent;
+import com.jwplayer.pub.api.events.PlaylistCompleteEvent;
+import com.jwplayer.pub.api.events.PlaylistEvent;
+import com.jwplayer.pub.api.events.PlaylistItemEvent;
+import com.jwplayer.pub.api.events.listeners.AdvertisingEvents;
+import com.jwplayer.pub.api.events.listeners.VideoPlayerEvents;
+import com.jwplayer.pub.api.media.playlists.PlaylistItem;
+import com.jwplayer.pub.view.JWPlayerView;
 
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 	/**
 	 * The Player we're managing the media session of.
 	 */
-	private JWPlayerView mPlayer;
+	private JWPlayerView mPlayerView;
 
 	/**
 	 * The current playlist index.
@@ -88,7 +89,7 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 	public MediaSessionManager(Context context,
                                JWPlayerView playerView,
                                NotificationWrapper notificationWrapper) {
-		mPlayer = playerView;
+		mPlayerView = playerView;
 		mNotificationWrapper = notificationWrapper;
 
 		// Create a new MediaSession
@@ -96,20 +97,22 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 													 MediaSessionManager.class.getSimpleName());
 		mMediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
 											 | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
-		mMediaSessionCompat.setCallback(new MediaSessionCallback(mPlayer));
+		mMediaSessionCompat.setCallback(new MediaSessionCallback(mPlayerView));
 
 		// Register listeners.
-		mPlayer.addOnPlayListener(this);
-		mPlayer.addOnPauseListener(this);
-		mPlayer.addOnBufferListener(this);
-		mPlayer.addOnErrorListener(this);
-		mPlayer.addOnPlaylistListener(this);
-		mPlayer.addOnPlaylistItemListener(this);
-		mPlayer.addOnPlaylistCompleteListener(this);
-		mPlayer.addOnAdPlayListener(this);
-		mPlayer.addOnErrorListener(this);
-		mPlayer.addOnAdSkippedListener(this);
-		mPlayer.addOnAdCompleteListener(this);
+		mPlayerView.getPlayer().addListener(EventType.PLAY, this);
+		mPlayerView.getPlayer().addListener(EventType.PAUSE, this);
+		mPlayerView.getPlayer().addListener(EventType.BUFFER, this);
+		mPlayerView.getPlayer().addListener(EventType.ERROR, this);
+		mPlayerView.getPlayer().addListener(EventType.PLAYLIST, this);
+		mPlayerView.getPlayer().addListener(EventType.PLAYLIST_ITEM, this);
+		mPlayerView.getPlayer().addListener(EventType.PLAYLIST_COMPLETE, this);
+
+		mPlayerView.getPlayer().addListener(EventType.AD_PLAY, this);
+//		mPlayerView.getPlayer().addListener(EventType.AD_PAUSE, this);
+		mPlayerView.getPlayer().addListener(EventType.AD_COMPLETE, this);
+		mPlayerView.getPlayer().addListener(EventType.AD_SKIPPED, this);
+		mPlayerView.getPlayer().addListener(EventType.AD_ERROR, this);
 	}
 
 	public @PlaybackStateCompat.Actions
@@ -150,8 +153,8 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 		return capabilities;
 	}
 
-	public JWPlayerView getPlayer() {
-		return mPlayer;
+	public JWPlayerView getPlayerView() {
+		return mPlayerView;
 	}
 
 
@@ -188,11 +191,11 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 				break;
 		}
 
-		if (mPlayer != null) {
-			newPlaybackState.setState(playbackStateCompat, (long)mPlayer.getPosition(), mPlayer.getPlaybackRate()); // PLAYBACK_RATE
+		if (mPlayerView != null) {
+			newPlaybackState.setState(playbackStateCompat, (long)mPlayerView.getPlayer().getPosition(), (float) mPlayerView.getPlayer().getPlaybackRate()); // PLAYBACK_RATE
 			mMediaSessionCompat.setPlaybackState(newPlaybackState.build());
 			mNotificationWrapper
-					.createNotification(mPlayer.getContext(), mMediaSessionCompat, capabilities);
+					.createNotification(mPlayerView.getContext(), mMediaSessionCompat, capabilities);
 		}
 	}
 
@@ -257,17 +260,7 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 	 */
 	public void release() {
 		mMediaSessionCompat.release();
-		mPlayer.removeOnPlayListener(this);
-		mPlayer.removeOnPauseListener(this);
-		mPlayer.removeOnBufferListener(this);
-		mPlayer.removeOnErrorListener(this);
-		mPlayer.removeOnPlaylistListener(this);
-		mPlayer.removeOnPlaylistItemListener(this);
-		mPlayer.removeOnPlaylistCompleteListener(this);
-		mPlayer.removeOnAdPlayListener(this);
-		mPlayer.removeOnAdErrorListener(this);
-		mPlayer.removeOnAdSkippedListener(this);
-		mPlayer.removeOnAdCompleteListener(this);
+		mPlayerView.getPlayer().removeAllListeners(this);
 
 		// Remove any notifications
 		mNotificationWrapper.cancelNotification();
@@ -332,55 +325,55 @@ public class MediaSessionManager implements VideoPlayerEvents.OnPlayListener,
 	private final class MediaSessionCallback extends MediaSessionCompat.Callback {
 
 		public MediaSessionCallback(JWPlayerView playerView) {
-			mPlayer = playerView;
+			mPlayerView = playerView;
 		}
 
 		@Override
 		public void onPause() {
-			if (mPlayer != null) {
-				mPlayer.pause();
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().pause();
 			}
 		}
 
 		@Override
 		public void onPlay() {
-			if (mPlayer != null) {
-				mPlayer.play();
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().play();
 			}
 		}
 
 		@Override
 		public void onSeekTo(long pos) {
-			if (mPlayer != null) {
-				mPlayer.seek(pos);
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().seek(pos);
 			}
 		}
 
 		@Override
 		public void onSkipToNext() {
-			if (mPlayer != null) {
-				mPlayer.playlistItem(mPlayer.getPlaylistIndex() + 1);
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().playlistItem(mPlayerView.getPlayer().getPlaylistIndex() + 1);
 			}
 		}
 
 		@Override
 		public void onSkipToPrevious() {
-			if (mPlayer != null) {
-				mPlayer.playlistItem(mPlayer.getPlaylistIndex() - 1);
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().playlistItem(mPlayerView.getPlayer().getPlaylistIndex() - 1);
 			}
 		}
 
 		@Override
 		public void onStop() {
-			if (mPlayer != null) {
-				mPlayer.stop();
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().stop();
 			}
 		}
 
 		@Override
 		public void onSkipToQueueItem(long id) {
-			if (mPlayer != null) {
-				mPlayer.playlistItem((int)id);
+			if (mPlayerView != null) {
+				mPlayerView.getPlayer().playlistItem((int)id);
 			}
 		}
 	}

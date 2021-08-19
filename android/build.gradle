@@ -43,16 +43,33 @@ allprojects {
     }
 }
 
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
-
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation "com.longtailvideo.jwplayer:jwplayer-core:${safeExtGet('jwplayerVersion', '+')}"
-    implementation "com.longtailvideo.jwplayer:jwplayer-common:${safeExtGet('jwplayerVersion', '+')}"
-    implementation "com.longtailvideo.jwplayer:jwplayer-ima:${safeExtGet('jwplayerVersion', '+')}"
-    implementation "com.longtailvideo.jwplayer:jwplayer-chromecast:${safeExtGet('jwplayerVersion', '+')}"
+    implementation 'com.google.code.gson:gson:2.8.2'
+
+    // JWPlayer SDK
+    implementation 'com.jwplayer:jwplayer-core:4.0.0'
+    implementation 'com.jwplayer:jwplayer-common:4.0.0'
+    implementation 'com.jwplayer:jwplayer-chromecast:4.0.0'
+    implementation 'com.jwplayer:jwplayer-ima:4.0.0'
+
+    // Ad dependencies
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.24.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
+    implementation 'com.google.android.gms:play-services-cast-framework:20.0.0'
+
+    // ExoPlayer dependencies
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.0'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.0'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.0'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
+
+    // JW Player Native UI dependencies
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'com.android.volley:volley:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.mediarouter:mediarouter:1.1.0'
     implementation 'androidx.media:media:1.1.0'
 }

@@ -48,32 +48,7 @@ export const JWPlayerAdClients = {
 export default class JWPlayer extends Component {
   static propTypes = {
     config: PropTypes.shape({
-      file: PropTypes.string,
-      image: PropTypes.string,
-      title: PropTypes.string,
-      desc: PropTypes.string,
-      mediaId: PropTypes.string,
-      autostart: PropTypes.bool,
-      controls: PropTypes.bool,
-      repeat: PropTypes.bool,
-      mute: PropTypes.bool,
-      displayTitle: PropTypes.bool,
-      displayDesc: PropTypes.bool,
-      nextUpDisplay: PropTypes.bool,
-      // playerStyle: PropTypes.string,
-      colors: PropTypes.shape({
-        buttons: PropTypes.string,
-        timeslider: PropTypes.shape({
-          thumb: PropTypes.string,
-          rail: PropTypes.string,
-          slider: PropTypes.string,
-        }),
-      }),
-      nativeFullScreen: PropTypes.bool,
-      fullScreenOnLandscape: PropTypes.bool,
-      landscapeOnFullScreen: PropTypes.bool,
-      portraitOnExitFullScreen: PropTypes.bool,
-      exitFullScreenOnPortrait: PropTypes.bool,
+      license: PropTypes.string,
       backgroundAudioEnabled: PropTypes.bool,
       // stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
       playlist: PropTypes.arrayOf(

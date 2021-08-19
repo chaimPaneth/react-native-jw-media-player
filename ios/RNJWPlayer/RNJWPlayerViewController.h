@@ -7,10 +7,12 @@
 #import <JWPlayerKit/JWPlayerKit-swift.h>
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
+#import "RNJWPlayerPresentationController.h"
 
-@interface RNJWPlayerViewController : UIView  <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
+@interface RNJWPlayerViewController : UIView  <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate, UIViewControllerTransitioningDelegate>
 
-@property(nonatomic, strong)JWPlayerViewController *playerViewController;
+@property(nonatomic, strong)JWPlayerViewController* playerViewController;
+@property(nonatomic)RNJWPlayerPresentationController* pController;
 
 @property(nonatomic)BOOL pipEnabled;
 @property(nonatomic)BOOL backgroundAudioEnabled;

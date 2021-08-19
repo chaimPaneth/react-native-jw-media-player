@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A50B84A26CEB97F00DE6F98 /* RNJWPlayerPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A50B84926CEB97F00DE6F98 /* RNJWPlayerPresentationController.m */; };
 		2A9166FF21064ECE00152DD3 /* JWPlayer_iOS_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */; };
 		2AA52BE526C144B200AD26AE /* RNJWPlayerViewControllerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52BDD26C144B200AD26AE /* RNJWPlayerViewControllerManager.m */; };
 		2AA52BE626C144B200AD26AE /* RNJWPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52BDE26C144B200AD26AE /* RNJWPlayerViewController.m */; };
@@ -30,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNJWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNJWPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A50B84826CEB97F00DE6F98 /* RNJWPlayerPresentationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNJWPlayerPresentationController.h; path = RNJWPlayer/RNJWPlayerPresentationController.h; sourceTree = "<group>"; };
+		2A50B84926CEB97F00DE6F98 /* RNJWPlayerPresentationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerPresentationController.m; path = RNJWPlayer/RNJWPlayerPresentationController.m; sourceTree = "<group>"; };
 		2A9166FD21064DE100152DD3 /* JWPlayer_iOS_SDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWPlayer_iOS_SDK.framework; path = "../../../ios/Pods/JWPlayer-SDK/JWPlayer_iOS_SDK.framework"; sourceTree = "<group>"; };
 		2AA52BDD26C144B200AD26AE /* RNJWPlayerViewControllerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerViewControllerManager.m; path = RNJWPlayer/RNJWPlayerViewControllerManager.m; sourceTree = "<group>"; };
 		2AA52BDE26C144B200AD26AE /* RNJWPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerViewController.m; path = RNJWPlayer/RNJWPlayerViewController.m; sourceTree = "<group>"; };
@@ -78,6 +81,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				2A50B84826CEB97F00DE6F98 /* RNJWPlayerPresentationController.h */,
+				2A50B84926CEB97F00DE6F98 /* RNJWPlayerPresentationController.m */,
 				2AA52BE126C144B200AD26AE /* RNJWPlayerView.h */,
 				2AA52BE426C144B200AD26AE /* RNJWPlayerView.m */,
 				2AA52BDF26C144B200AD26AE /* RNJWPlayerViewController.h */,
@@ -152,6 +157,7 @@
 				2AA52BE626C144B200AD26AE /* RNJWPlayerViewController.m in Sources */,
 				2AA52BE726C144B200AD26AE /* RNJWPlayerViewManager.m in Sources */,
 				2AA52BE526C144B200AD26AE /* RNJWPlayerViewControllerManager.m in Sources */,
+				2A50B84A26CEB97F00DE6F98 /* RNJWPlayerPresentationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

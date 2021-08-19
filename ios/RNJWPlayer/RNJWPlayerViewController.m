@@ -10,6 +10,9 @@
 - (instancetype)init
 {
     self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotated:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    }
     return self;
 }
 
@@ -37,6 +40,18 @@
     
     NSError *activationError = nil;
     success = [audioSession setActive:YES error:&activationError];
+}
+
+- (void)rotated:(NSNotification *)notification {
+    if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Landscape");
+    }
+
+    if (UIDeviceOrientationIsPortrait(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Portrait");
+    }
+    
+    [self layoutSubviews];
 }
 
 #pragma mark - RNJWPlayer styling
@@ -240,12 +255,159 @@
         }
 }
 
+-(void)setStyling:(NSDictionary*)styling
+{
+    JWError* error = nil;
+    
+    if (styling != nil && (styling != (id)[NSNull null])) {
+        JWPlayerSkinBuilder* skinStylingBuilder = [[JWPlayerSkinBuilder alloc] init];
+        
+        id colors = styling[@"colors"];
+        if (colors != nil && (colors != (id)[NSNull null])) {
+            JWTimeSliderStyleBuilder* timeSliderStyleBuilder = [[JWTimeSliderStyleBuilder alloc] init];
+            
+            id slider = colors[@"slider"];
+            if (slider != nil && (slider != (id)[NSNull null])) {
+                [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:slider]];
+            }
+            
+            id rail = colors[@"rail"];
+            if (rail != nil && (rail != (id)[NSNull null])) {
+                [timeSliderStyleBuilder minimumTrackColor:[self colorWithHexString:rail]];
+            }
+            
+            id thumb = colors[@"thumb"];
+            if (thumb != nil && (thumb != (id)[NSNull null])) {
+                [timeSliderStyleBuilder thumbColor:[self colorWithHexString:thumb]];
+            }
+            
+            JWTimeSliderStyle* timeSliderStyle = [timeSliderStyleBuilder buildAndReturnError:&error];
+            
+            [skinStylingBuilder timeSliderStyle:timeSliderStyle];
+            
+            id buttons = colors[@"buttons"];
+            if (buttons != nil && (buttons != (id)[NSNull null])) {
+                [skinStylingBuilder buttonsColor:[self colorWithHexString:buttons]];
+            }
+            
+            id backgroundColor = colors[@"backgroundColor"];
+            if (backgroundColor != nil && (backgroundColor != (id)[NSNull null])) {
+                [skinStylingBuilder backgroundColor:[self colorWithHexString:backgroundColor]];
+            }
+            
+            id fontColor = colors[@"fontColor"];
+            if (fontColor != nil && (fontColor != (id)[NSNull null])) {
+                [skinStylingBuilder fontColor:[self colorWithHexString:fontColor]];
+            }
+        }
+        
+        id font = styling[@"font"];
+        if (font != nil && (font != (id)[NSNull null])) {
+            id name = font[@"name"];
+            id size = font[@"size"];
+            
+            if (name != nil && (name != (id)[NSNull null]) && size != nil && (size != (id)[NSNull null])) {
+                [skinStylingBuilder font:[UIFont fontWithName:name size:[size floatValue]]];
+            }
+        }
+        
+        id showTitle = styling[@"showTitle"];
+        if (showTitle != nil && (showTitle != (id)[NSNull null])) {
+            [skinStylingBuilder titleIsVisible:showTitle];
+        }
+        
+        id showDesc = styling[@"showDesc"];
+        if (showDesc != nil && (showDesc != (id)[NSNull null])) {
+            [skinStylingBuilder descriptionIsVisible:showDesc];
+        }
+        
+        id capStyle = styling[@"capStyle"];
+        if (capStyle != nil && (capStyle != (id)[NSNull null])) {
+            JWCaptionStyleBuilder* capStyleBuilder = [[JWCaptionStyleBuilder alloc] init];
+            
+            id font = capStyle[@"font"];
+            if (font != nil && (font != (id)[NSNull null])) {
+                id name = font[@"name"];
+                id size = font[@"size"];
+                if (name != nil && (name != (id)[NSNull null]) && size != nil && (size != (id)[NSNull null])) {
+                    [capStyleBuilder font:[UIFont fontWithName:name size:[size floatValue]]];
+                }
+            }
+            
+            id fontColor = capStyle[@"fontColor"];
+            if (fontColor != nil && (fontColor != (id)[NSNull null])) {
+                [capStyleBuilder fontColor:[self colorWithHexString:fontColor]];
+            }
+            
+            id backgroundColor = capStyle[@"backgroundColor"];
+            if (backgroundColor != nil && (backgroundColor != (id)[NSNull null])) {
+                [capStyleBuilder backgroundColor:[self colorWithHexString:backgroundColor]];
+            }
+            
+            id highlightColor = capStyle[@"highlightColor"];
+            if (highlightColor != nil && (highlightColor != (id)[NSNull null])) {
+                [capStyleBuilder highlightColor:[self colorWithHexString:highlightColor]];
+            }
+            
+            id edgeStyle = capStyle[@"edgeStyle"];
+            if (edgeStyle != nil && (edgeStyle != (id)[NSNull null])) {
+                JWCaptionEdgeStyle finalEdgeStyle;
+                switch ([edgeStyle intValue]) {
+                    case 1:
+                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
+                        break;
+                    case 2:
+                        finalEdgeStyle = JWCaptionEdgeStyleNone;
+                        break;
+                    case 3:
+                        finalEdgeStyle = JWCaptionEdgeStyleDropshadow;
+                        break;
+                    case 4:
+                        finalEdgeStyle = JWCaptionEdgeStyleRaised;
+                        break;
+                    case 5:
+                        finalEdgeStyle = JWCaptionEdgeStyleDepressed;
+                        break;
+                    case 6:
+                        finalEdgeStyle = JWCaptionEdgeStyleUniform;
+                        break;
+    
+                    default:
+                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
+                        break;
+                }
+                
+                [capStyleBuilder edgeStyle:finalEdgeStyle];
+            }
+            
+            JWCaptionStyle* captionStyle = [capStyleBuilder buildAndReturnError:&error];
+            
+            [skinStylingBuilder captionStyle:captionStyle];
+        }
+        
+//        menuStyle
+        
+        JWPlayerSkin *skinStyling = [skinStylingBuilder buildAndReturnError:&error];
+        
+        _playerViewController.styling = skinStyling;
+    }
+}
+
 -(void)setConfig:(NSDictionary*)config
 {
+    id license = config[@"license"];
+    if ((license != nil) && (license != (id)[NSNull null])) {
+        [JWPlayerKitLicense setLicenseKey:license];
+    } else {
+        NSLog(@"JW SDK License key not set.");
+    }
+    
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     if (_backgroundAudioEnabled) {
         [self initializeAudioSession];
     }
+    
+    [self dismissPlayerViewController];
     
     _playerViewController = [JWPlayerViewController new];
     _playerViewController.delegate = self;
@@ -282,56 +444,26 @@
         _playerViewController.enableLockScreenControls = enableLockScreenControls;
     }
     
-    JWError* error = nil;
-    
-    id colors = config[@"colors"];
-    if (colors != nil && (colors != (id)[NSNull null])) {
-        JWTimeSliderStyleBuilder* timeSliderStyleBuilder = [[JWTimeSliderStyleBuilder alloc] init];
-        
-        id slider = colors[@"slider"];
-        if (slider != nil && (slider != (id)[NSNull null])) {
-            [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:slider]];
-        }
-        
-        id rail = colors[@"rail"];
-        if (rail != nil && (rail != (id)[NSNull null])) {
-            [timeSliderStyleBuilder minimumTrackColor:[self colorWithHexString:rail]];
-        }
-        
-        id thumb = colors[@"thumb"];
-        if (thumb != nil && (thumb != (id)[NSNull null])) {
-            [timeSliderStyleBuilder thumbColor:[self colorWithHexString:thumb]];
-        }
-        
-        JWTimeSliderStyle* timeSliderStyle = [timeSliderStyleBuilder buildAndReturnError:&error];
-        
-        JWPlayerSkinBuilder* skinStylingBuilder = [[JWPlayerSkinBuilder alloc] init];
-        
-        [skinStylingBuilder timeSliderStyle:timeSliderStyle];
-        
-        id buttons = colors[@"buttons"];
-        if (buttons != nil && (buttons != (id)[NSNull null])) {
-            [skinStylingBuilder buttonsColor:[self colorWithHexString:buttons]];
-        }
-        
-//        menuStyle
-//        captionStyle
-//        backgroundColor
-//        fontColor
-//        font
-//        titleIsVisible
-//        descriptionIsVisible
-        
-        JWPlayerSkin *skinStyling = [skinStylingBuilder buildAndReturnError:&error];
-        
-        _playerViewController.styling = skinStyling;
-    }
+    id styling = config[@"styling"];
+    [self setStyling:styling];
     
     //    _playerViewController.adInterfaceStyle
 //    _playerViewController.logo
 //    _playerViewController.nextUpStyle
-//    _playerViewController.offlineMessage
-//    _playerViewController.offlinePosterImage
+    
+    id offlineMsg = config[@"offlineMessage"];
+    if (offlineMsg != nil && offlineMsg != (id)[NSNull null]) {
+        _playerViewController.offlineMessage = offlineMsg;
+    }
+    
+    id offlineImg = config[@"offlineImage"];
+    if (offlineImg != nil && offlineImg != (id)[NSNull null]) {
+        NSURL* imageUrl = [NSURL URLWithString:offlineImg];
+        if ([imageUrl isFileURL]) {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+            _playerViewController.offlinePosterImage = image;
+        }
+    }
     
     NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
     if (config[@"items"] != nil && (config[@"items"] != (id)[NSNull null])) {
@@ -356,40 +488,42 @@
         [configBuilder repeatContent:repeatContent];
     }
     
-//    if (config[@"playerSize"] != nil && (config[@"playerSize"] != (id)[NSNull null])) {
-//        id playerSize = config[@"playerSize"];
-//        id width = playerSize[@"width"];
-//        id height = playerSize[@"height"];
-//
-//        if (width != nil && width != (id)[NSNull null] && height != nil && height != (id)[NSNull null]) {
-//            _playerViewController.preferredContentSize = CGSizeMake([width doubleValue], [height doubleValue]);
-//        }
-//    }
-    
 //            preload
 //            JWRelatedContentConfiguration
 //            [configBuilder related:(JWRelatedContentConfiguration * _Nonnull)]
     
-    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
-//    [window.rootViewController presentViewController:_playerViewController animated:NO completion:nil];
-    
-    [window.rootViewController presentViewController:_playerViewController animated:NO completion:^{
-//        if (config[@"playerSize"] == nil || (config[@"playerSize"] == (id)[NSNull null])) {
-            self->_playerViewController.view.frame = self.superview.frame;
-//        }
-    }];
-    
+    JWError* error = nil;
     JWPlayerConfiguration* configuration = [configBuilder buildAndReturnError:&error];
+    [self presentPlayerViewController:configuration];
+}
+
+-(void)dismissPlayerViewController
+{
+    if (_playerViewController != nil) {
+        [_playerViewController dismissViewControllerAnimated:NO completion:^{
+            self->_playerViewController = nil;
+        }];
+    }
+}
+
+-(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
+{
+    _playerViewController.providesPresentationContextTransitionStyle = YES;
+    _playerViewController.definesPresentationContext = YES;
+    _playerViewController.modalPresentationStyle = UIModalPresentationCustom;
+    _playerViewController.transitioningDelegate = self;
+    _playerViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    
+    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
+    [window.rootViewController presentViewController:_playerViewController animated:NO completion:nil];
     
     [_playerViewController.player configurePlayerWith:configuration];
-//    [_playerViewController.playerView.player configurePlayerWith:configuration];
-    
-    _playerViewController.playerView.delegate = self;
 
-    _playerViewController.playerView.player.delegate = self;
-    _playerViewController.playerView.player.playbackStateDelegate = self; // this causes issue
-    _playerViewController.playerView.player.adDelegate = self;
-    _playerViewController.playerView.player.avDelegate = self;
+    _playerViewController.playerView.delegate = self;
+    _playerViewController.player.delegate = self;
+//    _playerViewController.player.playbackStateDelegate = self; // this causes issue with ui
+    _playerViewController.player.adDelegate = self;
+    _playerViewController.player.avDelegate = self;
 }
 
 -(void)continuePlaying
@@ -409,11 +543,6 @@
     if (self.onPlayerReady) {
         self.onPlayerReady(@{});
     }
-    
-//    CGRect f = self.frame;
-//    f.origin = self.superview.frame.origin;
-//
-//    _playerViewController.view.frame = f;
 }
 
 - (void)jwplayer:(id<JWPlayer>)player failedWithError:(NSUInteger)code message:(NSString *)message
@@ -886,6 +1015,33 @@
     if (!_userPaused) { // && _backgroundAudioEnabled
         [self.playerViewController.player play];
     }
+}
+
+#pragma mark - UIViewController Transitioning Delegate
+
+- (UIPresentationController *)presentationControllerForPresentedViewController:(UIViewController *)presented presentingViewController:(UIViewController *)presenting sourceViewController:(UIViewController *)source
+{
+    _pController = [[RNJWPlayerPresentationController alloc] initWithPresentedViewController:presented presentingViewController:presenting];
+    return _pController;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    _pController.jwSuperView = self.superview;
+    
+    CGRect f;
+    if (@available(iOS 11.0, *)) {
+        f = self.superview.superview.superview.superview.safeAreaLayoutGuide.layoutFrame;
+    } else {
+        // Fallback on earlier versions
+    }
+    
+    CGRect superFrame = self.superview.frame;
+    superFrame.origin.y = f.origin.y;
+    
+    _pController.superFrame = superFrame;
 }
 
 @end

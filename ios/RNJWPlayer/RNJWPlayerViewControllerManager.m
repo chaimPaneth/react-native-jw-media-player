@@ -13,7 +13,7 @@
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
+- (UIView*)view
 {
     return [[RNJWPlayerViewController alloc] init];
 }
