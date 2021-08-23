@@ -5,23 +5,22 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.view.KeyEvent;
 
-import com.longtailvideo.jwplayer.JWPlayerView;
-import com.longtailvideo.jwplayer.configuration.PlayerConfig;
+import com.jwplayer.pub.view.JWPlayerView;
 
 public class RNJWPlayer extends JWPlayerView {
     public Boolean fullScreenOnLandscape = false;
     public Boolean exitFullScreenOnPortrait = false;
 
-    public RNJWPlayer(Context var1, PlayerConfig var2) {
-        super(var1, var2);
+    public RNJWPlayer(Context var1) {
+        super(var1);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // Exit fullscreen or perform the action requested
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && this.getFullscreen()) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && this.getPlayer().getFullscreen()) {
             if (event.getAction() == KeyEvent.ACTION_UP) {
-                this.setFullscreen(false,false);
+                this.getPlayer().setFullscreen(false,false);
                 return false;
             }
             return true;
@@ -57,11 +56,11 @@ public class RNJWPlayer extends JWPlayerView {
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (fullScreenOnLandscape) {
-                this.setFullscreen(true,true);
+                this.getPlayer().setFullscreen(true,true);
             }
         } else if (newConfig.orientation==Configuration.ORIENTATION_PORTRAIT) {
             if (exitFullScreenOnPortrait) {
-                this.setFullscreen(false,false);
+                this.getPlayer().setFullscreen(false,false);
             }
         }
     }
