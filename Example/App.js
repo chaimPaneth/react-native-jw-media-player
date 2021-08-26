@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 
-import JWPlayer from 'react-native-jw-media-player/JWPlayerViewController';
+import JWPlayer from 'react-native-jw-media-player';
 
 const {width} = Dimensions.get('window');
 

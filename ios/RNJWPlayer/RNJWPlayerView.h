@@ -8,14 +8,14 @@
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
 
-@interface RNJWPlayerView: UIView  <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
+@interface RNJWPlayerView : UIView  <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
 
+@property(nonatomic, strong)JWPlayerViewController* playerViewController;
 @property(nonatomic, strong)JWPlayerView *playerView;
 
 @property(nonatomic)BOOL pipEnabled;
 @property(nonatomic)BOOL backgroundAudioEnabled;
 
-@property(nonatomic)CGRect initFrame;
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 
@@ -48,6 +48,14 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerAdWarning;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerAdError;
 @property(nonatomic, copy)RCTBubblingEventBlock onAdEvent;
+
+/* player view controller events */
+@property(nonatomic, copy)RCTBubblingEventBlock onScreenTapped;
+@property(nonatomic, copy)RCTBubblingEventBlock onControlBarVisible;
+@property(nonatomic, copy)RCTBubblingEventBlock onFullScreen;
+@property(nonatomic, copy)RCTBubblingEventBlock onFullScreenRequested;
+@property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExit;
+@property(nonatomic, copy)RCTBubblingEventBlock onFullScreenExitRequested;
 
 /* player view events */
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerSizeChange;

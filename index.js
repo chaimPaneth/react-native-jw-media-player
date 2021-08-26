@@ -10,12 +10,12 @@ import PropTypes from "prop-types";
 
 const RNJWPlayerManager =
   Platform.OS === "ios"
-    ? NativeModules.RNJWPlayerViewControllerManager
+    ? NativeModules.RNJWPlayerViewManager
     : NativeModules.RNJWPlayerModule;
 
 const RCT_RNJWPLAYER_REF = "rnjwplayer";
 
-const RNJWPlayer = requireNativeComponent("RNJWPlayerViewController", null);
+const RNJWPlayer = requireNativeComponent("RNJWPlayerView", null);
 
 const JWPlayerStateIOS = {
   JWPlayerStatePlaying: 0,
@@ -48,54 +48,107 @@ export const JWPlayerAdClients = {
 export default class JWPlayer extends Component {
   static propTypes = {
     config: PropTypes.shape({
-      file: PropTypes.string,
-      image: PropTypes.string,
-      title: PropTypes.string,
-      desc: PropTypes.string,
-      mediaId: PropTypes.string,
+      license: PropTypes.string,
+      backgroundAudioEnabled: PropTypes.bool,
+      pipEnabled: PropTypes.bool,
+      viewOnly: PropTypes.bool,
       autostart: PropTypes.bool,
       controls: PropTypes.bool,
       repeat: PropTypes.bool,
-      mute: PropTypes.bool,
-      displayTitle: PropTypes.bool,
-      displayDesc: PropTypes.bool,
-      nextUpDisplay: PropTypes.bool,
-      // playerStyle: PropTypes.string,
-      colors: PropTypes.shape({
-        buttons: PropTypes.string,
-        timeslider: PropTypes.shape({
-          thumb: PropTypes.string,
-          rail: PropTypes.string,
-          slider: PropTypes.string,
-        }),
-      }),
-      nativeFullScreen: PropTypes.bool,
-      fullScreenOnLandscape: PropTypes.bool,
-      landscapeOnFullScreen: PropTypes.bool,
-      portraitOnExitFullScreen: PropTypes.bool,
-      exitFullScreenOnPortrait: PropTypes.bool,
-      backgroundAudioEnabled: PropTypes.bool,
-      // stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
-      playlist: PropTypes.arrayOf(
+      preload: PropTypes.oneOf(["0", "1"]),
+      items: PropTypes.arrayOf(
         PropTypes.shape({
-          file: PropTypes.string.isRequired,
+          file: PropTypes.string,
+          sources: PropTypes.arrayOf(
+            PropTypes.shape({
+              file: PropTypes.string,
+              label: PropTypes.string,
+              default: PropTypes.bool,
+            }),
+          ),
           image: PropTypes.string,
           title: PropTypes.string,
           desc: PropTypes.string,
-          mediaId: PropTypes.string.isRequired,
-          autostart: PropTypes.bool.isRequired,
+          mediaId: PropTypes.string,
+          autostart: PropTypes.bool,
+          recommendations: PropTypes.string,
+          tracks: PropTypes.arrayOf(
+            PropTypes.shape({
+              file: PropTypes.string,
+              label: PropTypes.string,
+            }),
+          ),
           adSchedule: PropTypes.arrayOf(
             PropTypes.shape({
               tag: PropTypes.string,
               offset: PropTypes.string,
-            })
+            }),
           ),
           adVmap: PropTypes.string,
-          adClient: PropTypes.string,
           startTime: PropTypes.number,
-          // backgroundAudioEnabled: PropTypes.bool,
         })
       ),
+      advertising: PropTypes.shape({
+        // adClient: PropTypes.string,
+        adSchedule: PropTypes.arrayOf(
+          PropTypes.shape({
+            tag: PropTypes.string,
+            offset: PropTypes.string,
+          }),
+        ),
+        adVmap: PropTypes.string,
+        tag: PropTypes.string,
+        openBrowserOnAdClick: PropTypes.bool,
+      }),
+
+      // controller only
+      interfaceBehavior: PropTypes.oneOf(["0", "1", "2"]),
+      styling: PropTypes.shape({
+        colors: PropTypes.shape({
+          buttons: PropTypes.string,
+          backgroundColor: PropTypes.string,
+          fontColor: PropTypes.string,
+          timeslider: PropTypes.shape({
+            thumb: PropTypes.string,
+            rail: PropTypes.string,
+            slider: PropTypes.string,
+          }),
+          font: PropTypes.shape({
+            name: PropTypes.string,
+            size: PropTypes.number,
+          }),
+          captionsStyle: PropTypes.shape({
+            font: PropTypes.shape({
+              name: PropTypes.string,
+              size: PropTypes.number,
+            }),
+            backgroundColor: PropTypes.string,
+            fontColor: PropTypes.string,
+            highlightColor: PropTypes.string,
+            edgeStyle: PropTypes.oneOf(["1", "2" ,"3", "4", "5", "6"])
+          }),
+          menuStyle: PropTypes.shape({
+            font: PropTypes.shape({
+              name: PropTypes.string,
+              size: PropTypes.number,
+            }),
+            backgroundColor: PropTypes.string,
+            fontColor: PropTypes.string,
+          }),
+        }),
+        showTitle: PropTypes.bool,
+        showDesc: PropTypes.bool,
+      }),
+      nextUpStyle: PropTypes.shape({
+        offsetSeconds: PropTypes.number,
+        offsetPercentage: PropTypes.number
+      }),
+      offlineMessage: PropTypes.string,
+      offlineImage: PropTypes.string,
+      forceFullScreenOnLandscape: PropTypes.bool,
+      forceLandscapeOnFullScreen: PropTypes.bool,
+      enableLockScreenControls: PropTypes.bool,
+      stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
     }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
@@ -226,50 +279,21 @@ export default class JWPlayer extends Component {
   }
 
   showAirPlayButton(x, y, width = 44, hight = 44, autoHide = true) {
-    if (RNJWPlayerManager && Platform.OS === "ios")
-      RNJWPlayerManager.showAirPlayButton(
-        this.getRNJWPlayerBridgeHandle(),
-        x,
-        y,
-        width,
-        hight,
-        autoHide
-      );
+    if (RNJWPlayerManager && Platform.OS === 'ios')
+      RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
   }
 
   hideAirPlayButton() {
-    if (RNJWPlayerManager && Platform.OS === "ios")
+    if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
   }
 
-  showCastButton(
-    x,
-    y,
-    width = 24,
-    hight = 24,
-    autoHide = true,
-    customButton = false
-  ) {
+  showCastButton(x, y, width = 24, hight = 24, autoHide = true, customButton = false) {
     if (RNJWPlayerManager) {
-      if (Platform.OS === "ios") {
-        RNJWPlayerManager.showCastButton(
-          this.getRNJWPlayerBridgeHandle(),
-          x,
-          y,
-          width,
-          hight,
-          autoHide,
-          customButton
-        );
+      if (Platform.OS === 'ios') {
+          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide, customButton);
       } else {
-        RNJWPlayerManager.showCastButton(
-          this.getRNJWPlayerBridgeHandle(),
-          x,
-          y,
-          width,
-          hight,
-          autoHide
-        );
+          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
       }
     }
   }

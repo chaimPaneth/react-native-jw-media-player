@@ -13,7 +13,7 @@
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
+- (UIView*)view
 {
     return [[RNJWPlayerView alloc] init];
 }
@@ -48,6 +48,14 @@ RCT_EXPORT_VIEW_PROPERTY(onPlayerAdWarning, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerAdError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdEvent, RCTBubblingEventBlock);
 
+/* jwplayer view controller events */
+RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onScreenTapped, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenRequested, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenExit, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
+
 /* jwplayer view events */
 RCT_EXPORT_VIEW_PROPERTY(onPlayerSizeChange, RCTBubblingEventBlock);
 
@@ -61,13 +69,15 @@ RCT_REMAP_METHOD(state,
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
             
             NSError *error = [[NSError alloc] init];
-            reject(@"no_player", @"There is no playerView", error);
+            reject(@"no_player", @"There is no playerViewController or playerView", error);
         } else {
-            if (view.playerView) {
+            if (view.playerViewController) {
+                resolve([NSNumber numberWithInt:[view.playerViewController.player getState]]);
+            } else if (view.playerView) {
                 resolve([NSNumber numberWithInt:[view.playerView.player getState]]);
             } else {
                 NSError *error = [[NSError alloc] init];
@@ -80,11 +90,15 @@ RCT_REMAP_METHOD(state,
 RCT_EXPORT_METHOD(pause:(nonnull NSNumber*)reactTag) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
             view.userPaused = YES;
-            [view.playerView.player pause];
+            if (view.playerView) {
+                [view.playerView.player pause];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player pause];
+            }
         }
     }];
 }
@@ -92,11 +106,14 @@ RCT_EXPORT_METHOD(pause:(nonnull NSNumber*)reactTag) {
 RCT_EXPORT_METHOD(play:(nonnull NSNumber *)reactTag) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-//            view.playerView.config.controls = [view.playerView.player controls];
-            [view.playerView.player play];
+            if (view.playerView) {
+                [view.playerView.player play];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player play];
+            }
         }
     }];
     
@@ -105,11 +122,15 @@ RCT_EXPORT_METHOD(play:(nonnull NSNumber *)reactTag) {
 RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
             view.userPaused = YES;
-            [view.playerView.player stop];
+            if (view.playerView) {
+                [view.playerView.player stop];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player stop];
+            }
         }
     }];
     
@@ -121,13 +142,17 @@ RCT_REMAP_METHOD(time,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView.player == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
             
             NSError *error = [[NSError alloc] init];
             reject(@"no_player", @"There is no playerView", error);
         } else {
-            resolve(@{@"time": view.playerView.player.time});
+            if (view.playerView) {
+                resolve(@{@"time": view.playerView.player.time});
+            } else if (view.playerViewController) {
+                resolve(@{@"time": view.playerViewController.player.time});
+            }
         }
     }];
 }
@@ -135,13 +160,21 @@ RCT_REMAP_METHOD(time,
 RCT_EXPORT_METHOD(toggleSpeed:(nonnull NSNumber*)reactTag) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-            if ([view.playerView.player playbackRate] < 2.0) {
-                view.playerView.player.playbackRate = [view.playerView.player playbackRate] + 0.5;
-            } else {
-                view.playerView.player.playbackRate = 0.5;
+            if (view.playerView) {
+                if ([view.playerView.player playbackRate] < 2.0) {
+                    view.playerView.player.playbackRate = [view.playerView.player playbackRate] + 0.5;
+                } else {
+                    view.playerView.player.playbackRate = 0.5;
+                }
+            } else if (view.playerViewController) {
+                if ([view.playerViewController.player playbackRate] < 2.0) {
+                    view.playerViewController.player.playbackRate = [view.playerViewController.player playbackRate] + 0.5;
+                } else {
+                    view.playerViewController.player.playbackRate = 0.5;
+                }
             }
         }
     }];
@@ -151,10 +184,14 @@ RCT_EXPORT_METHOD(toggleSpeed:(nonnull NSNumber*)reactTag) {
 RCT_EXPORT_METHOD(setSpeed:(nonnull NSNumber*)reactTag: (double)speed) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-            view.playerView.player.playbackRate = speed;
+            if (view.playerView) {
+                view.playerView.player.playbackRate = speed;
+            } else if (view.playerViewController) {
+                view.playerViewController.player.playbackRate = speed;
+            }
         }
     }];
 }
@@ -162,10 +199,14 @@ RCT_EXPORT_METHOD(setSpeed:(nonnull NSNumber*)reactTag: (double)speed) {
 RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-            [view.playerView.player loadPlayerItemAtIndex:[index integerValue]];
+            if (view.playerView) {
+                [view.playerView.player loadPlayerItemAtIndex:[index integerValue]];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player loadPlayerItemAtIndex:[index integerValue]];
+            }
         }
     }];
 }
@@ -173,21 +214,14 @@ RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNum
 RCT_EXPORT_METHOD(seekTo :(nonnull NSNumber *)reactTag: (nonnull NSNumber *)time) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-            [view.playerView.player seekTo:[time integerValue]];
-        }
-    }];
-}
-
-RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fs) {
-    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
-        RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
-            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
-        } else {
-//            [view.playerView.player setFullscreen:fs];
+            if (view.playerView) {
+                [view.playerView.player seekTo:[time integerValue]];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player seekTo:[time integerValue]];
+            }
         }
     }];
 }
@@ -195,10 +229,14 @@ RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fs) {
 RCT_EXPORT_METHOD(setVolume: (nonnull NSNumber *)reactTag :(nonnull NSNumber *)volume) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
         RNJWPlayerView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerViewController == nil && view.playerView == nil)) {
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
-            [view.playerView.player setVolume:[volume floatValue]];
+            if (view.playerView) {
+                [view.playerView.player setVolume:[volume floatValue]];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player setVolume:[volume floatValue]];
+            }
         }
     }];
 }

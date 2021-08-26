@@ -26,7 +26,18 @@
     }
 }
 
--(void)layoutSubviews
+- (void)removeFromSuperview {
+    [self reset];
+    [super removeFromSuperview];
+}
+
+-(void)reset
+{
+    [self removePlayerView];
+    [self dismissPlayerViewController];
+}
+
+- (void)layoutSubviews
 {
     [super layoutSubviews];
     
@@ -34,41 +45,53 @@
         self.playerView.frame = self.frame;
     }
     
-    if (_initFrame.size.height == 0) {
-        _initFrame = self.frame;
+    if (self.playerViewController != nil) {
+        self.playerViewController.view.frame = self.frame;
     }
 }
 
-- (void)removeFromSuperview {
-    [self reset];
-    [super removeFromSuperview];
+- (void)rotated:(NSNotification *)notification {
+    if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Landscape");
+    }
+
+    if (UIDeviceOrientationIsPortrait(UIDevice.currentDevice.orientation)) {
+        NSLog(@"Portrait");
+    }
+    
+    [self layoutSubviews];
 }
 
-- (void)initializeAudioSession
+-(BOOL)shouldAutorotate {
+    return NO;
+}
+
+#pragma mark - RNJWPlayer props
+
+-(void)setConfig:(NSDictionary*)config
 {
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    id license = config[@"license"];
+    if ((license != nil) && (license != (id)[NSNull null])) {
+        [JWPlayerKitLicense setLicenseKey:license];
+    } else {
+        NSLog(@"JW SDK License key not set.");
+    }
     
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(audioSessionInterrupted:)
-                                                 name: AVAudioSessionInterruptionNotification
-                                               object: audioSession];
+    _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
+    _pipEnabled = config[@"pipEnabled"];
+    if (_backgroundAudioEnabled || _pipEnabled) {
+        [self initializeAudioSession];
+    }
     
-    NSError *setCategoryError = nil;
-    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
-    
-    NSError *activationError = nil;
-    success = [audioSession setActive:YES error:&activationError];
+    id viewOnly = config[@"viewOnly"];
+    if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
+        [self setupPlayerView:config :[self getPlayerConfiguration:config]];
+    } else {
+        [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
+    }
 }
 
 #pragma mark - RNJWPlayer styling
-
--(void)customStyle: (JWPlayerView*)playerView :(NSString*)name
-{
-    JWPlayerSkin *skinStyling = [JWPlayerSkin init];
-    
-//    skinStyling.url = [NSString stringWithFormat:@"file://%@", [[NSBundle mainBundle] pathForResource:name ofType:@"css"]];
-//    skinStyling.name = name;
-}
 
 -(UIColor*)colorWithHexString:(NSString*)hex
 {
@@ -106,22 +129,180 @@
                            alpha:1.0f];
 }
 
-
-
-#pragma mark - RNJWPlayer props
-
--(BOOL)shouldAutorotate {
-    return NO;
-}
-
--(void)reset
+-(void)setStyling:(NSDictionary*)styling
 {
-    _playerView = nil;
+    JWError* error = nil;
+    
+    if (styling != nil && (styling != (id)[NSNull null])) {
+        JWPlayerSkinBuilder* skinStylingBuilder = [[JWPlayerSkinBuilder alloc] init];
+        
+        id colors = styling[@"colors"];
+        if (colors != nil && (colors != (id)[NSNull null])) {
+            id timeSlider = styling[@"timeslider"];
+            if (timeSlider != nil && (timeSlider != (id)[NSNull null])) {
+                JWTimeSliderStyleBuilder* timeSliderStyleBuilder = [[JWTimeSliderStyleBuilder alloc] init];
+                
+                id slider = timeSlider[@"slider"];
+                if (slider != nil && (slider != (id)[NSNull null])) {
+                    [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:slider]];
+                }
+                
+                id rail = timeSlider[@"rail"];
+                if (rail != nil && (rail != (id)[NSNull null])) {
+                    [timeSliderStyleBuilder minimumTrackColor:[self colorWithHexString:rail]];
+                }
+                
+                id thumb = timeSlider[@"thumb"];
+                if (thumb != nil && (thumb != (id)[NSNull null])) {
+                    [timeSliderStyleBuilder thumbColor:[self colorWithHexString:thumb]];
+                }
+                
+                JWTimeSliderStyle* timeSliderStyle = [timeSliderStyleBuilder buildAndReturnError:&error];
+                
+                [skinStylingBuilder timeSliderStyle:timeSliderStyle];
+            }
+            
+            id buttons = colors[@"buttons"];
+            if (buttons != nil && (buttons != (id)[NSNull null])) {
+                [skinStylingBuilder buttonsColor:[self colorWithHexString:buttons]];
+            }
+            
+            id backgroundColor = colors[@"backgroundColor"];
+            if (backgroundColor != nil && (backgroundColor != (id)[NSNull null])) {
+                [skinStylingBuilder backgroundColor:[self colorWithHexString:backgroundColor]];
+            }
+            
+            id fontColor = colors[@"fontColor"];
+            if (fontColor != nil && (fontColor != (id)[NSNull null])) {
+                [skinStylingBuilder fontColor:[self colorWithHexString:fontColor]];
+            }
+        }
+        
+        id font = styling[@"font"];
+        if (font != nil && (font != (id)[NSNull null])) {
+            id name = font[@"name"];
+            id size = font[@"size"];
+            
+            if (name != nil && (name != (id)[NSNull null]) && size != nil && (size != (id)[NSNull null])) {
+                [skinStylingBuilder font:[UIFont fontWithName:name size:[size floatValue]]];
+            }
+        }
+        
+        id showTitle = styling[@"showTitle"];
+        if (showTitle != nil && (showTitle != (id)[NSNull null])) {
+            [skinStylingBuilder titleIsVisible:showTitle];
+        }
+        
+        id showDesc = styling[@"showDesc"];
+        if (showDesc != nil && (showDesc != (id)[NSNull null])) {
+            [skinStylingBuilder descriptionIsVisible:showDesc];
+        }
+        
+        id capStyle = styling[@"captionsStyle"];
+        if (capStyle != nil && (capStyle != (id)[NSNull null])) {
+            JWCaptionStyleBuilder* capStyleBuilder = [[JWCaptionStyleBuilder alloc] init];
+            
+            id font = capStyle[@"font"];
+            if (font != nil && (font != (id)[NSNull null])) {
+                id name = font[@"name"];
+                id size = font[@"size"];
+                if (name != nil && (name != (id)[NSNull null]) && size != nil && (size != (id)[NSNull null])) {
+                    [capStyleBuilder font:[UIFont fontWithName:name size:[size floatValue]]];
+                }
+            }
+            
+            id fontColor = capStyle[@"fontColor"];
+            if (fontColor != nil && (fontColor != (id)[NSNull null])) {
+                [capStyleBuilder fontColor:[self colorWithHexString:fontColor]];
+            }
+            
+            id backgroundColor = capStyle[@"backgroundColor"];
+            if (backgroundColor != nil && (backgroundColor != (id)[NSNull null])) {
+                [capStyleBuilder backgroundColor:[self colorWithHexString:backgroundColor]];
+            }
+            
+            id highlightColor = capStyle[@"highlightColor"];
+            if (highlightColor != nil && (highlightColor != (id)[NSNull null])) {
+                [capStyleBuilder highlightColor:[self colorWithHexString:highlightColor]];
+            }
+            
+            id edgeStyle = capStyle[@"edgeStyle"];
+            if (edgeStyle != nil && (edgeStyle != (id)[NSNull null])) {
+                JWCaptionEdgeStyle finalEdgeStyle;
+                switch ([edgeStyle intValue]) {
+                    case 1:
+                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
+                        break;
+                    case 2:
+                        finalEdgeStyle = JWCaptionEdgeStyleNone;
+                        break;
+                    case 3:
+                        finalEdgeStyle = JWCaptionEdgeStyleDropshadow;
+                        break;
+                    case 4:
+                        finalEdgeStyle = JWCaptionEdgeStyleRaised;
+                        break;
+                    case 5:
+                        finalEdgeStyle = JWCaptionEdgeStyleDepressed;
+                        break;
+                    case 6:
+                        finalEdgeStyle = JWCaptionEdgeStyleUniform;
+                        break;
+    
+                    default:
+                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
+                        break;
+                }
+                
+                [capStyleBuilder edgeStyle:finalEdgeStyle];
+            }
+            
+            JWCaptionStyle* captionStyle = [capStyleBuilder buildAndReturnError:&error];
+            
+            [skinStylingBuilder captionStyle:captionStyle];
+        }
+        
+        
+        id menuStyle = styling[@"menuStyle"];
+        if (menuStyle != nil && (menuStyle != (id)[NSNull null])) {
+            JWMenuStyleBuilder* menuStyleBuilder = [[JWMenuStyleBuilder alloc] init];
+            
+            id font = capStyle[@"font"];
+            if (font != nil && (font != (id)[NSNull null])) {
+                id name = font[@"name"];
+                id size = font[@"size"];
+                if (name != nil && (name != (id)[NSNull null]) && size != nil && (size != (id)[NSNull null])) {
+                    [menuStyle font:[UIFont fontWithName:name size:[size floatValue]]];
+                }
+            }
+            
+            id fontColor = capStyle[@"fontColor"];
+            if (fontColor != nil && (fontColor != (id)[NSNull null])) {
+                [menuStyle fontColor:[self colorWithHexString:fontColor]];
+            }
+            
+            id backgroundColor = capStyle[@"backgroundColor"];
+            if (backgroundColor != nil && (backgroundColor != (id)[NSNull null])) {
+                [menuStyle backgroundColor:[self colorWithHexString:backgroundColor]];
+            }
+            
+            JWMenuStyle* jwMenuStyle = [menuStyleBuilder buildAndReturnError:&error];
+            
+            [skinStylingBuilder menuStyle:jwMenuStyle];
+        }
+        
+        JWPlayerSkin *skinStyling = [skinStylingBuilder buildAndReturnError:&error];
+        
+        _playerViewController.styling = skinStyling;
+    }
 }
+
+#pragma mark - RNJWPlayer config helpers
 
 -(JWPlayerItem*)getPlayerItem:item
 {
-    JWPlayerItemBuilder* itemBuilder = [JWPlayerItemBuilder new];
+    JWPlayerItemBuilder* itemBuilder = [[JWPlayerItemBuilder alloc] init];
+    JWError* error = nil;
     
     NSString* newFile = [item objectForKey:@"file"];
     NSURL* url = [NSURL URLWithString:newFile];
@@ -132,6 +313,34 @@
         NSString* encodedString = [newFile stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
         NSURL* encodedUrl = [NSURL URLWithString:encodedString];
         [itemBuilder file:encodedUrl];
+    }
+    
+    id itemSources = item[@"sources"];
+    if(itemSources != nil && (itemSources != (id)[NSNull null])) {
+        NSArray* itemSourcesArray = (NSArray*)itemSources;
+        if (itemSourcesArray.count > 0) {
+            NSMutableArray <JWVideoSource*> *sourcesArray = [[NSMutableArray alloc] init];
+            
+            for (id source in itemSourcesArray) {
+                NSString* file = [source objectForKey:@"file"];
+                NSURL* fileUrl = [NSURL URLWithString:file];
+                NSString* label = [source objectForKey:@"label"];
+                bool isDefault = [source objectForKey:@"default"];
+                
+                JWVideoSource* sourceItem = [JWVideoSource init];
+                JWVideoSourceBuilder* sourceBuilder = [[JWVideoSourceBuilder alloc] init];
+                
+                [sourceBuilder file:fileUrl];
+                [sourceBuilder label:label];
+                [sourceBuilder defaultVideo:isDefault];
+                
+                sourceItem = [sourceBuilder buildAndReturnError:&error];
+                
+                [sourcesArray addObject:sourceItem];
+            }
+            
+            [itemBuilder videoSources:itemSourcesArray];
+        }
     }
     
     id mediaId = item[@"mediaId"];
@@ -159,91 +368,80 @@
     if ((startTime != nil) && (startTime != (id)[NSNull null])) {
         [itemBuilder startTime:[startTime floatValue]];
     }
+    
+    id recommendations = item[@"recommendations"];
+    if ((recommendations != nil) && (recommendations != (id)[NSNull null])) {
+        NSURL* recUrl = [NSURL URLWithString:recommendations];
+        [itemBuilder recommendations:recUrl];
+    }
 
-    NSMutableArray <JWMediaTrack*> *tracksArray = [[NSMutableArray alloc] init];
     id tracksItem = item[@"tracks"];
-    if(tracksItem != nil) {
+    if(tracksItem != nil && (tracksItem != (id)[NSNull null])) {
         NSArray* tracksItemArray = (NSArray*)tracksItem;
-        if(tracksItemArray.count > 0) {
+        if (tracksItemArray.count > 0) {
+            NSMutableArray <JWMediaTrack*> *tracksArray = [[NSMutableArray alloc] init];
+            
             for (id item in tracksItemArray) {
                 NSString *file = [item objectForKey:@"file"];
                 NSURL *fileUrl = [NSURL URLWithString:file];
                 NSString *label = [item objectForKey:@"label"];
                 
                 JWMediaTrack *trackItem = [JWMediaTrack init];
-                JWCaptionTrackBuilder* trackBuilder = [JWCaptionTrackBuilder new];
+                JWCaptionTrackBuilder* trackBuilder = [[JWCaptionTrackBuilder alloc] init];
                 
                 [trackBuilder file:fileUrl];
                 [trackBuilder label:label];
                 
-                NSError* error = nil;
                 trackItem = [trackBuilder buildAndReturnError:&error];
                 
                 [tracksArray addObject:trackItem];
             }
+            
+            [itemBuilder mediaTracks:tracksArray];
         }
     }
-    if (tracksArray.count > 0) {
-        [itemBuilder mediaTracks:tracksArray];
-    }
     
-    NSMutableArray <JWAdBreak*>* adsArray = [[NSMutableArray alloc] init];
     id ads = item[@"adSchedule"];
-    if(ads != nil) {
+    if(ads != nil && (ads != (id)[NSNull null])) {
         NSArray* adsAr = (NSArray*)ads;
-        if(adsAr.count > 0) {
+        if (adsAr.count > 0) {
+            NSMutableArray <JWAdBreak*>* adsArray = [[NSMutableArray alloc] init];
+            
             for (id item in adsAr) {
                 NSString *offsetString = [item objectForKey:@"offset"];
                 NSString *tag = [item objectForKey:@"tag"];
                 NSURL* tagUrl = [NSURL URLWithString:tag];
                 
                 JWAdBreak *adBreak = [JWAdBreak init];
-                JWAdBreakBuilder* adBreakBuilder = [JWAdBreakBuilder new];
+                JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
                 JWAdOffset* offset = [JWAdOffset fromString:offsetString];
                 
                 [adBreakBuilder offset:offset];
                 [adBreakBuilder tags:@[tagUrl]];
                 
-                NSError* error = nil;
                 adBreak = [adBreakBuilder buildAndReturnError:&error];
                 
                 [adsArray addObject:adBreak];
             }
+            
+            //    if (adsArray.count > 0) {
+            //        [itemBuilder adScheduleWithBreaks:adsArray];
+            //    }
         }
     }
 
-    if(adsArray.count > 0) {
-        [itemBuilder adSchedule:adsArray];
-    }
+//    id adVmap = item[@"adVmap"];
+//    if (adVmap != nil && (adVmap != (id)[NSNull null])) {
+//        NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
+//        [itemBuilder adScheduleWithVmapURL:adVmapUrl];
+//    }
     
-    NSError* error = nil;
     return [itemBuilder buildAndReturnError:&error];
 }
 
--(void)setConfig:(NSDictionary*)config
+-(JWPlayerConfiguration*)getPlayerConfiguration:config
 {
-    id license = config[@"license"];
-    if ((license != nil) && (license != (id)[NSNull null])) {
-        [JWPlayerKitLicense setLicenseKey:license];
-    } else {
-        NSLog(@"JW SDK License key not set.");
-    }
-    
-    _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
-    _pipEnabled = config[@"pipEnabled"];
-    
-    bool initAudioSession = _backgroundAudioEnabled || _pipEnabled;
-    if (initAudioSession) {
-        [self initializeAudioSession];
-    }
-    
-    _playerView = [[JWPlayerView new] initWithFrame:self.superview.frame];
-    
-    _playerView.delegate = self;
-    _playerView.player.delegate = self;
-    _playerView.player.playbackStateDelegate = self;
-    _playerView.player.adDelegate = self;
-    _playerView.player.avDelegate = self;
+    JWPlayerConfigurationBuilder *configBuilder = [[JWPlayerConfigurationBuilder alloc] init];
     
     NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
     if (config[@"items"] != nil && (config[@"items"] != (id)[NSNull null])) {
@@ -252,72 +450,255 @@
             JWPlayerItem *playerItem = [self getPlayerItem:item];
             [playlistArray addObject:playerItem];
         }
+        
+        [configBuilder playlist:playlistArray];
     }
     
-    JWPlayerConfigurationBuilder *configBuilder = [JWPlayerConfigurationBuilder new];
-    
-    [configBuilder playlist:playlistArray];
-    
-    if (config[@"autostart"] != nil) {
-        bool autostart = config[@"autostart"];
+    id autostart = config[@"autostart"];
+    if (autostart != nil && (autostart != (id)[NSNull null])) {
         [configBuilder autostart:autostart];
     }
     
-    if (config[@"repeat"] != nil) {
-        bool repeatContent = config[@"repeat"];
+    id repeatContent = config[@"repeat"];
+    if (repeatContent != nil && (repeatContent != (id)[NSNull null])) {
         [configBuilder repeatContent:repeatContent];
     }
     
-    //        JWAdClientJWPlayer = 0,
-    //      /// Google IMA
-    //        JWAdClientGoogleIMA = 1,
-    //      /// Google IMA DAI
-    //        JWAdClientGoogleIMADAI = 2,
-    //      /// An unrecognized ad client.
-    //        JWAdClientUnknown = 3,
-            
-    //        JWAdsAdvertisingConfigBuilder* adConfigBuilder = [JWAdsAdvertisingConfigBuilder new];
-            
-    //        id adClient = [playlist[0] objectForKey:@"adClient"];
-    //        if ((adClient != nil) && (adClient != (id)[NSNull null])) {
-    //            switch ([adClient intValue]) {
-    //                case 1:
-    //                    advertising.client = JWAdClientGoogima;
-    //                    break;
-    //                case 2:
-    //                    advertising.client = JWAdClientGoogimaDAI;
-    //                    break;
-    //                case 3:
-    //                    advertising.client = JWAdClientFreewheel;
-    //                    break;
-    //
-    //                default:
-    //                    advertising.client = JWAdClientVast;
-    //                    break;
-    //            }
-    //        } else {
-    //            advertising.client = JWAdClientVast;
-    //        }
-    //
-    //        config.advertising = advertising;
-            
-    //        if ([playlist[0] objectForKey:@"adVmap"] != nil) {
-    //            id adVmap = [playlist[0] objectForKey:@"adVmap"];
-    //            if ((adVmap != nil) && (adVmap != (id)[NSNull null])) {
-    //                config.advertising.adVmap = adVmap;
-    //            }
-    //        }
+    id preload = config[@"preload"];
+    if (preload != nil && (preload != (id)[NSNull null])) {
+        switch ([preload intValue]) {
+            case 0:
+                [configBuilder preload:JWPreloadAuto];
+                break;
+            case 1:
+                [configBuilder preload:JWPreloadNone];
+                break;
+            default:
+                break;
+        }
+    }
     
-//            preload
-//            JWRelatedContentConfiguration
-//            [configBuilder related:(JWRelatedContentConfiguration * _Nonnull)]
+    JWRelatedContentConfigurationBuilder* relatedBuilder = [[JWRelatedContentConfigurationBuilder alloc] init];
+//    [relatedBuilder onClick:JWRelatedOnClickPlay];
+//    [relatedBuilder onComplete:JWRelatedOnCompleteShow];
+//    [relatedBuilder autoplayTimer:autoplayTimer];
+//    [relatedBuilder url:url];
+//    [relatedBuilder heading:heading];
+//    [relatedBuilder autoplayMessage:autoplayMessage];
     
-    NSError* error = nil;
+    JWRelatedContentConfiguration* related = [relatedBuilder build];
     
-    JWPlayerConfiguration* configuration = [configBuilder buildAndReturnError:&error];
-    
+    [configBuilder related:related];
+             
+    JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
+             
+     id adClient = config[@"adClient"];
+     if ((adClient != nil) && (adClient != (id)[NSNull null])) {
+         JWAdClient jwAdClient;
+         switch ([adClient intValue]) {
+             case 0:
+                 jwAdClient = JWAdClientJWPlayer;
+                 break;
+             case 1:
+                 jwAdClient = JWAdClientGoogleIMA;
+                 break;
+             case 2:
+                 jwAdClient = JWAdClientGoogleIMADAI;
+                 break;
+             case 3:
+                 jwAdClient = JWAdClientUnknown;
+                 break;
 
-    [_playerView.player configurePlayerWith:configuration];
+             default:
+                 jwAdClient = JWAdClientUnknown;
+                 break;
+         }
+     } else {
+
+     }
+    
+    // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
+    
+    JWError* error = nil;
+    
+    id ads = config[@"avertising"];
+    if (ads != nil && (ads != (id)[NSNull null])) {
+        id schedule = config[@"adSchedule"];
+        if(schedule != nil && (schedule != (id)[NSNull null])) {
+            NSArray* scheduleAr = (NSArray*)schedule;
+            if (scheduleAr.count > 0) {
+                NSMutableArray <JWAdBreak*>* scheduleArray = [[NSMutableArray alloc] init];
+                
+                for (id item in scheduleAr) {
+                    NSString *offsetString = [item objectForKey:@"offset"];
+                    NSString *tag = [item objectForKey:@"tag"];
+                    NSURL* tagUrl = [NSURL URLWithString:tag];
+                    
+                    JWAdBreak *adBreak = [JWAdBreak init];
+                    JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
+                    JWAdOffset* offset = [JWAdOffset fromString:offsetString];
+                    
+                    [adBreakBuilder offset:offset];
+                    [adBreakBuilder tags:@[tagUrl]];
+                    
+                    adBreak = [adBreakBuilder buildAndReturnError:&error];
+                    
+                    [scheduleArray addObject:adBreak];
+                }
+            
+                if (scheduleArray.count > 0) {
+                    [adConfigBuilder schedule:scheduleArray];
+                }
+            }
+        }
+        
+        id tag = ads[@"tag"];
+        if (tag != nil && (tag != (id)[NSNull null])) {
+            NSURL* tagUrl = [NSURL URLWithString:tag];
+            [adConfigBuilder tag:tagUrl];
+        }
+                
+        id adVmap = config[@"adVmap"];
+        if (adVmap != nil && (adVmap != (id)[NSNull null])) {
+            NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
+            [adConfigBuilder vmapURL:adVmapUrl];
+        }
+        
+        id openBrowserOnAdClick = config[@"openBrowserOnAdClick"];
+        if (openBrowserOnAdClick != nil && (openBrowserOnAdClick != (id)[NSNull null])) {
+            [adConfigBuilder openBrowserOnAdClick:openBrowserOnAdClick];
+        }
+        
+        JWAdvertisingConfig* advertising = [adConfigBuilder buildAndReturnError:&error];
+        [configBuilder advertising:advertising];
+    }
+    
+    JWPlayerConfiguration* playerConfig = [configBuilder buildAndReturnError:&error];
+    
+    return playerConfig;
+}
+
+#pragma mark - JWPlayer View Controller helpers
+
+-(void)setupPlayerViewController:config :(JWPlayerConfiguration*)playerConfig
+{
+    [self dismissPlayerViewController];
+    
+    _playerViewController = [JWPlayerViewController new];
+    _playerViewController.delegate = self;
+    
+    id interfaceBehavior = config[@"interfaceBehavior"];
+    if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
+        switch ([interfaceBehavior intValue]) {
+            case 0:
+                _playerViewController.interfaceBehavior = JWInterfaceBehaviorNormal;
+                break;
+            case 1:
+                _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
+                break;
+            case 2:
+                _playerViewController.interfaceBehavior = JWInterfaceBehaviorAlwaysOnScreen;
+                break;
+            default:
+                break;
+        }
+    }
+    
+    id forceFullScreenOnLandscape = config[@"forceFullScreenOnLandscape"];
+    if (forceFullScreenOnLandscape != nil && forceFullScreenOnLandscape != (id)[NSNull null]) {
+        _playerViewController.forceFullScreenOnLandscape = forceFullScreenOnLandscape;
+    }
+    
+    id forceLandscapeOnFullScreen = config[@"forceLandscapeOnFullScreen"];
+    if (forceLandscapeOnFullScreen != nil && forceLandscapeOnFullScreen != (id)[NSNull null]) {
+        _playerViewController.forceLandscapeOnFullScreen = forceLandscapeOnFullScreen;
+    }
+    
+    id enableLockScreenControls = config[@"enableLockScreenControls"];
+    if (enableLockScreenControls != nil && enableLockScreenControls != (id)[NSNull null]) {
+        _playerViewController.enableLockScreenControls = enableLockScreenControls;
+    }
+    
+    id styling = config[@"styling"];
+    [self setStyling:styling];
+    
+    JWError* error = nil;
+    
+    id nextUpStyle = config[@"nextUpStyle"];
+    if (nextUpStyle != nil && nextUpStyle != (id)[NSNull null]) {
+        JWNextUpStyleBuilder* nextUpBuilder = [[JWNextUpStyleBuilder alloc] init];
+        
+        id offsetSeconds = nextUpStyle[@"offsetSeconds"];
+        id offsetPercentage = nextUpStyle[@"offsetPercentage"];
+        
+        [nextUpBuilder timeOffsetWithSeconds:[offsetSeconds doubleValue]];
+        [nextUpBuilder timeOffsetWithPercentage:[offsetPercentage doubleValue]];
+        _playerViewController.nextUpStyle = [nextUpBuilder buildAndReturnError:&error];
+    }
+    
+    //    _playerViewController.adInterfaceStyle
+//    _playerViewController.logo
+//    _playerView.videoGravity = 0;
+    //            _playerView.captionStyle
+    
+    id offlineMsg = config[@"offlineMessage"];
+    if (offlineMsg != nil && offlineMsg != (id)[NSNull null]) {
+        _playerViewController.offlineMessage = offlineMsg;
+    }
+    
+    id offlineImg = config[@"offlineImage"];
+    if (offlineImg != nil && offlineImg != (id)[NSNull null]) {
+        NSURL* imageUrl = [NSURL URLWithString:offlineImg];
+        if ([imageUrl isFileURL]) {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+            _playerViewController.offlinePosterImage = image;
+        }
+    }
+    
+    [self presentPlayerViewController:playerConfig];
+}
+
+-(void)dismissPlayerViewController
+{
+    if (_playerViewController != nil) {
+        [_playerViewController willMoveToParentViewController:nil];
+        [_playerViewController.view removeFromSuperview];
+        [_playerViewController removeFromParentViewController];
+        _playerViewController = nil;
+    }
+}
+
+-(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
+{
+    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
+    [window.rootViewController addChildViewController:_playerViewController];
+    _playerViewController.view.frame = self.superview.frame;
+    [self addSubview:_playerViewController.view];
+    [_playerViewController didMoveToParentViewController:window.rootViewController];
+    
+    // before presentation of viewcontroller player is nil so acces only after
+    [_playerViewController.player configurePlayerWith:configuration];
+
+    _playerViewController.playerView.delegate = self;
+    _playerViewController.player.delegate = self;
+//    _playerViewController.player.playbackStateDelegate = self; // this causes issue with ui
+    _playerViewController.player.adDelegate = self;
+    _playerViewController.player.avDelegate = self;
+}
+
+#pragma mark - JWPlayer View helpers
+
+-(void)setupPlayerView:config :(JWPlayerConfiguration*)playerConfig
+{
+    _playerView = [[JWPlayerView new] initWithFrame:self.superview.frame];
+    
+    _playerView.delegate = self;
+    _playerView.player.delegate = self;
+    _playerView.player.playbackStateDelegate = self;
+    _playerView.player.adDelegate = self;
+    _playerView.player.avDelegate = self;
+    
+    [_playerView.player configurePlayerWith:playerConfig];
 
     if (_pipEnabled) {
         AVPictureInPictureController* pipController = _playerView.pictureInPictureController;
@@ -329,42 +710,12 @@
     [self addSubview:self.playerView];
 }
 
--(void)continuePlaying
+-(void)removePlayerView
 {
-//    if (_playerView != nil && [_playerView c].file != nil) {
-//        if ([_playerView config].autostart) {
-//            [_playerView play];
-//        }
-//    }
-}
-
-#pragma mark - RNJWPlayer utils
-
--(void)explode
-{
-    CGRect rect = CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
-    self.frame = rect;
-    
-    [self setBackgroundColor:[UIColor blackColor]];
-}
-
--(void)shrink
-{
-    self.frame = _initFrame;
-    
-    [self setBackgroundColor:[UIColor whiteColor]];
-}
-
-- (void)rotated:(NSNotification *)notification {
-    if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
-        NSLog(@"Landscape");
+    if (_playerView != nil) {
+        [_playerView removeFromSuperview];
+        _playerView = nil;
     }
-
-    if (UIDeviceOrientationIsPortrait(UIDevice.currentDevice.orientation)) {
-        NSLog(@"Portrait");
-    }
-    
-    [self layoutSubviews];
 }
 
 #pragma mark - JWPlayer Delegate
@@ -432,6 +783,86 @@
         NSData* data = [NSJSONSerialization dataWithJSONObject:sizesDict options:NSJSONWritingPrettyPrinted error: &error];
         self.onPlayerSizeChange(@{@"sizes": data});
     }
+}
+
+#pragma mark - JWPlayer View Controller Delegate
+
+- (void)playerViewController:(JWPlayerViewController *)controller sizeChangedFrom:(CGSize)oldSize to:(CGSize)newSize
+{
+    if (self.onPlayerSizeChange) {
+        NSMutableDictionary* oldSizeDict = [[NSMutableDictionary alloc] init];
+        [oldSizeDict setObject:[NSNumber numberWithFloat: oldSize.width] forKey:@"width"];
+        [oldSizeDict setObject:[NSNumber numberWithFloat: oldSize.height] forKey:@"height"];
+        
+        NSMutableDictionary* newSizeDict = [[NSMutableDictionary alloc] init];
+        [newSizeDict setObject:[NSNumber numberWithFloat: newSize.width] forKey:@"width"];
+        [newSizeDict setObject:[NSNumber numberWithFloat: newSize.height] forKey:@"height"];
+        
+        NSMutableDictionary* sizesDict = [[NSMutableDictionary alloc] init];
+        [sizesDict setObject:oldSizeDict forKey:@"oldSize"];
+        [sizesDict setObject:newSizeDict forKey:@"newSize"];
+        
+        NSError* error = nil;
+        NSData* data = [NSJSONSerialization dataWithJSONObject:sizesDict options:NSJSONWritingPrettyPrinted error: &error];
+        self.onPlayerSizeChange(@{@"sizes": data});
+    }
+}
+
+- (void)playerViewController:(JWPlayerViewController *)controller screenTappedAt:(CGPoint)position
+{
+    if (self.onScreenTapped) {
+        self.onScreenTapped(@{@"x": @(position.x), @"y": @(position.y)});
+    }
+}
+
+- (void)playerViewController:(JWPlayerViewController *)controller controlBarVisibilityChanged:(BOOL)isVisible frame:(CGRect)frame
+{
+    if (self.onControlBarVisible) {
+        self.onControlBarVisible(@{@"visible": @(isVisible)});
+    }
+}
+
+- (JWFullScreenViewController * _Nullable)playerViewControllerWillGoFullScreen:(JWPlayerViewController * _Nonnull)controller {
+    if (self.onFullScreenRequested) {
+        self.onFullScreenRequested(@{});
+    }
+    return nil;
+}
+
+- (void)playerViewControllerDidGoFullScreen:(JWPlayerViewController *)controller
+{
+    if (self.onFullScreen) {
+        self.onFullScreen(@{});
+    }
+}
+
+- (void)playerViewControllerWillDismissFullScreen:(JWPlayerViewController *)controller
+{
+    if (self.onFullScreenExitRequested) {
+        self.onFullScreenExitRequested(@{});
+    }
+}
+
+- (void)playerViewControllerDidDismissFullScreen:(JWPlayerViewController *)controller
+{
+    if (self.onFullScreenExit) {
+        self.onFullScreenExit(@{});
+    }
+}
+
+- (void)playerViewController:(JWPlayerViewController *)controller relatedMenuClosedWithMethod:(enum JWRelatedInteraction)method
+{
+    
+}
+
+- (void)playerViewController:(JWPlayerViewController *)controller relatedMenuOpenedWithItems:(NSArray<JWPlayerItem *> *)items withMethod:(enum JWRelatedInteraction)method
+{
+    
+}
+
+- (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedInteraction)method
+{
+    
 }
 
 #pragma mark - AV Picture In Picture Delegate
@@ -562,34 +993,6 @@
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
     if (self.onPlaylistItem) {
-//        NSString *file = @"";
-//        NSString *mediaId = @"";
-//        NSString *title = @"";
-//        NSString *desc = @"";
-//
-////        if (item.file != nil) {
-////            file = item.file;
-////        }
-//
-//        if (item.mediaId != nil) {
-//            mediaId = item.mediaId;
-//        }
-//
-//        if (item.title != nil) {
-//            title = item.title;
-//        }
-//
-//        if (item.description != nil) {
-//            desc = item.description;
-//        }
-//
-//        NSMutableDictionary *itemDict = [[NSMutableDictionary alloc] init];
-//        [itemDict setObject:file forKey:@"file"];
-//        [itemDict setObject:mediaId forKey:@"mediaId"];
-//        [itemDict setObject:title forKey:@"title"];
-//        [itemDict setObject:desc forKey:@"desc"];
-//        [itemDict setObject:[NSNumber numberWithInteger:index] forKey:@"index"];
-        
         NSError *error;
         NSData *data = [NSJSONSerialization dataWithJSONObject:item options:NSJSONWritingPrettyPrinted error: &error];
         
@@ -600,41 +1003,6 @@
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
     if (self.onPlaylist) {
-//        NSMutableArray<NSData*>* playlistArray = [[NSMutableArray alloc] init];
-//
-//        for (JWPlayerItem* item in playlist) {
-//            NSError *error;
-//            NSString *file = @"";
-//            NSString *mediaId = @"";
-//            NSString *title = @"";
-//            NSString *desc = @"";
-//
-//    //        if (item.file != nil) {
-//    //            file = item.file;
-//    //        }
-//
-//            if (item.mediaId != nil) {
-//                mediaId = item.mediaId;
-//            }
-//
-//            if (item.title != nil) {
-//                title = item.title;
-//            }
-//
-//            if (item.description != nil) {
-//                desc = item.description;
-//            }
-//
-//            NSMutableDictionary *itemDict = [[NSMutableDictionary alloc] init];
-//            [itemDict setObject:file forKey:@"file"];
-//            [itemDict setObject:mediaId forKey:@"mediaId"];
-//            [itemDict setObject:title forKey:@"title"];
-//            [itemDict setObject:desc forKey:@"desc"];
-//
-//            NSData* data = [NSJSONSerialization dataWithJSONObject:itemDict options:NSJSONWritingPrettyPrinted error: &error];
-//            [playlistArray addObject:data];
-//        }
-        
         NSError *error;
         NSData* data = [NSJSONSerialization dataWithJSONObject:playlist options:NSJSONWritingPrettyPrinted error: &error];
         
@@ -749,7 +1117,23 @@
     
 }
 
-#pragma mark - JWPlayer Interruption handling
+#pragma mark - JWPlayer audio session && interruption handling
+
+- (void)initializeAudioSession
+{
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(audioSessionInterrupted:)
+                                                 name: AVAudioSessionInterruptionNotification
+                                               object: audioSession];
+    
+    NSError *setCategoryError = nil;
+    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
+    
+    NSError *activationError = nil;
+    success = [audioSession setActive:YES error:&activationError];
+}
 
 -(void)audioSessionInterrupted:(NSNotification*)note
 {
@@ -766,12 +1150,21 @@
 
 -(void)audioInterruptionsStarted:(NSNotification *)note {
     _wasInterrupted = YES;
-    [self.playerView.player pause];
+    
+    if (_playerView != nil) {
+        [_playerView.player pause];
+    } else if (_playerViewController != nil) {
+        [_playerViewController.player pause];
+    }
 }
 
 -(void)audioInterruptionsEnded:(NSNotification *)note {
-    if (!_userPaused) {
-        [self.playerView.player play];
+    if (!_userPaused && _backgroundAudioEnabled) {
+        if (_playerView != nil) {
+            [_playerView.player play];
+        } else if (_playerViewController != nil) {
+            [_playerViewController.player play];
+        }
     }
 }
 
