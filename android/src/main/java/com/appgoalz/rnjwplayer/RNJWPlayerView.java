@@ -5,6 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.util.Log;
@@ -40,8 +44,10 @@ import com.google.gson.Gson;
 import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.background.MediaServiceController;
 import com.jwplayer.pub.api.configuration.PlayerConfig;
+import com.jwplayer.pub.api.configuration.UiConfig;
 import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.VastAdvertisingConfig;
+import com.jwplayer.pub.api.configuration.ads.VmapAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.ima.ImaAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.ima.dai.ImaDaiAdvertisingConfig;
 import com.jwplayer.pub.api.events.AdPauseEvent;
@@ -80,14 +86,14 @@ import com.jwplayer.pub.api.media.ads.AdBreak;
 import com.jwplayer.pub.api.media.ads.AdClient;
 import com.jwplayer.pub.api.media.captions.Caption;
 import com.jwplayer.pub.api.media.captions.CaptionType;
+import com.jwplayer.pub.api.media.playlists.MediaSource;
 import com.jwplayer.pub.api.media.playlists.PlaylistItem;
 import com.jwplayer.pub.view.JWPlayerView;
+import com.jwplayer.ui.views.CueMarkerSeekbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.jwplayer.pub.api.configuration.PlayerConfig.STRETCHING_UNIFORM;
 
 public class RNJWPlayerView extends RelativeLayout implements
         VideoPlayerEvents.OnFullscreenListener,
@@ -139,35 +145,17 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     private ViewGroup mRootView;
 
-    List<PlaylistItem> mPlayList = null;
-
     //Props
-    String file = "";
-    String image = "";
-    String title = "";
-    String desc = "";
-    String mediaId = "";
-    String customStyle;
-    String adVmap = "";
-    String stretching = STRETCHING_UNIFORM;
-    Double startTime = 0.0;
+    ReadableMap mConfig = null;
+    ReadableArray mPlaylistProp = null;
+    ReadableMap mColors = null;
 
-    Boolean autostart = true;
-    Boolean controls = true;
-    Boolean repeat = false;
-    Boolean mute = false;
-    Boolean displayTitle = false;
-    Boolean displayDesc = false;
-    Boolean nextUpDisplay = false;
     Boolean backgroundAudioEnabled = false;
 
-    Boolean nativeFullScreen = false;
     Boolean landscapeOnFullScreen = false;
     Boolean fullScreenOnLandscape = false;
     Boolean portraitOnExitFullScreen = false;
 
-    ReadableMap playlistItem; // PlaylistItem
-    ReadableArray playlist; // List <PlaylistItem>
     Number currentPlayingIndex;
 
     private CastContext mCastContext;
@@ -332,159 +320,173 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayer.addListener(EventType.AD_PLAY, this);
             mPlayer.addListener(EventType.AD_PAUSE, this);
 
-            mPlayer.setFullscreenHandler(new FullscreenHandler() {
-                ViewGroup mPlayerViewContainer = (ViewGroup) mPlayerView.getParent();
-                private View mDecorView;
+            mPlayer.setFullscreenHandler(new fullscreenHandler());
 
-                @Override
-                public void onFullscreenRequested() {
-                    if (nativeFullScreen) {
-                        mDecorView = mActivity.getWindow().getDecorView();
-
-                        // Hide system ui
-                        mDecorView.setSystemUiVisibility(
-                                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hides bottom bar
-                                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hides top bar
-                                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // prevents navigation bar from overriding
-                                // exit-full-screen button. Swipe from side to access nav bar.
-                        );
-
-                        // Enter landscape mode for fullscreen videos
-                        if (landscapeOnFullScreen) {
-                            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                        }
-
-                        // Destroy the player's rendering surface, we need to do this to prevent Android's
-                        // MediaDecoders from crashing.
-//                        mPlayerView.destroySurface();
-
-                        mPlayerViewContainer = (ViewGroup) mPlayerView.getParent();
-
-                        // Remove the JWPlayerView from the list item.
-                        if (mPlayerViewContainer != null) {
-                            mPlayerViewContainer.removeView(mPlayerView);
-                        }
-
-                        // Initialize a new rendering surface.
-//                        mPlayerView.initializeSurface();
-
-                        // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
-                        mRootView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRootView.addView(mPlayerView, new ViewGroup.LayoutParams(
-                                        ViewGroup.LayoutParams.MATCH_PARENT,
-                                        ViewGroup.LayoutParams.MATCH_PARENT
-                                ));
-                                mFullscreenPlayer = mPlayerView;
-                            }
-                        });
-                    }
-
-                    WritableMap eventEnterFullscreen = Arguments.createMap();
-                    eventEnterFullscreen.putString("message", "onFullscreenRequested");
-                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                            getId(),
-                            "topFullScreenRequested",
-                            eventEnterFullscreen);
-                }
-
-                @Override
-                public void onFullscreenExitRequested() {
-                    if (nativeFullScreen) {
-                        mDecorView.setSystemUiVisibility(
-                                View.SYSTEM_UI_FLAG_VISIBLE // clear the hide system flags
-                        );
-
-                        // Enter portrait mode
-                        if (portraitOnExitFullScreen) {
-                            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                        }
-
-                        // Destroy the surface that is used for video output, we need to do this before
-                        // we can detach the JWPlayerView from a ViewGroup.
-//                        mPlayerView.destroySurface();
-
-                        // Remove the player view from the root ViewGroup.
-                        mRootView.removeView(mPlayerView);
-
-                        // After we've detached the JWPlayerView we can safely reinitialize the surface.
-//                        mPlayerView.initializeSurface();
-
-                        // As soon as the UI thread has finished processing the current message queue it
-                        // should add the JWPlayerView back to the list item.
-                        mPlayerViewContainer.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mPlayerViewContainer.addView(mPlayerView, new ViewGroup.LayoutParams(
-                                        ViewGroup.LayoutParams.MATCH_PARENT,
-                                        ViewGroup.LayoutParams.MATCH_PARENT
-                                ));
-                                mPlayerView.layout(mPlayerViewContainer.getLeft(), mPlayerViewContainer.getTop(), mPlayerViewContainer.getRight(), mPlayerViewContainer.getBottom());
-                                mFullscreenPlayer = null;
-                            }
-                        });
-                    }
-
-                    WritableMap eventExitFullscreen = Arguments.createMap();
-                    eventExitFullscreen.putString("message", "onFullscreenExitRequested");
-                    getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
-                            getId(),
-                            "topFullScreenExitRequested",
-                            eventExitFullscreen);
-                }
-
-                @Override
-                public void onAllowRotationChanged(boolean b) {
-                    Log.e(TAG, "onAllowRotationChanged: "+b );
-                }
-
-                @Override
-                public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "updateLayoutParams: "+layoutParams );
-                }
-
-                @Override
-                public void setUseFullscreenLayoutFlags(boolean b) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
-                }
-            });
-
-//            mPlayer.setControls(true);
             mPlayer.allowBackgroundAudio(backgroundAudioEnabled);
         }
     }
 
+    private class fullscreenHandler implements FullscreenHandler {
+        ViewGroup mPlayerViewContainer = (ViewGroup) mPlayerView.getParent();
+        private View mDecorView;
+
+        @Override
+        public void onFullscreenRequested() {
+            mDecorView = mActivity.getWindow().getDecorView();
+
+            // Hide system ui
+            mDecorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hides bottom bar
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN // hides top bar
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // prevents navigation bar from overriding
+                    // exit-full-screen button. Swipe from side to access nav bar.
+            );
+
+            // Enter landscape mode for fullscreen videos
+            if (landscapeOnFullScreen) {
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+
+            mPlayerViewContainer = (ViewGroup) mPlayerView.getParent();
+
+            // Remove the JWPlayerView from the list item.
+            if (mPlayerViewContainer != null) {
+                mPlayerViewContainer.removeView(mPlayerView);
+            }
+
+            // Initialize a new rendering surface.
+//                        mPlayerView.initializeSurface();
+
+            // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
+            mRootView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRootView.addView(mPlayerView, new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                    ));
+                    mPlayerView.requestLayout();
+                    mFullscreenPlayer = mPlayerView;
+                }
+            });
+
+            WritableMap eventEnterFullscreen = Arguments.createMap();
+            eventEnterFullscreen.putString("message", "onFullscreenRequested");
+            getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
+                    getId(),
+                    "topFullScreenRequested",
+                    eventEnterFullscreen);
+        }
+
+        @Override
+        public void onFullscreenExitRequested() {
+            mDecorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_VISIBLE // clear the hide system flags
+            );
+
+            // Enter portrait mode
+            if (portraitOnExitFullScreen) {
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+
+            // Remove the player view from the root ViewGroup.
+            mRootView.removeView(mPlayerView);
+
+            // As soon as the UI thread has finished processing the current message queue it
+            // should add the JWPlayerView back to the list item.
+            mPlayerViewContainer.post(new Runnable() {
+                @Override
+                public void run() {
+                    mPlayerViewContainer.addView(mPlayerView, new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                    ));
+                    mPlayerView.layout(mPlayerViewContainer.getLeft(), mPlayerViewContainer.getTop(), mPlayerViewContainer.getRight(), mPlayerViewContainer.getBottom());
+                    mPlayerView.requestLayout();
+                    mFullscreenPlayer = null;
+                }
+            });
+
+            WritableMap eventExitFullscreen = Arguments.createMap();
+            eventExitFullscreen.putString("message", "onFullscreenExitRequested");
+            getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
+                    getId(),
+                    "topFullScreenExitRequested",
+                    eventExitFullscreen);
+        }
+
+        @Override
+        public void onAllowRotationChanged(boolean b) {
+            Log.e(TAG, "onAllowRotationChanged: "+b );
+        }
+
+        @Override
+        public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+//        View.setSystemUiVisibility(int).
+//        Log.e(TAG, "updateLayoutParams: "+layoutParams );
+        }
+
+        @Override
+        public void setUseFullscreenLayoutFlags(boolean b) {
+//        View.setSystemUiVisibility(int).
+//        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
+        }
+    }
+
     public PlaylistItem getPlaylistItem (ReadableMap playlistItem) {
+        PlaylistItem.Builder itemBuilder = new PlaylistItem.Builder();
+
         if (playlistItem.hasKey("file")) {
-            file = playlistItem.getString("file");
+            String file = playlistItem.getString("file");
+            itemBuilder.file(file);
+        }
+
+        if (playlistItem.hasKey("sources")) {
+            ArrayList<MediaSource> sources = new ArrayList<>();
+            ReadableArray sourcesArray = playlistItem.getArray("sources");
+            if (sourcesArray != null) {
+                for (int i = 0; i < sourcesArray.size(); i++) {
+                    ReadableMap sourceProp = sourcesArray.getMap(i);
+                    if (sourceProp.hasKey("file")) {
+                        String file = sourceProp.getString("file");
+                        String label = sourceProp.getString("label");
+                        boolean isDefault = sourceProp.getBoolean("default");
+                        MediaSource source = new MediaSource.Builder().file(file).label(label).isDefault(isDefault).build();
+                        sources.add(source);
+                    }
+                }
+            }
+
+            itemBuilder.sources(sources);
         }
 
         if (playlistItem.hasKey("title")) {
-            title = playlistItem.getString("title");
+            String title = playlistItem.getString("title");
+            itemBuilder.title(title);
         }
 
         if (playlistItem.hasKey("desc")) {
-            desc = playlistItem.getString("desc");
+            String desc = playlistItem.getString("desc");
+            itemBuilder.description(desc);
         }
 
         if (playlistItem.hasKey("image")) {
-            image = playlistItem.getString("image");
+            String image = playlistItem.getString("image");
+            itemBuilder.image(image);
         }
 
         if (playlistItem.hasKey("mediaId")) {
-            mediaId = playlistItem.getString("mediaId");
+            String mediaId = playlistItem.getString("mediaId");
+            itemBuilder.mediaId(mediaId);
         }
 
         if (playlistItem.hasKey("startTime")) {
-            startTime = playlistItem.getDouble("startTime");
+            double startTime = playlistItem.getDouble("startTime");
+            itemBuilder.startTime(startTime);
         }
 
-        ArrayList<Caption> tracks = new ArrayList<>();
-
         if (playlistItem.hasKey("tracks")) {
+            ArrayList<Caption> tracks = new ArrayList<>();
             ReadableArray track = playlistItem.getArray("tracks");
             if (track != null) {
                 for (int i = 0; i < track.size(); i++) {
@@ -497,11 +499,12 @@ public class RNJWPlayerView extends RelativeLayout implements
                     }
                 }
             }
+
+            itemBuilder.tracks(tracks);
         }
 
-        ArrayList<AdBreak> adSchedule = new ArrayList<>();
-
         if (playlistItem.hasKey("adSchedule")) {
+            ArrayList<AdBreak> adSchedule = new ArrayList<>();
             ReadableArray ad = playlistItem.getArray("adSchedule");
 
             for (int i = 0; i < ad.size(); i++) {
@@ -512,18 +515,17 @@ public class RNJWPlayerView extends RelativeLayout implements
                     adSchedule.add(adBreak);
                 }
             }
+
+            itemBuilder.adSchedule(adSchedule);
         }
 
-        return new PlaylistItem.Builder()
-                .file(file)
-                .title(title)
-                .description(desc)
-                .image(image)
-                .mediaId(mediaId)
-                .startTime(startTime)
-                .adSchedule(adSchedule)
-                .tracks(tracks)
-                .build();
+        String recommendations;
+        if (playlistItem.hasKey("recommendations")) {
+            recommendations = playlistItem.getString("recommendations");
+            itemBuilder.recommendations(recommendations);
+        }
+
+        return itemBuilder.build();
     }
 
     public void setConfig(ReadableMap prop) {
@@ -533,108 +535,153 @@ public class RNJWPlayerView extends RelativeLayout implements
             Log.e(TAG, "JW SDK license not set");
         }
 
-        if (prop.hasKey("items") && playlist != prop.getArray("items") && !Arrays.deepEquals(new ReadableArray[]{playlist}, new ReadableArray[]{prop.getArray("items")})) {
-            playlist = prop.getArray("items");
-            if (playlist != null && playlist.size() > 0) {
-                mPlayList = new ArrayList<>();
-
-                int j = 0;
-                while (playlist.size() > j) {
-                    playlistItem = playlist.getMap(j);
-
-                    PlaylistItem newPlayListItem = this.getPlaylistItem((playlistItem));
-                    mPlayList.add(newPlayListItem);
-
-                    j++;
-                }
-
-                this.setupPlayer(prop);
-            }
-        } else {
-//            if (mPlayerView != null && mPlayerView.getConfig().getFile() != null) {
-//                boolean autostart = mPlayer.getConfig().getAutostart();
-//                if (autostart) {
-//                    mPlayer.play();
-//                }
-//            }
+        if (mConfig == null || (mConfig != prop && !mConfig.equals(prop))) {
+            this.setupPlayer(prop);
         }
     }
 
+    boolean playlistNotTheSame(ReadableMap prop) {
+        return prop.hasKey("playlist") && mPlaylistProp != prop.getArray("playlist") && !Arrays.deepEquals(new ReadableArray[]{mPlaylistProp}, new ReadableArray[]{prop.getArray("playlist")});
+    }
+
     private void setupPlayer(ReadableMap prop) {
-        boolean autostart = false;
+        PlayerConfig.Builder configBuilder = new PlayerConfig.Builder();
+
+        if (playlistNotTheSame(prop)) {
+            List<PlaylistItem> playlist = new ArrayList<>();
+            mPlaylistProp = prop.getArray("playlist");
+            if (mPlaylistProp != null && mPlaylistProp.size() > 0) {
+
+                int j = 0;
+                while (mPlaylistProp.size() > j) {
+                    ReadableMap playlistItem = mPlaylistProp.getMap(j);
+
+                    PlaylistItem newPlayListItem = this.getPlaylistItem((playlistItem));
+                    playlist.add(newPlayListItem);
+                    j++;
+                }
+            }
+
+            configBuilder.playlist(playlist);
+        }
+
         if (prop.hasKey("autostart")) {
-            autostart = prop.getBoolean("autostart");
+            boolean autostart = prop.getBoolean("autostart");
+            configBuilder.autostart(autostart);
         }
 
-        int nextUpOffset = -10;
-        if (prop.hasKey("nextUpOffset")) {
-            nextUpOffset = prop.getInt("nextUpOffset");
+        if (prop.hasKey("nextUpStyle")) {
+            ReadableMap nextUpStyle = prop.getMap("nextUpStyle");
+            if (nextUpStyle != null && nextUpStyle.hasKey("offsetSeconds") && nextUpStyle.hasKey("offsetPercentage")) {
+                int offsetSeconds = prop.getInt("offsetSeconds");
+                int offsetPercentage = prop.getInt("offsetPercentage");
+                configBuilder.nextUpOffset(offsetSeconds).nextUpOffsetPercentage(offsetPercentage);
+            }
         }
 
-        List<AdBreak> adSchedule = new ArrayList<>();
+        if (prop.hasKey("repeat")) {
+            boolean repeat = prop.getBoolean("repeat");
+            configBuilder.repeat(repeat);
+        }
+
+        if (prop.hasKey("styling")) {
+            ReadableMap styling = prop.getMap("styling");
+            if (styling != null) {
+                if (styling.hasKey("displayDescription")) {
+                    boolean displayDescription = styling.getBoolean("displayDescription");
+                    configBuilder.displayDescription(displayDescription);
+                }
+
+                if (styling.hasKey("displayTitle")) {
+                    boolean displayTitle = styling.getBoolean("displayTitle");
+                    configBuilder.displayTitle(displayTitle);
+                }
+
+                if (styling.hasKey("colors")) {
+                    mColors = styling.getMap("colors");
+                }
+            }
+        }
+
+        List<AdBreak> adScheduleList = new ArrayList<>();
         AdClient client;
         AdvertisingConfig advertisingConfig;
 
-        if (prop.hasKey("adVmap")) {
-            adVmap = prop.getString("adVmap");
+        if (prop.hasKey("advertising")) {
+            ReadableMap ads = prop.getMap("advertising");
+            if (ads != null && ads.hasKey("adSchedule")) {
+                ReadableMap adSchedule = ads.getMap("adSchedule");
+                if (adSchedule.hasKey("tag") && adSchedule.hasKey("offset")) {
+                    String tag = adSchedule.getString("tag");
+                    String offset = adSchedule.getString("offset");
+//            int skipOffset = prop.getInt("skipOffset");
+//            String adTypeStr = prop.getString("adType");
+//            List<String> tags = (List<String>) prop.getArray("tags");
 
-            AdBreak adBreak = new AdBreak.Builder()
-                    .tag(adVmap)
-                    .build();
+                    AdBreak adBreak = new AdBreak.Builder()
+                            .tag(tag)
+                            .offset(offset)
+//                    .skipOffset(skipOffset)
+//                    .adType(adTypeStr.equals("LINEAR") ? AdType.LINEAR : AdType.NONLINEAR)
+//                    .tag(tags)
+//                    .customParams()
+                            .build();
 
-            adSchedule.add(adBreak);
-
-            if (prop.hasKey("adClient")) {
-                switch (prop.getInt("adClient")) {
-                    case 1:
-                        client = AdClient.IMA;
-                        advertisingConfig = new ImaAdvertisingConfig.Builder().schedule(adSchedule).build();
-                        break;
-                    case 2:
-                        client = AdClient.IMA_DAI;
-                        advertisingConfig = new ImaDaiAdvertisingConfig.Builder().build();
-                        break;
-                    default:
-                        client = AdClient.VAST;
-                        advertisingConfig = new VastAdvertisingConfig.Builder()
-                                .schedule(adSchedule)
-                                .build();
-                        break;
+                    adScheduleList.add(adBreak);
                 }
-            } else {
-                client = AdClient.VAST;
-                advertisingConfig = new VastAdvertisingConfig.Builder()
-                        .schedule(adSchedule)
-                        .build();
+
+                if (ads.hasKey("adClient")) {
+                    switch (ads.getInt("adClient")) {
+                        case 1:
+                            client = AdClient.IMA;
+                            advertisingConfig = new ImaAdvertisingConfig.Builder().schedule(adScheduleList).build();
+                            break;
+                        case 2:
+                            client = AdClient.IMA_DAI;
+                            advertisingConfig = new ImaDaiAdvertisingConfig.Builder().build();
+                            break;
+                        default:
+                            client = AdClient.VAST;
+                            advertisingConfig = new VastAdvertisingConfig.Builder()
+                                    .schedule(adScheduleList)
+                                    .build();
+                            break;
+                    }
+                } else {
+                    client = AdClient.VAST;
+                    advertisingConfig = new VastAdvertisingConfig.Builder()
+                            .schedule(adScheduleList)
+                            .build();
+                }
+
+                configBuilder.advertisingConfig(advertisingConfig);
+            } else if (ads != null && ads.hasKey("adVmap")) {
+                String adVmap = ads.getString("adVmap");
+                advertisingConfig = new VmapAdvertisingConfig.Builder().tag(adVmap).build();
+
+                configBuilder.advertisingConfig(advertisingConfig);
             }
-        } else {
-            client = AdClient.VAST;
-            advertisingConfig = new VastAdvertisingConfig.Builder()
-                    .schedule(adSchedule)
-                    .build();
         }
 
         if (prop.hasKey("stretching")) {
-            stretching = prop.getString("stretching");
+            String stretching = prop.getString("stretching");
+            configBuilder.stretching(stretching);
         }
 
-        if (prop.hasKey("nativeFullScreen")) {
-            nativeFullScreen = prop.getBoolean("nativeFullScreen");
+        if (prop.hasKey("controls")) {
+            boolean controls = prop.getBoolean("controls");
+            if (!controls) {
+                UiConfig uiConfig = new UiConfig.Builder().hideAllControls().build();
+                configBuilder.uiConfig(uiConfig);
+            }
+
+            // in future support hiding showing individual ui groups
+//            UiConfig hideJwControlbarUiConfig = new UiConfig.Builder()
+//                    .hide(UiGroup.CONTROLBAR)
+//                    .build();
         }
 
-//        UiConfig uiConfig = new UiConfig.Builder().displayAllControls().build();
-
-        PlayerConfig playerConfig = new PlayerConfig.Builder()
-                .repeat(false)
-                .autostart(autostart)
-                .displayTitle(true)
-                .displayDescription(true)
-                .nextUpOffset(nextUpOffset)
-                .advertisingConfig(advertisingConfig)
-                .stretching(stretching)
-                .playlist(mPlayList)
-//                .uiConfig(uiConfig)
-                .build();
+        PlayerConfig playerConfig = configBuilder.build();
 
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
@@ -642,17 +689,62 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         mPlayerView = new RNJWPlayer(simpleContext);
 
-//        mPlayerView.fullScreenOnLandscape
-//        mPlayerView.exitFullScreenOnPortrait
-
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mPlayerView.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
         addView(mPlayerView);
 
+        if (prop.hasKey("fullScreenOnLandscape")) {
+            boolean fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
+            mPlayerView.fullScreenOnLandscape = fullScreenOnLandscape;
+        }
+
+        if (prop.hasKey("exitFullScreenOnPortrait")) {
+            boolean exitFullScreenOnPortrait = prop.getBoolean("exitFullScreenOnPortrait");
+            mPlayerView.exitFullScreenOnPortrait = exitFullScreenOnPortrait;
+        }
+
         mPlayer = mPlayerView.getPlayer();
         mPlayer.setup(playerConfig);
+
+        if (mColors != null) {
+            if (mColors.hasKey("backgroundColor")) {
+                mPlayerView.setBackgroundColor(Color.parseColor("#" + mColors.getString("backgroundColor")));
+            }
+
+            if (mColors.hasKey("buttons")) {
+
+            }
+
+            if (mColors.hasKey("timeslider")) {
+                CueMarkerSeekbar seekBar = findViewById(R.id.controlbar_seekbar);
+                ReadableMap timeslider = mColors.getMap("timeslider");
+                if (timeslider != null) {
+                    LayerDrawable progressDrawable = (LayerDrawable) seekBar.getProgressDrawable();
+
+                    if (timeslider.hasKey("progress")) {
+//                    seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#" + timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
+                        Drawable processDrawable = progressDrawable.findDrawableByLayerId(android.R.id.progress);
+                        processDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
+                    }
+
+                    if (timeslider.hasKey("secondaryProgress")) {
+                        Drawable secondaryProgressDrawable = progressDrawable.findDrawableByLayerId(android.R.id.secondaryProgress);
+                        secondaryProgressDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("secondaryProgress")), PorterDuff.Mode.SRC_IN);
+                    }
+
+                    if (timeslider.hasKey("rail")) {
+                        Drawable backgroundDrawable = progressDrawable.findDrawableByLayerId(android.R.id.background);
+                        backgroundDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("rail")), PorterDuff.Mode.SRC_IN);
+                    }
+
+                    if (timeslider.hasKey("thumb")) {
+                        seekBar.getThumb().setColorFilter(Color.parseColor("#" + timeslider.getString("thumb")), PorterDuff.Mode.SRC_IN);
+                    }
+                }
+            }
+        }
 
         if (prop.hasKey("backgroundAudioEnabled")) {
             backgroundAudioEnabled = prop.getBoolean("backgroundAudioEnabled");

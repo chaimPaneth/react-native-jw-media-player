@@ -90,20 +90,20 @@ export default class App extends Component {
               config={{
                 license:
                   Platform.OS === 'android'
-                    ? 'ANDROID_LICENSE'
-                    : 'IOS_LICENSE',
+                    ? 'YOUR_ANDROID_SDK_LICENSE'
+                    : 'YOUR_IOS_SDK_LICENSE',
                 backgroundAudioEnabled: true,
-                autostart: true,
-                items: [
+                // autostart: true,
+                playlist: [
                   {
-                    file: 'https://content.jwplatform.com/manifests/MEDIAID.m3u8',
+                    file: 'https://playertest.longtailvideo.com/adaptive/oceans/oceans.m3u8',
+                    image:
+                      'https://d3el35u4qe4frz.cloudfront.net/bkaovAYt-480.jpg',
                   },
                 ],
-                playerSize: {
-                  width,
-                  height: 300,
+                styling: {
+                  colors: {},
                 },
-                nativeFullScreen: true,
               }}
               onBeforePlay={() => this.onBeforePlay()}
               onPlay={() => this.onPlay()}

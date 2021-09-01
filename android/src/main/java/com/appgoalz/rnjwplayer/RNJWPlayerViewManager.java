@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 
 public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
-  public static final String REACT_CLASS = "RNJWPlayer";
+  public static final String REACT_CLASS = "RNJWPlayerView";
 
   public static final int COMMAND_PLAY = 101;
   public static final int COMMAND_PAUSE = 102;

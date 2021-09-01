@@ -18,12 +18,13 @@ const RCT_RNJWPLAYER_REF = "rnjwplayer";
 const RNJWPlayer = requireNativeComponent("RNJWPlayerView", null);
 
 const JWPlayerStateIOS = {
-  JWPlayerStatePlaying: 0,
-  JWPlayerStatePaused: 1,
+  JWPlayerStateUnknown: 0,
+  JWPlayerStateIdle: 1,
   JWPlayerStateBuffering: 2,
-  JWPlayerStateIdle: 3,
-  JWPlayerStateComplete: 4,
-  JWPlayerStateError: 5,
+  JWPlayerStatePlaying: 3,
+  JWPlayerStatePaused: 4,
+  JWPlayerStateComplete: 5,
+  JWPlayerStateError: 6,
 };
 
 const JWPlayerStateAndroid = {
@@ -39,10 +40,10 @@ export const JWPlayerState =
   Platform.OS === "ios" ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
 export const JWPlayerAdClients = {
-  JWAdClientGoogima: 1,
-  JWAdClientGoogimaDAI: 2,
-  JWAdClientFreewheel: 3,
-  JWAdClientVast: 4,
+  JWAdClientJWPlayer: 0,
+  JWAdClientGoogleIMA: 1,
+  JWAdClientGoogleIMADAI: 2,
+  JWAdClientUnknown: 3,
 };
 
 export default class JWPlayer extends Component {
@@ -56,7 +57,7 @@ export default class JWPlayer extends Component {
       controls: PropTypes.bool,
       repeat: PropTypes.bool,
       preload: PropTypes.oneOf(["0", "1"]),
-      items: PropTypes.arrayOf(
+      playlist: PropTypes.arrayOf(
         PropTypes.shape({
           file: PropTypes.string,
           sources: PropTypes.arrayOf(
@@ -89,7 +90,7 @@ export default class JWPlayer extends Component {
         })
       ),
       advertising: PropTypes.shape({
-        // adClient: PropTypes.string,
+        adClient: PropTypes.string,
         adSchedule: PropTypes.arrayOf(
           PropTypes.shape({
             tag: PropTypes.string,
@@ -374,6 +375,7 @@ export default class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    var {config} = nextProps;
     var {
       file,
       image,
@@ -391,54 +393,39 @@ export default class JWPlayer extends Component {
       playlist,
       style,
       stretching,
-    } = nextProps;
+    } = config || {};
+
+    var thisConfig = this.props.config || {};
 
     if (
-      file !== this.props.file ||
-      image !== this.props.image ||
-      desc !== this.props.desc ||
-      title !== this.props.title ||
-      mediaId !== this.props.mediaId ||
-      autostart !== this.props.autostart ||
-      controls !== this.props.controls ||
-      repeat !== this.props.repeat ||
-      mute !== this.props.mute ||
-      displayTitle !== this.props.displayTitle ||
-      displayDesc !== this.props.displayDesc ||
-      nextUpDisplay !== this.props.nextUpDisplay ||
-      style !== this.props.style ||
-      stretching !== this.props.stretching
+      file !== thisConfig.file ||
+      image !== thisConfig.image ||
+      desc !== thisConfig.desc ||
+      title !== thisConfigs.title ||
+      mediaId !== thisConfig.mediaId ||
+      autostart !== thisConfig.autostart ||
+      controls !== thisConfig.controls ||
+      repeat !== thisConfig.repeat ||
+      displayTitle !== thisConfig.displayTitle ||
+      displayDesc !== thisConfig.displayDesc ||
+      nextUpDisplay !== thisConfig.nextUpDisplay ||
+      style !== thisConfig.style ||
+      stretching !== thisConfig.stretching
     ) {
       return true;
     }
 
-    if (playlist) {
-      if (this.props.playlist) {
-        return !this.arraysAreEqual(playlist, this.props.playlist);
-      } else {
-        return true;
-      }
-    }
-
-    if (playlistItem) {
-      if (this.props.playlistItem) {
-        if (playlistItem.mediaId !== this.props.playlistItem.mediaId) {
-          return true;
-        }
-
-        if (playlistItem.controls !== this.props.playlistItem.controls) {
-          return true;
-        }
-      } else {
-        return true;
-      }
+    if (playlist && thisConfig.playlist) {
+      return !this.arraysAreEqual(playlist, thisConfig.playlist);
+    } else if (!playlist && thisConfig.playlist) {
+      return true
     }
 
     return false;
   }
 
   arraysAreEqual(ary1, ary2) {
-    return ary1.join("") == ary2.join("");
+    return ary1?.join("") == ary2?.join("");
   }
 
   render() {

@@ -129,7 +129,7 @@
                            alpha:1.0f];
 }
 
--(void)setStyling:(NSDictionary*)styling
+-(void)setStyling:styling
 {
     JWError* error = nil;
     
@@ -138,13 +138,13 @@
         
         id colors = styling[@"colors"];
         if (colors != nil && (colors != (id)[NSNull null])) {
-            id timeSlider = styling[@"timeslider"];
+            id timeSlider = colors[@"timeslider"];
             if (timeSlider != nil && (timeSlider != (id)[NSNull null])) {
                 JWTimeSliderStyleBuilder* timeSliderStyleBuilder = [[JWTimeSliderStyleBuilder alloc] init];
                 
-                id slider = timeSlider[@"slider"];
-                if (slider != nil && (slider != (id)[NSNull null])) {
-                    [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:slider]];
+                id progress = timeSlider[@"progress"];
+                if (progress != nil && (progress != (id)[NSNull null])) {
+                    [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:progress]];
                 }
                 
                 id rail = timeSlider[@"rail"];
@@ -188,12 +188,12 @@
             }
         }
         
-        id showTitle = styling[@"showTitle"];
+        id showTitle = styling[@"displayTitle"];
         if (showTitle != nil && (showTitle != (id)[NSNull null])) {
             [skinStylingBuilder titleIsVisible:showTitle];
         }
         
-        id showDesc = styling[@"showDesc"];
+        id showDesc = styling[@"displayDescription"];
         if (showDesc != nil && (showDesc != (id)[NSNull null])) {
             [skinStylingBuilder descriptionIsVisible:showDesc];
         }
@@ -293,7 +293,9 @@
         
         JWPlayerSkin *skinStyling = [skinStylingBuilder buildAndReturnError:&error];
         
-        _playerViewController.styling = skinStyling;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self->_playerViewController.styling = skinStyling;
+        });
     }
 }
 
@@ -424,17 +426,17 @@
                 [adsArray addObject:adBreak];
             }
             
-            //    if (adsArray.count > 0) {
-            //        [itemBuilder adScheduleWithBreaks:adsArray];
-            //    }
+            if (adsArray.count > 0) {
+                [itemBuilder adScheduleWithBreaks:adsArray];
+            }
         }
     }
 
-//    id adVmap = item[@"adVmap"];
-//    if (adVmap != nil && (adVmap != (id)[NSNull null])) {
-//        NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
-//        [itemBuilder adScheduleWithVmapURL:adVmapUrl];
-//    }
+    id adVmap = item[@"adVmap"];
+    if (adVmap != nil && (adVmap != (id)[NSNull null])) {
+        NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
+        [itemBuilder adScheduleWithVmapURL:adVmapUrl];
+    }
     
     return [itemBuilder buildAndReturnError:&error];
 }
@@ -444,9 +446,9 @@
     JWPlayerConfigurationBuilder *configBuilder = [[JWPlayerConfigurationBuilder alloc] init];
     
     NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
-    if (config[@"items"] != nil && (config[@"items"] != (id)[NSNull null])) {
-        NSArray* items = config[@"items"];
-        for (id item in items) {
+    if (config[@"playlist"] != nil && (config[@"playlist"] != (id)[NSNull null])) {
+        NSArray* playlist = config[@"playlist"];
+        for (id item in playlist) {
             JWPlayerItem *playerItem = [self getPlayerItem:item];
             [playlistArray addObject:playerItem];
         }
@@ -478,51 +480,108 @@
         }
     }
     
-    JWRelatedContentConfigurationBuilder* relatedBuilder = [[JWRelatedContentConfigurationBuilder alloc] init];
-//    [relatedBuilder onClick:JWRelatedOnClickPlay];
-//    [relatedBuilder onComplete:JWRelatedOnCompleteShow];
-//    [relatedBuilder autoplayTimer:autoplayTimer];
-//    [relatedBuilder url:url];
-//    [relatedBuilder heading:heading];
-//    [relatedBuilder autoplayMessage:autoplayMessage];
+    id related = config[@"related"];
+    if ((related != nil) && (related != (id)[NSNull null])) {
+        JWRelatedContentConfigurationBuilder* relatedBuilder = [[JWRelatedContentConfigurationBuilder alloc] init];
+        
+        id onClick = related[@"onClick"];
+        if ((onClick != nil) && (onClick != (id)[NSNull null])) {
+            switch ([onClick intValue]) {
+                case 0:
+                    [relatedBuilder onClick:JWRelatedOnClickPlay];
+                    break;
+                case 1:
+                    [relatedBuilder onClick:JWRelatedOnClickLink];
+                    break;
+                default:
+                    [relatedBuilder onClick:JWRelatedOnClickPlay];
+                    break;
+            }
+        }
+        
+        id onComplete = related[@"onComplete"];
+        if ((onComplete != nil) && (onComplete != (id)[NSNull null])) {
+            switch ([onComplete intValue]) {
+                case 0:
+                    [relatedBuilder onComplete:JWRelatedOnCompleteShow];
+                    break;
+                case 1:
+                    [relatedBuilder onComplete:JWRelatedOnCompleteHide];
+                    break;
+                case 2:
+                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
+                    break;
+                default:
+                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
+                    break;
+            }
+        }
+        
+        id heading = related[@"heading"];
+        if ((heading != nil) && (heading != (id)[NSNull null])) {
+            [relatedBuilder heading:heading];
+        }
+        
+        id urlStr = related[@"url"];
+        if ((urlStr != nil) && (urlStr != (id)[NSNull null])) {
+            NSURL* url = [NSURL URLWithString:urlStr];
+            [relatedBuilder url:url];
+        }
+        
+        id autoplayMessage = related[@"autoplayMessage"];
+        if ((autoplayMessage != nil) && (autoplayMessage != (id)[NSNull null])) {
+            [relatedBuilder autoplayMessage:autoplayMessage];
+        }
+        
+        id autoplayTimer = related[@"autoplayTimer"];
+        if ((autoplayTimer != nil) && (autoplayTimer != (id)[NSNull null])) {
+            [relatedBuilder autoplayTimer:[autoplayTimer intValue]];
+        }
+        
+        JWRelatedContentConfiguration* related = [relatedBuilder build];
+        
+        [configBuilder related:related];
+    }
     
-    JWRelatedContentConfiguration* related = [relatedBuilder build];
-    
-    [configBuilder related:related];
-             
-    JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
-             
-     id adClient = config[@"adClient"];
-     if ((adClient != nil) && (adClient != (id)[NSNull null])) {
-         JWAdClient jwAdClient;
-         switch ([adClient intValue]) {
-             case 0:
-                 jwAdClient = JWAdClientJWPlayer;
-                 break;
-             case 1:
-                 jwAdClient = JWAdClientGoogleIMA;
-                 break;
-             case 2:
-                 jwAdClient = JWAdClientGoogleIMADAI;
-                 break;
-             case 3:
-                 jwAdClient = JWAdClientUnknown;
-                 break;
-
-             default:
-                 jwAdClient = JWAdClientUnknown;
-                 break;
-         }
-     } else {
-
-     }
-    
-    // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
+//    JWJSONParser
+//    JWLockScreenManager
     
     JWError* error = nil;
     
-    id ads = config[@"avertising"];
+    id ads = config[@"advertising"];
     if (ads != nil && (ads != (id)[NSNull null])) {
+        JWAdvertisingConfig* advertising;
+        JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
+                 
+         id adClient = config[@"adClient"];
+         if ((adClient != nil) && (adClient != (id)[NSNull null])) {
+             JWAdClient jwAdClient;
+             switch ([adClient intValue]) {
+                 case 0:
+                     jwAdClient = JWAdClientJWPlayer;
+                     break;
+                 case 1:
+    //                 JWImaAdvertisingConfigBuilder
+                     jwAdClient = JWAdClientGoogleIMA;
+                     break;
+                 case 2:
+    //                 JWImaDaiAdvertisingConfigBuilder
+                     jwAdClient = JWAdClientGoogleIMADAI;
+                     break;
+                 case 3:
+                     jwAdClient = JWAdClientUnknown;
+                     break;
+
+                 default:
+                     jwAdClient = JWAdClientUnknown;
+                     break;
+             }
+         } else {
+
+         }
+        
+        // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
+        
         id schedule = config[@"adSchedule"];
         if(schedule != nil && (schedule != (id)[NSNull null])) {
             NSArray* scheduleAr = (NSArray*)schedule;
@@ -569,7 +628,7 @@
             [adConfigBuilder openBrowserOnAdClick:openBrowserOnAdClick];
         }
         
-        JWAdvertisingConfig* advertising = [adConfigBuilder buildAndReturnError:&error];
+        advertising = [adConfigBuilder buildAndReturnError:&error];
         [configBuilder advertising:advertising];
     }
     
@@ -636,10 +695,10 @@
         _playerViewController.nextUpStyle = [nextUpBuilder buildAndReturnError:&error];
     }
     
-    //    _playerViewController.adInterfaceStyle
+//    _playerViewController.adInterfaceStyle
 //    _playerViewController.logo
 //    _playerView.videoGravity = 0;
-    //            _playerView.captionStyle
+//    _playerView.captionStyle
     
     id offlineMsg = config[@"offlineMessage"];
     if (offlineMsg != nil && offlineMsg != (id)[NSNull null]) {
@@ -677,7 +736,9 @@
     [_playerViewController didMoveToParentViewController:window.rootViewController];
     
     // before presentation of viewcontroller player is nil so acces only after
-    [_playerViewController.player configurePlayerWith:configuration];
+    if (configuration != nil) {
+        [_playerViewController.player configurePlayerWith:configuration];
+    }
 
     _playerViewController.playerView.delegate = self;
     _playerViewController.player.delegate = self;
