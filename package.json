@@ -1,6 +1,6 @@
 {
   "name": "react-native-jw-media-player",
-  "version": "0.2.0",
+  "version": "0.2.0-beta.0",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "homepage": "https://github.com/chaimPaneth/react-native-jw-media-player#readme",
   "peerDependencies": {
-    "react": "^16.13.1",
-    "react-native": "^0.63.2"
+    "react": ">= 16.13.1",
+    "react-native": ">= 0.63.2"
   }
 }

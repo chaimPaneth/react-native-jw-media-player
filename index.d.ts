@@ -91,6 +91,7 @@ declare module "react-native-jw-media-player" {
     stretching?: string;
     related?: Related;
     preload?: string;
+    interfaceBehavior: number;
   }
   interface PropsType {
     config: Config;
