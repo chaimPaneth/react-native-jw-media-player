@@ -39,7 +39,7 @@ public class MediaPlaybackService extends Service {
 		if (mMediaSessionManager != null) {
 			MediaButtonReceiver.handleIntent(mMediaSessionManager.getMediaSession(), intent);
 		}
-		return START_STICKY;
+		return START_NOT_STICKY;
 	}
 
 	@Nullable
