@@ -4,12 +4,10 @@ package com.appgoalz.rnjwplayer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.util.Log;
 import android.view.View;
@@ -20,10 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.mediarouter.app.MediaRouteButton;
-import androidx.mediarouter.app.MediaRouteChooserDialog;
-import androidx.mediarouter.media.MediaRouter;
 
+import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -32,14 +28,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.google.android.gms.cast.Cast;
-import com.google.android.gms.cast.CastDevice;
-import com.google.android.gms.cast.framework.CastContext;
-import com.google.android.gms.cast.framework.CastSession;
-import com.google.android.gms.cast.framework.SessionManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.background.MediaServiceController;
@@ -59,6 +47,7 @@ import com.jwplayer.pub.api.events.BeforePlayEvent;
 import com.jwplayer.pub.api.events.BufferEvent;
 import com.jwplayer.pub.api.events.CaptionsChangedEvent;
 import com.jwplayer.pub.api.events.CaptionsListEvent;
+import com.jwplayer.pub.api.events.CastEvent;
 import com.jwplayer.pub.api.events.CompleteEvent;
 import com.jwplayer.pub.api.events.ControlBarVisibilityEvent;
 import com.jwplayer.pub.api.events.ControlsEvent;
@@ -69,6 +58,8 @@ import com.jwplayer.pub.api.events.FirstFrameEvent;
 import com.jwplayer.pub.api.events.FullscreenEvent;
 import com.jwplayer.pub.api.events.IdleEvent;
 import com.jwplayer.pub.api.events.PauseEvent;
+import com.jwplayer.pub.api.events.PipCloseEvent;
+import com.jwplayer.pub.api.events.PipOpenEvent;
 import com.jwplayer.pub.api.events.PlayEvent;
 import com.jwplayer.pub.api.events.PlaylistCompleteEvent;
 import com.jwplayer.pub.api.events.PlaylistEvent;
@@ -79,6 +70,8 @@ import com.jwplayer.pub.api.events.SeekedEvent;
 import com.jwplayer.pub.api.events.SetupErrorEvent;
 import com.jwplayer.pub.api.events.TimeEvent;
 import com.jwplayer.pub.api.events.listeners.AdvertisingEvents;
+import com.jwplayer.pub.api.events.listeners.CastingEvents;
+import com.jwplayer.pub.api.events.listeners.PipPluginEvents;
 import com.jwplayer.pub.api.events.listeners.VideoPlayerEvents;
 import com.jwplayer.pub.api.fullscreen.FullscreenHandler;
 import com.jwplayer.pub.api.license.LicenseUtil;
@@ -88,7 +81,6 @@ import com.jwplayer.pub.api.media.captions.Caption;
 import com.jwplayer.pub.api.media.captions.CaptionType;
 import com.jwplayer.pub.api.media.playlists.MediaSource;
 import com.jwplayer.pub.api.media.playlists.PlaylistItem;
-import com.jwplayer.pub.view.JWPlayerView;
 import com.jwplayer.ui.views.CueMarkerSeekbar;
 
 import java.util.ArrayList;
@@ -124,6 +116,12 @@ public class RNJWPlayerView extends RelativeLayout implements
         AdvertisingEvents.OnBeforeCompleteListener,
         AdvertisingEvents.OnAdPauseListener,
         AdvertisingEvents.OnAdPlayListener,
+
+        CastingEvents.OnCastListener,
+
+        PipPluginEvents.OnPipCloseListener,
+        PipPluginEvents.OnPipOpenListener,
+
 //        AdvertisingEvents.OnAdRequestListener,
 //        AdvertisingEvents.OnAdScheduleListener,
 //        AdvertisingEvents.OnAdStartedListener,
@@ -138,10 +136,10 @@ public class RNJWPlayerView extends RelativeLayout implements
 //        AdvertisingEvents.OnAdSkippedListener,
 //        AdvertisingEvents.OnAdTimeListener,
 //        AdvertisingEvents.OnAdViewableImpressionListener,
+
         LifecycleEventListener {
     public RNJWPlayer mPlayerView = null;
     public JWPlayer mPlayer = null;
-    private JWPlayerView mFullscreenPlayer;
 
     private ViewGroup mRootView;
 
@@ -155,35 +153,18 @@ public class RNJWPlayerView extends RelativeLayout implements
     Boolean landscapeOnFullScreen = false;
     Boolean fullScreenOnLandscape = false;
     Boolean portraitOnExitFullScreen = false;
+    Boolean exitFullScreenOnPortrait = false;
 
     Number currentPlayingIndex;
 
-    private CastContext mCastContext;
-    private CastSession mCastSession;
-    private SessionManager mSessionManager;
-    private MediaRouteButton mMediaRouteButton;
-    private boolean mAutoHide;
-    private Cast.Listener mCastClientListener;
-    private GoogleApiClient mApiClient;
-
-    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
-    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
-
     private static final String TAG = "RNJWPlayerView";
 
-    static Activity mActivity;
+    static ReactActivity mActivity;
 
     Window mWindow;
 
     public static AudioManager audioManager;
 
-    final Object focusLock = new Object();
-
-    AudioFocusRequest focusRequest;
-
-    boolean hasAudioFocus = false;
-    boolean playbackDelayed = false;
-    boolean playbackNowAuthorized = false;
     boolean userPaused = false;
     boolean wasInterrupted = false;
 
@@ -232,7 +213,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         mThemedReactContext = reactContext;
 
-        mActivity = getActivity();
+        mActivity = (ReactActivity) getActivity();
         if (mActivity != null) {
             mWindow = mActivity.getWindow();
         }
@@ -240,27 +221,6 @@ public class RNJWPlayerView extends RelativeLayout implements
         mRootView = mActivity.findViewById(android.R.id.content);
 
         getReactContext().addLifecycleEventListener(this);
-    }
-
-    private boolean doesPackageExist(String targetPackage) {
-        try {
-            getActivity().getPackageManager().getPackageInfo(targetPackage, PackageManager.GET_META_DATA);
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-        return true;
-    }
-
-    // Without the Google API's Chromecast won't work
-    private boolean isGoogleApiAvailable(Context context) {
-        boolean isOldPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD);
-        boolean isNewPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW);
-
-        boolean isPlaystoreInstalled = isNewPlayStoreInstalled||isOldPlayStoreInstalled;
-
-        boolean isGoogleApiAvailable = GoogleApiAvailability.getInstance()
-                .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
-        return isPlaystoreInstalled && isGoogleApiAvailable;
     }
 
     public ReactApplicationContext getAppContext() {
@@ -283,6 +243,8 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayerView = null;
 
             getReactContext().removeLifecycleEventListener(this);
+
+            audioManager = null;
 
             doUnbindService();
         }
@@ -319,6 +281,13 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayer.addListener(EventType.BEFORE_COMPLETE, this);
             mPlayer.addListener(EventType.AD_PLAY, this);
             mPlayer.addListener(EventType.AD_PAUSE, this);
+
+            // Cast event
+            mPlayer.addListener(EventType.CAST, this);
+
+            // Pip events
+            mPlayer.addListener(EventType.PIP_CLOSE, this);
+            mPlayer.addListener(EventType.PIP_OPEN, this);
 
             mPlayer.setFullscreenHandler(new fullscreenHandler());
 
@@ -365,8 +334,6 @@ public class RNJWPlayerView extends RelativeLayout implements
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                     ));
-                    mPlayerView.requestLayout();
-                    mFullscreenPlayer = mPlayerView;
                 }
             });
 
@@ -402,8 +369,6 @@ public class RNJWPlayerView extends RelativeLayout implements
                             ViewGroup.LayoutParams.MATCH_PARENT
                     ));
                     mPlayerView.layout(mPlayerViewContainer.getLeft(), mPlayerViewContainer.getTop(), mPlayerViewContainer.getRight(), mPlayerViewContainer.getBottom());
-                    mPlayerView.requestLayout();
-                    mFullscreenPlayer = null;
                 }
             });
 
@@ -696,17 +661,21 @@ public class RNJWPlayerView extends RelativeLayout implements
         addView(mPlayerView);
 
         if (prop.hasKey("fullScreenOnLandscape")) {
-            boolean fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
+            fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
             mPlayerView.fullScreenOnLandscape = fullScreenOnLandscape;
         }
 
         if (prop.hasKey("exitFullScreenOnPortrait")) {
-            boolean exitFullScreenOnPortrait = prop.getBoolean("exitFullScreenOnPortrait");
+            exitFullScreenOnPortrait = prop.getBoolean("exitFullScreenOnPortrait");
             mPlayerView.exitFullScreenOnPortrait = exitFullScreenOnPortrait;
         }
 
         mPlayer = mPlayerView.getPlayer();
         mPlayer.setup(playerConfig);
+
+        if (mActivity != null && prop.hasKey("pipEnabled")) {
+            mPlayer.registerActivityForPip(mActivity, mActivity.getSupportActionBar());
+        }
 
         if (mColors != null) {
             if (mColors.hasKey("backgroundColor")) {
@@ -729,9 +698,9 @@ public class RNJWPlayerView extends RelativeLayout implements
                         processDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
                     }
 
-                    if (timeslider.hasKey("secondaryProgress")) {
+                    if (timeslider.hasKey("buffer")) {
                         Drawable secondaryProgressDrawable = progressDrawable.findDrawableByLayerId(android.R.id.secondaryProgress);
-                        secondaryProgressDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("secondaryProgress")), PorterDuff.Mode.SRC_IN);
+                        secondaryProgressDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("buffer")), PorterDuff.Mode.SRC_IN);
                     }
 
                     if (timeslider.hasKey("rail")) {
@@ -746,6 +715,9 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
+        // Needed to handle volume control
+        audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
+
         if (prop.hasKey("backgroundAudioEnabled")) {
             backgroundAudioEnabled = prop.getBoolean("backgroundAudioEnabled");
         }
@@ -755,55 +727,6 @@ public class RNJWPlayerView extends RelativeLayout implements
         if (backgroundAudioEnabled) {
             mMediaServiceController = new MediaServiceController.Builder((AppCompatActivity) mActivity, mPlayer).build();
         }
-    }
-
-    void presentCastDialog() {
-        MediaRouteChooserDialog dialog = new MediaRouteChooserDialog(getReactContext());
-        dialog.show();
-    }
-
-    void setUpCastController() {
-        if (mCastContext == null) {
-            mCastContext = CastContext.getSharedInstance(getReactContext());
-            mSessionManager = mCastContext.getSessionManager();
-        }
-    }
-
-    int castState() {
-        if (mCastContext != null) {
-            return mCastContext.getCastState();
-        }
-
-        return -1;
-    }
-
-    CastDevice connectedDevice() {
-        if (mCastContext != null && mCastContext.getSessionManager() != null && mCastContext.getSessionManager().getCurrentCastSession() != null) {
-            return mCastContext.getSessionManager().getCurrentCastSession().getCastDevice();
-        }
-
-        return null;
-    }
-
-    List<CastDevice> availableDevice() {
-        if (mCastContext != null) {
-            MediaRouter router =
-                    MediaRouter.getInstance(getReactContext());
-            List<MediaRouter.RouteInfo> routes = router.getRoutes();
-
-            List<CastDevice> devices = new ArrayList<>();
-
-            for (MediaRouter.RouteInfo routeInfo : routes) {
-                CastDevice device = CastDevice.getFromBundle(routeInfo.getExtras());
-                if (device != null) {
-                    devices.add(device);
-                }
-            }
-
-            return devices;
-        }
-
-        return null;
     }
 
     private void updateWakeLock(boolean enable) {
@@ -1056,6 +979,30 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     }
 
+    // Picture in Picture events
+
+    @Override
+    public void onPipClose(PipCloseEvent pipCloseEvent) {
+
+    }
+
+    @Override
+    public void onPipOpen(PipOpenEvent pipOpenEvent) {
+
+    }
+
+    // Casting events
+
+    @Override
+    public void onCast(CastEvent castEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onCast");
+        event.putString("device", castEvent.getDeviceName());
+        event.putBoolean("active", castEvent.isActive());
+        event.putBoolean("available", castEvent.isAvailable());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCast", event);
+    }
+
     // LifecycleEventListener
 
     @Override
@@ -1070,7 +1017,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onHostDestroy() {
-
+        this.destroyPlayer();
     }
 }
 

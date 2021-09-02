@@ -376,6 +376,11 @@
         NSURL* recUrl = [NSURL URLWithString:recommendations];
         [itemBuilder recommendations:recUrl];
     }
+    
+    id autostart = item[@"autostart"];
+    if (autostart != nil && (autostart != (id)[NSNull null])) {
+        [itemBuilder autostart:autostart];
+    }
 
     id tracksItem = item[@"tracks"];
     if(tracksItem != nil && (tracksItem != (id)[NSNull null])) {
@@ -663,12 +668,12 @@
         }
     }
     
-    id forceFullScreenOnLandscape = config[@"forceFullScreenOnLandscape"];
+    id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
     if (forceFullScreenOnLandscape != nil && forceFullScreenOnLandscape != (id)[NSNull null]) {
         _playerViewController.forceFullScreenOnLandscape = forceFullScreenOnLandscape;
     }
     
-    id forceLandscapeOnFullScreen = config[@"forceLandscapeOnFullScreen"];
+    id forceLandscapeOnFullScreen = config[@"landscapeOnFullScreen"];
     if (forceLandscapeOnFullScreen != nil && forceLandscapeOnFullScreen != (id)[NSNull null]) {
         _playerViewController.forceLandscapeOnFullScreen = forceLandscapeOnFullScreen;
     }
@@ -1110,42 +1115,180 @@
     }
 }
 
+#pragma Mark - Casting methods
+
+-(void)setUpCastController
+{
+   if (_playerView != nil && _playerView.player != nil && _castController == nil) {
+       _castController = [[JWCastController alloc] initWithPlayer:_playerView.player];
+       _castController.delegate = self;
+   }
+   
+   [self scanForDevices];
+}
+
+- (void)scanForDevices
+{
+   if (_castController != nil) {
+       [_castController startDiscovery];
+   }
+}
+
+- (void)stopScanForDevices
+{
+   if (_castController != nil) {
+       [_castController stopDiscovery];
+   }
+}
+
+- (void)presentCastDialog
+{
+    [GCKCastContext.sharedInstance presentCastDialog];
+}
+
+- (void)startDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] startDiscovery];
+}
+
+- (void)stopDiscovery
+{
+    [[GCKCastContext.sharedInstance discoveryManager] stopDiscovery];
+}
+
+- (BOOL)discoveryActive
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryActive];
+}
+
+- (BOOL)hasDiscoveredDevices
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] hasDiscoveredDevices];
+}
+
+- (GCKDiscoveryState)discoveryState
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] discoveryState];
+}
+
+- (void)setPassiveScan:(BOOL)passive
+{
+    [[GCKCastContext.sharedInstance discoveryManager] setPassiveScan:passive];
+}
+
+- (GCKCastState)castState
+{
+    return [GCKCastContext.sharedInstance castState];
+}
+
+- (NSUInteger)deviceCount
+{
+    return [[GCKCastContext.sharedInstance discoveryManager] deviceCount];
+}
+
+- (NSArray <JWCastingDevice *>*)availableDevices
+{
+    return _castController.availableDevices;
+}
+
+- (JWCastingDevice*)connectedDevice
+{
+    return _castController.connectedDevice;
+}
+
+- (void)connectToDevice:(JWCastingDevice*)device
+{
+    return [_castController connectToDevice:device];
+}
+
+- (void)cast
+{
+    return [_castController cast];
+}
+
+- (void)stopCasting
+{
+    return [_castController stopCasting];
+}
+
 #pragma mark - JWPlayer Cast Delegate
 
 - (void)castController:(JWCastController * _Nonnull)controller castingBeganWithDevice:(JWCastingDevice * _Nonnull)device {
-    
+    if (self.onCasting) {
+        self.onCasting(@{});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller castingEndedWithError:(NSError * _Nullable)error {
-    
+    if (self.onCastingEnded) {
+        self.onCastingEnded(@{@"error": error});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller castingFailedWithError:(NSError * _Nonnull)error {
-    
+    if (self.onCastingFailed) {
+        self.onCastingFailed(@{@"error": error});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectedTo:(JWCastingDevice * _Nonnull)device {
-    
+    if (self.onConnectedToCastingDevice) {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            
+        [dict setObject:device.name forKey:@"name"];
+        [dict setObject:device.identifier forKey:@"identifier"];
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onConnectedToCastingDevice(@{@"device": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionFailedWithError:(NSError * _Nonnull)error {
-    
+    if (self.onConnectionFailed) {
+        self.onConnectionFailed(@{@"error": error});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionRecoveredWithDevice:(JWCastingDevice * _Nonnull)device {
-    
+    if (self.onConnectionRecovered) {
+        self.onConnectionRecovered(@{});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionSuspendedWithDevice:(JWCastingDevice * _Nonnull)device {
-    
+    if (self.onConnectionTemporarilySuspended) {
+        self.onConnectionTemporarilySuspended(@{});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller devicesAvailable:(NSArray<JWCastingDevice *> * _Nonnull)devices {
+    self.availableDevices = devices;
     
+    if (self.onCastingDevicesAvailable) {
+        NSMutableArray *devicesInfo = [[NSMutableArray alloc] init];
+
+        for (JWCastingDevice *device in devices) {
+            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                
+            [dict setObject:device.name forKey:@"name"];
+            [dict setObject:device.identifier forKey:@"identifier"];
+
+            [devicesInfo addObject:dict];
+        }
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:devicesInfo options:NSJSONWritingPrettyPrinted error: &error];
+        
+        self.onCastingDevicesAvailable(@{@"devices": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
+    }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller disconnectedWithError:(NSError * _Nullable)error {
-    
+    if (self.onDisconnectedFromCastingDevice) {
+        self.onDisconnectedFromCastingDevice(@{@"error": error});
+    }
 }
 
 #pragma mark - JWPlayer AV Delegate

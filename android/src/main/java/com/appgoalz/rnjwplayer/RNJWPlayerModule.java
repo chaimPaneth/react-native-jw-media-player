@@ -267,129 +267,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     }
   }
 
-  @ReactMethod
-  public void setUpCastController(final int reactTag) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayerView != null) {
-            playerView.setUpCastController();
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void presentCastDialog(final int reactTag) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayerView != null) {
-            playerView.presentCastDialog();
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void connectedDevice(final int reactTag, final Promise promise) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayerView != null) {
-            if (playerView.connectedDevice() != null) {
-              String name = playerView.connectedDevice().getFriendlyName();
-              String id = playerView.connectedDevice().getDeviceId();
-
-              WritableMap map = Arguments.createMap();
-              map.putString("name", name);
-              map.putString("identifier", id);
-              promise.resolve(map);
-            } else {
-              promise.reject("RNJW Casting Error", "No connected device.");
-            }
-          } else {
-            promise.reject("RNJW Error", "Player is null");
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void availableDevices(final int reactTag, final Promise promise) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayerView != null) {
-            if (playerView.availableDevice() != null) {
-              WritableArray deviceArray = Arguments.createArray();
-
-              for (CastDevice device : playerView.availableDevice()) {
-                String name = device.getFriendlyName();
-                String id = device.getDeviceId();
-
-                WritableMap map = Arguments.createMap();
-                map.putString("name", name);
-                map.putString("identifier", id);
-
-                deviceArray.pushMap(map);
-              }
-
-              promise.resolve(deviceArray);
-            } else {
-              promise.reject("RNJW Casting Error", "No connected device.");
-            }
-          } else {
-            promise.reject("RNJW Error", "Player is null");
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void castState(final int reactTag, final Promise promise) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayerView != null) {
-            promise.resolve(playerView.castState());
-          } else {
-            promise.reject("RNJW Error", "Player is null");
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
   private int stateToInt(PlayerState playerState) {
     switch (playerState) {
       case IDLE:
@@ -402,8 +279,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         return 3;
       case COMPLETE:
         return 4;
+      case ERROR:
+        return 5;
       default:
-        return 0;
+        return -1;
     }
   }
 }

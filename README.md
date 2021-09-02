@@ -179,24 +179,26 @@ Running the example project:
 
 ##### Config
 
-| Prop                           | Description                                                                                    | Type                                                |
-| ------------------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| **`offlineImage`**             | The url for the player offline thumbnail.                                                      | `String`                                            |
-| **`offlineMessage`**           | The message when the player is offline.                                                        | `String`                                            |
-| **`autostart`**                | Should the tracks auto start.                                                                  | `Boolean`                                           |
-| **`controls`**                 | Should the control buttons show.                                                               | `Boolean`                                           |
-| **`repeat`**                   | Should the track repeat.                                                                       | `Boolean`                                           |
-| **`playlist`**                 | An array of playlistItems.                                                                     | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
-| **`nextUpStyle`**              | How the next up videos should be presented.                                                    | `{offsetSeconds: Int, offsetPercentage, Int}`       |
-| **`styling`**                  | All the stylings for the player see [Styling](#Styling) section.                               | `Object`                                            |
-| **`advertising`**              | General Advertising settings on the player see [Advertising](#Advertising) section.            | `Object`                                            |
-| **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape          | `Boolean`                                           |
-| **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen            | `Boolean`                                           |
-| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen        | `Boolean`                                           |
-| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait           | `Boolean`                                           |
-| **`enableLockScreenControls`** | When this is true the player will show media controls on lock screen                           | `Boolean`                                           |
-| **`stretching`**               | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section. | `String`                                            |
-| **`backgroundAudioEnabled`**   | Should the player continue playing in the background and handle interruptions.                 | `Boolean`                                           |
+| Prop                           | Description                                                                                                                          | Type                                                | Platform                       | Default |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | ------------------------------ | ------- |
+| **`offlineImage`**             | The url for the player offline thumbnail.                                                                                            | `String`                                            | `iOS`                          | `none`  |
+| **`offlineMessage`**           | The message when the player is offline.                                                                                              | `String`                                            | `iOS`                          | `none`  |
+| **`autostart`**                | Should the tracks auto start.                                                                                                        | `Boolean`                                           | `iOS && Android`               | `false` |
+| **`controls`**                 | Should the control buttons show.                                                                                                     | `Boolean`                                           | `Android`                      | `true`  |
+| **`repeat`**                   | Should the track repeat.                                                                                                             | `Boolean`                                           | `iOS && Android`               | `false` |
+| **`playlist`**                 | An array of playlistItems.                                                                                                           | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] | `iOS && Android`               | `none`  |
+| **`nextUpStyle`**              | How the next up videos should be presented.                                                                                          | `{offsetSeconds: Int, offsetPercentage, Int}`       | `iOS && Android`               | `none`  |
+| **`styling`**                  | All the stylings for the player see [Styling](#Styling) section.                                                                     | `Object`                                            | `iOS && Android`               | `none`  |
+| **`advertising`**              | General Advertising settings on the player see [Advertising](#Advertising) section.                                                  | `Object`                                            | `iOS && Android`               | `none`  |
+| **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                | `Boolean`                                           | `iOS && Android`               | `false` |
+| **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                  | `Boolean`                                           | `iOS && Android`               | `false` |
+| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                              | `Boolean`                                           | `Android`                      | `false` |
+| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                 | `Boolean`                                           | `Android`                      | `false` |
+| **`enableLockScreenControls`** | When this is true the player will show media controls on lock screen                                                                 | `Boolean`                                           | `iOS`                          | `true`  |
+| **`stretching`**               | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                       | `String`                                            | `Android`                      | `none`  |
+| **`backgroundAudioEnabled`**   | Should the player continue playing in the background and handle interruptions.                                                       | `Boolean`                                           | `iOS && Android`               | `false` |
+| **`viewOnly`**                 | When true the player will not have any controls it will show only the video.                                                         | `Boolean`                                           | `iOS`                          | `false` |
+| **`pipEnabled`**               | When true the player will be able to go into Picture in Picture mode. **Note: This is true by default for iOS PlayerViewController**. **For Android you will also need to follow the instruction mentioned [here](https://developer.jwplayer.com/jwplayer/docs/android-invoke-picture-in-picture-playback)** | `Boolean`                                           | `iOS when viewOnly prop is true && Android` | `false` |
 
 ##### PlaylistItem
 | Prop                  | Description                                    | Type                                              |
@@ -364,7 +366,11 @@ For iOS you will have to enable `audio` in **Signing & Capabilities** under `bac
 
 ### Casting
 
+JWPlayer enables casting by default with a casting button (if you pass the `viewOnly` prop in the player config on iOS then you will need to enable casting by yourself).
+
 ###### iOS
+
+Follow the instruction [here](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices) on the official JWPlayer site.
 
 Edit your `Info.plist` with the following values:
 
@@ -379,6 +385,8 @@ Edit your `Info.plist` with the following values:
 Enable *Access WiFi Information* capability under `Signing & Capabilities`
 
 #### Available methods
+
+##### For iOS
 
 | Func            | Description          | Argument                                      |
 | --------------- | -------------------- | --------------------------------------------- |
@@ -400,7 +408,9 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 
 #### Available callbacks
 
-| Func                                   | Description                                           | Argument                                          |
+##### For iOS
+
+| Func                                   | Description                                           | Payload                                           |
 | -------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
 | **`onCastingDevicesAvailable`**        | Casting were devices discovered and became available. | `{devices: [{name: string, identifier: string}}]` |
 | **`onConnectedToCastingDevice`**       | Connected to cast device.                             | `{device: {name: string, identifier: string}}`    |
@@ -411,6 +421,12 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 | **`onConnectionFailed`**               | Connection to cast device failed.                     | `{error: Error}`                                  |
 | **`onCastingEnded`**                   | Casting ended.                                        | `{error: Error}`                                  |
 | **`onCastingFailed`**                  | Casting failed.                                       | `{error: Error}`                                  |
+
+##### For Android
+
+| Func         | Description            | Payload                                                 |
+| ------------ | ---------------------- | ------------------------------------------------------- |
+| **`onCast`** | Casting event occurred | `{active: Boolean, available: Boolean, device: String}` |
 
 #### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
 

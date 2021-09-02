@@ -59,6 +59,17 @@ RCT_EXPORT_VIEW_PROPERTY(onFullScreenExitRequested, RCTBubblingEventBlock);
 /* jwplayer view events */
 RCT_EXPORT_VIEW_PROPERTY(onPlayerSizeChange, RCTBubblingEventBlock);
 
+/* casting events */
+RCT_EXPORT_VIEW_PROPERTY(onCastingDevicesAvailable, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onConnectedToCastingDevice, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onDisconnectedFromCastingDevice, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onConnectionTemporarilySuspended, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onConnectionRecovered, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onConnectionFailed, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onCasting, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onCastingEnded, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onCastingFailed, RCTBubblingEventBlock);
+
 /* props */
 RCT_EXPORT_VIEW_PROPERTY(config, NSDictionary);
 
@@ -255,6 +266,116 @@ RCT_EXPORT_METHOD(togglePIP: (nonnull NSNumber *)reactTag) {
                     [pipController startPictureInPicture];
                 }
             }
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setUpCastController: (nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            [view setUpCastController];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(presentCastDialog: (nonnull NSNumber *)reactTag) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            [view presentCastDialog];
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(connectedDevice,
+                 tag:(nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 rejecte:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            JWCastingDevice *device = view.connectedDevice;
+            
+            if (device != nil) {
+                NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                    
+                [dict setObject:device.name forKey:@"name"];
+                [dict setObject:device.identifier forKey:@"identifier"];
+
+                NSError *error;
+                NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error: &error];
+                
+                resolve([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+            } else {
+                NSError *error = [[NSError alloc] init];
+                reject(@"no_connected_device", @"There is no connected device", error);
+            }
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(availableDevices,
+                 tag:(nonnull NSNumber *)reactTag
+                 solve:(RCTPromiseResolveBlock)resolve
+                 eject:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            if (view.availableDevices != nil) {
+                NSMutableArray *devicesInfo = [[NSMutableArray alloc] init];
+
+                for (JWCastingDevice *device in view.availableDevices) {
+                    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                        
+                    [dict setObject:device.name forKey:@"name"];
+                    [dict setObject:device.identifier forKey:@"identifier"];
+
+                    [devicesInfo addObject:dict];
+                }
+
+                NSError *error;
+                NSData *data = [NSJSONSerialization dataWithJSONObject:devicesInfo options:NSJSONWritingPrettyPrinted error: &error];
+                
+                resolve([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+            } else {
+                NSError *error = [[NSError alloc] init];
+                               reject(@"no_available_device", @"There are no available devices", error);
+            }
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(castState,
+                 tag:(nonnull NSNumber *)reactTag
+                 solver:(RCTPromiseResolveBlock)resolve
+                 ejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || view.playerView == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+            
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            resolve([NSNumber numberWithInt:[view castState]]);
         }
     }];
 }

@@ -4,9 +4,10 @@
 #import "RCTViewManager.h"
 #endif
 
-#import <JWPlayerKit/JWPlayerKit-swift.h>
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
+#import <JWPlayerKit/JWPlayerKit-swift.h>
+#import <GoogleCast/GoogleCast.h>
 
 @interface RNJWPlayerView : UIView  <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
 
@@ -18,6 +19,11 @@
 
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
+
+/* casting objects */
+@property(nonatomic, strong)JWCastController *castController;
+@property(nonatomic)BOOL isCasting;
+@property(nonatomic, strong)NSArray<JWCastingDevice *> *availableDevices;
 
 /* player state events */
 @property(nonatomic, copy)RCTBubblingEventBlock onBuffer;
@@ -59,5 +65,23 @@
 
 /* player view events */
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerSizeChange;
+
+/* casting events */
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingDevicesAvailable;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectedToCastingDevice;
+@property(nonatomic, copy)RCTBubblingEventBlock onDisconnectedFromCastingDevice;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionTemporarilySuspended;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionRecovered;
+@property(nonatomic, copy)RCTBubblingEventBlock onConnectionFailed;
+@property(nonatomic, copy)RCTBubblingEventBlock onCasting;
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingEnded;
+@property(nonatomic, copy)RCTBubblingEventBlock onCastingFailed;
+
+/* casting methods */
+- (void)setUpCastController;
+- (void)presentCastDialog;
+- (GCKCastState)castState;
+- (JWCastingDevice*)connectedDevice;
+- (NSArray <JWCastingDevice *>*)availableDevices;
 
 @end
