@@ -75,6 +75,7 @@ declare module "react-native-jw-media-player" {
     };
   }
   interface Config {
+    license: string,
     advertising?: Advertising;
     adClient?: string;
     autostart?: boolean;

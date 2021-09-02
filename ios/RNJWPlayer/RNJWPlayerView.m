@@ -144,12 +144,12 @@
                 
                 id progress = timeSlider[@"progress"];
                 if (progress != nil && (progress != (id)[NSNull null])) {
-                    [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:progress]];
+                    [timeSliderStyleBuilder minimumTrackColor:[self colorWithHexString:progress]];
                 }
                 
                 id rail = timeSlider[@"rail"];
                 if (rail != nil && (rail != (id)[NSNull null])) {
-                    [timeSliderStyleBuilder minimumTrackColor:[self colorWithHexString:rail]];
+                    [timeSliderStyleBuilder maximumTrackColor:[self colorWithHexString:rail]];
                 }
                 
                 id thumb = timeSlider[@"thumb"];
@@ -1059,8 +1059,22 @@
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
     if (self.onPlaylistItem) {
+        NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  item.mediaId, @"mediaId",
+                                  item.posterImage, @"image",
+                                  item.title, @"title",
+                                  item.description, @"desc",
+                                  item.vmapURL, @"adVmap",
+                                  item.recommendations, @"recommendations",
+                                  item.startTime, @"startTime",
+                                  item.autostart, @"autostart",
+                                  item.videoSources, @"sources",
+                                  item.adSchedule, @"adSchedule",
+                                  item.mediaTracks, @"tracks",
+                                  nil];
+
         NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:item options:NSJSONWritingPrettyPrinted error: &error];
+        NSData *data = [NSJSONSerialization dataWithJSONObject:itemDict options:NSJSONWritingPrettyPrinted error: &error];
         
         self.onPlaylistItem(@{@"playlistItem": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], @"index": [NSNumber numberWithInteger:index]});
     }
@@ -1069,8 +1083,27 @@
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
     if (self.onPlaylist) {
+        NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
+        
+        for (JWPlayerItem* item in playlist) {
+            NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      item.mediaId, @"mediaId",
+                                      item.posterImage, @"image",
+                                      item.title, @"title",
+                                      item.description, @"desc",
+                                      item.vmapURL, @"adVmap",
+                                      item.recommendations, @"recommendations",
+                                      item.startTime, @"startTime",
+                                      item.autostart, @"autostart",
+                                      item.videoSources, @"sources",
+                                      item.adSchedule, @"adSchedule",
+                                      item.mediaTracks, @"tracks",
+                                      nil];
+            [playlistArray addObject:itemDict];
+        }
+        
         NSError *error;
-        NSData* data = [NSJSONSerialization dataWithJSONObject:playlist options:NSJSONWritingPrettyPrinted error: &error];
+        NSData* data = [NSJSONSerialization dataWithJSONObject:playlistArray options:NSJSONWritingPrettyPrinted error: &error];
         
         self.onPlaylist(@{@"playlist": [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]});
     }
