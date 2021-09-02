@@ -6,45 +6,95 @@ declare module "react-native-jw-media-player" {
     name?: string;
     identifier?: string;
   }
+  interface Source {
+    file: string;
+    label: string;
+    default?: boolean;
+  }
+  interface Track {
+    file: string;
+    label: string;
+  }
+  interface AdSchedule {
+    tag: string;
+    offset: string;
+  }
+  interface Advertising {
+    adSchedule?: AdSchedule;
+    adVmap?: string;
+    tag?: string;
+    openBrowserOnAdClick?: boolean;
+  }
   interface PlaylistItem {
     file: string;
-    image?: string;
-    title?: string;
-    desc?: string
-    mediaId?: string;
-    autostart?: boolean
-    adSchedule?: { tag: string; offset: string };
-    adVmap?: string;
-    adClient?: string;
-    startTime?: number;
-    backgroundAudioEnabled?: boolean;
-  }
-  interface PropsType {
-    file?: string;
+    sources?: Source[];
     image?: string;
     title?: string;
     desc?: string;
-    mediaId?: string
+    mediaId?: string;
+    adSchedule?: AdSchedule;
+    adVmap?: string;
+    tracks?: Track[];
+    recommendations?: string;
+    startTime?: number;
+    autostart?: boolean;
+  }
+  interface Related {
+    onClick?: string;
+    onComplete?: string;
+    heading?: string;
+    url?: string;
+    autoplayMessage?: string;
+    autoplayTimer?: string;
+  }
+  interface Font {
+    name?: string;
+    size?: number;
+  }
+  interface Styling {
+    colors?: {
+      buttons?: string;
+      backgroundColor?: string;
+      fontColor?: string;
+      timeslider?: { progress?: string; rail?: string; thumb?: string };
+    };
+    font?: Font;
+    displayTitle?: boolean;
+    displayDescription?: boolean;
+    captionsStyle?: {
+      font?: Font;
+      fontColor?: string;
+      backgroundColor?: string;
+      highlightColor?: string;
+      edgeStyle?: number;
+    };
+    menuStyle: {
+      font?: Font;
+      fontColor?: string;
+      backgroundColor?: string;
+    };
+  }
+  interface Config {
+    advertising?: Advertising;
+    adClient?: string;
     autostart?: boolean;
     controls?: boolean;
     repeat?: boolean;
-    mute?: boolean
-    displayTitle?: boolean;
-    displayDescription?: boolean;
-    nextUpDisplay?: boolean;
-    playerStyle?: string;
-    colors?: {
-      icons?: string;
-      timeslider: { progress: string; rail: string };
-    };
-    nativeFullScreen?: boolean;
+    nextUpStyle?: { offsetSeconds: number; offsetPercentage: number };
+    styling?: Styling;
+    backgroundAudioEnabled?: boolean;
     fullScreenOnLandscape?: boolean;
     landscapeOnFullScreen?: boolean;
     portraitOnExitFullScreen?: boolean;
     exitFullScreenOnPortrait?: boolean;
-    playlistItem?: PlaylistItem;
     playlist?: PlaylistItem[];
     stretching?: string;
+    related?: Related;
+    preload?: string;
+    interfaceBehavior: number;
+  }
+  interface PropsType {
+    config: Config;
     onPlayerReady?: (event: any) => void;
     onPlaylist?: (playlist: PlaylistItem[]) => void;
     onBeforePlay?: (event: any) => void;
@@ -65,7 +115,7 @@ declare module "react-native-jw-media-player" {
     onPlaylistItem?: (playlistItem: PlaylistItem) => void;
     onControlBarVisible?: (event: any) => void;
     onPlaylistComplete?: (event: any) => void;
-    style?: ViewStyle
+    style?: ViewStyle;
   }
 
   export default class JWPlayer extends React.Component<PropsType> {
@@ -81,10 +131,6 @@ declare module "react-native-jw-media-player" {
     seekTo(time: number): void;
     setFullscreen(shouldDisplayInFullScreen: boolean): void;
     position(): Promise<number>;
-    showAirPlayButton(x: number, y: number, width: number, height: number, autoHide: boolean): void;
-    hideAirPlayButton(): void;
-    showCastButton(x: number, y: number, width: number, height: number, autoHide: boolean, customButton?: boolean): void;
-    hideCastButton(): void;
     setUpCastController(): void;
     presentCastDialog(): void;
     connectedDevice(): Promise<CastingDevice | null>;

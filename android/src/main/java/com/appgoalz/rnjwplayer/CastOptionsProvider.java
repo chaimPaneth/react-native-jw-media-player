@@ -3,6 +3,7 @@ package com.appgoalz.rnjwplayer;
 import android.content.Context;
 
 import com.google.android.gms.cast.CastMediaControlIntent;
+import com.google.android.gms.cast.LaunchOptions;
 import com.google.android.gms.cast.framework.CastOptions;
 import com.google.android.gms.cast.framework.OptionsProvider;
 import com.google.android.gms.cast.framework.SessionProvider;
@@ -12,6 +13,7 @@ import com.google.android.gms.cast.framework.media.NotificationOptions;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 
 public class CastOptionsProvider implements OptionsProvider {
@@ -23,7 +25,6 @@ public class CastOptionsProvider implements OptionsProvider {
 
     @Override
     public CastOptions getCastOptions(Context context) {
-
         final NotificationOptions notificationOptions = new NotificationOptions.Builder()
                 .setActions(Arrays.asList(
                         MediaIntentReceiver.ACTION_SKIP_NEXT,
@@ -36,9 +37,14 @@ public class CastOptionsProvider implements OptionsProvider {
                 .setNotificationOptions(notificationOptions)
                 .build();
 
+        final LaunchOptions launchOptions = new LaunchOptions.Builder()
+                .setLocale(Locale.US)
+                .build();
+
         return new CastOptions.Builder()
                 .setReceiverApplicationId(DEFAULT_APPLICATION_ID)
                 .setCastMediaOptions(mediaOptions)
+                .setLaunchOptions(launchOptions)
                 .build();
     }
 
