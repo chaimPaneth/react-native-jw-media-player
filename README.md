@@ -10,34 +10,17 @@
 
 ### Mostly automatic installation
 
-Since **React Native 0.60** and higher, [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) makes the installation process simpler.
+For iOS you have to run `cd ios/` && `pod install`.
 
-On iOS you have to run `cd ios/` && `pod install`.
+For Android the package is automatically linked.
 
-On Android the package is automatically linked.
+### Important
 
-### Using React Native Link (React Native 0.59 and lower)
+This **README** is for `react-native-jw-media-player` version `0.2.0` and higher, for previous version check out the [Old README](./Pre.0.2.0_README.md).
 
-Link module with
-
-`$ react-native link react-native-jw-media-player`
-
-Then add SDK dependencies:
-
-#### Add dependencies
-
-##### iOS dependencies
-
-Follow official instructions [iOS sdk installation](https://developer.jwplayer.com/jwplayer/docs/ios-getting-started) for installation via Cocoapods (only supported, other way wasn't tested).
-
-Add `pod 'JWPlayer-SDK', '~> 3.16.0'` to your Podfile.
-Then run **pod install** from your `ios` directory.
-
-In your `info.plist` properties file, create a string entry named `JWPlayerKey`, and set its value to be your JW Player Beta license key. Make sure you enter this string exactly as you received it from JW Player, or as it appears in your JW Player Dashboard. The string is case-sensitive.
+Since version `0.2.0` we use the new JWPlayerKit && SDK 4 check out [iOS get started](https://developer.jwplayer.com/jwplayer/docs/ios-get-started) && [Android get started](https://developer.jwplayer.com/jwplayer/docs/android-get-started)
 
 ##### Android dependencies
-
-Follow official instructions [Android sdk installation](https://developer.jwplayer.com/jwplayer/docs/android-getting-started)
 
 Insert the following lines inside the allProjects.dependencies block in `android/build.gradle`:
 
@@ -71,72 +54,6 @@ allprojects {
 }
 ```
 
-Add to AndroidManifest.xml in the Application tag above the Activity tag:
-
-```
-<meta-data
-    android:name="JW_LICENSE_KEY"
-    android:value="<API_KEY_FOUND_IN_JW_DASHBOARD>" />
-```
-
-... and these lines (This is needed for the controls bar in notification center).
-
-```
-<receiver android:name="androidx.media.session.MediaButtonReceiver">
-    <intent-filter>
-        <action android:name="android.intent.action.MEDIA_BUTTON" />
-    </intent-filter>
-</receiver>
-<service
-    android:name="com.appgoalz.rnjwplayer.MediaPlaybackService"
-    android:exported="false">
-    <intent-filter>
-        <action android:name="android.intent.action.MEDIA_BUTTON" />
-    </intent-filter>
-</service>
-```
-
-and this line to the dependencies block in `android/app/build.gradle` (also needed for the controls bar in notification center).
-
-```
-implementation 'androidx.media:media:1.1.0'
-
-```
-
-JW uses some of google services in their sdk so if you get an error about any missing google services (e.g. `ERROR: Failed to resolve: com.google.android.gms:play-services-ads-identifier:16.0.0`) you can add this line to the dependencies block in `android/app/build.gradle`:
-
-```
-api 'com.google.android.gms:play-services-base:+'
-```
-
-### Manual installation
-
-#### iOS
-
-1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-jwplayer` and add `RNJWPlayer.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNJWPlayer.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Add [dependencies](#ios-dependencies)
-5. Run your project (`Cmd+R`)<
-
-#### Android
-
-1. Open up `android/app/src/main/java/[...]/MainApplication.java`
-
-- Add `import net.gamesofton.rnjwplayer.RNJWPlayerPackage;` to the imports at the top of the file
-- Add `new RNJWPlayerPackage()` to the list returned by the `getPackages()` method
-
-2. Append the following lines to `android/settings.gradle`:
-   ```
-    include ':react-native-jwplayer'
-    project(':react-native-jwplayer').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-jwplayer/android')
-   ```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-   ```
-    implementation project(':react-native-jwplayer')
-   ```
-4. Add [dependencies](#android-dependencies)
-
 ## Usage
 
 ```javascript
@@ -162,10 +79,9 @@ const playlistItem = {
   mediaId: -1,
   image: 'http://image.com/image.png',
   desc: 'My beautiful track',
-  time: 0,
+  startTime: 0,
   file: 'http://file.com/file.mp3',
   autostart: true,
-  controls: true,
   repeat: false,
   displayDescription: true,
   displayTitle: true,
@@ -178,23 +94,37 @@ const playlistItem = {
       file: 'http://file.com/spanish.srt',
       label: 'es'
     }
+  ],
+  sources: [
+    {
+      file: 'http://file.com/file.mp3',
+      label: 'audio'
+    },
+    {
+      file: 'http://file.com/file.mp4',
+      label: 'video',
+      default: true
+    }
   ]
 }
 
-...
-
-componentDidMount() {
-
-  // Not Recommended - load the playlistItem into the player with loadPlaylistItem method
-  /*
-  setTimeout(() => {
-    this.JWPlayer.loadPlaylistItem(playlistItem);
-
-    // for playlist
-    // const playlist = [playlistItem, playlistItem]
-    // this.JWPlayer.loadPlaylist(playlistItem);
-  }, 100)
-  */
+const config = {
+  license:
+    Platform.OS === 'android'
+      ? 'YOUR_ANDROID_SDK_KEY'
+      : 'YOUR_IOS_SDK_KEY',
+  backgroundAudioEnabled: true,
+  autostart: true,
+  styling: {
+    colors: {
+      timeslider: {
+        rail: "0000FF",
+      },
+    },
+  },
+  playlist: {
+    [playlistItem],
+  },
 }
 
 ...
@@ -214,8 +144,7 @@ render() {
   <JWPlayer
     ref={p => (this.JWPlayer = p)}
     style={styles.player}
-    playlistItem={playlistItem} // Recommended - pass the playlistItem as a prop into the player
-    // playlist={[playlistItem]}
+    config={config}
     onBeforePlay={() => this.onBeforePlay()}
     onPlay={() => this.onPlay()}
     onPause={() => this.onPause()}
@@ -237,54 +166,78 @@ render() {
 
 ## Run example project
 
-For running example project:
+Running the example project:
 
 1. Checkout this repository.
 2. Go to `Example` directory and run `yarn` or `npm i`
 3. Go to `Example/ios` and install Pods with `pod install`
-4. Open `demoJWPlayer.xcworkspace` with XCode.
-5. Add your iOS api key for JWPlayer into `Info.plist`
+4. Open `RNJWPlayer.xcworkspace` with XCode.
+5. Add your JW SDK license in `App.js` under the `config `prop.
+
+## Available props
+
+| Prop         | Description                      | Type     |
+| ------------ | -------------------------------- | -------- |
+| **`config`** | The JW [Config](#Config) object. | `Object` |
+
+##### Config
+
+| Prop                           | Description                                                                                                                                                                                                                                                                                                                                                             | Type                                                | Platform                                    | Default |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------- | ------- |
+| **`offlineImage`**             | The url for the player offline thumbnail.                                                                                                                                                                                                                                                                                                                               | `String`                                            | `iOS`                                       | `none`  |
+| **`offlineMessage`**           | The message when the player is offline.                                                                                                                                                                                                                                                                                                                                 | `String`                                            | `iOS`                                       | `none`  |
+| **`autostart`**                | Should the tracks auto start.                                                                                                                                                                                                                                                                                                                                           | `Boolean`                                           | `iOS && Android`                            | `false` |
+| **`controls`**                 | Should the control buttons show.                                                                                                                                                                                                                                                                                                                                        | `Boolean`                                           | `Android`                                   | `true`  |
+| **`repeat`**                   | Should the track repeat.                                                                                                                                                                                                                                                                                                                                                | `Boolean`                                           | `iOS && Android`                            | `false` |
+| **`playlist`**                 | An array of playlistItems.                                                                                                                                                                                                                                                                                                                                              | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] | `iOS && Android`                            | `none`  |
+| **`nextUpStyle`**              | How the next up videos should be presented.                                                                                                                                                                                                                                                                                                                             | `{offsetSeconds: Int, offsetPercentage, Int}`       | `iOS && Android`                            | `none`  |
+| **`styling`**                  | All the stylings for the player see [Styling](#Styling) section.                                                                                                                                                                                                                                                                                                        | `Object`                                            | `iOS && Android`                            | `none`  |
+| **`advertising`**              | General Advertising settings on the player see [Advertising](#Advertising) section.                                                                                                                                                                                                                                                                                     | `Object`                                            | `iOS && Android`                            | `none`  |
+| **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                                                                                                                                                                                                                   | `Boolean`                                           | `iOS && Android`                            | `false` |
+| **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                                                                                                                                                                                                                     | `Boolean`                                           | `iOS && Android`                            | `false` |
+| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                                                                                                                                                                                                                                                 | `Boolean`                                           | `Android`                                   | `false` |
+| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                                                                                                                                                                                                                                                    | `Boolean`                                           | `Android`                                   | `false` |
+| **`enableLockScreenControls`** | When this is true the player will show media controls on lock screen                                                                                                                                                                                                                                                                                                    | `Boolean`                                           | `iOS`                                       | `true`  |
+| **`stretching`**               | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                                                                                                                                                                                                                                                          | `String`                                            | `Android`                                   | `none`  |
+| **`backgroundAudioEnabled`**   | Should the player continue playing in the background and handle interruptions.                                                                                                                                                                                                                                                                                          | `Boolean`                                           | `iOS && Android`                            | `false` |
+| **`viewOnly`**                 | When true the player will not have any controls it will show only the video.                                                                                                                                                                                                                                                                                            | `Boolean`                                           | `iOS`                                       | `false` |
+| **`pipEnabled`**               | When true the player will be able to go into Picture in Picture mode. **Note: This is true by default for iOS PlayerViewController**. **For Android you will also need to follow the instruction mentioned [here](https://developer.jwplayer.com/jwplayer/docs/android-invoke-picture-in-picture-playback) && below [Picture in picture](Picture-in-picture) section.** | `Boolean`                                           | `iOS when viewOnly prop is true && Android` | `false` |
 
 ##### PlaylistItem
-| Prop                         | Description                                                                                                                                                                                      | Type                            |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
-| **`mediaId`**                | The JW media id.                                                                                                                                                                                 | `Int`                           |
-| **`time`**                   | should the player seek to a certain second.                                                                                                                                                      | `Int`                           |
-| **`adVmap`**                 | The url of ads VMAP xml.                                                                                                                                                                         | `String`                        |
-| **`adSchedule`**             | Array of tags and and offsets for ads.                                                                                                                                                           | `{tag: String, offset: String}` |
-| **`adClient`**               | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast                                                                                                        | `Int`                           |
-| **`desc`**                   | Description of the track.                                                                                                                                                                        | `String`                        |
-| **`file`**                   | The url of the file to play.                                                                                                                                                                     | `String`                        |
-| **`tracks`**                 | Array of caption tracks.                                                                                                                                                                         | `{file: String, label: String}` |
-| **`image`**                  | The url of the player thumbnail.                                                                                                                                                                 | `String`                        |
-| **`title`**                  | The title of the track.                                                                                                                                                                          | `String`                        |
-| **`autostart`**              | Should the track auto start.                                                                                                                                                                     | `Boolean`                       |
-| **`controls`**               | Should the control buttons show.                                                                                                                                                                 | `Boolean`                       |
-| **`displayDescription`**     | Should the player show the description.                                                                                                                                                          | `Boolean`                       |
-| **`displayTitle`**           | Should the player show the title.                                                                                                                                                                | `Boolean`                       |
-| **`repeat`**                 | Should the track repeat.                                                                                                                                                                         | `Boolean`                       |
-| **`backgroundAudioEnabled`** | Should the player continue playing in the background. **Note when this is true this prop will add the player controls on the lock screen in iOS and in Notification Center in Android as well.** | `Boolean`                       |
-| **`stretching`**             | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                                                                                   | `String`                        |
+| Prop                  | Description                                    | Type                                              |
+| --------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| **`mediaId`**         | The JW media id.                               | `Int`                                             |
+| **`startTime`**       | the player should start from a certain second. | `Int`                                             |
+| **`adVmap`**          | The url of ads VMAP xml.                       | `String`                                          |
+| **`adSchedule`**      | Array of tags and and offsets for ads.         | `{tag: String, offset: String}`                   |
+| **`desc`**            | Description of the track.                      | `String`                                          |
+| **`file`**            | The url of the file to play.                   | `String`                                          |
+| **`tracks`**          | Array of caption tracks.                       | `{file: String, label: String}`                   |
+| **`sources`**         | Array of media sources.                        | `{file: String, label: String, default: Boolean}` |
+| **`image`**           | The url of the player thumbnail.               | `String`                                          |
+| **`title`**           | The title of the track.                        | `String`                                          |
+| **`recommendations`** | Url for recommended videos.                    | `String`                                          |
+| **`autostart`**       | Should the track auto start.                   | `Boolean`                                         |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
   | -------------------------- | ----- |
+  | **`JWAdClientVast`**       | 0     |
   | **`JWAdClientGoogima`**    | 1     |
   | **`JWAdClientGoogimaDAI`** | 2     |
-  | **`JWAdClientFreewheel`**  | 3     |
-  | **`JWAdClientVast`**       | 4     |
 
 ##### JWPlayerState
 
 #### **iOS**
 | State                        | Value |
 | ---------------------------- | ----- |
-| **`JWPlayerStatePlaying`**   | 0     |
-| **`JWPlayerStatePaused`**    | 1     |
+| **`JWPlayerStateUnknown`**   | 0     |
+| **`JWPlayerStateIdle`**      | 1     |
 | **`JWPlayerStateBuffering`** | 2     |
-| **`JWPlayerStateIdle`**      | 3     |
-| **`JWPlayerStateComplete`**  | 4     |
-| **`JWPlayerStateError`**     | 5     |
+| **`JWPlayerStatePlaying`**   | 3     |
+| **`JWPlayerStatePaused`**    | 4     |
+| **`JWPlayerStateComplete`**  | 5     |
+| **`JWPlayerStateError`**     | 6     |
 
 #### **Android**
 | State                        | Value |
@@ -294,39 +247,98 @@ For running example project:
 | **`JWPlayerStatePlaying`**   | 2     |
 | **`JWPlayerStatePaused`**    | 3     |
 | **`JWPlayerStateComplete`**  | 4     |
-| **`JWPlayerStateError`**     | null  |
+| **`JWPlayerStateError`**     | 5     |
 
-## Available props
-| Prop                           | Description                                                                                                                                                            | Type                                                |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| **`mediaId`**                  | The JW media id.                                                                                                                                                       | `Int`                                               |
-| **`file`**                     | The url of the file to play.                                                                                                                                           | `String`                                            |
-| **`title`**                    | The title of the track.                                                                                                                                                | `String`                                            |
-| **`image`**                    | The url of the player thumbnail.                                                                                                                                       | `String`                                            |
-| **`autostart`**                | Should the track auto start.                                                                                                                                           | `Boolean`                                           |
-| **`startTime`**                | The player should start from a certain second.                                                                                                                         | `Double`                                            |
-| **`desc`**                     | Description of the track.                                                                                                                                              | `String`                                            |
-| **`controls`**                 | Should the control buttons show.                                                                                                                                       | `Boolean`                                           |
-| **`repeat`**                   | Should the track repeat.                                                                                                                                               | `Boolean`                                           |
-| **`displayDescription`**       | Should the player show the description.                                                                                                                                | `Boolean`                                           |
-| **`displayTitle`**             | Should the player show the title.                                                                                                                                      | `Boolean`                                           |
-| **`playlistItem`**             | An object of playlistItem shape.                                                                                                                                       | [PlaylistItem](#PlaylistItem)                       |
-| **`playlist`**                 | An array of playlistItems.                                                                                                                                             | `[playlistItem]` see [PlaylistItem](#PlaylistItem)] |
-| **`nextUpDisplay`**            | Should the player show the next up item in a playlist.                                                                                                                 | `Boolean`                                           |
-| **`playerStyle`**              | Name of css file you put in the Main Bundle for you custom style. See below [Custom-style](#Custom-style) section.                                                     | `String`                                            |
-| **`colors`**                   | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section.                                                | `Object`                                            |
-| **`nativeFullScreen`**         | When this is true the player will go into full screen on the native layer automatically without the need to manage the full screen request in js onFullScreen callback | `Boolean`                                           |
-| **`fullScreenOnLandscape`**    | When this is true the player will go into full screen on rotate of phone to landscape                                                                                  | `Boolean`                                           |
-| **`landscapeOnFullScreen`**    | When this is true the player will go into landscape orientation when on full screen                                                                                    | `Boolean`                                           |
-| **`portraitOnExitFullScreen`** | When this is true the player will go into portrait orientation when exiting full screen                                                                                | `Boolean`                                           |
-| **`exitFullScreenOnPortrait`** | When this is true the player will exit full screen when the phone goes into portrait                                                                                   | `Boolean`                                           |
-| **`stretching`**               | Resize images and video to fit player dimensions. See below [Stretching](#Stretching) section.                                                                         | `String`                                            |
+##### Styling
+
+| Prop                     | Description                                                                                                                                                        | Type                                                                                                                                            | Platform         | Default  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | -------- |
+| **`displayDescription`** | Should the player show the description.                                                                                                                            | `Boolean`                                                                                                                                       | `iOS && Android` | `true`   |
+| **`displayTitle`**       | Should the player show the title.                                                                                                                                  | `Boolean`                                                                                                                                       | `iOS && Android` | `true`   |
+| **`colors`**             | Object with colors in hex format (without hashtag), for the icons and progress bar See below [Colors](#Colors) section.                                            | `Object`                                                                                                                                        |
+| **`font`**               | Name and size of the fonts for all texts in the player. **Note: the font must be added properly in your native project**                                           | `{name: String, size: Int}`                                                                                                                     | `iOS`            | `System` |
+| **`captionsStyle`**      | Style of the captions: name and size of the fonts, backgroundColor, edgeStyle and highlightColor. **Note: the font must be added properly in your native project** | `{font: {name: String, size: Int}, backgroundColor: String, highlightColor: String, edgeStyle: Int}` See the [edgeStyle](#EdgeStyle) enum below | `iOS`            | `System` |
+| **`menuStyle`**          | Style of the menu: name and size of the fonts, backgroundColor and fontColor. **Note: the font must be added properly in your native project**                     | `{font: {name: String, size: Int}, backgroundColor: String, fontColor: String}`                                                                 | `iOS`            | `System` |
+
+##### Colors
+
+| Prop                  | Description                  | Type                                                               | Platform                                                      | Default  |
+| --------------------- | ---------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------- | -------- |
+| **`buttons`**         | Color of all the icons.      | `String`                                                           | `iOS`                                                         | `FFFFFF` |
+| **`timeslider`**      | Colors for the progress bar. | `{progress: String, buffer: String, rail: String, thumb: String,}` | `iOS & Android **Note: buffer is only available on android**` | `FFFFFF` |
+| **`backgroundColor`** | Color for the background.    | `String`                                                           | `iOS & Android`                                               | `FFFFFF` |
+
+**Note: It is expected to pass the colors in hex format without the hashtag example for white FFFFFF.**
+
+```javascript
+colors: PropTypes.shape({
+  buttons: PropTypes.string,
+  timeslider: PropTypes.shape({
+    progress: PropTypes.string,
+    rail: PropTypes.string,
+    thumb: PropTypes.string,
+  })
+})
+```
+
+##### EdgeStyle
+| State                              | Value |
+| ---------------------------------- | ----- |
+| **`JWCaptionEdgeStyleUndefined`**  | 1     |
+| **`JWCaptionEdgeStyleNone`**       | 2     |
+| **`JWCaptionEdgeStyleDropshadow`** | 3     |
+| **`JWCaptionEdgeStyleRaised`**     | 4     |
+| **`JWCaptionEdgeStyleDepressed`**  | 5     |
+| **`JWCaptionEdgeStyleUniform`**    | 6     |
+
+### Stretching
+
+`uniform`: (default) Fits JW Player dimensions while maintaining aspect ratio
+
+`exactFit`: Will fit JW Player dimensions without maintaining aspect ratio
+
+`fill`: Will zoom and crop video to fill dimensions, maintaining aspect ratio
+
+`none`: Displays the actual size of the video file. (Black borders)
+
+##### Stretching Examples:
+
+![Stretching Example](https://files.readme.io/ce19994-stretch-options.png)
+
+(image from JW Player docs - here use `exactFit` instead of `exactfit`)
+
+##### Advertising
+
+| Prop                       | Description                                                                               | Type                            |
+| -------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------- |
+| **`adVmap`**               | The url of ads VMAP xml.                                                                  | `String`                        |
+| **`adSchedule`**           | Array of tags and and offsets for ads.                                                    | `{tag: String, offset: String}` |
+| **`openBrowserOnAdClick`** | Should the player open the browser when clicking on an ad.                                | `Boolean`                       |
+| **`adClient`**             | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast | `Int`                           |
+
+##### Picture-in-picture
+
+Picture in picture mode is enabled by JW on iOS for the PlayerViewController, however when setting the `viewOnly` prop to true you will also need to set the `pipEnabled` prop to true, and call the `togglePIP` method to enable / disable PIP.
+For Android you will have to add the following code in your `MainActivity.java`
+
+```
+@Override
+public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+  super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+
+  Intent intent = new Intent("onPictureInPictureModeChanged");
+  intent.putExtra("isInPictureInPictureMode", isInPictureInPictureMode);
+  intent.putExtra("newConfig", newConfig);
+  this.sendBroadcast(intent);
+}
+```
 
 ## Available methods
 
 | Func                   | Description                                                                                                                                                                             | Argument                      |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | **`seekTo`**           | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
+| **`togglePIP`**        | Enter or exist Picture in picture mode.                                                                                                                                                 | `none`                     |
 | **`play`**             | Starts playing.                                                                                                                                                                         | `none`                        |
 | **`pause`**            | Pauses playing.                                                                                                                                                                         | `none`                        |
 | **`stop`**             | Stops the player completely.                                                                                                                                                            | `none`                        |
@@ -363,50 +375,6 @@ For running example project:
 | **`onPlaylistComplete`**        | Player finished playing playlist items.                                                                                                                                                                                    | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onPlaylistItem`**            | When starting to play a playlist item.                                                                                                                                                                                     | JW type playlist item see docs [ios](https://developer.jwplayer.com/sdk/ios/reference/Protocols/JWPlaylistItemEvent.html), [android](https://developer.jwplayer.com/sdk/android/reference/com/longtailvideo/jwplayer/events/PlaylistItemEvent.html) contains additional index of current playing item in playlist 0 for default |
 
-##### Custom-style
-
-For setting a custom style on the player:
-
-  1. Check out the [JW player guide](https://developer.jwplayer.com/jw-player/docs/developer-guide/customization/css-skinning/skins_reference/) for adding a custom css file on your player.
-
-  2. Put your custom css file in the root folder of your native files.
-
-  3. Add the prop `playerStyle` to the player and set to the name of your css file without the .css file type e.g. `playerStyle={'myCssFile'}`.
-
-  4. build & run.
-
-##### Colors
-
-To set the colors of icons and progress bar pass to the player a prop as such.
-
-Note: It is expected to pass the colors in hex format without the hashtag example for white FFFFFF.
-
-```javascript
-colors: PropTypes.shape({
-  icons: PropTypes.string,
-  timeslider: PropTypes.shape({
-    progress: PropTypes.string,
-    rail: PropTypes.string
-  })
-})
-```
-
-### Stretching
-
-`uniform`: (default) Fits JW Player dimensions while maintaining aspect ratio
-
-`exactFit`: Will fit JW Player dimensions without maintaining aspect ratio
-
-`fill`: Will zoom and crop video to fill dimensions, maintaining aspect ratio
-
-`none`: Displays the actual size of the video file. (Black borders)
-
-##### Examples:
-
-![Stretching Example](https://files.readme.io/ce19994-stretch-options.png)
-
-(image from JW Player docs - here use `exactFit` instead of `exactfit`)
-
 ### Background Audio
 
 This package supports Background audio sessions by setting the `backgroundAudioEnabled` prop on the [PlaylistItem](#PlaylistItem), just follow the JWPlayer docs for background session.
@@ -419,7 +387,11 @@ For iOS you will have to enable `audio` in **Signing & Capabilities** under `bac
 
 ### Casting
 
+JWPlayer enables casting by default with a casting button (if you pass the `viewOnly` prop in the player config on iOS then you will need to enable casting by yourself).
+
 ###### iOS
+
+Follow the instruction [here](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices) on the official JWPlayer site.
 
 Edit your `Info.plist` with the following values:
 
@@ -435,13 +407,11 @@ Enable *Access WiFi Information* capability under `Signing & Capabilities`
 
 #### Available methods
 
-| Func                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Argument                                                                                          |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **`showAirPlayButton`** | Show an AirPlay button in the player. The autoHide variable will auto manage visibility to when the player controls are visible or not. *(Available on iOS)*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `{x: Double, y: Double, width: Double, height: Double, autoHide: Boolean}`                        |
-| **`hideAirPlayButton`** | Hides the AirPlay button in the player. *(Available on iOS)*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `none`                                                                                            |
-| **`showCastButton`**    | This will enable the casting controller and show a cast button. You will need to follow the additional instruction to enable [Chrome Casting](#Casting). Check out the docs [iOS](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices#section-configure-and-enable-casting), [Android](https://developer.jwplayer.com/jwplayer/docs/android-enable-casting-to-chromecast-devices) for additional info. **Note** When not using a custom cast button we make use of the default cast button provided by the Cast SDK and on iOS it will be invisible if there are no available casting devices. You can also use [react-native-google-cast](https://github.com/react-native-google-cast/react-native-google-cast) instead. | `{x: Double, y: Double, width: Double, height: Double, autoHide: Boolean, customButton: Boolean}` |
-| **`hideCastButton`**    | Hides the cast button in the player.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `none`                                                                                            |
-| **`castState`**    | Gets the cast state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `int` check out [GCKCastState](#GCKCastState)                                                                                            |
+##### For iOS
+
+| Func            | Description          | Argument                                      |
+| --------------- | -------------------- | --------------------------------------------- |
+| **`castState`** | Gets the cast state. | `int` check out [GCKCastState](#GCKCastState) |
 
 ##### GCKCastState
 ```
@@ -459,7 +429,9 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 
 #### Available callbacks
 
-| Func                                   | Description                                           | Argument                                          |
+##### For iOS
+
+| Func                                   | Description                                           | Payload                                           |
 | -------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
 | **`onCastingDevicesAvailable`**        | Casting were devices discovered and became available. | `{devices: [{name: string, identifier: string}}]` |
 | **`onConnectedToCastingDevice`**       | Connected to cast device.                             | `{device: {name: string, identifier: string}}`    |
@@ -470,6 +442,12 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 | **`onConnectionFailed`**               | Connection to cast device failed.                     | `{error: Error}`                                  |
 | **`onCastingEnded`**                   | Casting ended.                                        | `{error: Error}`                                  |
 | **`onCastingFailed`**                  | Casting failed.                                       | `{error: Error}`                                  |
+
+##### For Android
+
+| Func         | Description            | Payload                                                 |
+| ------------ | ---------------------- | ------------------------------------------------------- |
+| **`onCast`** | Casting event occurred | `{active: Boolean, available: Boolean, device: String}` |
 
 #### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
 

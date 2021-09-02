@@ -16,14 +16,9 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_EXACT_FIT;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_FILL;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_NONE;
-import static com.longtailvideo.jwplayer.configuration.PlayerConfig.STRETCHING_UNIFORM;
-
 public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
-  public static final String REACT_CLASS = "RNJWPlayer";
+  public static final String REACT_CLASS = "RNJWPlayerView";
 
   public static final int COMMAND_PLAY = 101;
   public static final int COMMAND_PAUSE = 102;
@@ -48,212 +43,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
     return new RNJWPlayerView(context, mAppContext);
   }
 
-  @ReactProp(name = "file")
-  public void setFile(RNJWPlayerView view, String prop) {
-    if (view.file!=prop) {
-      view.file = prop;
-    }
-  }
-
-  @ReactProp(name = "mediaId")
-  public void setMediaId(RNJWPlayerView view, String prop) {
-    if (view.mediaId!=prop) {
-      view.mediaId = prop;
-    }
-  }
-
-  @ReactProp(name = "image")
-  public void setImage(RNJWPlayerView view, String prop) {
-    if(view.image!=prop) {
-      view.image = prop;
-    }
-  }
-
-  @ReactProp(name = "title")
-  public void setTitle(RNJWPlayerView view, String prop) {
-    if(view.title!=prop) {
-      view.title = prop;
-    }
-  }
-
-  @ReactProp(name = "desc")
-  public void setDescription(RNJWPlayerView view, String prop) {
-    if(view.desc!=prop) {
-      view.desc = prop;
-    }
-  }
-
-  @ReactProp(name = "displayTitle")
-  public void setDisplayTitle(RNJWPlayerView view, Boolean prop) {
-    if(view.displayTitle!=prop) {
-      view.displayTitle = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setDisplayTitle(view.displayTitle);
-      }
-    }
-  }
-
-  @ReactProp(name = "displayDesc")
-  public void setDisplayDescription(RNJWPlayerView view, Boolean prop) {
-    if(view.displayDesc!=prop) {
-      view.displayDesc = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setDisplayDescription(view.displayDesc);
-      }
-    }
-  }
-
-  @ReactProp(name = "autostart")
-  public void setAutostart(RNJWPlayerView view, Boolean prop) {
-    if(view.autostart!=prop) {
-      view.autostart = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setAutostart(view.autostart);
-      }
-    }
-  }
-
-  @ReactProp(name = "controls")
-  public void setControls(RNJWPlayerView view, Boolean prop) {
-    if(view.controls!=prop) {
-      view.controls = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setControls(view.controls);
-        view.mPlayer.setControls(view.controls);
-      }
-    }
-  }
-
-  @ReactProp(name = "repeat")
-  public void setRepeat(RNJWPlayerView view, Boolean prop) {
-    if(view.repeat!=prop) {
-      view.repeat = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setRepeat(view.repeat);
-      }
-    }
-  }
-  
-  @ReactProp(name = "mute")
-  public void setMute(RNJWPlayerView view, Boolean prop) {
-    if(view.mute!=prop) {
-      view.mute = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setMute(view.mute);
-      }
-    }
-  }
-
-  @ReactProp(name = "colors")
-  public void setColors(RNJWPlayerView view, ReadableMap prop) {
-    if (prop != null && view.mPlayer != null) {
-      if (prop.hasKey("icons")) {
-        view.mPlayer.getConfig().getSkinConfig().setControlBarIcons("#" + prop.getString("icons"));
-      }
-
-      if (prop.hasKey("timeslider")) {
-        ReadableMap timeslider = prop.getMap("timeslider");
-
-        if (timeslider.hasKey("progress")) {
-          view.mPlayer.getConfig().getSkinConfig().setTimeSliderProgress("#" + timeslider.getString("progress"));
-        }
-
-        if (timeslider.hasKey("rail")) {
-          view.mPlayer.getConfig().getSkinConfig().setTimeSliderRail("#" + timeslider.getString("rail"));
-        }
-      }
-
-      if (view.mPlayer != null) {
-        view.mPlayer.setup(view.mPlayer.getConfig());
-      }
-    }
-  }
-
-  @ReactProp(name = "playerStyle")
-  public void setPlayerStyle(RNJWPlayerView view, String prop) {
-    if (prop != null) {
-      view.customStyle = prop;
-    }
-  }
-
-  @ReactProp(name = "nextUpDisplay")
-  public void setNextUpDisplay(RNJWPlayerView view, Boolean prop) {
-    if(view.nextUpDisplay!=prop) {
-      view.nextUpDisplay = prop;
-
-      if (view.mPlayer != null) {
-        view.mPlayer.getConfig().setNextUpDisplay(view.nextUpDisplay);
-      }
-    }
-  }
-
-  @ReactProp(name = "playlistItem")
-  public void setPlaylistItem(RNJWPlayerView view, ReadableMap prop) {
-    view.setPlaylistItem(prop);
-  }
-
-  @ReactProp(name = "playlist")
-  public void setPlaylist(RNJWPlayerView view, ReadableArray prop) {
-    view.setPlaylist(prop);
-  }
-
-  @ReactProp(name = "nativeFullScreen")
-  public void setNativeFullScreen(RNJWPlayerView view, Boolean prop) {
-    if (prop != null) {
-      view.nativeFullScreen = prop;
-    }
-  }
-
-  @ReactProp(name = "fullScreenOnLandscape")
-  public void setFullScreenOnLandscape(RNJWPlayerView view, Boolean prop) {
-    if (prop != null) {
-      view.fullScreenOnLandscape = prop;
-      if (view.mPlayer != null) {
-        view.mPlayer.fullScreenOnLandscape = prop;
-      }
-    }
-  }
-
-  @ReactProp(name = "portraitOnExitFullScreen")
-  public void setPortraitOnExitFullScreen(RNJWPlayerView view, Boolean prop) {
-    if (prop != null) {
-      view.portraitOnExitFullScreen = prop;
-    }
-  }
-
-  @ReactProp(name = "exitFullScreenOnPortrait")
-  public void setExitFullScreenOnPortrait(RNJWPlayerView view, Boolean prop) {
-    if (prop != null) {
-      if (view.mPlayer != null) {
-        view.mPlayer.exitFullScreenOnPortrait = prop;
-      }
-    }
-  }
-
-  @ReactProp(name = "landscapeOnFullScreen")
-  public void setLandscapeOnFullScreen(RNJWPlayerView view, Boolean prop) {
-    if (prop != null) {
-      view.landscapeOnFullScreen = prop;
-    }
-  }
-
-  @ReactProp(name = "stretching")
-  public void setStretching(RNJWPlayerView view, String prop) {
-    if (prop.equals("exactFit")) {
-      view.stretching = STRETCHING_EXACT_FIT;
-    } else if (prop.equals("fill")) {
-      view.stretching = STRETCHING_FILL;
-    } else if (prop.equals("none")) {
-      view.stretching = STRETCHING_NONE;
-    } else {
-      view.stretching = STRETCHING_UNIFORM;
-    }
+  @ReactProp(name = "config")
+  public void setConfig(RNJWPlayerView view, ReadableMap prop) {
+    view.setConfig(prop);
   }
 
   public Map getExportedCustomBubblingEventTypeConstants() {
@@ -390,25 +182,25 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
   }
 
   public void play(RNJWPlayerView root) {
-    root.mPlayer.play();
+    root.mPlayerView.getPlayer().play();
   }
 
   public void pause(RNJWPlayerView root) {
-    root.mPlayer.pause();
+    root.mPlayerView.getPlayer().pause();
     root.userPaused = true;
   }
 
   public void stop(RNJWPlayerView root) {
-    root.mPlayer.stop();
+    root.mPlayerView.getPlayer().stop();
     root.userPaused = true;
   }
 
   public void toggleSpeed(RNJWPlayerView root) {
-    float rate = root.mPlayer.getPlaybackRate();
+    double rate = root.mPlayerView.getPlayer().getPlaybackRate();
     if (rate < 2) {
-      root.mPlayer.setPlaybackRate(rate += 0.5);
+      root.mPlayerView.getPlayer().setPlaybackRate(rate += 0.5);
     } else {
-      root.mPlayer.setPlaybackRate((float) 0.5);
+      root.mPlayerView.getPlayer().setPlaybackRate((float) 0.5);
     }
   }
 
