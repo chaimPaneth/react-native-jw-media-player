@@ -175,11 +175,15 @@ public class RNJWPlayerView extends RelativeLayout implements
     private MediaServiceController mMediaServiceController;
 
     private void doBindService() {
-        mMediaServiceController.bindService();
+        if(mMediaServiceController!=null) {
+            mMediaServiceController.bindService();
+        }
     }
 
     private void doUnbindService() {
-        mMediaServiceController.unbindService();
+        if(mMediaServiceController!=null){
+            mMediaServiceController.unbindService();
+        }
     }
 
     private static boolean contextHasBug(Context context) {
@@ -236,18 +240,29 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     public void destroyPlayer() {
-        if (mPlayerView != null) {
-            mPlayer.stop();
+        try{
+            if (mPlayerView != null) {
+                mPlayer.stop();
 
-            mPlayer.removeAllListeners(this);
-            mPlayerView = null;
+                mPlayer.removeAllListeners(this);
+                mPlayerView = null;
 
+                getReactContext().removeLifecycleEventListener(this);
+
+                audioManager = null;
+
+                doUnbindService();
+            }
+        }catch(Exception e){
+            Log.e(TAG,e.getLocalizedMessage());
+        }finally {
             getReactContext().removeLifecycleEventListener(this);
 
             audioManager = null;
 
             doUnbindService();
         }
+
     }
 
     public void setupPlayerView(Boolean backgroundAudioEnabled) {
