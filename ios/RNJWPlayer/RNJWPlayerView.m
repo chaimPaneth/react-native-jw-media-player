@@ -747,7 +747,7 @@
 
     _playerViewController.playerView.delegate = self;
     _playerViewController.player.delegate = self;
-//    _playerViewController.player.playbackStateDelegate = self; // this causes issue with ui
+    _playerViewController.player.playbackStateDelegate = self;
     _playerViewController.player.adDelegate = self;
     _playerViewController.player.avDelegate = self;
 }
@@ -974,6 +974,10 @@
 
 - (void)jwplayerContentIsBuffering:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentIsBuffering:player];
+    }
+    
     if (self.onBuffer) {
         self.onBuffer(@{});
     }
@@ -981,6 +985,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player updatedBuffer:percent position:time];
+    }
+    
     if (self.onUpdateBuffer) {
         self.onUpdateBuffer(@{@"percent": @(percent), @"position": time});
     }
@@ -988,6 +996,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didFinishLoadingWithTime:(NSTimeInterval)loadTime
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didFinishLoadingWithTime:loadTime];
+    }
+    
     if (self.onLoaded) {
         self.onLoaded(@{});
     }
@@ -995,6 +1007,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isAttemptingToPlay:(JWPlayerItem *)playlistItem reason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isAttemptingToPlay:playlistItem reason:reason];
+    }
+    
     if (self.onAttemptPlay) {
         self.onAttemptPlay(@{});
     }
@@ -1002,6 +1018,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isPlayingWithReason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isPlayingWithReason:reason];
+    }
+    
     if (self.onPlay) {
         self.onPlay(@{});
     }
@@ -1012,6 +1032,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player willPlayWithReason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player willPlayWithReason:reason];
+    }
+    
     if (self.onBeforePlay) {
         self.onBeforePlay(@{});
     }
@@ -1019,6 +1043,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didPauseWithReason:(enum JWPauseReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didPauseWithReason:reason];
+    }
+    
     if (self.onPause) {
         self.onPause(@{});
     }
@@ -1030,6 +1058,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didBecomeIdleWithReason:(enum JWIdleReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didBecomeIdleWithReason:reason];
+    }
+    
     if (self.onIdle) {
         self.onIdle(@{});
     }
@@ -1037,6 +1069,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isVisible:(BOOL)isVisible
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isVisible:isVisible];
+    }
+    
     if (self.onVisible) {
         self.onVisible(@{@"visible": @(isVisible)});
     }
@@ -1044,6 +1080,10 @@
 
 - (void)jwplayerContentWillComplete:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentWillComplete:player];
+    }
+    
     if (self.onBeforeComplete) {
         self.onBeforeComplete(@{});
     }
@@ -1051,6 +1091,10 @@
 
 - (void)jwplayerContentDidComplete:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentDidComplete:player];
+    }
+    
     if (self.onComplete) {
         self.onComplete(@{});
     }
@@ -1058,19 +1102,23 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didLoadPlaylistItem:item at:index];
+    }
+    
     if (self.onPlaylistItem) {
         NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   item.mediaId, @"mediaId",
-                                  item.posterImage, @"image",
-                                  item.title, @"title",
-                                  item.description, @"desc",
-                                  item.vmapURL, @"adVmap",
-                                  item.recommendations, @"recommendations",
-                                  item.startTime, @"startTime",
-                                  item.autostart, @"autostart",
-                                  item.videoSources, @"sources",
-                                  item.adSchedule, @"adSchedule",
-                                  item.mediaTracks, @"tracks",
+//                                  item.posterImage, @"image",
+//                                  item.title, @"title",
+//                                  item.description, @"desc",
+//                                  item.vmapURL, @"adVmap",
+//                                  item.recommendations, @"recommendations",
+//                                  item.startTime, @"startTime",
+//                                  item.autostart, @"autostart",
+//                                  item.videoSources, @"sources",
+//                                  item.adSchedule, @"adSchedule",
+//                                  item.mediaTracks, @"tracks",
                                   nil];
 
         NSError *error;
@@ -1082,22 +1130,26 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didLoadPlaylist:playlist];
+    }
+    
     if (self.onPlaylist) {
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
         for (JWPlayerItem* item in playlist) {
             NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                       item.mediaId, @"mediaId",
-                                      item.posterImage, @"image",
-                                      item.title, @"title",
-                                      item.description, @"desc",
-                                      item.vmapURL, @"adVmap",
-                                      item.recommendations, @"recommendations",
-                                      item.startTime, @"startTime",
-                                      item.autostart, @"autostart",
-                                      item.videoSources, @"sources",
-                                      item.adSchedule, @"adSchedule",
-                                      item.mediaTracks, @"tracks",
+//                                      item.posterImage, @"image",
+//                                      item.title, @"title",
+//                                      item.description, @"desc",
+//                                      item.vmapURL, @"adVmap",
+//                                      item.recommendations, @"recommendations",
+//                                      item.startTime, @"startTime",
+//                                      item.autostart, @"autostart",
+//                                      item.videoSources, @"sources",
+//                                      item.adSchedule, @"adSchedule",
+//                                      item.mediaTracks, @"tracks",
                                       nil];
             [playlistArray addObject:itemDict];
         }
@@ -1111,6 +1163,10 @@
 
 - (void)jwplayerPlaylistHasCompleted:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerPlaylistHasCompleted:player];
+    }
+    
     if (self.onPlaylistComplete) {
         self.onPlaylistComplete(@{});
     }
@@ -1118,11 +1174,17 @@
 
 - (void)jwplayer:(id<JWPlayer>)player usesMediaType:(enum JWMediaType)type
 {
-    
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player usesMediaType:type];
+    }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player seekedFrom:(NSTimeInterval)oldPosition to:(NSTimeInterval)newPosition
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player seekedFrom:oldPosition to:newPosition];
+    }
+    
     if (self.onSeek) {
         self.onSeek(@{@"from": @(oldPosition), @"to": @(newPosition)});
     }
@@ -1130,6 +1192,10 @@
 
 - (void)jwplayerHasSeeked:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerHasSeeked:player];
+    }
+    
     if (self.onSeeked) {
         self.onSeeked(@{});
     }
@@ -1137,7 +1203,9 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-    
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
+    }
 }
 
 #pragma mark - JWPlayer Ad Delegate
