@@ -345,14 +345,14 @@ export default class JWPlayer extends Component {
       controls,
       repeat,
       mute,
-      displayTitle,
-      displayDesc,
+      styling,
       nextUpDisplay,
       playlistItem,
       playlist,
       style,
       stretching,
     } = config || {};
+    var {displayTitle, displayDescription} = styling || {}
 
     var thisConfig = this.props.config || {};
 

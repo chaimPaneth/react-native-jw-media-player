@@ -3,18 +3,14 @@ package com.appgoalz.rnjwplayer;
 
 import android.media.AudioManager;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
-import com.google.android.gms.cast.CastDevice;
 import com.jwplayer.pub.api.PlayerState;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
@@ -66,6 +62,28 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
               playerView.mPlayerView.getPlayer().setPlaybackRate(rate += 0.5);
             } else {
               playerView.mPlayerView.getPlayer().setPlaybackRate((float) 0.5);
+            }
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void togglePIP(final int reactTag) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            if (playerView.mPlayerView.getPlayer().isInPictureInPictureMode()) {
+              playerView.mPlayerView.getPlayer().exitPictureInPictureMode();
+            } else {
+              playerView.mPlayerView.getPlayer().enterPictureInPictureMode();
             }
           }
         }

@@ -2,6 +2,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "RCTConvert+RNJWPlayer.h"
 
 @implementation RNJWPlayerView
 
@@ -47,6 +48,7 @@
     
     if (self.playerViewController != nil) {
         self.playerViewController.view.frame = self.frame;
+//        [_playerViewController.view.subviews[0].subviews[2] setHidden:YES]; // this is overlay with controls
     }
 }
 
@@ -228,33 +230,7 @@
             
             id edgeStyle = capStyle[@"edgeStyle"];
             if (edgeStyle != nil && (edgeStyle != (id)[NSNull null])) {
-                JWCaptionEdgeStyle finalEdgeStyle;
-                switch ([edgeStyle intValue]) {
-                    case 1:
-                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
-                        break;
-                    case 2:
-                        finalEdgeStyle = JWCaptionEdgeStyleNone;
-                        break;
-                    case 3:
-                        finalEdgeStyle = JWCaptionEdgeStyleDropshadow;
-                        break;
-                    case 4:
-                        finalEdgeStyle = JWCaptionEdgeStyleRaised;
-                        break;
-                    case 5:
-                        finalEdgeStyle = JWCaptionEdgeStyleDepressed;
-                        break;
-                    case 6:
-                        finalEdgeStyle = JWCaptionEdgeStyleUniform;
-                        break;
-    
-                    default:
-                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
-                        break;
-                }
-                
-                [capStyleBuilder edgeStyle:finalEdgeStyle];
+                [capStyleBuilder edgeStyle:[RCTConvert JWCaptionEdgeStyle:edgeStyle]];
             }
             
             JWCaptionStyle* captionStyle = [capStyleBuilder buildAndReturnError:&error];
@@ -355,7 +331,7 @@
         [itemBuilder title:title];
     }
     
-    id desc = item[@"desc"];
+    id desc = item[@"description"];
     if ((desc != nil) && (desc != (id)[NSNull null])) {
         [itemBuilder description:desc];
     }
@@ -375,11 +351,6 @@
     if ((recommendations != nil) && (recommendations != (id)[NSNull null])) {
         NSURL* recUrl = [NSURL URLWithString:recommendations];
         [itemBuilder recommendations:recUrl];
-    }
-    
-    id autostart = item[@"autostart"];
-    if (autostart != nil && (autostart != (id)[NSNull null])) {
-        [itemBuilder autostart:autostart];
     }
 
     id tracksItem = item[@"tracks"];
@@ -473,16 +444,7 @@
     
     id preload = config[@"preload"];
     if (preload != nil && (preload != (id)[NSNull null])) {
-        switch ([preload intValue]) {
-            case 0:
-                [configBuilder preload:JWPreloadAuto];
-                break;
-            case 1:
-                [configBuilder preload:JWPreloadNone];
-                break;
-            default:
-                break;
-        }
+        [configBuilder preload:[RCTConvert JWPreload:preload]];
     }
     
     id related = config[@"related"];
@@ -491,35 +453,13 @@
         
         id onClick = related[@"onClick"];
         if ((onClick != nil) && (onClick != (id)[NSNull null])) {
-            switch ([onClick intValue]) {
-                case 0:
-                    [relatedBuilder onClick:JWRelatedOnClickPlay];
-                    break;
-                case 1:
-                    [relatedBuilder onClick:JWRelatedOnClickLink];
-                    break;
-                default:
-                    [relatedBuilder onClick:JWRelatedOnClickPlay];
-                    break;
-            }
+            [relatedBuilder onClick:[RCTConvert JWRelatedOnClick:onClick]];
         }
         
         id onComplete = related[@"onComplete"];
         if ((onComplete != nil) && (onComplete != (id)[NSNull null])) {
-            switch ([onComplete intValue]) {
-                case 0:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteShow];
-                    break;
-                case 1:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteHide];
-                    break;
-                case 2:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
-                    break;
-                default:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
-                    break;
-            }
+
+            [relatedBuilder onComplete:[RCTConvert JWRelatedOnComplete:onComplete]];
         }
         
         id heading = related[@"heading"];
@@ -558,10 +498,11 @@
         JWAdvertisingConfig* advertising;
         JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
                  
-         id adClient = config[@"adClient"];
+         id adClient = ads[@"adClient"];
          if ((adClient != nil) && (adClient != (id)[NSNull null])) {
+             int clientType = (int)[RCTConvert JWAdClient:adClient];
              JWAdClient jwAdClient;
-             switch ([adClient intValue]) {
+             switch (clientType) {
                  case 0:
                      jwAdClient = JWAdClientJWPlayer;
                      break;
@@ -587,7 +528,7 @@
         
         // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
         
-        id schedule = config[@"adSchedule"];
+        id schedule = ads[@"adSchedule"];
         if(schedule != nil && (schedule != (id)[NSNull null])) {
             NSArray* scheduleAr = (NSArray*)schedule;
             if (scheduleAr.count > 0) {
@@ -622,13 +563,13 @@
             [adConfigBuilder tag:tagUrl];
         }
                 
-        id adVmap = config[@"adVmap"];
+        id adVmap = ads[@"adVmap"];
         if (adVmap != nil && (adVmap != (id)[NSNull null])) {
             NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
             [adConfigBuilder vmapURL:adVmapUrl];
         }
         
-        id openBrowserOnAdClick = config[@"openBrowserOnAdClick"];
+        id openBrowserOnAdClick = ads[@"openBrowserOnAdClick"];
         if (openBrowserOnAdClick != nil && (openBrowserOnAdClick != (id)[NSNull null])) {
             [adConfigBuilder openBrowserOnAdClick:openBrowserOnAdClick];
         }
@@ -651,22 +592,10 @@
     _playerViewController = [JWPlayerViewController new];
     _playerViewController.delegate = self;
     
-    id interfaceBehavior = config[@"interfaceBehavior"];
-    if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
-        switch ([interfaceBehavior intValue]) {
-            case 0:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorNormal;
-                break;
-            case 1:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
-                break;
-            case 2:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorAlwaysOnScreen;
-                break;
-            default:
-                break;
-        }
-    }
+//    id interfaceBehavior = config[@"interfaceBehavior"];
+//    if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
+//        _playerViewController.interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
+//    }
     
     id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
     if (forceFullScreenOnLandscape != nil && forceFullScreenOnLandscape != (id)[NSNull null]) {
@@ -1109,13 +1038,12 @@
     if (self.onPlaylistItem) {
         NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   item.mediaId, @"mediaId",
+                                  item.title, @"title",
+                                  item.description, @"description",
 //                                  item.posterImage, @"image",
-//                                  item.title, @"title",
-//                                  item.description, @"desc",
+//                                  item.startTime, @"startTime",
 //                                  item.vmapURL, @"adVmap",
 //                                  item.recommendations, @"recommendations",
-//                                  item.startTime, @"startTime",
-//                                  item.autostart, @"autostart",
 //                                  item.videoSources, @"sources",
 //                                  item.adSchedule, @"adSchedule",
 //                                  item.mediaTracks, @"tracks",
@@ -1140,13 +1068,12 @@
         for (JWPlayerItem* item in playlist) {
             NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                       item.mediaId, @"mediaId",
+                                      item.title, @"title",
+                                      item.description, @"description",
 //                                      item.posterImage, @"image",
-//                                      item.title, @"title",
-//                                      item.description, @"desc",
+//                                      item.startTime, @"startTime",
 //                                      item.vmapURL, @"adVmap",
 //                                      item.recommendations, @"recommendations",
-//                                      item.startTime, @"startTime",
-//                                      item.autostart, @"autostart",
 //                                      item.videoSources, @"sources",
 //                                      item.adSchedule, @"adSchedule",
 //                                      item.mediaTracks, @"tracks",
