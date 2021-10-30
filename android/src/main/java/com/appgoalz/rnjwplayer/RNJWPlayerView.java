@@ -29,8 +29,10 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jwplayer.pub.api.JWPlayer;
+import com.jwplayer.pub.api.UiGroup;
 import com.jwplayer.pub.api.background.MediaServiceController;
 import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.configuration.UiConfig;
@@ -683,20 +685,16 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
-//        if (prop.hasKey("hideUIGroup")) {
-//            UiGroup uiGroup;
-//
-//            if (prop.getString("hideUIGroup").contains("menu")) {
-//                uiGroup = MENU_UI_GROUP_TYPES.get(prop.getString("hideUIGroup"));
-//            } else {
-//                uiGroup = UI_GROUP_TYPES.get(prop.getString("hideUIGroup"));
-//            }
-//
-//            UiConfig hideJwControlbarUiConfig = new UiConfig.Builder()
-//                    .hide(uiGroup)
-//                    .build();
-//            configBuilder.uiConfig(hideJwControlbarUiConfig);
-//        }
+        if (prop.hasKey("hideUIGroup")) {
+            UiGroup uiGroup = GROUP_TYPES.get(prop.getString("hideUIGroup"));
+            if (uiGroup != null) {
+                UiConfig hideJwControlbarUiConfig = new UiConfig.Builder()
+                        .displayAllControls()
+                        .hide(uiGroup)
+                        .build();
+                configBuilder.uiConfig(hideJwControlbarUiConfig);
+            }
+        }
 
         PlayerConfig playerConfig = configBuilder.build();
 
@@ -824,17 +822,21 @@ public class RNJWPlayerView extends RelativeLayout implements
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforePlay", event);
     }
 
-    // VideoPlayerEvents
+    // Audio Events
+
+    @Override
+    public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAudioTracks");
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAudioTracks", event);
+    }
 
     @Override
     public void onAudioTrackChanged(AudioTrackChangedEvent audioTrackChangedEvent) {
 
     }
 
-    @Override
-    public void onAudioTracks(AudioTracksEvent audioTracksEvent) {
-
-    }
+    // Player Events
 
     @Override
     public void onBuffer(BufferEvent bufferEvent) {
@@ -1084,24 +1086,20 @@ public class RNJWPlayerView extends RelativeLayout implements
             "ima_dai", 2
     );
 
-//    private final Map<String, UiGroup> UI_GROUP_TYPES = MapBuilder.of(
-//            "overlay", UiGroup.OVERLAY,
-//            "control_bar", UiGroup.CONTROLBAR,
-//            "center_controls", UiGroup.CENTER_CONTROLS,
-//            "next_up", UiGroup.NEXT_UP,
-//            "error", UiGroup.ERROR,
-//            "playlist", UiGroup.PLAYLIST,
-//            "controls_container", UiGroup.PLAYER_CONTROLS_CONTAINER
-//    );
-//
-//    private final Map<String, UiGroup> MENU_UI_GROUP_TYPES = MapBuilder.of(
-//            "settings_menu", UiGroup.SETTINGS_MENU,
-//            "quality_submenu", UiGroup.SETTINGS_QUALITY_SUBMENU,
-//            "captions_submenu", UiGroup.SETTINGS_CAPTIONS_SUBMENU,
-//            "playback_submenu", UiGroup.SETTINGS_PLAYBACK_SUBMENU,
-//            "audiotracks_submenu", UiGroup.SETTINGS_AUDIOTRACKS_SUBMENU,
-//            "casting_menu", UiGroup.CASTING_MENU
-//    );
+    private final Map<String, UiGroup> GROUP_TYPES =  ImmutableMap.<String, UiGroup>builder()
+            .put("overlay", UiGroup.OVERLAY)
+            .put("control_bar", UiGroup.CONTROLBAR)
+            .put("center_controls", UiGroup.CENTER_CONTROLS)
+            .put("next_up", UiGroup.NEXT_UP)
+            .put("error", UiGroup.ERROR)
+            .put("playlist", UiGroup.PLAYLIST)
+            .put("controls_container", UiGroup.PLAYER_CONTROLS_CONTAINER)
+            .put("settings_menu", UiGroup.SETTINGS_MENU)
+            .put("quality_submenu", UiGroup.SETTINGS_QUALITY_SUBMENU)
+            .put("captions_submenu", UiGroup.SETTINGS_CAPTIONS_SUBMENU)
+            .put("playback_submenu", UiGroup.SETTINGS_PLAYBACK_SUBMENU)
+            .put("audiotracks_submenu", UiGroup.SETTINGS_AUDIOTRACKS_SUBMENU)
+            .put("casting_menu", UiGroup.CASTING_MENU).build();
 }
 
 

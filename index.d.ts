@@ -2,6 +2,13 @@ declare module "react-native-jw-media-player" {
   import React from "react";
   import { ViewStyle } from "react-native";
 
+  interface AudioTrack {
+    autoSelect: boolean;
+    defaultTrack: boolean;
+    groupId: string;
+    language: string;
+    name: string;
+  }
   interface CastingDevice {
     name?: string;
     identifier?: string;
@@ -99,6 +106,20 @@ declare module "react-native-jw-media-player" {
     | 'normal'
     | 'hidden'
     | 'onscreen';
+  type UIGroups =
+    | 'overlay'
+    | 'control_bar'
+    | 'center_controls'
+    | 'next_up'
+    | 'error'
+    | 'playlist'
+    | 'controls_container'
+    | 'settings_menu'
+    | 'quality_submenu'
+    | 'captions_submenu'
+    | 'playback_submenu'
+    | 'audiotracks_submenu'
+    | 'casting_menu';
   interface Config {
     license: string,
     advertising?: Advertising;
@@ -116,7 +137,8 @@ declare module "react-native-jw-media-player" {
     stretching?: string;
     related?: Related;
     preload?: Preloads;
-    interfaceBehavior: InterfaceBehaviors;
+    interfaceBehavior?: InterfaceBehaviors;
+    hideUIGroup?: UIGroups;
   }
   interface PropsType {
     config: Config;
@@ -140,6 +162,7 @@ declare module "react-native-jw-media-player" {
     onPlaylistItem?: (playlistItem: PlaylistItem) => void;
     onControlBarVisible?: (event: any) => void;
     onPlaylistComplete?: (event: any) => void;
+    onAudioTracks?: (event: any) => void;
     style?: ViewStyle;
   }
 
@@ -162,5 +185,9 @@ declare module "react-native-jw-media-player" {
     availableDevices(): Promise<CastingDevice[] | null>;
     castState(): Promise<number | null>;
     playerState(): Promise<number | null>;
+    getAudioTracks(): Promise<AudioTrack[] | null>;
+    getCurrentAudioTrack(): Promise<number | null>;
+    setCurrentAudioTrack(index: number): void;
+    setCurrentCaptions(index: number): void;
   }
 }

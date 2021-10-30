@@ -1036,17 +1036,38 @@
     }
     
     if (self.onPlaylistItem) {
+        NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
+        for (JWVideoSource* source in item.videoSources) {
+            [sourceDict setObject:source.file forKey:@"file"];
+            [sourceDict setObject:source.label forKey:@"label"];
+            [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+        }
+        
+        NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
+        for (JWAdBreak* sched in item.adSchedule) {
+            [schedDict setObject:sched.offset forKey:@"offset"];
+            [schedDict setObject:sched.tagArray forKey:@"tags"];
+            [schedDict setObject:@(sched.type) forKey:@"type"];
+        }
+        
+        NSMutableDictionary* trackDict = [[NSMutableDictionary alloc] init];
+        for (JWMediaTrack* track in item.mediaTracks) {
+            [trackDict setObject:track.file forKey:@"file"];
+            [trackDict setObject:track.label forKey:@"label"];
+            [trackDict setObject:@(track.defaultTrack) forKey:@"default"];
+        }
+        
         NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   item.mediaId, @"mediaId",
                                   item.title, @"title",
                                   item.description, @"description",
-//                                  item.posterImage, @"image",
-//                                  item.startTime, @"startTime",
-//                                  item.vmapURL, @"adVmap",
-//                                  item.recommendations, @"recommendations",
-//                                  item.videoSources, @"sources",
-//                                  item.adSchedule, @"adSchedule",
-//                                  item.mediaTracks, @"tracks",
+                                  item.posterImage.absoluteString, @"image",
+                                  @(item.startTime), @"startTime",
+                                  item.vmapURL.absoluteString, @"adVmap",
+                                  item.recommendations.absoluteString, @"recommendations",
+                                  sourceDict, @"sources",
+                                  schedDict, @"adSchedule",
+                                  trackDict, @"tracks",
                                   nil];
 
         NSError *error;
@@ -1066,18 +1087,40 @@
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
         for (JWPlayerItem* item in playlist) {
+            NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
+            for (JWVideoSource* source in item.videoSources) {
+                [sourceDict setObject:source.file forKey:@"file"];
+                [sourceDict setObject:source.label forKey:@"label"];
+                [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+            }
+            
+            NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
+            for (JWAdBreak* sched in item.adSchedule) {
+                [schedDict setObject:sched.offset forKey:@"offset"];
+                [schedDict setObject:sched.tagArray forKey:@"tags"];
+                [schedDict setObject:@(sched.type) forKey:@"type"];
+            }
+            
+            NSMutableDictionary* trackDict = [[NSMutableDictionary alloc] init];
+            for (JWMediaTrack* track in item.mediaTracks) {
+                [trackDict setObject:track.file forKey:@"file"];
+                [trackDict setObject:track.label forKey:@"label"];
+                [trackDict setObject:@(track.defaultTrack) forKey:@"default"];
+            }
+            
             NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                       item.mediaId, @"mediaId",
                                       item.title, @"title",
                                       item.description, @"description",
-//                                      item.posterImage, @"image",
-//                                      item.startTime, @"startTime",
-//                                      item.vmapURL, @"adVmap",
-//                                      item.recommendations, @"recommendations",
-//                                      item.videoSources, @"sources",
-//                                      item.adSchedule, @"adSchedule",
-//                                      item.mediaTracks, @"tracks",
+                                      item.posterImage.absoluteString, @"image",
+                                      @(item.startTime), @"startTime",
+                                      item.vmapURL.absoluteString, @"adVmap",
+                                      item.recommendations.absoluteString, @"recommendations",
+                                      sourceDict, @"sources",
+                                      schedDict, @"adSchedule",
+                                      trackDict, @"tracks",
                                       nil];
+            
             [playlistArray addObject:itemDict];
         }
         
@@ -1321,11 +1364,13 @@
 
 #pragma mark - JWPlayer AV Delegate
 
-- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTrackChanged:(NSInteger)currentLevel {
-    
+- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTracksUpdated:(NSArray<JWMediaSelectionOption *> * _Nonnull)levels {
+    if (self.onAudioTracks) {
+        self.onAudioTracks(@{});
+    }
 }
 
-- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTracksUpdated:(NSArray<JWMediaSelectionOption *> * _Nonnull)levels {
+- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTrackChanged:(NSInteger)currentLevel {
     
 }
 
