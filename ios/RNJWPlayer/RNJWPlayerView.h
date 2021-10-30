@@ -44,6 +44,9 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforeComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onComplete;
 
+/* av events */
+@property(nonatomic, copy)RCTBubblingEventBlock onAudioTracks;
+
 /* player events */
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerReady;
 @property(nonatomic, copy)RCTBubblingEventBlock onSetupPlayerError;
