@@ -422,7 +422,7 @@ export default class JWPlayer extends Component {
       controls !== thisConfig.controls ||
       repeat !== thisConfig.repeat ||
       displayTitle !== thisConfig.displayTitle ||
-      displayDesc !== thisConfig.displayDesc ||
+      displayDescription !== thisConfig.displayDescription ||
       nextUpDisplay !== thisConfig.nextUpDisplay ||
       style !== thisConfig.style ||
       stretching !== thisConfig.stretching
