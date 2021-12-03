@@ -11,13 +11,17 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion safeExtGet('compileSdkVersion', 28)
+    buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 28)
         versionCode 1
         versionName "1.0"
         ndk {
@@ -48,10 +52,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
 
     // JWPlayer SDK
-    implementation 'com.jwplayer:jwplayer-core:4.1.0'
-    implementation 'com.jwplayer:jwplayer-common:4.1.0'
-    implementation 'com.jwplayer:jwplayer-chromecast:4.1.0'
-    implementation 'com.jwplayer:jwplayer-ima:4.1.0'
+    implementation 'com.jwplayer:jwplayer-core:4.2.0'
+    implementation 'com.jwplayer:jwplayer-common:4.2.0'
+    implementation 'com.jwplayer:jwplayer-chromecast:4.2.0'
+    implementation 'com.jwplayer:jwplayer-ima:4.2.0'
 
     // Ad dependencies
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.24.0'
@@ -59,11 +63,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-cast-framework:20.0.0'
 
     // ExoPlayer dependencies
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.0'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.0'
-    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.0'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.2'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.2'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.2'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.2'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.2'
 
     // JW Player Native UI dependencies
     implementation 'com.squareup.picasso:picasso:2.71828'

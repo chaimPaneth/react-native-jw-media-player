@@ -40,7 +40,7 @@ import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.VastAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.VmapAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.ima.ImaAdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.ima.dai.ImaDaiAdvertisingConfig;
+import com.jwplayer.pub.api.configuration.ads.dai.ImaDaiAdvertisingConfig;
 import com.jwplayer.pub.api.events.AdPauseEvent;
 import com.jwplayer.pub.api.events.AdPlayEvent;
 import com.jwplayer.pub.api.events.AudioTrackChangedEvent;
