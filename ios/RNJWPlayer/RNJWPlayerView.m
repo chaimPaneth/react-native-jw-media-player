@@ -1046,7 +1046,7 @@
         NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
         for (JWAdBreak* sched in item.adSchedule) {
             [schedDict setObject:sched.offset forKey:@"offset"];
-            [schedDict setObject:sched.tagArray forKey:@"tags"];
+            [schedDict setObject:sched.tags forKey:@"tags"];
             [schedDict setObject:@(sched.type) forKey:@"type"];
         }
         
@@ -1097,7 +1097,7 @@
             NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
             for (JWAdBreak* sched in item.adSchedule) {
                 [schedDict setObject:sched.offset forKey:@"offset"];
-                [schedDict setObject:sched.tagArray forKey:@"tags"];
+                [schedDict setObject:sched.tags forKey:@"tags"];
                 [schedDict setObject:@(sched.type) forKey:@"type"];
             }
             

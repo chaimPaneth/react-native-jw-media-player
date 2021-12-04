@@ -40,7 +40,7 @@ import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.VastAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.VmapAdvertisingConfig;
 import com.jwplayer.pub.api.configuration.ads.ima.ImaAdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.ima.dai.ImaDaiAdvertisingConfig;
+import com.jwplayer.pub.api.configuration.ads.dai.ImaDaiAdvertisingConfig;
 import com.jwplayer.pub.api.events.AdPauseEvent;
 import com.jwplayer.pub.api.events.AdPlayEvent;
 import com.jwplayer.pub.api.events.AudioTrackChangedEvent;
@@ -860,7 +860,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     public void onControlBarVisibilityChanged(ControlBarVisibilityEvent controlBarVisibilityEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onControlBarVisible");
-        event.putBoolean("controls", controlBarVisibilityEvent.isVisible());
+        event.putBoolean("visible", controlBarVisibilityEvent.isVisible());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topControlBarVisible", event);
 
         updateWakeLock(true);
