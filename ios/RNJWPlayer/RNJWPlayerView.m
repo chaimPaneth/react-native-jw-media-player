@@ -912,6 +912,17 @@
     }
 }
 
+- (void)jwplayer:(id<JWPlayer>)player isBufferingWithReason:(enum JWBufferReason)reason
+{
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isBufferingWithReason:reason];
+    }
+    
+    if (self.onBuffer) {
+        self.onBuffer(@{});
+    }
+}
+
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
     if (_playerViewController) {
