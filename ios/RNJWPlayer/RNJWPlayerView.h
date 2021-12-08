@@ -20,6 +20,8 @@
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 
+@property(nonatomic)JWInterfaceBehavior interfaceBehavior;
+
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
 @property(nonatomic)BOOL isCasting;

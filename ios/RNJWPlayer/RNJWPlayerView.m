@@ -592,10 +592,10 @@
     _playerViewController = [JWPlayerViewController new];
     _playerViewController.delegate = self;
     
-//    id interfaceBehavior = config[@"interfaceBehavior"];
-//    if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
-//        _playerViewController.interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
-//    }
+    id interfaceBehavior = config[@"interfaceBehavior"];
+    if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
+        _interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
+    }
     
     id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
     if (forceFullScreenOnLandscape != nil && forceFullScreenOnLandscape != (id)[NSNull null]) {
@@ -672,6 +672,10 @@
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
+        
+        if (_interfaceBehavior) {
+            _playerViewController.interfaceBehavior = _interfaceBehavior;
+        }
     }
 
     _playerViewController.playerView.delegate = self;
