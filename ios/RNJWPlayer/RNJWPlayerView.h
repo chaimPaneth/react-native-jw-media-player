@@ -89,4 +89,7 @@
 - (JWCastingDevice*)connectedDevice;
 - (NSArray <JWCastingDevice *>*)availableDevices;
 
+/* Methods */
+-(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show;
+
 @end

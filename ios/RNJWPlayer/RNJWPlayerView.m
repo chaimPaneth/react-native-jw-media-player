@@ -48,7 +48,6 @@
     
     if (self.playerViewController != nil) {
         self.playerViewController.view.frame = self.frame;
-//        [_playerViewController.view.subviews[0].subviews[2] setHidden:YES]; // this is overlay with controls
     }
 }
 
@@ -91,6 +90,11 @@
     } else {
         [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
     }
+}
+
+-(void)setControls:(BOOL)controls
+{
+    [self toggleUIGroup:_playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :controls];
 }
 
 #pragma mark - RNJWPlayer styling
@@ -674,7 +678,7 @@
         [_playerViewController.player configurePlayerWith:configuration];
         
         if (_interfaceBehavior) {
-            _playerViewController.interfaceBehavior = _interfaceBehavior;
+            _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
         }
     }
 
@@ -714,6 +718,19 @@
     if (_playerView != nil) {
         [_playerView removeFromSuperview];
         _playerView = nil;
+    }
+}
+
+-(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show
+{
+    NSArray *subviews = [view subviews];
+
+    for (UIView *subview in subviews) {
+        if ([NSStringFromClass(subview.class) isEqualToString:name] && (ofSubview == nil || [NSStringFromClass(subview.superview.class) isEqualToString:name])) {
+            [subview setHidden:!show];
+        } else {
+            [self toggleUIGroup:subview :name :ofSubview :show];
+        }
     }
 }
 

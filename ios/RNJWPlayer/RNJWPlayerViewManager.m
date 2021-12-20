@@ -75,6 +75,7 @@ RCT_EXPORT_VIEW_PROPERTY(onCastingFailed, RCTBubblingEventBlock);
 
 /* props */
 RCT_EXPORT_VIEW_PROPERTY(config, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber*)reactTag
@@ -459,6 +460,19 @@ RCT_EXPORT_METHOD(setCurrentAudioTrack: (nonnull NSNumber *)reactTag: (nonnull N
                 [view.playerView.player setCurrentAudioTrack:[index integerValue]];
             } else if (view.playerViewController) {
                 [view.playerViewController.player setCurrentAudioTrack:[index integerValue]];
+            }
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setControls: (nonnull NSNumber *)reactTag: (BOOL)show) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerView == nil && view.playerViewController == nil)) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            if (view.playerViewController) {
+                [view toggleUIGroup:view.playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :show];
             }
         }
     }];

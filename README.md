@@ -176,9 +176,10 @@ Running the example project:
 
 ## Available props
 
-| Prop         | Description                      | Type     |
-| ------------ | -------------------------------- | -------- |
-| **`config`** | The JW [Config](#Config) object. | `Object` |
+| Prop           | Description                      | Default     | Type      |
+| -------------- | -------------------------------- | ----------- | --------- |
+| **`config`**   | The JW [Config](#Config) object. | `undefined` | `Object`  |
+| **`controls`** | Should the player controls show. | `true`      | `Boolean` |
 
 ##### Config
 
