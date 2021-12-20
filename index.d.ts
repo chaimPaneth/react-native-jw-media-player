@@ -142,6 +142,7 @@ declare module "react-native-jw-media-player" {
   }
   interface PropsType {
     config: Config;
+    controls: boolean;
     onPlayerReady?: (event: any) => void;
     onPlaylist?: (playlist: PlaylistItem[]) => void;
     onBeforePlay?: (event: any) => void;
@@ -173,11 +174,11 @@ declare module "react-native-jw-media-player" {
     toggleSpeed(): void;
     setSpeed(speed: number): void;
     setPlaylistIndex(index: number): void;
-    setControls(shouldDisplayControl: boolean): void;
+    setControls(show: boolean): void;
     loadPlaylist(playlist: PlaylistItem[]): void;
     loadPlaylistItem(playlistItem: PlaylistItem): void;
     seekTo(time: number): void;
-    setFullscreen(shouldDisplayInFullScreen: boolean): void;
+    setFullscreen(fullScreen: boolean): void;
     position(): Promise<number>;
     setUpCastController(): void;
     presentCastDialog(): void;

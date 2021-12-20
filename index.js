@@ -227,7 +227,7 @@ export default class JWPlayer extends Component {
   }
 
   setControls(show) {
-    if (RNJWPlayerManager && Platform.OS === "android")
+    if (RNJWPlayerManager)
       RNJWPlayerManager.setControls(this.getRNJWPlayerBridgeHandle(), show);
   }
 
@@ -390,7 +390,7 @@ export default class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var {config} = nextProps;
+    var {config, controls} = nextProps;
     var {
       file,
       image,
@@ -434,6 +434,10 @@ export default class JWPlayer extends Component {
       return !this.arraysAreEqual(playlist, thisConfig.playlist);
     } else if (!playlist && thisConfig.playlist) {
       return true
+    }
+
+    if (controls !== this.props.controls) {
+      return true;
     }
 
     return false;

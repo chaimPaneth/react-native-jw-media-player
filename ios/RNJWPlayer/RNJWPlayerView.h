@@ -20,6 +20,8 @@
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 
+@property(nonatomic)JWInterfaceBehavior interfaceBehavior;
+
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
 @property(nonatomic)BOOL isCasting;
@@ -86,5 +88,8 @@
 - (GCKCastState)castState;
 - (JWCastingDevice*)connectedDevice;
 - (NSArray <JWCastingDevice *>*)availableDevices;
+
+/* Methods */
+-(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show;
 
 @end
