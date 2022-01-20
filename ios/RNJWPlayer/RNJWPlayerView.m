@@ -2,6 +2,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "RCTConvert+RNJWPlayer.h"
 
 @implementation RNJWPlayerView
 
@@ -89,6 +90,11 @@
     } else {
         [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
     }
+}
+
+-(void)setControls:(BOOL)controls
+{
+    [self toggleUIGroup:_playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :controls];
 }
 
 #pragma mark - RNJWPlayer styling
@@ -228,33 +234,7 @@
             
             id edgeStyle = capStyle[@"edgeStyle"];
             if (edgeStyle != nil && (edgeStyle != (id)[NSNull null])) {
-                JWCaptionEdgeStyle finalEdgeStyle;
-                switch ([edgeStyle intValue]) {
-                    case 1:
-                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
-                        break;
-                    case 2:
-                        finalEdgeStyle = JWCaptionEdgeStyleNone;
-                        break;
-                    case 3:
-                        finalEdgeStyle = JWCaptionEdgeStyleDropshadow;
-                        break;
-                    case 4:
-                        finalEdgeStyle = JWCaptionEdgeStyleRaised;
-                        break;
-                    case 5:
-                        finalEdgeStyle = JWCaptionEdgeStyleDepressed;
-                        break;
-                    case 6:
-                        finalEdgeStyle = JWCaptionEdgeStyleUniform;
-                        break;
-    
-                    default:
-                        finalEdgeStyle = JWCaptionEdgeStyleUndefined;
-                        break;
-                }
-                
-                [capStyleBuilder edgeStyle:finalEdgeStyle];
+                [capStyleBuilder edgeStyle:[RCTConvert JWCaptionEdgeStyle:edgeStyle]];
             }
             
             JWCaptionStyle* captionStyle = [capStyleBuilder buildAndReturnError:&error];
@@ -355,7 +335,7 @@
         [itemBuilder title:title];
     }
     
-    id desc = item[@"desc"];
+    id desc = item[@"description"];
     if ((desc != nil) && (desc != (id)[NSNull null])) {
         [itemBuilder description:desc];
     }
@@ -375,11 +355,6 @@
     if ((recommendations != nil) && (recommendations != (id)[NSNull null])) {
         NSURL* recUrl = [NSURL URLWithString:recommendations];
         [itemBuilder recommendations:recUrl];
-    }
-    
-    id autostart = item[@"autostart"];
-    if (autostart != nil && (autostart != (id)[NSNull null])) {
-        [itemBuilder autostart:autostart];
     }
 
     id tracksItem = item[@"tracks"];
@@ -473,16 +448,7 @@
     
     id preload = config[@"preload"];
     if (preload != nil && (preload != (id)[NSNull null])) {
-        switch ([preload intValue]) {
-            case 0:
-                [configBuilder preload:JWPreloadAuto];
-                break;
-            case 1:
-                [configBuilder preload:JWPreloadNone];
-                break;
-            default:
-                break;
-        }
+        [configBuilder preload:[RCTConvert JWPreload:preload]];
     }
     
     id related = config[@"related"];
@@ -491,35 +457,13 @@
         
         id onClick = related[@"onClick"];
         if ((onClick != nil) && (onClick != (id)[NSNull null])) {
-            switch ([onClick intValue]) {
-                case 0:
-                    [relatedBuilder onClick:JWRelatedOnClickPlay];
-                    break;
-                case 1:
-                    [relatedBuilder onClick:JWRelatedOnClickLink];
-                    break;
-                default:
-                    [relatedBuilder onClick:JWRelatedOnClickPlay];
-                    break;
-            }
+            [relatedBuilder onClick:[RCTConvert JWRelatedOnClick:onClick]];
         }
         
         id onComplete = related[@"onComplete"];
         if ((onComplete != nil) && (onComplete != (id)[NSNull null])) {
-            switch ([onComplete intValue]) {
-                case 0:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteShow];
-                    break;
-                case 1:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteHide];
-                    break;
-                case 2:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
-                    break;
-                default:
-                    [relatedBuilder onComplete:JWRelatedOnCompleteAutoplay];
-                    break;
-            }
+
+            [relatedBuilder onComplete:[RCTConvert JWRelatedOnComplete:onComplete]];
         }
         
         id heading = related[@"heading"];
@@ -558,10 +502,11 @@
         JWAdvertisingConfig* advertising;
         JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
                  
-         id adClient = config[@"adClient"];
+         id adClient = ads[@"adClient"];
          if ((adClient != nil) && (adClient != (id)[NSNull null])) {
+             int clientType = (int)[RCTConvert JWAdClient:adClient];
              JWAdClient jwAdClient;
-             switch ([adClient intValue]) {
+             switch (clientType) {
                  case 0:
                      jwAdClient = JWAdClientJWPlayer;
                      break;
@@ -587,7 +532,7 @@
         
         // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
         
-        id schedule = config[@"adSchedule"];
+        id schedule = ads[@"adSchedule"];
         if(schedule != nil && (schedule != (id)[NSNull null])) {
             NSArray* scheduleAr = (NSArray*)schedule;
             if (scheduleAr.count > 0) {
@@ -622,13 +567,13 @@
             [adConfigBuilder tag:tagUrl];
         }
                 
-        id adVmap = config[@"adVmap"];
+        id adVmap = ads[@"adVmap"];
         if (adVmap != nil && (adVmap != (id)[NSNull null])) {
             NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
             [adConfigBuilder vmapURL:adVmapUrl];
         }
         
-        id openBrowserOnAdClick = config[@"openBrowserOnAdClick"];
+        id openBrowserOnAdClick = ads[@"openBrowserOnAdClick"];
         if (openBrowserOnAdClick != nil && (openBrowserOnAdClick != (id)[NSNull null])) {
             [adConfigBuilder openBrowserOnAdClick:openBrowserOnAdClick];
         }
@@ -653,19 +598,7 @@
     
     id interfaceBehavior = config[@"interfaceBehavior"];
     if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
-        switch ([interfaceBehavior intValue]) {
-            case 0:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorNormal;
-                break;
-            case 1:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
-                break;
-            case 2:
-                _playerViewController.interfaceBehavior = JWInterfaceBehaviorAlwaysOnScreen;
-                break;
-            default:
-                break;
-        }
+        _interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
     }
     
     id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
@@ -743,11 +676,15 @@
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
+        
+        if (_interfaceBehavior) {
+            _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
+        }
     }
 
     _playerViewController.playerView.delegate = self;
     _playerViewController.player.delegate = self;
-//    _playerViewController.player.playbackStateDelegate = self; // this causes issue with ui
+    _playerViewController.player.playbackStateDelegate = self;
     _playerViewController.player.adDelegate = self;
     _playerViewController.player.avDelegate = self;
 }
@@ -781,6 +718,19 @@
     if (_playerView != nil) {
         [_playerView removeFromSuperview];
         _playerView = nil;
+    }
+}
+
+-(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show
+{
+    NSArray *subviews = [view subviews];
+
+    for (UIView *subview in subviews) {
+        if ([NSStringFromClass(subview.class) isEqualToString:name] && (ofSubview == nil || [NSStringFromClass(subview.superview.class) isEqualToString:name])) {
+            [subview setHidden:!show];
+        } else {
+            [self toggleUIGroup:subview :name :ofSubview :show];
+        }
     }
 }
 
@@ -974,6 +924,21 @@
 
 - (void)jwplayerContentIsBuffering:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentIsBuffering:player];
+    }
+    
+    if (self.onBuffer) {
+        self.onBuffer(@{});
+    }
+}
+
+- (void)jwplayer:(id<JWPlayer>)player isBufferingWithReason:(enum JWBufferReason)reason
+{
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isBufferingWithReason:reason];
+    }
+    
     if (self.onBuffer) {
         self.onBuffer(@{});
     }
@@ -981,6 +946,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player updatedBuffer:percent position:time];
+    }
+    
     if (self.onUpdateBuffer) {
         self.onUpdateBuffer(@{@"percent": @(percent), @"position": time});
     }
@@ -988,6 +957,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didFinishLoadingWithTime:(NSTimeInterval)loadTime
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didFinishLoadingWithTime:loadTime];
+    }
+    
     if (self.onLoaded) {
         self.onLoaded(@{});
     }
@@ -995,6 +968,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isAttemptingToPlay:(JWPlayerItem *)playlistItem reason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isAttemptingToPlay:playlistItem reason:reason];
+    }
+    
     if (self.onAttemptPlay) {
         self.onAttemptPlay(@{});
     }
@@ -1002,6 +979,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isPlayingWithReason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isPlayingWithReason:reason];
+    }
+    
     if (self.onPlay) {
         self.onPlay(@{});
     }
@@ -1012,6 +993,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player willPlayWithReason:(enum JWPlayReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player willPlayWithReason:reason];
+    }
+    
     if (self.onBeforePlay) {
         self.onBeforePlay(@{});
     }
@@ -1019,6 +1004,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didPauseWithReason:(enum JWPauseReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didPauseWithReason:reason];
+    }
+    
     if (self.onPause) {
         self.onPause(@{});
     }
@@ -1030,6 +1019,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didBecomeIdleWithReason:(enum JWIdleReason)reason
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didBecomeIdleWithReason:reason];
+    }
+    
     if (self.onIdle) {
         self.onIdle(@{});
     }
@@ -1037,6 +1030,10 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isVisible:(BOOL)isVisible
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player isVisible:isVisible];
+    }
+    
     if (self.onVisible) {
         self.onVisible(@{@"visible": @(isVisible)});
     }
@@ -1044,6 +1041,10 @@
 
 - (void)jwplayerContentWillComplete:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentWillComplete:player];
+    }
+    
     if (self.onBeforeComplete) {
         self.onBeforeComplete(@{});
     }
@@ -1051,6 +1052,10 @@
 
 - (void)jwplayerContentDidComplete:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerContentDidComplete:player];
+    }
+    
     if (self.onComplete) {
         self.onComplete(@{});
     }
@@ -1058,19 +1063,43 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didLoadPlaylistItem:item at:index];
+    }
+    
     if (self.onPlaylistItem) {
+        NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
+        for (JWVideoSource* source in item.videoSources) {
+            [sourceDict setObject:source.file forKey:@"file"];
+            [sourceDict setObject:source.label forKey:@"label"];
+            [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+        }
+        
+        NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
+        for (JWAdBreak* sched in item.adSchedule) {
+            [schedDict setObject:sched.offset forKey:@"offset"];
+            [schedDict setObject:sched.tags forKey:@"tags"];
+            [schedDict setObject:@(sched.type) forKey:@"type"];
+        }
+        
+        NSMutableDictionary* trackDict = [[NSMutableDictionary alloc] init];
+        for (JWMediaTrack* track in item.mediaTracks) {
+            [trackDict setObject:track.file forKey:@"file"];
+            [trackDict setObject:track.label forKey:@"label"];
+            [trackDict setObject:@(track.defaultTrack) forKey:@"default"];
+        }
+        
         NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   item.mediaId, @"mediaId",
-                                  item.posterImage, @"image",
                                   item.title, @"title",
-                                  item.description, @"desc",
-                                  item.vmapURL, @"adVmap",
-                                  item.recommendations, @"recommendations",
-                                  item.startTime, @"startTime",
-                                  item.autostart, @"autostart",
-                                  item.videoSources, @"sources",
-                                  item.adSchedule, @"adSchedule",
-                                  item.mediaTracks, @"tracks",
+                                  item.description, @"description",
+                                  item.posterImage.absoluteString, @"image",
+                                  @(item.startTime), @"startTime",
+                                  item.vmapURL.absoluteString, @"adVmap",
+                                  item.recommendations.absoluteString, @"recommendations",
+                                  sourceDict, @"sources",
+                                  schedDict, @"adSchedule",
+                                  trackDict, @"tracks",
                                   nil];
 
         NSError *error;
@@ -1082,23 +1111,48 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player didLoadPlaylist:playlist];
+    }
+    
     if (self.onPlaylist) {
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
         for (JWPlayerItem* item in playlist) {
+            NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
+            for (JWVideoSource* source in item.videoSources) {
+                [sourceDict setObject:source.file forKey:@"file"];
+                [sourceDict setObject:source.label forKey:@"label"];
+                [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+            }
+            
+            NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
+            for (JWAdBreak* sched in item.adSchedule) {
+                [schedDict setObject:sched.offset forKey:@"offset"];
+                [schedDict setObject:sched.tags forKey:@"tags"];
+                [schedDict setObject:@(sched.type) forKey:@"type"];
+            }
+            
+            NSMutableDictionary* trackDict = [[NSMutableDictionary alloc] init];
+            for (JWMediaTrack* track in item.mediaTracks) {
+                [trackDict setObject:track.file forKey:@"file"];
+                [trackDict setObject:track.label forKey:@"label"];
+                [trackDict setObject:@(track.defaultTrack) forKey:@"default"];
+            }
+            
             NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                       item.mediaId, @"mediaId",
-                                      item.posterImage, @"image",
                                       item.title, @"title",
-                                      item.description, @"desc",
-                                      item.vmapURL, @"adVmap",
-                                      item.recommendations, @"recommendations",
-                                      item.startTime, @"startTime",
-                                      item.autostart, @"autostart",
-                                      item.videoSources, @"sources",
-                                      item.adSchedule, @"adSchedule",
-                                      item.mediaTracks, @"tracks",
+                                      item.description, @"description",
+                                      item.posterImage.absoluteString, @"image",
+                                      @(item.startTime), @"startTime",
+                                      item.vmapURL.absoluteString, @"adVmap",
+                                      item.recommendations.absoluteString, @"recommendations",
+                                      sourceDict, @"sources",
+                                      schedDict, @"adSchedule",
+                                      trackDict, @"tracks",
                                       nil];
+            
             [playlistArray addObject:itemDict];
         }
         
@@ -1111,6 +1165,10 @@
 
 - (void)jwplayerPlaylistHasCompleted:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerPlaylistHasCompleted:player];
+    }
+    
     if (self.onPlaylistComplete) {
         self.onPlaylistComplete(@{});
     }
@@ -1118,11 +1176,17 @@
 
 - (void)jwplayer:(id<JWPlayer>)player usesMediaType:(enum JWMediaType)type
 {
-    
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player usesMediaType:type];
+    }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player seekedFrom:(NSTimeInterval)oldPosition to:(NSTimeInterval)newPosition
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player seekedFrom:oldPosition to:newPosition];
+    }
+    
     if (self.onSeek) {
         self.onSeek(@{@"from": @(oldPosition), @"to": @(newPosition)});
     }
@@ -1130,6 +1194,10 @@
 
 - (void)jwplayerHasSeeked:(id<JWPlayer>)player
 {
+    if (_playerViewController) {
+        [_playerViewController jwplayerHasSeeked:player];
+    }
+    
     if (self.onSeeked) {
         self.onSeeked(@{});
     }
@@ -1137,7 +1205,9 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-    
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
+    }
 }
 
 #pragma mark - JWPlayer Ad Delegate
@@ -1326,11 +1396,13 @@
 
 #pragma mark - JWPlayer AV Delegate
 
-- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTrackChanged:(NSInteger)currentLevel {
-    
+- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTracksUpdated:(NSArray<JWMediaSelectionOption *> * _Nonnull)levels {
+    if (self.onAudioTracks) {
+        self.onAudioTracks(@{});
+    }
 }
 
-- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTracksUpdated:(NSArray<JWMediaSelectionOption *> * _Nonnull)levels {
+- (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTrackChanged:(NSInteger)currentLevel {
     
 }
 

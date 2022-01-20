@@ -56,7 +56,7 @@ export default class JWPlayer extends Component {
       autostart: PropTypes.bool,
       controls: PropTypes.bool,
       repeat: PropTypes.bool,
-      preload: PropTypes.oneOf(["0", "1"]),
+      preload: PropTypes.oneOf(["auto", "none"]),
       playlist: PropTypes.arrayOf(
         PropTypes.shape({
           file: PropTypes.string,
@@ -103,7 +103,7 @@ export default class JWPlayer extends Component {
       }),
 
       // controller only
-      interfaceBehavior: PropTypes.oneOf(["0", "1", "2"]),
+      interfaceBehavior: PropTypes.oneOf(["normal", "hidden", "onscreen"]),
       styling: PropTypes.shape({
         colors: PropTypes.shape({
           buttons: PropTypes.string,
@@ -126,7 +126,7 @@ export default class JWPlayer extends Component {
             backgroundColor: PropTypes.string,
             fontColor: PropTypes.string,
             highlightColor: PropTypes.string,
-            edgeStyle: PropTypes.oneOf(["1", "2" ,"3", "4", "5", "6"])
+            edgeStyle: PropTypes.oneOf(['none', 'dropshadow', 'raised', 'depressed', 'uniform'])
           }),
           menuStyle: PropTypes.shape({
             font: PropTypes.shape({
@@ -160,10 +160,6 @@ export default class JWPlayer extends Component {
     setPlaylistIndex: PropTypes.func,
     setControls: PropTypes.func,
     setFullscreen: PropTypes.func,
-    showAirPlayButton: PropTypes.func,
-    hideAirPlayButton: PropTypes.func,
-    showCastButton: PropTypes.func,
-    hideCastButton: PropTypes.func,
     setUpCastController: PropTypes.func,
     presentCastDialog: PropTypes.func,
     connectedDevice: PropTypes.func,
@@ -191,6 +187,10 @@ export default class JWPlayer extends Component {
     onControlBarVisible: PropTypes.func,
     onControlBarVisible: PropTypes.func,
     onPlaylistComplete: PropTypes.func,
+    getAudioTracks: PropTypes.func,
+    getCurrentAudioTrack: PropTypes.func,
+    setCurrentAudioTrack: PropTypes.func,
+    onAudioTracks: PropTypes.func,
   };
 
   pause() {
@@ -227,7 +227,7 @@ export default class JWPlayer extends Component {
   }
 
   setControls(show) {
-    if (RNJWPlayerManager && Platform.OS === "android")
+    if (RNJWPlayerManager)
       RNJWPlayerManager.setControls(this.getRNJWPlayerBridgeHandle(), show);
   }
 
@@ -242,6 +242,20 @@ export default class JWPlayer extends Component {
         this.getRNJWPlayerBridgeHandle(),
         fullscreen
       );
+  }
+
+  async time() {
+    if (RNJWPlayerManager) {
+      try {
+        var time = await RNJWPlayerManager.time(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return time;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
   }
 
   async position() {
@@ -329,12 +343,54 @@ export default class JWPlayer extends Component {
     }
   }
 
+  async getAudioTracks() {
+    if (RNJWPlayerManager) {
+      try {
+        var audioTracks = await RNJWPlayerManager.getAudioTracks(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        // iOS sends autoSelect as 0 or 1 instead of a boolean
+        // couldn't figure out how to send autoSelect as a boolean from Objective C
+        return audioTracks.map((audioTrack) => {
+          audioTrack.autoSelect = !!audioTrack.autoSelect;
+          return audioTrack;
+        });
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  async getCurrentAudioTrack() {
+    if (RNJWPlayerManager) {
+      try {
+        var currentAudioTrack = await RNJWPlayerManager.getCurrentAudioTrack(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return currentAudioTrack;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  setCurrentAudioTrack(index) {
+    if (RNJWPlayerManager) {
+      RNJWPlayerManager.setCurrentAudioTrack(
+        this.getRNJWPlayerBridgeHandle(),
+        index
+      );
+    }
+  }
+
   getRNJWPlayerBridgeHandle() {
     return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var {config} = nextProps;
+    var {config, controls} = nextProps;
     var {
       file,
       image,
@@ -345,14 +401,14 @@ export default class JWPlayer extends Component {
       controls,
       repeat,
       mute,
-      displayTitle,
-      displayDesc,
+      styling,
       nextUpDisplay,
       playlistItem,
       playlist,
       style,
       stretching,
     } = config || {};
+    var {displayTitle, displayDescription} = styling || {}
 
     var thisConfig = this.props.config || {};
 
@@ -366,7 +422,7 @@ export default class JWPlayer extends Component {
       controls !== thisConfig.controls ||
       repeat !== thisConfig.repeat ||
       displayTitle !== thisConfig.displayTitle ||
-      displayDesc !== thisConfig.displayDesc ||
+      displayDescription !== thisConfig.displayDescription ||
       nextUpDisplay !== thisConfig.nextUpDisplay ||
       style !== thisConfig.style ||
       stretching !== thisConfig.stretching
@@ -378,6 +434,10 @@ export default class JWPlayer extends Component {
       return !this.arraysAreEqual(playlist, thisConfig.playlist);
     } else if (!playlist && thisConfig.playlist) {
       return true
+    }
+
+    if (controls !== this.props.controls) {
+      return true;
     }
 
     return false;

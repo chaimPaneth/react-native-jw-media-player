@@ -20,6 +20,8 @@
 @property(nonatomic)BOOL userPaused;
 @property(nonatomic)BOOL wasInterrupted;
 
+@property(nonatomic)JWInterfaceBehavior interfaceBehavior;
+
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
 @property(nonatomic)BOOL isCasting;
@@ -43,6 +45,9 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylistComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforeComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onComplete;
+
+/* av events */
+@property(nonatomic, copy)RCTBubblingEventBlock onAudioTracks;
 
 /* player events */
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerReady;
@@ -83,5 +88,8 @@
 - (GCKCastState)castState;
 - (JWCastingDevice*)connectedDevice;
 - (NSArray <JWCastingDevice *>*)availableDevices;
+
+/* Methods */
+-(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show;
 
 @end
