@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.authors      = package['author']
   s.homepage     = package['homepage']
   s.platform     = :ios, "10.0"
-  s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
+  s.source       = { :git => "https://github.com/pocketoutdoormedia/react-native-jw-media-player.git", :tag => "v#{s.version}" }
   s.source_files  = "RNJWPlayer/*.{h,m}"
   s.dependency   'JWPlayerKit', '~> 4.3.0'
   s.dependency   'google-cast-sdk', '~> 4.7.0'
@@ -23,5 +23,5 @@ Pod::Spec.new do |s|
     'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
     'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
   }
-  
+
 end
