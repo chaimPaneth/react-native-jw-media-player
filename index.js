@@ -10,20 +10,21 @@ import PropTypes from "prop-types";
 
 const RNJWPlayerManager =
   Platform.OS === "ios"
-    ? NativeModules.RNJWPlayerManager
+    ? NativeModules.RNJWPlayerViewManager
     : NativeModules.RNJWPlayerModule;
 
 const RCT_RNJWPLAYER_REF = "rnjwplayer";
 
-const RNJWPlayer = requireNativeComponent("RNJWPlayer", null);
+const RNJWPlayer = requireNativeComponent("RNJWPlayerView", null);
 
 const JWPlayerStateIOS = {
-  JWPlayerStatePlaying: 0,
-  JWPlayerStatePaused: 1,
+  JWPlayerStateUnknown: 0,
+  JWPlayerStateIdle: 1,
   JWPlayerStateBuffering: 2,
-  JWPlayerStateIdle: 3,
-  JWPlayerStateComplete: 4,
-  JWPlayerStateError: 5,
+  JWPlayerStatePlaying: 3,
+  JWPlayerStatePaused: 4,
+  JWPlayerStateComplete: 5,
+  JWPlayerStateError: 6,
 };
 
 const JWPlayerStateAndroid = {
@@ -39,77 +40,117 @@ export const JWPlayerState =
   Platform.OS === "ios" ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
 export const JWPlayerAdClients = {
-  JWAdClientGoogima: 1,
-  JWAdClientGoogimaDAI: 2,
-  JWAdClientFreewheel: 3,
-  JWAdClientVast: 4,
+  JWAdClientJWPlayer: 0,
+  JWAdClientGoogleIMA: 1,
+  JWAdClientGoogleIMADAI: 2,
+  JWAdClientUnknown: 3,
 };
 
 export default class JWPlayer extends Component {
   static propTypes = {
-    file: PropTypes.string,
-    image: PropTypes.string,
-    title: PropTypes.string,
-    desc: PropTypes.string,
-    mediaId: PropTypes.string,
-    autostart: PropTypes.bool,
-    controls: PropTypes.bool,
-    repeat: PropTypes.bool,
-    mute: PropTypes.bool,
-    displayTitle: PropTypes.bool,
-    displayDesc: PropTypes.bool,
-    nextUpDisplay: PropTypes.bool,
-    playerStyle: PropTypes.string,
-    colors: PropTypes.shape({
-      icons: PropTypes.string,
-      timeslider: PropTypes.shape({
-        progress: PropTypes.string,
-        rail: PropTypes.string,
-      }),
-    }),
-    nativeFullScreen: PropTypes.bool,
-    fullScreenOnLandscape: PropTypes.bool,
-    landscapeOnFullScreen: PropTypes.bool,
-    portraitOnExitFullScreen: PropTypes.bool,
-    exitFullScreenOnPortrait: PropTypes.bool,
-    playlistItem: PropTypes.shape({
-      file: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      title: PropTypes.string,
-      desc: PropTypes.string,
-      mediaId: PropTypes.string.isRequired,
-      autostart: PropTypes.bool.isRequired,
-      adSchedule: PropTypes.arrayOf(
+    config: PropTypes.shape({
+      license: PropTypes.string.isRequired,
+      backgroundAudioEnabled: PropTypes.bool,
+      pipEnabled: PropTypes.bool,
+      viewOnly: PropTypes.bool,
+      autostart: PropTypes.bool,
+      controls: PropTypes.bool,
+      repeat: PropTypes.bool,
+      preload: PropTypes.oneOf(["auto", "none"]),
+      playlist: PropTypes.arrayOf(
         PropTypes.shape({
-          tag: PropTypes.string,
-          offset: PropTypes.string,
+          file: PropTypes.string,
+          sources: PropTypes.arrayOf(
+            PropTypes.shape({
+              file: PropTypes.string,
+              label: PropTypes.string,
+              default: PropTypes.bool,
+            }),
+          ),
+          image: PropTypes.string,
+          title: PropTypes.string,
+          desc: PropTypes.string,
+          mediaId: PropTypes.string,
+          autostart: PropTypes.bool,
+          recommendations: PropTypes.string,
+          tracks: PropTypes.arrayOf(
+            PropTypes.shape({
+              file: PropTypes.string,
+              label: PropTypes.string,
+            }),
+          ),
+          adSchedule: PropTypes.arrayOf(
+            PropTypes.shape({
+              tag: PropTypes.string,
+              offset: PropTypes.string,
+            }),
+          ),
+          adVmap: PropTypes.string,
+          startTime: PropTypes.number,
         })
       ),
-      adVmap: PropTypes.string,
-      adClient: PropTypes.string,
-      startTime: PropTypes.number,
-      backgroundAudioEnabled: PropTypes.bool,
-    }),
-    playlist: PropTypes.arrayOf(
-      PropTypes.shape({
-        file: PropTypes.string.isRequired,
-        image: PropTypes.string,
-        title: PropTypes.string,
-        desc: PropTypes.string,
-        mediaId: PropTypes.string.isRequired,
-        autostart: PropTypes.bool.isRequired,
+      advertising: PropTypes.shape({
+        adClient: PropTypes.string,
         adSchedule: PropTypes.arrayOf(
           PropTypes.shape({
             tag: PropTypes.string,
             offset: PropTypes.string,
-          })
+          }),
         ),
         adVmap: PropTypes.string,
-        adClient: PropTypes.string,
-        startTime: PropTypes.number,
-        backgroundAudioEnabled: PropTypes.bool,
-      })
-    ),
+        tag: PropTypes.string,
+        openBrowserOnAdClick: PropTypes.bool,
+      }),
+
+      // controller only
+      interfaceBehavior: PropTypes.oneOf(["normal", "hidden", "onscreen"]),
+      styling: PropTypes.shape({
+        colors: PropTypes.shape({
+          buttons: PropTypes.string,
+          backgroundColor: PropTypes.string,
+          fontColor: PropTypes.string,
+          timeslider: PropTypes.shape({
+            thumb: PropTypes.string,
+            rail: PropTypes.string,
+            slider: PropTypes.string,
+          }),
+          font: PropTypes.shape({
+            name: PropTypes.string,
+            size: PropTypes.number,
+          }),
+          captionsStyle: PropTypes.shape({
+            font: PropTypes.shape({
+              name: PropTypes.string,
+              size: PropTypes.number,
+            }),
+            backgroundColor: PropTypes.string,
+            fontColor: PropTypes.string,
+            highlightColor: PropTypes.string,
+            edgeStyle: PropTypes.oneOf(['none', 'dropshadow', 'raised', 'depressed', 'uniform'])
+          }),
+          menuStyle: PropTypes.shape({
+            font: PropTypes.shape({
+              name: PropTypes.string,
+              size: PropTypes.number,
+            }),
+            backgroundColor: PropTypes.string,
+            fontColor: PropTypes.string,
+          }),
+        }),
+        showTitle: PropTypes.bool,
+        showDesc: PropTypes.bool,
+      }),
+      nextUpStyle: PropTypes.shape({
+        offsetSeconds: PropTypes.number,
+        offsetPercentage: PropTypes.number
+      }),
+      offlineMessage: PropTypes.string,
+      offlineImage: PropTypes.string,
+      forceFullScreenOnLandscape: PropTypes.bool,
+      forceLandscapeOnFullScreen: PropTypes.bool,
+      enableLockScreenControls: PropTypes.bool,
+      stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
+    }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
     play: PropTypes.func,
@@ -120,10 +161,6 @@ export default class JWPlayer extends Component {
     setPlaylistIndex: PropTypes.func,
     setControls: PropTypes.func,
     setFullscreen: PropTypes.func,
-    showAirPlayButton: PropTypes.func,
-    hideAirPlayButton: PropTypes.func,
-    showCastButton: PropTypes.func,
-    hideCastButton: PropTypes.func,
     setUpCastController: PropTypes.func,
     presentCastDialog: PropTypes.func,
     connectedDevice: PropTypes.func,
@@ -151,6 +188,10 @@ export default class JWPlayer extends Component {
     onControlBarVisible: PropTypes.func,
     onControlBarVisible: PropTypes.func,
     onPlaylistComplete: PropTypes.func,
+    getAudioTracks: PropTypes.func,
+    getCurrentAudioTrack: PropTypes.func,
+    setCurrentAudioTrack: PropTypes.func,
+    onAudioTracks: PropTypes.func,
   };
 
   pause() {
@@ -200,22 +241,6 @@ export default class JWPlayer extends Component {
       RNJWPlayerManager.setControls(this.getRNJWPlayerBridgeHandle(), show);
   }
 
-  loadPlaylistItem(playlistItem) {
-    if (RNJWPlayerManager)
-      RNJWPlayerManager.loadPlaylistItem(
-        this.getRNJWPlayerBridgeHandle(),
-        playlistItem
-      );
-  }
-
-  loadPlaylist(playlist) {
-    if (RNJWPlayerManager)
-      RNJWPlayerManager.loadPlaylist(
-        this.getRNJWPlayerBridgeHandle(),
-        playlist
-      );
-  }
-
   seekTo(time) {
     if (RNJWPlayerManager)
       RNJWPlayerManager.seekTo(this.getRNJWPlayerBridgeHandle(), time);
@@ -227,6 +252,20 @@ export default class JWPlayer extends Component {
         this.getRNJWPlayerBridgeHandle(),
         fullscreen
       );
+  }
+
+  async time() {
+    if (RNJWPlayerManager) {
+      try {
+        var time = await RNJWPlayerManager.time(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return time;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
   }
 
   async position() {
@@ -243,43 +282,23 @@ export default class JWPlayer extends Component {
     }
   }
 
-  showAirPlayButton(x, y, width = 44, hight = 44, autoHide = true) {
-    if (RNJWPlayerManager && Platform.OS === 'ios')
-      RNJWPlayerManager.showAirPlayButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
-  }
-
-  hideAirPlayButton() {
-    if (RNJWPlayerManager && Platform.OS === 'ios')
-      RNJWPlayerManager.hideAirPlayButton(this.getRNJWPlayerBridgeHandle());
-  }
-
-  showCastButton(x, y, width = 24, hight = 24, autoHide = true, customButton = false) {
-    if (RNJWPlayerManager) {
-      if (Platform.OS === 'ios') {
-          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide, customButton);
-      } else {
-          RNJWPlayerManager.showCastButton(this.getRNJWPlayerBridgeHandle(), x, y, width, hight, autoHide);
-      }
-    }
-  }
-
-  hideCastButton() {
+  togglePIP() {
     if (RNJWPlayerManager)
-      RNJWPlayerManager.hideCastButton(this.getRNJWPlayerBridgeHandle());
+      RNJWPlayerManager.togglePIP(this.getRNJWPlayerBridgeHandle());
   }
 
   setUpCastController() {
-    if (RNJWPlayerManager)
+    if (RNJWPlayerManager && Platform.OS === "ios")
       RNJWPlayerManager.setUpCastController(this.getRNJWPlayerBridgeHandle());
   }
 
   presentCastDialog() {
-    if (RNJWPlayerManager)
+    if (RNJWPlayerManager && Platform.OS === "ios")
       RNJWPlayerManager.presentCastDialog(this.getRNJWPlayerBridgeHandle());
   }
 
   async connectedDevice() {
-    if (RNJWPlayerManager) {
+    if (RNJWPlayerManager && Platform.OS === "ios") {
       try {
         var connectedDevice = await RNJWPlayerManager.connectedDevice(
           this.getRNJWPlayerBridgeHandle()
@@ -293,7 +312,7 @@ export default class JWPlayer extends Component {
   }
 
   async availableDevices() {
-    if (RNJWPlayerManager) {
+    if (RNJWPlayerManager && Platform.OS === "ios") {
       try {
         var availableDevices = await RNJWPlayerManager.availableDevices(
           this.getRNJWPlayerBridgeHandle()
@@ -307,7 +326,7 @@ export default class JWPlayer extends Component {
   }
 
   async castState() {
-    if (RNJWPlayerManager) {
+    if (RNJWPlayerManager && Platform.OS === "ios") {
       try {
         var castState = await RNJWPlayerManager.castState(
           this.getRNJWPlayerBridgeHandle()
@@ -334,11 +353,54 @@ export default class JWPlayer extends Component {
     }
   }
 
+  async getAudioTracks() {
+    if (RNJWPlayerManager) {
+      try {
+        var audioTracks = await RNJWPlayerManager.getAudioTracks(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        // iOS sends autoSelect as 0 or 1 instead of a boolean
+        // couldn't figure out how to send autoSelect as a boolean from Objective C
+        return audioTracks.map((audioTrack) => {
+          audioTrack.autoSelect = !!audioTrack.autoSelect;
+          return audioTrack;
+        });
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  async getCurrentAudioTrack() {
+    if (RNJWPlayerManager) {
+      try {
+        var currentAudioTrack = await RNJWPlayerManager.getCurrentAudioTrack(
+          this.getRNJWPlayerBridgeHandle()
+        );
+        return currentAudioTrack;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+  }
+
+  setCurrentAudioTrack(index) {
+    if (RNJWPlayerManager) {
+      RNJWPlayerManager.setCurrentAudioTrack(
+        this.getRNJWPlayerBridgeHandle(),
+        index
+      );
+    }
+  }
+
   getRNJWPlayerBridgeHandle() {
     return ReactNative.findNodeHandle(this.refs[RCT_RNJWPLAYER_REF]);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    var {config, controls} = nextProps;
     var {
       file,
       image,
@@ -349,59 +411,50 @@ export default class JWPlayer extends Component {
       controls,
       repeat,
       mute,
-      displayTitle,
-      displayDesc,
+      styling,
       nextUpDisplay,
       playlistItem,
       playlist,
       style,
-    } = nextProps;
+      stretching,
+    } = config || {};
+    var {displayTitle, displayDescription} = styling || {}
+
+    var thisConfig = this.props.config || {};
 
     if (
-      file !== this.props.file ||
-      image !== this.props.image ||
-      desc !== this.props.desc ||
-      title !== this.props.title ||
-      mediaId !== this.props.mediaId ||
-      autostart !== this.props.autostart ||
-      controls !== this.props.controls ||
-      repeat !== this.props.repeat ||
-      mute !== this.props.mute ||
-      displayTitle !== this.props.displayTitle ||
-      displayDesc !== this.props.displayDesc ||
-      nextUpDisplay !== this.props.nextUpDisplay ||
-      style !== this.props.style
+      file !== thisConfig.file ||
+      image !== thisConfig.image ||
+      desc !== thisConfig.desc ||
+      title !== thisConfig.title ||
+      mediaId !== thisConfig.mediaId ||
+      autostart !== thisConfig.autostart ||
+      controls !== thisConfig.controls ||
+      repeat !== thisConfig.repeat ||
+      displayTitle !== thisConfig.displayTitle ||
+      displayDescription !== thisConfig.displayDescription ||
+      nextUpDisplay !== thisConfig.nextUpDisplay ||
+      style !== thisConfig.style ||
+      stretching !== thisConfig.stretching
     ) {
       return true;
     }
 
-    if (playlist) {
-      if (this.props.playlist) {
-        return !this.arraysAreEqual(playlist, this.props.playlist);
-      } else {
-        return true;
-      }
+    if (playlist && thisConfig.playlist) {
+      return !this.arraysAreEqual(playlist, thisConfig.playlist);
+    } else if (!playlist && thisConfig.playlist) {
+      return true
     }
 
-    if (playlistItem) {
-      if (this.props.playlistItem) {
-        if (playlistItem.mediaId !== this.props.playlistItem.mediaId) {
-          return true;
-        }
-
-        if (playlistItem.controls !== this.props.playlistItem.controls) {
-          return true;
-        }
-      } else {
-        return true;
-      }
+    if (controls !== this.props.controls) {
+      return true;
     }
 
     return false;
   }
 
   arraysAreEqual(ary1, ary2) {
-    return ary1.join("") == ary2.join("");
+    return ary1?.join("") == ary2?.join("");
   }
 
   render() {

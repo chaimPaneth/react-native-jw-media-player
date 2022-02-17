@@ -8,16 +8,16 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
-import com.google.android.gms.cast.CastDevice;
-import com.longtailvideo.jwplayer.core.PlayerState;
+import com.jwplayer.pub.api.PlayerState;
+import com.jwplayer.pub.api.media.audio.AudioTrack;
+
+import java.util.List;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
@@ -33,7 +33,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
   @Override
   public String getName() {
-    return "RNJWPlayerModule";
+    return TAG;
   }
 
   @ReactMethod
@@ -44,8 +44,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.play();
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().play();
           }
         }
       });
@@ -62,12 +62,34 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            float rate = playerView.mPlayer.getPlaybackRate();
+          if (playerView != null && playerView.mPlayerView != null) {
+            double rate = playerView.mPlayerView.getPlayer().getPlaybackRate();
             if (rate < 2) {
-              playerView.mPlayer.setPlaybackRate(rate += 0.5);
+              playerView.mPlayerView.getPlayer().setPlaybackRate(rate += 0.5);
             } else {
-              playerView.mPlayer.setPlaybackRate((float) 0.5);
+              playerView.mPlayerView.getPlayer().setPlaybackRate((float) 0.5);
+            }
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void togglePIP(final int reactTag) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            if (playerView.mPlayerView.getPlayer().isInPictureInPictureMode()) {
+              playerView.mPlayerView.getPlayer().exitPictureInPictureMode();
+            } else {
+              playerView.mPlayerView.getPlayer().enterPictureInPictureMode();
             }
           }
         }
@@ -85,8 +107,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.setPlaybackRate(speed);
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().setPlaybackRate(speed);
           }
         }
       });
@@ -103,8 +125,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.pause();
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().pause();
             playerView.userPaused = true;
           }
         }
@@ -122,27 +144,9 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.stop();
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().stop();
             playerView.userPaused = true;
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void seekTo(final int reactTag, final double time) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.seek(time);
           }
         }
       });
@@ -170,6 +174,24 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void seekTo(final int reactTag, final double time) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().seek(time);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
   public void setPlaylistIndex(final int reactTag, final int index) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
@@ -177,8 +199,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.setCurrentAudioTrack(index);
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().playlistItem(index);
           }
         }
       });
@@ -195,9 +217,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.setControls(show);
-            playerView.mPlayer.getConfig().setControls(show);
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().setControls(show);
           }
         }
       });
@@ -214,8 +235,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            promise.resolve((Double.valueOf(playerView.mPlayer.getPosition()).intValue()));
+          if (playerView != null && playerView.mPlayerView != null) {
+            promise.resolve((Double.valueOf(playerView.mPlayerView.getPlayer().getPosition()).intValue()));
           } else {
             promise.reject("RNJW Error", "Player is null");
           }
@@ -234,8 +255,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            PlayerState playerState = playerView.mPlayer.getState();
+          if (playerView != null && playerView.mPlayerView != null) {
+            PlayerState playerState = playerView.mPlayerView.getPlayer().getState();
             promise.resolve(stateToInt(playerState));
           } else {
             promise.reject("RNJW Error", "Player is null");
@@ -248,36 +269,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void loadPlaylistItem(final int reactTag, final ReadableMap playlistItem) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-          playerView.setPlaylistItem(playlistItem);
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void loadPlaylist(final int reactTag, final ReadableArray playlist) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute(NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-          playerView.setPlaylist(playlist);
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
   public void setFullscreen(final int reactTag, final boolean fullscreen) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
@@ -285,8 +276,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.mPlayer.setFullscreen(fullscreen, fullscreen);
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().setFullscreen(fullscreen, fullscreen);
           }
         }
       });
@@ -303,7 +294,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         public void execute (NativeViewHierarchyManager nvhm) {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
-          if (playerView != null && playerView.mPlayer != null) {
+          if (playerView != null && playerView.mPlayerView != null) {
             int maxValue = playerView.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             if (volume <= maxValue) {
               playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
@@ -319,7 +310,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void showCastButton(final int reactTag, final float x, final float y, final float width, final float height, final boolean autoHide) {
+  public void getAudioTracks(final int reactTag, final Promise promise) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -327,101 +318,31 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            playerView.showCastButton(x, y, width, height, autoHide);
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void hideCastButton(final int reactTag) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.hideCastButton();
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void setUpCastController(final int reactTag) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.setUpCastController();
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void presentCastDialog(final int reactTag) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayer != null) {
-            playerView.presentCastDialog();
-          }
-        }
-      });
-    } catch (IllegalViewOperationException e) {
-      throw e;
-    }
-  }
-
-  @ReactMethod
-  public void connectedDevice(final int reactTag, final Promise promise) {
-    try {
-      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
-      uiManager.addUIBlock(new UIBlock() {
-        public void execute (NativeViewHierarchyManager nvhm) {
-          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
-
-          if (playerView != null && playerView.mPlayer != null) {
-            if (playerView.connectedDevice() != null) {
-              String name = playerView.connectedDevice().getFriendlyName();
-              String id = playerView.connectedDevice().getDeviceId();
-
-              WritableMap map = Arguments.createMap();
-              map.putString("name", name);
-              map.putString("identifier", id);
-              promise.resolve(map);
-            } else {
-              promise.reject("RNJW Casting Error", "No connected device.");
+            List<AudioTrack> audioTrackList = playerView.mPlayer.getAudioTracks();
+            WritableArray audioTracks = Arguments.createArray();
+            for (int i = 0; i < audioTrackList.size(); i++) {
+              WritableMap audioTrack = Arguments.createMap();
+              AudioTrack track = audioTrackList.get(i);
+              audioTrack.putString("name", track.getName());
+              audioTrack.putString("language", track.getLanguage());
+              audioTrack.putString("groupId", track.getGroupId());
+              audioTrack.putBoolean("defaultTrack", track.isDefaultTrack());
+              audioTrack.putBoolean("autoSelect", track.isAutoSelect());
+              audioTracks.pushMap(audioTrack);
             }
+            promise.resolve(audioTracks);
           } else {
             promise.reject("RNJW Error", "Player is null");
           }
         }
       });
     } catch (IllegalViewOperationException e) {
-      throw e;
+      promise.reject("RNJW Error", e);
     }
   }
 
   @ReactMethod
-  public void availableDevices(final int reactTag, final Promise promise) {
+  public void getCurrentAudioTrack(final int reactTag, final Promise promise) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -429,36 +350,19 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            if (playerView.availableDevice() != null) {
-              WritableArray deviceArray = Arguments.createArray();
-
-              for (CastDevice device : playerView.availableDevice()) {
-                String name = device.getFriendlyName();
-                String id = device.getDeviceId();
-
-                WritableMap map = Arguments.createMap();
-                map.putString("name", name);
-                map.putString("identifier", id);
-
-                deviceArray.pushMap(map);
-              }
-
-              promise.resolve(deviceArray);
-            } else {
-              promise.reject("RNJW Casting Error", "No connected device.");
-            }
+            promise.resolve(playerView.mPlayer.getCurrentAudioTrack());
           } else {
             promise.reject("RNJW Error", "Player is null");
           }
         }
       });
     } catch (IllegalViewOperationException e) {
-      throw e;
+      promise.reject("RNJW Error", e);
     }
   }
 
   @ReactMethod
-  public void castState(final int reactTag, final Promise promise) {
+  public void setCurrentAudioTrack(final int reactTag, final int index) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -466,9 +370,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayer != null) {
-            promise.resolve(playerView.castState());
-          } else {
-            promise.reject("RNJW Error", "Player is null");
+            playerView.mPlayer.setCurrentAudioTrack(index);
           }
         }
       });
@@ -489,8 +391,10 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
         return 3;
       case COMPLETE:
         return 4;
+      case ERROR:
+        return 5;
       default:
-        return 0;
+        return -1;
     }
   }
 }
