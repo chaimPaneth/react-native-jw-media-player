@@ -97,6 +97,17 @@
     [self toggleUIGroup:_playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :controls];
 }
 
+-(void)setFairplayCertUrl:(NSString)fairplayCertUrl
+{
+    self.fairplayCertUrl = fairplayCertUrl;
+}
+
+-(void)setProcessSpcUrl:(NSString)processSpcUrl
+{
+    self.processSpcUrl = processSpcUrl;
+}
+
+
 #pragma mark - RNJWPlayer styling
 
 -(UIColor*)colorWithHexString:(NSString*)hex
@@ -429,8 +440,8 @@
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSURL *certURL = [bundle URLForResource:@"fps" withExtension:@"cer"];
-    NSData *certData = [NSData dataWithContentsOfURL:certURL];
+    // NSURL *certURL = [bundle URLForResource:@"fps" withExtension:@"cer"];
+    NSData *certData = [NSData dataWithContentsOfURL:self.fairplayCertUrl];
     handler(certData);
 }
 
