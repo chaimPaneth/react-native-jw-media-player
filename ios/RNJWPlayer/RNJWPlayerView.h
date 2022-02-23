@@ -83,8 +83,8 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onCastingFailed;
 
 /* DRM props */
-@property(nonatomic) NSString fairplayCertUrl;
-@property(nonatomic) NSString processSpcUrl;
+@property(nonatomic) NSString *fairplayCertUrl;
+@property(nonatomic) NSString *processSpcUrl;
 
 /* casting methods */
 - (void)setUpCastController;

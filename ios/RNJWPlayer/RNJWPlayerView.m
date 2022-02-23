@@ -97,12 +97,12 @@
     [self toggleUIGroup:_playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :controls];
 }
 
--(void)setFairplayCertUrl:(NSString)fairplayCertUrl
+-(void)setFairplayCertUrl:(NSString*)fairplayCertUrl
 {
     self.fairplayCertUrl = fairplayCertUrl;
 }
 
--(void)setProcessSpcUrl:(NSString)processSpcUrl
+-(void)setProcessSpcUrl:(NSString*)processSpcUrl
 {
     self.processSpcUrl = processSpcUrl;
 }
@@ -447,7 +447,7 @@
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
-    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", processSpcUrl, @"content-uuid", (NSInteger)currentTime];
+    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, @"content-uuid", (NSInteger)currentTime];
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
