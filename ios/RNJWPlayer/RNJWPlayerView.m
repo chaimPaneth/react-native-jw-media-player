@@ -434,7 +434,7 @@
 }
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    RCTLogInfo("contentIdentifierForURL");
+    RCTLogInfo(@"contentIdentifierForURL");
     _contentUUID = url.absoluteString;
     NSString *contentUUID = _contentUUID;
     NSData *uuidData = [contentUUID dataUsingEncoding:NSUTF8StringEncoding];
@@ -442,7 +442,7 @@
 }
 
 - (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    RCTLogInfo("appIdentifierForUrl");
+    RCTLogInfo(@"appIdentifierForUrl");
 
     NSURL *certURL = [NSURL URLWithString:_fairplayCertUrl];
     NSData *certData = [NSData dataWithContentsOfURL:certURL];
