@@ -1,6 +1,6 @@
-declare module "react-native-jw-media-player" {
-  import React from "react";
-  import { ViewStyle } from "react-native";
+declare module 'react-native-jw-media-player' {
+  import React from 'react';
+  import { ViewStyle } from 'react-native';
 
   interface AudioTrack {
     autoSelect: boolean;
@@ -26,10 +26,7 @@ declare module "react-native-jw-media-player" {
     tag: string;
     offset: string;
   }
-  type ClientTypes =
-    | 'vast'
-    | 'ima'
-    | 'ima_dai';
+  type ClientTypes = 'vast' | 'ima' | 'ima_dai';
   interface Advertising {
     adSchedule?: AdSchedule;
     adVmap?: string;
@@ -51,13 +48,8 @@ declare module "react-native-jw-media-player" {
     startTime?: number;
     autostart?: boolean;
   }
-  type RelatedOnClicks =
-    | 'play'
-    | 'link';
-    type RelatedOnCompletes =
-    | 'show'
-    | 'hide'
-    | 'autoplay';
+  type RelatedOnClicks = 'play' | 'link';
+  type RelatedOnCompletes = 'show' | 'hide' | 'autoplay';
   interface Related {
     onClick?: RelatedOnClicks;
     onComplete?: RelatedOnCompletes;
@@ -70,12 +62,7 @@ declare module "react-native-jw-media-player" {
     name?: string;
     size?: number;
   }
-  type EdgeStyles =
-    | 'none'
-    | 'dropshadow'
-    | 'raised'
-    | 'depressed'
-    | 'uniform';
+  type EdgeStyles = 'none' | 'dropshadow' | 'raised' | 'depressed' | 'uniform';
   interface Styling {
     colors?: {
       buttons?: string;
@@ -99,13 +86,8 @@ declare module "react-native-jw-media-player" {
       backgroundColor?: string;
     };
   }
-  type Preloads =
-    | 'auto'
-    | 'none';
-  type InterfaceBehaviors =
-    | 'normal'
-    | 'hidden'
-    | 'onscreen';
+  type Preloads = 'auto' | 'none';
+  type InterfaceBehaviors = 'normal' | 'hidden' | 'onscreen';
   type UIGroups =
     | 'overlay'
     | 'control_bar'
@@ -121,7 +103,7 @@ declare module "react-native-jw-media-player" {
     | 'audiotracks_submenu'
     | 'casting_menu';
   interface Config {
-    license: string,
+    license: string;
     advertising?: Advertising;
     autostart?: boolean;
     controls?: boolean;
@@ -139,12 +121,12 @@ declare module "react-native-jw-media-player" {
     preload?: Preloads;
     interfaceBehavior?: InterfaceBehaviors;
     hideUIGroup?: UIGroups;
+    processSpcUrl?: string;
+    fairplayCertUrl?: string;
   }
   interface PropsType {
     config: Config;
     controls: boolean;
-    processSpcUrl: string;
-    fairplayCertUrl: string;
     onPlayerReady?: (event: any) => void;
     onPlaylist?: (playlist: PlaylistItem[]) => void;
     onBeforePlay?: (event: any) => void;

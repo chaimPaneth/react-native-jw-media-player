@@ -1,21 +1,21 @@
-import React, { Component } from "react";
-var ReactNative = require("react-native");
+import React, { Component } from 'react';
+var ReactNative = require('react-native');
 import {
   requireNativeComponent,
   UIManager,
   NativeModules,
   Platform,
-} from "react-native";
-import PropTypes from "prop-types";
+} from 'react-native';
+import PropTypes from 'prop-types';
 
 const RNJWPlayerManager =
-  Platform.OS === "ios"
+  Platform.OS === 'ios'
     ? NativeModules.RNJWPlayerViewManager
     : NativeModules.RNJWPlayerModule;
 
-const RCT_RNJWPLAYER_REF = "rnjwplayer";
+const RCT_RNJWPLAYER_REF = 'rnjwplayer';
 
-const RNJWPlayer = requireNativeComponent("RNJWPlayerView", null);
+const RNJWPlayer = requireNativeComponent('RNJWPlayerView', null);
 
 const JWPlayerStateIOS = {
   JWPlayerStateUnknown: 0,
@@ -37,7 +37,7 @@ const JWPlayerStateAndroid = {
 };
 
 export const JWPlayerState =
-  Platform.OS === "ios" ? JWPlayerStateIOS : JWPlayerStateAndroid;
+  Platform.OS === 'ios' ? JWPlayerStateIOS : JWPlayerStateAndroid;
 
 export const JWPlayerAdClients = {
   JWAdClientJWPlayer: 0,
@@ -56,7 +56,7 @@ export default class JWPlayer extends Component {
       autostart: PropTypes.bool,
       controls: PropTypes.bool,
       repeat: PropTypes.bool,
-      preload: PropTypes.oneOf(["auto", "none"]),
+      preload: PropTypes.oneOf(['auto', 'none']),
       playlist: PropTypes.arrayOf(
         PropTypes.shape({
           file: PropTypes.string,
@@ -87,7 +87,7 @@ export default class JWPlayer extends Component {
           ),
           adVmap: PropTypes.string,
           startTime: PropTypes.number,
-        })
+        }),
       ),
       advertising: PropTypes.shape({
         adClient: PropTypes.string,
@@ -103,7 +103,7 @@ export default class JWPlayer extends Component {
       }),
 
       // controller only
-      interfaceBehavior: PropTypes.oneOf(["normal", "hidden", "onscreen"]),
+      interfaceBehavior: PropTypes.oneOf(['normal', 'hidden', 'onscreen']),
       styling: PropTypes.shape({
         colors: PropTypes.shape({
           buttons: PropTypes.string,
@@ -126,7 +126,13 @@ export default class JWPlayer extends Component {
             backgroundColor: PropTypes.string,
             fontColor: PropTypes.string,
             highlightColor: PropTypes.string,
-            edgeStyle: PropTypes.oneOf(['none', 'dropshadow', 'raised', 'depressed', 'uniform'])
+            edgeStyle: PropTypes.oneOf([
+              'none',
+              'dropshadow',
+              'raised',
+              'depressed',
+              'uniform',
+            ]),
           }),
           menuStyle: PropTypes.shape({
             font: PropTypes.shape({
@@ -142,7 +148,7 @@ export default class JWPlayer extends Component {
       }),
       nextUpStyle: PropTypes.shape({
         offsetSeconds: PropTypes.number,
-        offsetPercentage: PropTypes.number
+        offsetPercentage: PropTypes.number,
       }),
       offlineMessage: PropTypes.string,
       offlineImage: PropTypes.string,
@@ -150,6 +156,8 @@ export default class JWPlayer extends Component {
       forceLandscapeOnFullScreen: PropTypes.bool,
       enableLockScreenControls: PropTypes.bool,
       stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
+      processSpcUrl: PropTypes.string,
+      fairplayCertUrl: PropTypes.string,
     }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
@@ -222,7 +230,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager)
       RNJWPlayerManager.setPlaylistIndex(
         this.getRNJWPlayerBridgeHandle(),
-        index
+        index,
       );
   }
 
@@ -240,7 +248,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager)
       RNJWPlayerManager.setFullscreen(
         this.getRNJWPlayerBridgeHandle(),
-        fullscreen
+        fullscreen,
       );
   }
 
@@ -248,7 +256,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       try {
         var time = await RNJWPlayerManager.time(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return time;
       } catch (e) {
@@ -262,7 +270,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       try {
         var position = await RNJWPlayerManager.position(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return position;
       } catch (e) {
@@ -278,20 +286,20 @@ export default class JWPlayer extends Component {
   }
 
   setUpCastController() {
-    if (RNJWPlayerManager && Platform.OS === "ios")
+    if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.setUpCastController(this.getRNJWPlayerBridgeHandle());
   }
 
   presentCastDialog() {
-    if (RNJWPlayerManager && Platform.OS === "ios")
+    if (RNJWPlayerManager && Platform.OS === 'ios')
       RNJWPlayerManager.presentCastDialog(this.getRNJWPlayerBridgeHandle());
   }
 
   async connectedDevice() {
-    if (RNJWPlayerManager && Platform.OS === "ios") {
+    if (RNJWPlayerManager && Platform.OS === 'ios') {
       try {
         var connectedDevice = await RNJWPlayerManager.connectedDevice(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return connectedDevice;
       } catch (e) {
@@ -302,10 +310,10 @@ export default class JWPlayer extends Component {
   }
 
   async availableDevices() {
-    if (RNJWPlayerManager && Platform.OS === "ios") {
+    if (RNJWPlayerManager && Platform.OS === 'ios') {
       try {
         var availableDevices = await RNJWPlayerManager.availableDevices(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return availableDevices;
       } catch (e) {
@@ -316,10 +324,10 @@ export default class JWPlayer extends Component {
   }
 
   async castState() {
-    if (RNJWPlayerManager && Platform.OS === "ios") {
+    if (RNJWPlayerManager && Platform.OS === 'ios') {
       try {
         var castState = await RNJWPlayerManager.castState(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return castState;
       } catch (e) {
@@ -333,7 +341,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       try {
         var state = await RNJWPlayerManager.state(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return state;
       } catch (e) {
@@ -347,7 +355,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       try {
         var audioTracks = await RNJWPlayerManager.getAudioTracks(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         // iOS sends autoSelect as 0 or 1 instead of a boolean
         // couldn't figure out how to send autoSelect as a boolean from Objective C
@@ -366,7 +374,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       try {
         var currentAudioTrack = await RNJWPlayerManager.getCurrentAudioTrack(
-          this.getRNJWPlayerBridgeHandle()
+          this.getRNJWPlayerBridgeHandle(),
         );
         return currentAudioTrack;
       } catch (e) {
@@ -380,7 +388,7 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) {
       RNJWPlayerManager.setCurrentAudioTrack(
         this.getRNJWPlayerBridgeHandle(),
-        index
+        index,
       );
     }
   }
@@ -390,7 +398,7 @@ export default class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var {config, controls} = nextProps;
+    var { config, controls } = nextProps;
     var {
       file,
       image,
@@ -408,7 +416,7 @@ export default class JWPlayer extends Component {
       style,
       stretching,
     } = config || {};
-    var {displayTitle, displayDescription} = styling || {}
+    var { displayTitle, displayDescription } = styling || {};
 
     var thisConfig = this.props.config || {};
 
@@ -433,7 +441,7 @@ export default class JWPlayer extends Component {
     if (playlist && thisConfig.playlist) {
       return !this.arraysAreEqual(playlist, thisConfig.playlist);
     } else if (!playlist && thisConfig.playlist) {
-      return true
+      return true;
     }
 
     if (controls !== this.props.controls) {
@@ -444,7 +452,7 @@ export default class JWPlayer extends Component {
   }
 
   arraysAreEqual(ary1, ary2) {
-    return ary1?.join("") == ary2?.join("");
+    return ary1?.join('') == ary2?.join('');
   }
 
   render() {

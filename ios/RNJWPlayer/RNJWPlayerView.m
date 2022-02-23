@@ -79,6 +79,9 @@
         NSLog(@"JW SDK License key not set.");
     }
 
+     _processSpcUrl = config[@"processSpcUrl"];
+     _fairplayCertUrl = config[@"fairplayCertUrl"];
+
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
     if (_backgroundAudioEnabled || _pipEnabled) {
@@ -96,16 +99,6 @@
 -(void)setControls:(BOOL)controls
 {
     [self toggleUIGroup:_playerViewController.view :@"JWPlayerKit.InterfaceView" :nil :controls];
-}
-
--(void)setFairplayCertUrl:(NSString*)fairplayCertUrl
-{
-    _fairplayCertUrl = fairplayCertUrl;
-}
-
--(void)setProcessSpcUrl:(NSString*)processSpcUrl
-{
-    _processSpcUrl = processSpcUrl;
 }
 
 
