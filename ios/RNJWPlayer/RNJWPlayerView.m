@@ -449,6 +449,12 @@
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
     NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
+
+    NSLog(@"%@", _processSpcUrl);
+    NSLog(@"%@", _contentUUID);
+    NSLog(@"%@", _fairplayCertUrl);
+    NSLog(@"%@", spcProcessURL);
+
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
