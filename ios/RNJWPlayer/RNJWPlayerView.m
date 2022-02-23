@@ -3,6 +3,7 @@
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "RCTConvert+RNJWPlayer.h"
+#import <React/RCTLog.h>
 
 @implementation RNJWPlayerView
 
@@ -450,10 +451,10 @@
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
     NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
 
-    NSLog(@"%@", _processSpcUrl);
-    NSLog(@"%@", _contentUUID);
-    NSLog(@"%@", _fairplayCertUrl);
-    NSLog(@"%@", spcProcessURL);
+    RCTLogInfo(@"%@", _processSpcUrl);
+    RCTLogInfo(@"%@", _contentUUID);
+    RCTLogInfo(@"%@", _fairplayCertUrl);
+    RCTLogInfo(@"%@", spcProcessURL);
 
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
