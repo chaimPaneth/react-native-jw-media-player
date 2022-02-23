@@ -434,26 +434,32 @@
 }
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    _contentUUID = url;
+    RCTLogInfo("contentIdentifierForURL");
+    _contentUUID = url.absoluteString;
     NSString *contentUUID = _contentUUID;
     NSData *uuidData = [contentUUID dataUsingEncoding:NSUTF8StringEncoding];
     handler(uuidData);
 }
 
 - (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSURL *certURL = [bundle URLForResource:_fairplayCertUrl withExtension:nil];
+    RCTLogInfo("appIdentifierForUrl");
+
+    NSURL *certURL = [NSURL URLWithString:_fairplayCertUrl];
     NSData *certData = [NSData dataWithContentsOfURL:certURL];
     handler(certData);
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
-    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
-
     RCTLogInfo(@"%@", _processSpcUrl);
     RCTLogInfo(@"%@", _contentUUID);
     RCTLogInfo(@"%@", _fairplayCertUrl);
+
+    NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
+
+    RCTLogInfo(@"%@", currentTime);
+
+    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
+
     RCTLogInfo(@"%@", spcProcessURL);
 
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
