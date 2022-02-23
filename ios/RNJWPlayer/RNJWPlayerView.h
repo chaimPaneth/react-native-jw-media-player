@@ -85,6 +85,7 @@
 /* DRM props */
 @property(nonatomic) NSString *fairplayCertUrl;
 @property(nonatomic) NSString *processSpcUrl;
+@property(nonatomic) NSURL *contentUUID;
 
 /* casting methods */
 - (void)setUpCastController;

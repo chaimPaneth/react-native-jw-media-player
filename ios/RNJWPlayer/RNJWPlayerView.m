@@ -99,12 +99,12 @@
 
 -(void)setFairplayCertUrl:(NSString*)fairplayCertUrl
 {
-    self.fairplayCertUrl = fairplayCertUrl;
+    _fairplayCertUrl = fairplayCertUrl;
 }
 
 -(void)setProcessSpcUrl:(NSString*)processSpcUrl
 {
-    self.processSpcUrl = processSpcUrl;
+    _processSpcUrl = processSpcUrl;
 }
 
 
@@ -432,22 +432,23 @@
     return [itemBuilder buildAndReturnError:&error];
 }
 
-- (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    NSString *contentUUID = @"content-uuid";
+- (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    _contentUUID = url;
+    NSString *contentUUID = _contentUUID;
     NSData *uuidData = [contentUUID dataUsingEncoding:NSUTF8StringEncoding];
     handler(uuidData);
 }
 
-- (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+- (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
     NSBundle *bundle = [NSBundle mainBundle];
-    // NSURL *certURL = [bundle URLForResource:@"fps" withExtension:@"cer"];
-    NSData *certData = [NSData dataWithContentsOfURL:self.fairplayCertUrl];
+    NSURL *certURL = [bundle URLForResource:_fairplayCertUrl withExtension:nil];
+    NSData *certData = [NSData dataWithContentsOfURL:certURL];
     handler(certData);
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
-    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, @"content-uuid", (NSInteger)currentTime];
+    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
