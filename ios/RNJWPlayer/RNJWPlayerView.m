@@ -447,7 +447,7 @@
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
-    NSString *spcProcessURL = [NSString stringWithFormat:@"SPC-PROCESS-URL/%@?p1=%li", @"content-uuid", (NSInteger)currentTime];
+    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", processSpcUrl, @"content-uuid", (NSInteger)currentTime];
     NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];

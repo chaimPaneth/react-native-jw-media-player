@@ -143,6 +143,8 @@ declare module "react-native-jw-media-player" {
   interface PropsType {
     config: Config;
     controls: boolean;
+    processSpcUrl: string;
+    fairplayCertUrl: string;
     onPlayerReady?: (event: any) => void;
     onPlaylist?: (playlist: PlaylistItem[]) => void;
     onBeforePlay?: (event: any) => void;
