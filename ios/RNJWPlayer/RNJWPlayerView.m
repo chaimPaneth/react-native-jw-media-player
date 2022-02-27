@@ -79,8 +79,8 @@
         NSLog(@"JW SDK License key not set.");
     }
 
-     _processSpcUrl = config[@"processSpcUrl"];
-     _fairplayCertUrl = config[@"fairplayCertUrl"];
+    _processSpcUrl = config[@"processSpcUrl"];
+    _fairplayCertUrl = config[@"fairplayCertUrl"];
 
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
@@ -723,6 +723,7 @@
 
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
+        _playerViewController.player.contentKeyDataSource = self;
         [_playerViewController.player configurePlayerWith:configuration];
 
         if (_interfaceBehavior) {
@@ -748,9 +749,6 @@
     _playerView.player.playbackStateDelegate = self;
     _playerView.player.adDelegate = self;
     _playerView.player.avDelegate = self;
-
-    _playerView.player.contentKeyDataSource = self;
-    [_playerView.player configurePlayerWith:playerConfig];
 
     if (_pipEnabled) {
         AVPictureInPictureController* pipController = _playerView.pictureInPictureController;
