@@ -443,9 +443,7 @@
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    RCTLogInfo(@"%@", _processSpcUrl);
-    RCTLogInfo(@"%@", _contentUUID);
-    RCTLogInfo(@"%@", _fairplayCertUrl);
+    RCTLogInfo(@"contentKeyWithSPCData");
 
     NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
 
