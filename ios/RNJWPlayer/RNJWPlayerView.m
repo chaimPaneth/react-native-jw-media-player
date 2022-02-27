@@ -723,7 +723,6 @@
 
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
-        _playerViewController.player.contentKeyDataSource = self;
         [_playerViewController.player configurePlayerWith:configuration];
 
         if (_interfaceBehavior) {
@@ -731,6 +730,7 @@
         }
     }
 
+    _playerViewController.player.contentKeyDataSource = self;
     _playerViewController.playerView.delegate = self;
     _playerViewController.player.delegate = self;
     _playerViewController.player.playbackStateDelegate = self;
