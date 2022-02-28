@@ -79,9 +79,6 @@
         NSLog(@"JW SDK License key not set.");
     }
 
-    _processSpcUrl = config[@"processSpcUrl"];
-    _fairplayCertUrl = config[@"fairplayCertUrl"];
-
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
     if (_backgroundAudioEnabled || _pipEnabled) {
@@ -426,49 +423,6 @@
     return [itemBuilder buildAndReturnError:&error];
 }
 
-- (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    RCTLogInfo(@"contentIdentifierForURL");
-    _contentUUID = url.absoluteString;
-    NSString *contentUUID = _contentUUID;
-    NSData *uuidData = [contentUUID dataUsingEncoding:NSUTF8StringEncoding];
-    handler(uuidData);
-}
-
-- (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    RCTLogInfo(@"appIdentifierForUrl");
-
-    NSURL *certURL = [NSURL URLWithString:_fairplayCertUrl];
-    NSData *certData = [NSData dataWithContentsOfURL:certURL];
-    handler(certData);
-}
-
-- (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    RCTLogInfo(@"contentKeyWithSPCData");
-
-    NSTimeInterval currentTime = [[NSDate alloc] timeIntervalSince1970];
-
-    RCTLogInfo(@"%@", currentTime);
-
-    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
-
-    RCTLogInfo(@"%@", spcProcessURL);
-
-    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
-    [ckcRequest setHTTPMethod:@"POST"];
-    [ckcRequest setHTTPBody:spcData];
-    [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
-
-    [[[NSURLSession sharedSession] dataTaskWithRequest:ckcRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        if (error != nil || (httpResponse != nil && httpResponse.statusCode != 200)) {
-            handler(nil, nil, nil);
-            return;
-        }
-
-        handler(data, nil, nil);
-    }] resume];
-}
-
 -(JWPlayerConfiguration*)getPlayerConfiguration:config
 {
     JWPlayerConfigurationBuilder *configBuilder = [[JWPlayerConfigurationBuilder alloc] init];
@@ -745,6 +699,7 @@
     _playerView = [[JWPlayerView new] initWithFrame:self.superview.frame];
 
     _playerView.delegate = self;
+    _playerView.player.contentKeyDataSource = self;
     _playerView.player.delegate = self;
     _playerView.player.playbackStateDelegate = self;
     _playerView.player.adDelegate = self;

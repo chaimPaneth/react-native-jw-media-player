@@ -9,7 +9,7 @@
 #import <JWPlayerKit/JWPlayerKit-swift.h>
 #import <GoogleCast/GoogleCast.h>
 
-@interface RNJWPlayerView : UIView <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate>
+@interface RNJWPlayerView : UIView <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
 
 @property(nonatomic, strong)JWPlayerViewController* playerViewController;
 @property(nonatomic, strong)JWPlayerView *playerView;
