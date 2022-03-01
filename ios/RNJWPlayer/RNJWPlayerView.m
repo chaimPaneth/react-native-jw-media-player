@@ -439,7 +439,7 @@
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    NSURLRequest *ckcRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:_processSpcUrl]];
+    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_processSpcUrl]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
     [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
