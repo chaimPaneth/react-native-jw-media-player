@@ -9,7 +9,7 @@
 #import <JWPlayerKit/JWPlayerKit-swift.h>
 #import <GoogleCast/GoogleCast.h>
 
-@interface RNJWPlayerView : UIView <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate>
+@interface RNJWPlayerView : UIView <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate>
 
 @property(nonatomic, strong)JWPlayerViewController* playerViewController;
 @property(nonatomic, strong)JWPlayerView *playerView;
@@ -85,7 +85,7 @@
 /* DRM props */
 @property(nonatomic) NSString *fairplayCertUrl;
 @property(nonatomic) NSString *processSpcUrl;
-@property(nonatomic) NSURL *contentUUID;
+@property(nonatomic) NSString *contentUUID;
 
 /* casting methods */
 - (void)setUpCastController;

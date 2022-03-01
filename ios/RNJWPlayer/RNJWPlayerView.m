@@ -79,6 +79,10 @@
         NSLog(@"JW SDK License key not set.");
     }
 
+    _processSpcUrl = config[@"processSpcUrl"];
+    _fairplayCertUrl = config[@"fairplayCertUrl"];
+    _contentUUID = config[@"contentUUID"];
+
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
     if (_backgroundAudioEnabled || _pipEnabled) {
@@ -421,6 +425,34 @@
     }
 
     return [itemBuilder buildAndReturnError:&error];
+}
+
+- (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    NSData *uuidData = [_contentUUID dataUsingEncoding:NSUTF8StringEncoding];
+    handler(uuidData);
+}
+
+- (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    NSURL *certURL = [NSURL URLWithString:_fairplayCertUrl];
+    NSData *certData = [NSData dataWithContentsOfURL:certURL];
+    handler(certData);
+}
+
+- (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
+    NSURLRequest *ckcRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:_processSpcUrl]];
+    [ckcRequest setHTTPMethod:@"POST"];
+    [ckcRequest setHTTPBody:spcData];
+    [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
+
+    [[[NSURLSession sharedSession] dataTaskWithRequest:ckcRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        if (error != nil || (httpResponse != nil && httpResponse.statusCode != 200)) {
+            handler(nil, nil, nil);
+            return;
+        }
+
+        handler(data, nil, nil);
+    }] resume];
 }
 
 -(JWPlayerConfiguration*)getPlayerConfiguration:config

@@ -78,6 +78,7 @@ RCT_EXPORT_VIEW_PROPERTY(config, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(fairplayCertUrl, NSString);
 RCT_EXPORT_VIEW_PROPERTY(processSpcUrl, NSString);
+RCT_EXPORT_VIEW_PROPERTY(contentUUID, NSString);
 
 RCT_REMAP_METHOD(state,
                  tag:(nonnull NSNumber*)reactTag

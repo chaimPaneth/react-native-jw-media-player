@@ -158,6 +158,7 @@ export default class JWPlayer extends Component {
       stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
       processSpcUrl: PropTypes.string,
       fairplayCertUrl: PropTypes.string,
+      contentUUID: PropTypes.string,
     }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
