@@ -478,4 +478,17 @@ RCT_EXPORT_METHOD(setControls: (nonnull NSNumber *)reactTag: (BOOL)show) {
     }];
 }
 
+RCT_EXPORT_METHOD(setLockScreenControls: (nonnull NSNumber *)reactTag: (BOOL)show) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerView == nil && view.playerViewController == nil)) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            if (view.playerViewController) {
+                view.playerViewController.enableLockScreenControls = show;
+            }
+        }
+    }];
+}
+
 @end

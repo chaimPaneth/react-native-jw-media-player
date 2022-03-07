@@ -90,6 +90,10 @@
     } else {
         [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
     }
+
+    _processSpcUrl = config[@"processSpcUrl"];
+    _fairplayCertUrl = config[@"fairplayCertUrl"];
+    _contentUUID = config[@"contentUUID"];
 }
 
 -(void)setControls:(BOOL)controls
@@ -612,8 +616,8 @@
     }
     
     id enableLockScreenControls = config[@"enableLockScreenControls"];
-    if (enableLockScreenControls != nil && enableLockScreenControls != (id)[NSNull null]) {
-        _playerViewController.enableLockScreenControls = enableLockScreenControls;
+    if ((enableLockScreenControls != nil && enableLockScreenControls != (id)[NSNull null]) || _backgroundAudioEnabled) {
+        _playerViewController.enableLockScreenControls = YES;
     }
     
     id styling = config[@"styling"];
@@ -687,6 +691,7 @@
     _playerViewController.player.playbackStateDelegate = self;
     _playerViewController.player.adDelegate = self;
     _playerViewController.player.avDelegate = self;
+    _playerViewController.player.contentKeyDataSource = self;
 }
 
 #pragma mark - JWPlayer View helpers
@@ -700,6 +705,7 @@
     _playerView.player.playbackStateDelegate = self;
     _playerView.player.adDelegate = self;
     _playerView.player.avDelegate = self;
+    _playerView.player.contentKeyDataSource = self;
     
     [_playerView.player configurePlayerWith:playerConfig];
 
@@ -879,6 +885,36 @@
 - (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedInteraction)method
 {
     
+}
+
+#pragma mark - DRM Delegate
+
+- (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    NSData *uuidData = [_contentUUID dataUsingEncoding:NSUTF8StringEncoding];
+    handler(uuidData);
+}
+
+- (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    NSURL *certURL = [NSURL URLWithString:_fairplayCertUrl];
+    NSData *certData = [NSData dataWithContentsOfURL:certURL];
+    handler(certData);
+}
+
+- (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
+    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_processSpcUrl]];
+    [ckcRequest setHTTPMethod:@"POST"];
+    [ckcRequest setHTTPBody:spcData];
+    [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
+
+    [[[NSURLSession sharedSession] dataTaskWithRequest:ckcRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        if (error != nil || (httpResponse != nil && httpResponse.statusCode != 200)) {
+            handler(nil, nil, nil);
+            return;
+        }
+
+        handler(data, nil, nil);
+    }] resume];
 }
 
 #pragma mark - AV Picture In Picture Delegate
@@ -1438,10 +1474,14 @@
                                                object: audioSession];
     
     NSError *setCategoryError = nil;
-    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&setCategoryError];
+    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers|AVAudioSessionCategoryOptionAllowBluetooth|AVAudioSessionCategoryOptionDefaultToSpeaker error:&setCategoryError];
     
     NSError *activationError = nil;
-    success = [audioSession setActive:YES error:&activationError];
+    success = [audioSession setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&activationError];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillResignActive:)
+                                                     name:UIApplicationWillResignActiveNotification object:nil];
 }
 
 -(void)audioSessionInterrupted:(NSNotification*)note
@@ -1468,6 +1508,18 @@
 }
 
 -(void)audioInterruptionsEnded:(NSNotification *)note {
+    if (!_userPaused && _backgroundAudioEnabled) {
+        if (_playerView != nil) {
+            [_playerView.player play];
+        } else if (_playerViewController != nil) {
+            [_playerViewController.player play];
+        }
+    }
+}
+
+// Inactive
+
+-(void)applicationWillResignActive:(NSNotification *)notification {
     if (!_userPaused && _backgroundAudioEnabled) {
         if (_playerView != nil) {
             [_playerView.player play];

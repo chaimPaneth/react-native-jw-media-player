@@ -150,6 +150,9 @@ export default class JWPlayer extends Component {
       forceLandscapeOnFullScreen: PropTypes.bool,
       enableLockScreenControls: PropTypes.bool,
       stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
+      processSpcUrl: PropTypes.string,
+      fairplayCertUrl: PropTypes.string,
+      contentUUID: PropTypes.string,
     }),
     onPlayerReady: PropTypes.func,
     onPlaylist: PropTypes.func,
@@ -159,6 +162,7 @@ export default class JWPlayer extends Component {
     setSpeed: PropTypes.func,
     setPlaylistIndex: PropTypes.func,
     setControls: PropTypes.func,
+    setLockScreenControls: PropTypes.func,
     setFullscreen: PropTypes.func,
     setUpCastController: PropTypes.func,
     presentCastDialog: PropTypes.func,
@@ -229,6 +233,11 @@ export default class JWPlayer extends Component {
   setControls(show) {
     if (RNJWPlayerManager)
       RNJWPlayerManager.setControls(this.getRNJWPlayerBridgeHandle(), show);
+  }
+
+  setLockScreenControls(show) {
+    if (RNJWPlayerManager && Platform.OS === "ios")
+      RNJWPlayerManager.setLockScreenControls(this.getRNJWPlayerBridgeHandle(), show);
   }
 
   seekTo(time) {
