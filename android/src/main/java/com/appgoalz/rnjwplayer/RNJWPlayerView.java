@@ -536,7 +536,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     public void setConfig(ReadableMap prop) {
         if (prop.hasKey("license")) {
-            LicenseUtil.setLicenseKey(getReactContext(), prop.getString("license"));
+            new LicenseUtil().setLicenseKey(getReactContext(), "YOUR_LICENSE_KEY");
         } else {
             Log.e(TAG, "JW SDK license not set");
         }
