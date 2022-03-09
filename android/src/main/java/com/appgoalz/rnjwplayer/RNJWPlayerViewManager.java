@@ -214,9 +214,9 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   @Override
   public void onDropViewInstance(@Nonnull RNJWPlayerView view) {
+    super.onDropViewInstance(view);
+
     view.destroyPlayer();
     view = null;
-
-    super.onDropViewInstance(view);
   }
 }
