@@ -11,7 +11,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application>
-        <receiver android:name="androidx.media.session.MediaButtonReceiver">
+        <receiver 
+            android:name="androidx.media.session.MediaButtonReceiver" 
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
