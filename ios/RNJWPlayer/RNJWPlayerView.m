@@ -1246,6 +1246,13 @@
     }
 }
 
+- (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
+{
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player updatedCues:cues];
+    }
+}
+
 #pragma mark - JWPlayer Ad Delegate
 
 - (void)jwplayer:(id _Nonnull)player adEvent:(JWAdEvent * _Nonnull)event {
