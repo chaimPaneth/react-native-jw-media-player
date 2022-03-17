@@ -173,6 +173,7 @@ declare module "react-native-jw-media-player" {
   export default class JWPlayer extends React.Component<PropsType> {
     pause(): void;
     play(): void;
+    setVolume(volume: number): void;
     stop(): void;
     toggleSpeed(): void;
     setSpeed(speed: number): void;
