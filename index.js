@@ -230,9 +230,9 @@ export default class JWPlayer extends Component {
       );
   }
   
-  setVolume(num) {
+  setVolume(volume) {
     if (RNJWPlayerManager)
-      RNJWPlayerManager.setVolume(this.getRNJWPlayerBridgeHandle(), num);
+      RNJWPlayerManager.setVolume(this.getRNJWPlayerBridgeHandle(), volume);
   }
 
   setControls(show) {
