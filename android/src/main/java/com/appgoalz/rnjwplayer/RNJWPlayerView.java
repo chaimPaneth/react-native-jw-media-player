@@ -181,11 +181,16 @@ public class RNJWPlayerView extends RelativeLayout implements
     private MediaServiceController mMediaServiceController;
 
     private void doBindService() {
-        mMediaServiceController.bindService();
+        if (mMediaServiceController != null) {
+            mMediaServiceController.bindService();
+        }
     }
 
     private void doUnbindService() {
-        mMediaServiceController.unbindService();
+        if (mMediaServiceController != null) {
+            mMediaServiceController.unbindService();
+            mMediaServiceController = null;
+        }
     }
 
     private static boolean contextHasBug(Context context) {
