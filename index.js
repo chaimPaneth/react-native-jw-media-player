@@ -158,6 +158,7 @@ export default class JWPlayer extends Component {
     onPlaylist: PropTypes.func,
     play: PropTypes.func,
     pause: PropTypes.func,
+    setVolume: PropTypes.func,
     toggleSpeed: PropTypes.func,
     setSpeed: PropTypes.func,
     setPlaylistIndex: PropTypes.func,
@@ -188,7 +189,6 @@ export default class JWPlayer extends Component {
     onSeek: PropTypes.func,
     onSeeked: PropTypes.func,
     onPlaylistItem: PropTypes.func,
-    onControlBarVisible: PropTypes.func,
     onControlBarVisible: PropTypes.func,
     onPlaylistComplete: PropTypes.func,
     getAudioTracks: PropTypes.func,
@@ -251,6 +251,12 @@ export default class JWPlayer extends Component {
         this.getRNJWPlayerBridgeHandle(),
         fullscreen
       );
+  }
+
+  setVolume(value) {
+    if (RNJWPlayerManager) {
+      RNJWPlayerManager.setVolume(this.getRNJWPlayerBridgeHandle(), value);
+    }
   }
 
   async time() {

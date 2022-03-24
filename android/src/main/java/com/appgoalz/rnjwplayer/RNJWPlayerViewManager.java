@@ -139,10 +139,6 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onAudioTracks")))
-            .put("topControlBarVisible",
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onControlBarVisible")))
             .build();
   }
 
@@ -214,9 +210,8 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
 
   @Override
   public void onDropViewInstance(@Nonnull RNJWPlayerView view) {
-    super.onDropViewInstance(view);
-
     view.destroyPlayer();
+    super.onDropViewInstance(view);
     view = null;
   }
 }
