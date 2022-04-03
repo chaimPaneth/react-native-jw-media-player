@@ -597,8 +597,8 @@
 {
     [self dismissPlayerViewController];
     
-    _playerViewController = [JWPlayerViewController new];
-    _playerViewController.delegate = self;
+    _playerViewController = [RNJWPlayerViewController new];
+    _playerViewController.parentView = self;
     
     id interfaceBehavior = config[@"interfaceBehavior"];
     if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
@@ -685,13 +685,14 @@
             _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
         }
     }
-
-    _playerViewController.playerView.delegate = self;
-    _playerViewController.player.delegate = self;
-    _playerViewController.player.playbackStateDelegate = self;
-    _playerViewController.player.adDelegate = self;
-    _playerViewController.player.avDelegate = self;
-    _playerViewController.player.contentKeyDataSource = self;
+    
+//    _playerViewController.delegate = self;
+//    _playerViewController.playerView.delegate = self;
+//    _playerViewController.player.delegate = self;
+//    _playerViewController.player.playbackStateDelegate = self;
+//    _playerViewController.player.adDelegate = self;
+//    _playerViewController.player.avDelegate = self;
+//    _playerViewController.player.contentKeyDataSource = self;
 }
 
 #pragma mark - JWPlayer View helpers
