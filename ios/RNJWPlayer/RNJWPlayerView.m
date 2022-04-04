@@ -372,13 +372,12 @@
                 NSURL *fileUrl = [NSURL URLWithString:file];
                 NSString *label = [item objectForKey:@"label"];
                 
-                JWMediaTrack *trackItem = [JWMediaTrack init];
                 JWCaptionTrackBuilder* trackBuilder = [[JWCaptionTrackBuilder alloc] init];
                 
                 [trackBuilder file:fileUrl];
                 [trackBuilder label:label];
                 
-                trackItem = [trackBuilder buildAndReturnError:&error];
+                JWMediaTrack *trackItem = [trackBuilder buildAndReturnError:&error];
                 
                 [tracksArray addObject:trackItem];
             }
@@ -597,8 +596,8 @@
 {
     [self dismissPlayerViewController];
     
-    _playerViewController = [JWPlayerViewController new];
-    _playerViewController.delegate = self;
+    _playerViewController = [RNJWPlayerViewController new];
+    _playerViewController.parentView = self;
     
     id interfaceBehavior = config[@"interfaceBehavior"];
     if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
@@ -618,6 +617,11 @@
     id enableLockScreenControls = config[@"enableLockScreenControls"];
     if ((enableLockScreenControls != nil && enableLockScreenControls != (id)[NSNull null]) || _backgroundAudioEnabled) {
         _playerViewController.enableLockScreenControls = YES;
+    }
+    
+    id allowsPictureInPicturePlayback = config[@"allowsPictureInPicturePlayback"];
+    if ((allowsPictureInPicturePlayback != nil && allowsPictureInPicturePlayback != (id)[NSNull null])) {
+        _playerViewController.allowsPictureInPicturePlayback = allowsPictureInPicturePlayback;
     }
     
     id styling = config[@"styling"];
@@ -685,13 +689,14 @@
             _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
         }
     }
-
-    _playerViewController.playerView.delegate = self;
-    _playerViewController.player.delegate = self;
-    _playerViewController.player.playbackStateDelegate = self;
-    _playerViewController.player.adDelegate = self;
-    _playerViewController.player.avDelegate = self;
-    _playerViewController.player.contentKeyDataSource = self;
+    
+//    _playerViewController.delegate = self;
+//    _playerViewController.playerView.delegate = self;
+//    _playerViewController.player.delegate = self;
+//    _playerViewController.player.playbackStateDelegate = self;
+//    _playerViewController.player.adDelegate = self;
+//    _playerViewController.player.avDelegate = self;
+//    _playerViewController.player.contentKeyDataSource = self;
 }
 
 #pragma mark - JWPlayer View helpers
@@ -1253,6 +1258,13 @@
 {
     if (_playerViewController) {
         [_playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
+    }
+}
+
+- (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
+{
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player updatedCues:cues];
     }
 }
 

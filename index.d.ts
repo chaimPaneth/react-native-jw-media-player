@@ -142,6 +142,7 @@ declare module "react-native-jw-media-player" {
     processSpcUrl?: string;
     fairplayCertUrl?: string;
     contentUUID?: string;
+    viewOnly: boolean;
   }
   interface PropsType {
     config: Config;
@@ -176,6 +177,7 @@ declare module "react-native-jw-media-player" {
     stop(): void;
     toggleSpeed(): void;
     setSpeed(speed: number): void;
+    setVolume(volume: number): void;
     setPlaylistIndex(index: number): void;
     setControls(show: boolean): void;
     setLockScreenControls(show: boolean): void;

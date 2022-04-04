@@ -491,4 +491,19 @@ RCT_EXPORT_METHOD(setLockScreenControls: (nonnull NSNumber *)reactTag: (BOOL)sho
     }];
 }
 
+RCT_EXPORT_METHOD(setCurrentCaptions: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerView == nil && view.playerViewController == nil)) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            if (view.playerView) {
+                [view.playerView.player setCurrentCaptionsTrack:[index integerValue] + 1];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player setCurrentCaptionsTrack:[index integerValue] + 1];
+            }
+        }
+    }];
+}
+
 @end
