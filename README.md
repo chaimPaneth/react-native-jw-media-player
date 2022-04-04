@@ -394,6 +394,7 @@ public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Conf
 | **`getAudioTracks`**       | Returns promise that returns an array of [AudioTracks](#AudioTrack)                                                                                                                     | `none`                        |
 | **`getCurrentAudioTrack`** | Returns promise that returns the index of the current audio track in array returned by getAudioTracks                                                                                   | `none`                        |
 | **`setCurrentAudioTrack`** | Sets the current audio track to the audio track at the specified index in the array returned by getAudioTracks                                                                          | `Int`                         |
+| **`setCurrentCaptions`** | Turns off captions when argument is 0. Setting argument to another integer, sets captions to track at playlistItem.tracks[integer - 1] | `Int` |
 
 ## Available callbacks
 

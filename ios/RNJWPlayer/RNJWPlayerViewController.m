@@ -243,10 +243,6 @@
 
 - (void)jwplayerContentIsBuffering:(id<JWPlayer>)player
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayerContentIsBuffering:player];
-//    }
-    
     if (_parentView.onBuffer) {
         _parentView.onBuffer(@{});
     }
@@ -254,10 +250,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isBufferingWithReason:(enum JWBufferReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player isBufferingWithReason:reason];
-//    }
-    
     if (_parentView.onBuffer) {
         _parentView.onBuffer(@{});
     }
@@ -265,10 +257,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player updatedBuffer:percent position:time];
-//    }
-    
     if (_parentView.onUpdateBuffer) {
         _parentView.onUpdateBuffer(@{@"percent": @(percent), @"position": time});
     }
@@ -276,10 +264,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didFinishLoadingWithTime:(NSTimeInterval)loadTime
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player didFinishLoadingWithTime:loadTime];
-//    }
-    
     if (_parentView.onLoaded) {
         _parentView.onLoaded(@{});
     }
@@ -287,10 +271,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isAttemptingToPlay:(JWPlayerItem *)playlistItem reason:(enum JWPlayReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player isAttemptingToPlay:playlistItem reason:reason];
-//    }
-    
     if (_parentView.onAttemptPlay) {
         _parentView.onAttemptPlay(@{});
     }
@@ -298,10 +278,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isPlayingWithReason:(enum JWPlayReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player isPlayingWithReason:reason];
-//    }
-    
     if (_parentView.onPlay) {
         _parentView.onPlay(@{});
     }
@@ -312,10 +288,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player willPlayWithReason:(enum JWPlayReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player willPlayWithReason:reason];
-//    }
-    
     if (_parentView.onBeforePlay) {
         _parentView.onBeforePlay(@{});
     }
@@ -323,10 +295,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didPauseWithReason:(enum JWPauseReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player didPauseWithReason:reason];
-//    }
-    
     if (_parentView.onPause) {
         _parentView.onPause(@{});
     }
@@ -338,10 +306,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didBecomeIdleWithReason:(enum JWIdleReason)reason
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player didBecomeIdleWithReason:reason];
-//    }
-    
     if (_parentView.onIdle) {
         _parentView.onIdle(@{});
     }
@@ -349,10 +313,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isVisible:(BOOL)isVisible
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player isVisible:isVisible];
-//    }
-    
     if (_parentView.onVisible) {
         _parentView.onVisible(@{@"visible": @(isVisible)});
     }
@@ -360,10 +320,6 @@
 
 - (void)jwplayerContentWillComplete:(id<JWPlayer>)player
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayerContentWillComplete:player];
-//    }
-    
     if (_parentView.onBeforeComplete) {
         _parentView.onBeforeComplete(@{});
     }
@@ -371,10 +327,6 @@
 
 - (void)jwplayerContentDidComplete:(id<JWPlayer>)player
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayerContentDidComplete:player];
-//    }
-    
     if (_parentView.onComplete) {
         _parentView.onComplete(@{});
     }
@@ -382,10 +334,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player didLoadPlaylistItem:item at:index];
-//    }
-    
     if (_parentView.onPlaylistItem) {
         NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
         for (JWVideoSource* source in item.videoSources) {
@@ -432,10 +380,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player didLoadPlaylist:playlist];
-//    }
-    
     if (_parentView.onPlaylist) {
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
@@ -486,10 +430,6 @@
 
 - (void)jwplayerPlaylistHasCompleted:(id<JWPlayer>)player
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayerPlaylistHasCompleted:player];
-//    }
-    
     if (_parentView.onPlaylistComplete) {
         _parentView.onPlaylistComplete(@{});
     }
@@ -497,17 +437,11 @@
 
 - (void)jwplayer:(id<JWPlayer>)player usesMediaType:(enum JWMediaType)type
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player usesMediaType:type];
-//    }
+
 }
 
 - (void)jwplayer:(id<JWPlayer>)player seekedFrom:(NSTimeInterval)oldPosition to:(NSTimeInterval)newPosition
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player seekedFrom:oldPosition to:newPosition];
-//    }
-    
     if (_parentView.onSeek) {
         _parentView.onSeek(@{@"from": @(oldPosition), @"to": @(newPosition)});
     }
@@ -515,10 +449,6 @@
 
 - (void)jwplayerHasSeeked:(id<JWPlayer>)player
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayerHasSeeked:player];
-//    }
-    
     if (_parentView.onSeeked) {
         _parentView.onSeeked(@{});
     }
@@ -526,9 +456,12 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-//    if (_parentView.playerViewController) {
-//        [_parentView.playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
-//    }
+    
+}
+
+- (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
+{
+    
 }
 
 #pragma mark - JWPlayer Ad Delegate

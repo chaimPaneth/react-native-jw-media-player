@@ -194,6 +194,7 @@ export default class JWPlayer extends Component {
     getAudioTracks: PropTypes.func,
     getCurrentAudioTrack: PropTypes.func,
     setCurrentAudioTrack: PropTypes.func,
+    setCurrentCaptions: PropTypes.func,
     onAudioTracks: PropTypes.func,
   };
 
@@ -394,6 +395,15 @@ export default class JWPlayer extends Component {
   setCurrentAudioTrack(index) {
     if (RNJWPlayerManager) {
       RNJWPlayerManager.setCurrentAudioTrack(
+        this.getRNJWPlayerBridgeHandle(),
+        index
+      );
+    }
+  }
+
+  setCurrentCaptions(index) {
+    if (RNJWPlayerManager) {
+      RNJWPlayerManager.setCurrentCaptions(
         this.getRNJWPlayerBridgeHandle(),
         index
       );

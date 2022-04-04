@@ -372,13 +372,12 @@
                 NSURL *fileUrl = [NSURL URLWithString:file];
                 NSString *label = [item objectForKey:@"label"];
                 
-                JWMediaTrack *trackItem = [JWMediaTrack init];
                 JWCaptionTrackBuilder* trackBuilder = [[JWCaptionTrackBuilder alloc] init];
                 
                 [trackBuilder file:fileUrl];
                 [trackBuilder label:label];
                 
-                trackItem = [trackBuilder buildAndReturnError:&error];
+                JWMediaTrack *trackItem = [trackBuilder buildAndReturnError:&error];
                 
                 [tracksArray addObject:trackItem];
             }
@@ -618,6 +617,11 @@
     id enableLockScreenControls = config[@"enableLockScreenControls"];
     if ((enableLockScreenControls != nil && enableLockScreenControls != (id)[NSNull null]) || _backgroundAudioEnabled) {
         _playerViewController.enableLockScreenControls = YES;
+    }
+    
+    id allowsPictureInPicturePlayback = config[@"allowsPictureInPicturePlayback"];
+    if ((allowsPictureInPicturePlayback != nil && allowsPictureInPicturePlayback != (id)[NSNull null])) {
+        _playerViewController.allowsPictureInPicturePlayback = allowsPictureInPicturePlayback;
     }
     
     id styling = config[@"styling"];
@@ -1254,6 +1258,13 @@
 {
     if (_playerViewController) {
         [_playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
+    }
+}
+
+- (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
+{
+    if (_playerViewController) {
+        [_playerViewController jwplayer:player updatedCues:cues];
     }
 }
 
