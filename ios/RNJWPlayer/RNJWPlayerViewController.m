@@ -9,18 +9,14 @@
 
 @implementation RNJWPlayerViewController
 
-- (instancetype)init
+-(void)setDelegates
 {
-    self = [super init];
-    if (self) {
-        self.delegate = self;
-        self.playerView.delegate = self;
-        self.player.delegate = self;
-        self.player.playbackStateDelegate = self;
-        self.player.adDelegate = self;
-        self.player.avDelegate = self;
-    }
-    return self;
+    self.delegate = self;
+    self.playerView.delegate = self;
+    self.player.delegate = self;
+    self.player.playbackStateDelegate = self;
+    self.player.adDelegate = self;
+    self.player.avDelegate = self;
 }
 
 #pragma mark - JWPlayer Delegate

@@ -24,4 +24,6 @@
 
 @property(nonatomic, strong)RNJWPlayerView *parentView;
 
+-(void)setDelegates;
+
 @end
