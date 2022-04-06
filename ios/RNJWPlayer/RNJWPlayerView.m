@@ -397,14 +397,13 @@
                 NSString *tag = [item objectForKey:@"tag"];
                 NSURL* tagUrl = [NSURL URLWithString:tag];
                 
-                JWAdBreak *adBreak = [JWAdBreak init];
                 JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
                 JWAdOffset* offset = [JWAdOffset fromString:offsetString];
                 
                 [adBreakBuilder offset:offset];
                 [adBreakBuilder tags:@[tagUrl]];
                 
-                adBreak = [adBreakBuilder buildAndReturnError:&error];
+                JWAdBreak *adBreak = [adBreakBuilder buildAndReturnError:&error];
                 
                 [adsArray addObject:adBreak];
             }
@@ -546,14 +545,13 @@
                     NSString *tag = [item objectForKey:@"tag"];
                     NSURL* tagUrl = [NSURL URLWithString:tag];
                     
-                    JWAdBreak *adBreak = [JWAdBreak init];
                     JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
                     JWAdOffset* offset = [JWAdOffset fromString:offsetString];
                     
                     [adBreakBuilder offset:offset];
                     [adBreakBuilder tags:@[tagUrl]];
                     
-                    adBreak = [adBreakBuilder buildAndReturnError:&error];
+                    JWAdBreak *adBreak = [adBreakBuilder buildAndReturnError:&error];
                     
                     [scheduleArray addObject:adBreak];
                 }
@@ -689,6 +687,8 @@
             _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
         }
     }
+    
+    [_playerViewController setDelegates];
     
 //    _playerViewController.delegate = self;
 //    _playerViewController.playerView.delegate = self;
