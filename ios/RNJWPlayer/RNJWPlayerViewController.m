@@ -17,6 +17,24 @@
     self.player.playbackStateDelegate = self;
     self.player.adDelegate = self;
     self.player.avDelegate = self;
+    self.player.contentKeyDataSource = self;
+}
+
+- (void)removeFromParentViewController
+{
+    [self reset];
+}
+
+- (void)dealloc
+{
+    [self reset];
+}
+
+-(void)reset
+{
+    [self.player stop];
+    [self.view removeFromSuperview];
+    [self willMoveToParentViewController:nil];
 }
 
 #pragma mark - JWPlayer Delegate

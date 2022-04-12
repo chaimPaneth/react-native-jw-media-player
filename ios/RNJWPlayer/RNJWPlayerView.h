@@ -98,6 +98,7 @@
 - (NSArray <JWCastingDevice *>*)availableDevices;
 
 /* Methods */
+-(void)setLicense:(id)license;
 -(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show;
 
 @end

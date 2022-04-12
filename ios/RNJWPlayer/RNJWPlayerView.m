@@ -69,14 +69,19 @@
 
 #pragma mark - RNJWPlayer props
 
--(void)setConfig:(NSDictionary*)config
+-(void)setLicense:(id)license
 {
-    id license = config[@"license"];
     if ((license != nil) && (license != (id)[NSNull null])) {
         [JWPlayerKitLicense setLicenseKey:license];
     } else {
         NSLog(@"JW SDK License key not set.");
     }
+}
+
+-(void)setConfig:(NSDictionary*)config
+{
+    id license = config[@"license"];
+    [self setLicense:license];
     
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
@@ -664,9 +669,10 @@
 -(void)dismissPlayerViewController
 {
     if (_playerViewController != nil) {
-        [_playerViewController willMoveToParentViewController:nil];
+        [_playerViewController.player stop];
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
+        [_playerViewController willMoveToParentViewController:nil];
         _playerViewController = nil;
     }
 }
@@ -689,14 +695,6 @@
     }
     
     [_playerViewController setDelegates];
-    
-//    _playerViewController.delegate = self;
-//    _playerViewController.playerView.delegate = self;
-//    _playerViewController.player.delegate = self;
-//    _playerViewController.player.playbackStateDelegate = self;
-//    _playerViewController.player.adDelegate = self;
-//    _playerViewController.player.avDelegate = self;
-//    _playerViewController.player.contentKeyDataSource = self;
 }
 
 #pragma mark - JWPlayer View helpers
@@ -727,6 +725,7 @@
 -(void)removePlayerView
 {
     if (_playerView != nil) {
+        [_playerView.player stop];
         [_playerView removeFromSuperview];
         _playerView = nil;
     }
