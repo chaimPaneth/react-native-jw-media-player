@@ -506,4 +506,15 @@ RCT_EXPORT_METHOD(setCurrentCaptions: (nonnull NSNumber *)reactTag: (nonnull NSN
     }];
 }
 
+RCT_EXPORT_METHOD(setLicenseKey: (nonnull NSNumber *)reactTag: (nonnull NSString *)license) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            [view setLicense:license];
+        }
+    }];
+}
+
 @end
