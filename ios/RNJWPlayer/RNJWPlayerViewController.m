@@ -20,23 +20,6 @@
     self.player.contentKeyDataSource = self;
 }
 
-- (void)removeFromParentViewController
-{
-    [self reset];
-}
-
-- (void)dealloc
-{
-    [self reset];
-}
-
--(void)reset
-{
-    [self.player stop];
-    [self.view removeFromSuperview];
-    [self willMoveToParentViewController:nil];
-}
-
 #pragma mark - JWPlayer Delegate
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player
