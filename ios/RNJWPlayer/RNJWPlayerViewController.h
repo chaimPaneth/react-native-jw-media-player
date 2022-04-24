@@ -22,7 +22,7 @@
 
 @interface RNJWPlayerViewController : JWPlayerObjCViewController <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate>
 
-@property(nonatomic, strong)RNJWPlayerView *parentView;
+@property(nonatomic, weak)RNJWPlayerView *parentView;
 
 -(void)setDelegates;
 
