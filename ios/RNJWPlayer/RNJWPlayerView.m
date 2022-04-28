@@ -19,6 +19,8 @@
 
 - (void)dealloc
 {
+    [self reset];
+    
     @try {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
