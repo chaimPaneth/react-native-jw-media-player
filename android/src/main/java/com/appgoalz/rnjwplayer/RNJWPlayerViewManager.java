@@ -48,6 +48,11 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
     view.setConfig(prop);
   }
 
+  @ReactProp(name = "controls")
+  public void setControls(RNJWPlayerView view, Boolean controls) {
+    view.mPlayerView.getPlayer().setControls(controls);
+  }
+
   public Map getExportedCustomBubblingEventTypeConstants() {
     return MapBuilder.builder()
             .put(

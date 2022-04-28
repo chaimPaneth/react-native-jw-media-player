@@ -715,6 +715,10 @@ public class RNJWPlayerView extends RelativeLayout implements
                 LinearLayout.LayoutParams.MATCH_PARENT));
         addView(mPlayerView);
 
+        if (prop.hasKey("controls")) { // Hack for controls hiding not working right away
+            mPlayerView.getPlayer().setControls(prop.getBoolean("controls"));
+        }
+
         if (prop.hasKey("fullScreenOnLandscape")) {
             fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
             mPlayerView.fullScreenOnLandscape = fullScreenOnLandscape;
