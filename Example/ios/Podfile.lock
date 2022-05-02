@@ -57,18 +57,15 @@ PODS:
     - FlipperKit/Core
     - FlipperKit/FlipperKitNetworkPlugin
   - glog (0.3.5)
-  - google-cast-sdk (4.5.3):
-    - google-cast-sdk/Core (= 4.5.3)
-    - GTMSessionFetcher/Core (~> 1.1)
+  - google-cast-sdk (4.7.0):
+    - google-cast-sdk/Core (= 4.7.0)
     - Protobuf (~> 3.13)
-  - google-cast-sdk/Core (4.5.3):
-    - GTMSessionFetcher/Core (~> 1.1)
+  - google-cast-sdk/Core (4.7.0):
     - Protobuf (~> 3.13)
-  - GTMSessionFetcher/Core (1.6.1)
-  - JWPlayerKit (4.0.0)
+  - JWPlayerKit (4.5.2)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.180)
-  - Protobuf (3.17.0)
+  - Protobuf (3.20.1)
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
     - DoubleConversion
@@ -326,9 +323,9 @@ PODS:
     - React-cxxreact (= 0.64.2)
     - React-jsi (= 0.64.2)
     - React-perflogger (= 0.64.2)
-  - RNJWPlayer (0.1.57):
-    - google-cast-sdk (~> 4.5.1)
-    - JWPlayerKit (~> 4.0.0)
+  - RNJWPlayer (0.2.15):
+    - google-cast-sdk (~> 4.7.0)
+    - JWPlayerKit (~> 4.5.2)
     - React
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -398,7 +395,6 @@ SPEC REPOS:
     - Flipper-RSocket
     - FlipperKit
     - google-cast-sdk
-    - GTMSessionFetcher
     - JWPlayerKit
     - libevent
     - OpenSSL-Universal
@@ -470,7 +466,7 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: e686045572151edef46010a6f819ade377dfeb4b
-  FBReactNativeSpec: 404c2275f6c31f6b1dddfe6bb72b5f7d63a8dba8
+  FBReactNativeSpec: 60b0c7b1485dea8d800e2671d394ef0d06c7b971
   Flipper: d3da1aa199aad94455ae725e9f3aa43f3ec17021
   Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
   Flipper-Folly: 755929a4f851b2fb2c347d533a23f191b008554c
@@ -479,12 +475,11 @@ SPEC CHECKSUMS:
   Flipper-RSocket: 127954abe8b162fcaf68d2134d34dc2bd7076154
   FlipperKit: 8a20b5c5fcf9436cac58551dc049867247f64b00
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  google-cast-sdk: f94c5df87564f71d4342400b8487665e9bed27c6
-  GTMSessionFetcher: 36689134877faeb055b27dfa4ccc9ceaa42e029e
-  JWPlayerKit: e484a07119faca8e5014c5c77275a226d7ba6d7f
+  google-cast-sdk: 6731e9a206ce43e0f4433d15598ad8a19f0371d5
+  JWPlayerKit: a64a4c1aa2c66e8c8aad735305614a7774eb54f9
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
-  Protobuf: 7327d4444215b5f18e560a97f879ff5503c4581c
+  Protobuf: b60ec2f51ad74765f44d0c09d2e0579d7de21745
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 6d3e854f0e7260a648badd0d44fc364bc9da9728
   RCTTypeSafety: c1f31d19349c6b53085766359caac425926fafaa
@@ -508,10 +503,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: 24600e3b1aaa77126989bc58b6747509a1ba14f3
   React-runtimeexecutor: a9904c6d0218fb9f8b19d6dd88607225927668f9
   ReactCommon: 149906e01aa51142707a10665185db879898e966
-  RNJWPlayer: b5afba134fe882bba257704688a3683491e565d5
+  RNJWPlayer: 642afe1c020911a61aa1f2f1f9fe53ff82e6918c
   Yoga: 575c581c63e0d35c9a83f4b46d01d63abc1100ac
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 3739f1c5cb98b41353ba081915e908ca17888647
+PODFILE CHECKSUM: 9e0c22d23526a8dfea436cef3e72a081eb44f72e
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.3

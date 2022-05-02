@@ -9,11 +9,6 @@
 
 @implementation RNJWPlayerViewController
 
-- (void)dealloc
-{
-    [self.player stop];
-}
-
 -(void)setDelegates
 {
     self.delegate = self;

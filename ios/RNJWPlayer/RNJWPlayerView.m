@@ -17,25 +17,45 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [self reset];
-    
+- (void)removeFromSuperview {
     @try {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] removeObserver:AVAudioSessionInterruptionNotification];
     } @catch(id anException) {
        
     }
-}
-
-- (void)removeFromSuperview {
+    
     [self reset];
     [super removeFromSuperview];
 }
 
 -(void)reset
 {
+    @try {
+        //[[NSNotificationCenter defaultCenter] removeObserver:self];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionMediaServicesWereResetNotification object:_audioSession];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionInterruptionNotification object:_audioSession];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+        
+        if (_playerViewController || _playerView) {
+            if (_playerViewController) {
+                [[_playerViewController.player currentItem] removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+            } else if (_playerView) {
+                [[_playerView.player currentItem] removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+                
+                [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:@"isPictureInPicturePossible" context:NULL];
+            }
+        }
+    } @catch(id anException) {
+       
+    }
+    
+    NSError *activationError = nil;
+    BOOL success = [_audioSession setActive:NO error:&activationError];
+    _audioSession = nil;
+    
     [self removePlayerView];
     [self dismissPlayerViewController];
 }
@@ -670,7 +690,8 @@
 
 -(void)dismissPlayerViewController
 {
-    if (_playerViewController != nil) {
+    if (_playerViewController) {
+        [_playerViewController.player pause]; // hack for stop not always stopping on unmount
         [_playerViewController.player stop];
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
@@ -726,7 +747,7 @@
 
 -(void)removePlayerView
 {
-    if (_playerView != nil) {
+    if (_playerView) {
         [_playerView.player stop];
         [_playerView removeFromSuperview];
         _playerView = nil;
@@ -927,14 +948,14 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)context
 {
-    if (_playerView != nil || _playerViewController != nil) {
+    if (_playerView || _playerViewController) {
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
-            if (_playerView != nil) {
+            if (_playerView) {
                 [_playerView.player play];
-            } else if (_playerViewController != nil) {
+            } else if (_playerViewController) {
                 [_playerViewController.player play];
             }
-        } else if (_playerView != nil && [object isEqual:_playerView.pictureInPictureController] && [keyPath isEqualToString:@"isPictureInPicturePossible"]) {
+        } else if (_playerView && [object isEqual:_playerView.pictureInPictureController] && [keyPath isEqualToString:@"isPictureInPicturePossible"]) {
             
         }
     }
@@ -1281,7 +1302,7 @@
 
 -(void)setUpCastController
 {
-   if (_playerView != nil && _playerView.player != nil && _castController == nil) {
+   if (_playerView && _playerView.player && !_castController) {
        _castController = [[JWCastController alloc] initWithPlayer:_playerView.player];
        _castController.delegate = self;
    }
@@ -1489,26 +1510,26 @@
 
 - (void)initializeAudioSession
 {
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    _audioSession = [AVAudioSession sharedInstance];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleMediaServicesReset)
                                                  name:AVAudioSessionMediaServicesWereResetNotification
-                                               object:audioSession];
+                                               object:_audioSession];
     
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(audioSessionInterrupted:)
                                                  name: AVAudioSessionInterruptionNotification
-                                               object: audioSession];
+                                               object: _audioSession];
     
     NSError *categoryError = nil;
-    BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&categoryError];
+    BOOL success = [_audioSession setCategory:AVAudioSessionCategoryPlayback error:&categoryError];
     
     NSError *modeError = nil;
-    [audioSession setMode:AVAudioSessionModeDefault error:&modeError];
+    [_audioSession setMode:AVAudioSessionModeDefault error:&modeError];
     
     NSError *activationError = nil;
-    success = [audioSession setActive:YES error:&activationError];
+    success = [_audioSession setActive:YES error:&activationError];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillResignActive:)
@@ -1530,17 +1551,17 @@
         case AVAudioSessionInterruptionTypeBegan: {
             _wasInterrupted = YES;
             
-            if (_playerView != nil) {
+            if (_playerView) {
                 [_playerView.player pause];
-            } else if (_playerViewController != nil) {
+            } else if (_playerViewController) {
                 [_playerViewController.player pause];
             }
         } break;
         case AVAudioSessionInterruptionTypeEnded: {
             if (interruptionOption.unsignedIntegerValue == AVAudioSessionInterruptionOptionShouldResume || (!_userPaused && _backgroundAudioEnabled)) {
-                if (_playerView != nil) {
+                if (_playerView) {
                     [self->_playerView.player play];
-                } else if (_playerViewController != nil) {
+                } else if (_playerViewController) {
                     [self->_playerViewController.player play];
                 }
             }
@@ -1561,9 +1582,9 @@
 // Hack for ios 14 stopping audio when going to background
 -(void)applicationWillResignActive:(NSNotification *)notification {
     if (!_userPaused && _backgroundAudioEnabled) {
-        if (_playerView != nil) {
+        if (_playerView) {
             [_playerView.player play];
-        } else if (_playerViewController != nil) {
+        } else if (_playerViewController) {
             [_playerViewController.player play];
         }
     }
@@ -1573,9 +1594,9 @@
 
 -(void)applicationWillEnterForeground:(NSNotification *)notification{
     if (!_userPaused && _backgroundAudioEnabled) {
-        if (_playerView != nil) {
+        if (_playerView) {
             [_playerView.player play];
-        } else if (_playerViewController != nil) {
+        } else if (_playerViewController) {
             [_playerViewController.player play];
         }
     }

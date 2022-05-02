@@ -17,6 +17,8 @@
 @property(nonatomic, strong)RNJWPlayerViewController* playerViewController;
 @property(nonatomic, strong)JWPlayerView *playerView;
 
+@property(nonatomic, strong)AVAudioSession *audioSession;
+
 @property(nonatomic)BOOL pipEnabled;
 @property(nonatomic)BOOL backgroundAudioEnabled;
 
