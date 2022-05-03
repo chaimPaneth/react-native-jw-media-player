@@ -204,7 +204,7 @@ export default class JWPlayer extends Component {
 
     this._playerId = playerId++;
 
-    this.quite()
+    this.quite();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
