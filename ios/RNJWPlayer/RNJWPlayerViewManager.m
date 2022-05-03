@@ -517,4 +517,19 @@ RCT_EXPORT_METHOD(setLicenseKey: (nonnull NSNumber *)reactTag: (nonnull NSString
     }];
 }
 
+RCT_EXPORT_METHOD(quite) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        for (id view in viewRegistry) {
+            if ([view isKindOfClass:[RNJWPlayerView class]]) {
+                RNJWPlayerView *rnjwView = view;
+                if (rnjwView.playerView) {
+                    [rnjwView.playerView.player pause];
+                } else if (rnjwView.playerViewController) {
+                    [rnjwView.playerViewController.player pause];
+                }
+            }
+        }
+    }];
+}
+
 @end
