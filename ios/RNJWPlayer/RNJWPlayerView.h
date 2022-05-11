@@ -69,6 +69,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerAdWarning;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlayerAdError;
 @property(nonatomic, copy)RCTBubblingEventBlock onAdEvent;
+@property(nonatomic, copy)RCTBubblingEventBlock onAdTime;
 
 /* player view controller events */
 @property(nonatomic, copy)RCTBubblingEventBlock onScreenTapped;

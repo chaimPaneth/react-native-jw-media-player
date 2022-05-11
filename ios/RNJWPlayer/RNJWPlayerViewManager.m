@@ -50,6 +50,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPlayerWarning, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerAdWarning, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerAdError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdEvent, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdTime, RCTBubblingEventBlock);
 
 /* jwplayer view controller events */
 RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);

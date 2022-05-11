@@ -92,7 +92,8 @@ export default class App extends Component {
     // console.log('onSetupPlayerError was called with error: ', error);
   }
 
-  onTime({position, duration}) {
+  onTime(e) {
+    // var {position, duration} = e.nativeEvent;
     // eslint-disable-line
     // console.log('onTime was called with: ', position, duration);
   }

@@ -167,6 +167,22 @@
     
 }
 
+#pragma mark Time events
+
+-(void)onAdTimeEvent:(JWTimeData * _Nonnull)time {
+    [super onAdTimeEvent:time];
+    if (_parentView.onAdTime) {
+        _parentView.onAdTime(@{@"position": @(time.position), @"duration": @(time.duration)});
+    }
+}
+
+- (void)onMediaTimeEvent:(JWTimeData * _Nonnull)time {
+    [super onMediaTimeEvent:time];
+    if (_parentView.onTime) {
+        _parentView.onTime(@{@"position": @(time.position), @"duration": @(time.duration)});
+    }
+}
+
 #pragma mark - DRM Delegate
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
