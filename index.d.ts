@@ -143,6 +143,8 @@ declare module "react-native-jw-media-player" {
     fairplayCertUrl?: string;
     contentUUID?: string;
     viewOnly: boolean;
+    enableLockScreenControls: boolean;
+    pipEnabled: boolean;
   }
   interface PropsType {
     config: Config;

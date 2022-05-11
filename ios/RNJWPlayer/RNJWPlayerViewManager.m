@@ -50,6 +50,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPlayerWarning, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerAdWarning, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlayerAdError, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAdEvent, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAdTime, RCTBubblingEventBlock);
 
 /* jwplayer view controller events */
 RCT_EXPORT_VIEW_PROPERTY(onControlBarVisible, RCTBubblingEventBlock);
@@ -513,6 +514,21 @@ RCT_EXPORT_METHOD(setLicenseKey: (nonnull NSNumber *)reactTag: (nonnull NSString
             RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
         } else {
             [view setLicense:license];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(quite) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        for (id view in viewRegistry) {
+            if ([view isKindOfClass:[RNJWPlayerView class]]) {
+                RNJWPlayerView *rnjwView = view;
+                if (rnjwView.playerView) {
+                    [rnjwView.playerView.player pause];
+                } else if (rnjwView.playerViewController) {
+                    [rnjwView.playerViewController.player pause];
+                }
+            }
         }
     }];
 }

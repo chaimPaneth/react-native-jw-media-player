@@ -203,6 +203,8 @@ export default class JWPlayer extends Component {
     super(props);
 
     this._playerId = playerId++;
+
+    this.quite();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -261,6 +263,16 @@ export default class JWPlayer extends Component {
 
   arraysAreEqual(ary1, ary2) {
     return ary1?.join("") == ary2?.join("");
+  }
+
+  componentWillUnmount() {
+    this.pause();
+    this.stop();
+  }
+
+  quite() {
+    if (RNJWPlayerManager && Platform.OS === "ios")
+      RNJWPlayerManager.quite();
   }
 
   pause() {

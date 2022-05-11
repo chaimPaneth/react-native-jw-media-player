@@ -37,7 +37,9 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionInterruptionNotification object:_audioSession];
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
         
         if (_playerViewController || _playerView) {
             if (_playerViewController) {
@@ -108,7 +110,11 @@
     _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
     _pipEnabled = config[@"pipEnabled"];
     if (_backgroundAudioEnabled || _pipEnabled) {
-        [self initializeAudioSession];
+        id category = config[@"category"];
+        id mixWithOther = config[@"mixWithOther"];
+        id mode = config[@"mode"];
+        
+        [self initializeAudioSession:category :mixWithOther :mode];
     }
     
     id viewOnly = config[@"viewOnly"];
@@ -743,6 +749,25 @@
     }
     
     [self addSubview:self.playerView];
+    
+    BOOL autostart = config[@"autostart"];
+    if (autostart) {
+        [_playerView.player play];
+    }
+    
+    // Time observers
+    __weak RNJWPlayerView *weakSelf = self;
+    _playerView.player.adTimeObserver = ^(JWTimeData * time) {
+        if (weakSelf.onAdTime) {
+            weakSelf.onAdTime(@{@"position": @(time.position), @"duration": @(time.duration)});
+        }
+    };
+    
+    _playerView.player.mediaTimeObserver = ^(JWTimeData * time) {
+        if (weakSelf.onTime) {
+            weakSelf.onTime(@{@"position": @(time.position), @"duration": @(time.duration)});
+        }
+    };
 }
 
 -(void)removePlayerView
@@ -995,10 +1020,6 @@
 
 - (void)jwplayerContentIsBuffering:(id<JWPlayer>)player
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayerContentIsBuffering:player];
-    }
-    
     if (self.onBuffer) {
         self.onBuffer(@{});
     }
@@ -1006,10 +1027,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isBufferingWithReason:(enum JWBufferReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player isBufferingWithReason:reason];
-    }
-    
     if (self.onBuffer) {
         self.onBuffer(@{});
     }
@@ -1017,10 +1034,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player updatedBuffer:percent position:time];
-    }
-    
     if (self.onUpdateBuffer) {
         self.onUpdateBuffer(@{@"percent": @(percent), @"position": time});
     }
@@ -1028,10 +1041,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didFinishLoadingWithTime:(NSTimeInterval)loadTime
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player didFinishLoadingWithTime:loadTime];
-    }
-    
     if (self.onLoaded) {
         self.onLoaded(@{});
     }
@@ -1039,10 +1048,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isAttemptingToPlay:(JWPlayerItem *)playlistItem reason:(enum JWPlayReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player isAttemptingToPlay:playlistItem reason:reason];
-    }
-    
     if (self.onAttemptPlay) {
         self.onAttemptPlay(@{});
     }
@@ -1050,10 +1055,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isPlayingWithReason:(enum JWPlayReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player isPlayingWithReason:reason];
-    }
-    
     if (self.onPlay) {
         self.onPlay(@{});
     }
@@ -1064,10 +1065,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player willPlayWithReason:(enum JWPlayReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player willPlayWithReason:reason];
-    }
-    
     if (self.onBeforePlay) {
         self.onBeforePlay(@{});
     }
@@ -1075,10 +1072,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didPauseWithReason:(enum JWPauseReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player didPauseWithReason:reason];
-    }
-    
     if (self.onPause) {
         self.onPause(@{});
     }
@@ -1090,10 +1083,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didBecomeIdleWithReason:(enum JWIdleReason)reason
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player didBecomeIdleWithReason:reason];
-    }
-    
     if (self.onIdle) {
         self.onIdle(@{});
     }
@@ -1101,10 +1090,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isVisible:(BOOL)isVisible
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player isVisible:isVisible];
-    }
-    
     if (self.onVisible) {
         self.onVisible(@{@"visible": @(isVisible)});
     }
@@ -1112,10 +1097,6 @@
 
 - (void)jwplayerContentWillComplete:(id<JWPlayer>)player
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayerContentWillComplete:player];
-    }
-    
     if (self.onBeforeComplete) {
         self.onBeforeComplete(@{});
     }
@@ -1123,10 +1104,6 @@
 
 - (void)jwplayerContentDidComplete:(id<JWPlayer>)player
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayerContentDidComplete:player];
-    }
-    
     if (self.onComplete) {
         self.onComplete(@{});
     }
@@ -1134,10 +1111,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player didLoadPlaylistItem:item at:index];
-    }
-    
     if (self.onPlaylistItem) {
         NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
         for (JWVideoSource* source in item.videoSources) {
@@ -1184,10 +1157,6 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player didLoadPlaylist:playlist];
-    }
-    
     if (self.onPlaylist) {
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
@@ -1238,10 +1207,6 @@
 
 - (void)jwplayerPlaylistHasCompleted:(id<JWPlayer>)player
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayerPlaylistHasCompleted:player];
-    }
-    
     if (self.onPlaylistComplete) {
         self.onPlaylistComplete(@{});
     }
@@ -1249,17 +1214,11 @@
 
 - (void)jwplayer:(id<JWPlayer>)player usesMediaType:(enum JWMediaType)type
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player usesMediaType:type];
-    }
+   
 }
 
 - (void)jwplayer:(id<JWPlayer>)player seekedFrom:(NSTimeInterval)oldPosition to:(NSTimeInterval)newPosition
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player seekedFrom:oldPosition to:newPosition];
-    }
-    
     if (self.onSeek) {
         self.onSeek(@{@"from": @(oldPosition), @"to": @(newPosition)});
     }
@@ -1267,10 +1226,6 @@
 
 - (void)jwplayerHasSeeked:(id<JWPlayer>)player
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayerHasSeeked:player];
-    }
-    
     if (self.onSeeked) {
         self.onSeeked(@{});
     }
@@ -1278,16 +1233,12 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player playbackRateChangedTo:rate at:time];
-    }
+    
 }
 
 - (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
 {
-    if (_playerViewController) {
-        [_playerViewController jwplayer:player updatedCues:cues];
-    }
+    
 }
 
 #pragma mark - JWPlayer Ad Delegate
@@ -1508,7 +1459,18 @@
 
 #pragma mark - JWPlayer audio session && interruption handling
 
-- (void)initializeAudioSession
+- (void)initializeAudioSession:(NSString*)category :(BOOL)mixWithOthers :(NSString*)mode
+{
+    [self setObservers];
+    
+    [self setCategory:category mixWithOthers:mixWithOthers];
+    
+    [self setMode:mode];
+    
+    [_audioSession setActive:YES error:nil];
+}
+
+-(void)setObservers
 {
     _audioSession = [AVAudioSession sharedInstance];
     
@@ -1522,26 +1484,91 @@
                                                  name: AVAudioSessionInterruptionNotification
                                                object: _audioSession];
     
-    NSError *categoryError = nil;
-    BOOL success = [_audioSession setCategory:AVAudioSessionCategoryPlayback error:&categoryError];
-    
-    NSError *modeError = nil;
-    [_audioSession setMode:AVAudioSessionModeDefault error:&modeError];
-    
-    NSError *activationError = nil;
-    success = [_audioSession setActive:YES error:&activationError];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillResignActive:)
                                                      name:UIApplicationWillResignActiveNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidEnterBackground:)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillEnterForeground:)
                                                      name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioRouteChanged:)
+                                                     name:AVAudioSessionRouteChangeNotification
+                                                   object:nil];
+}
+
+-(void)setCategory:(NSString *)categoryName mixWithOthers :(BOOL)mixWithOthers
+{
+    if (!_audioSession) {
+        _audioSession = [AVAudioSession sharedInstance];
+    }
+    
+    NSString* category = nil;
+
+    if ([categoryName isEqual:@"Ambient"]) {
+        category = AVAudioSessionCategoryAmbient;
+    } else if ([categoryName isEqual:@"SoloAmbient"]) {
+        category = AVAudioSessionCategorySoloAmbient;
+    } else if ([categoryName isEqual:@"Playback"]) {
+        category = AVAudioSessionCategoryPlayback;
+    } else if ([categoryName isEqual:@"Record"]) {
+        category = AVAudioSessionCategoryRecord;
+    } else if ([categoryName isEqual:@"PlayAndRecord"]) {
+        category = AVAudioSessionCategoryPlayAndRecord;
+    } else if ([categoryName isEqual:@"MultiRoute"]) {
+        category = AVAudioSessionCategoryMultiRoute;
+    } else {
+        category = AVAudioSessionCategoryPlayback;
+    }
+
+    if (mixWithOthers) {
+        [_audioSession setCategory:category
+                 withOptions:AVAudioSessionCategoryOptionMixWithOthers |
+                             AVAudioSessionCategoryOptionAllowBluetooth
+                       error:nil];
+    } else {
+        [_audioSession setCategory:category error:nil];
+    }
+}
+
+-(void)setMode:(NSString *)modeName
+{
+    if (!_audioSession) {
+        _audioSession = [AVAudioSession sharedInstance];
+    }
+    
+    NSString* mode = nil;
+
+    if ([modeName isEqual:@"Default"]) {
+        mode = AVAudioSessionModeDefault;
+    } else if ([modeName isEqual:@"VoiceChat"]) {
+        mode = AVAudioSessionModeVoiceChat;
+    } else if ([modeName isEqual:@"VideoChat"]) {
+        mode = AVAudioSessionModeVideoChat;
+    } else if ([modeName isEqual:@"GameChat"]) {
+        mode = AVAudioSessionModeGameChat;
+    } else if ([modeName isEqual:@"VideoRecording"]) {
+        mode = AVAudioSessionModeVideoRecording;
+    } else if ([modeName isEqual:@"Measurement"]) {
+        mode = AVAudioSessionModeMeasurement;
+    } else if ([modeName isEqual:@"MoviePlayback"]) {
+        mode = AVAudioSessionModeMoviePlayback;
+    } else if ([modeName isEqual:@"SpokenAudio"]) {
+        mode = AVAudioSessionModeSpokenAudio;
+    }
+
+    if (mode) {
+        [_audioSession setMode:mode error:nil];
+    }
 }
 
 // Interupted
-
 -(void)audioSessionInterrupted:(NSNotification*)note
 {
     NSNumber *interruptionType = [[note userInfo] objectForKey:AVAudioSessionInterruptionTypeKey];
@@ -1572,7 +1599,6 @@
 }
 
 // Service reset
-
 -(void)handleMediaServicesReset
 {
     // • Handle this notification by fully reconfiguring audio
@@ -1590,8 +1616,14 @@
     }
 }
 
-// Active
+// Background
+- (void)applicationDidEnterBackground:(NSNotification *)notification
+{
+  
+}
 
+
+// Active
 -(void)applicationWillEnterForeground:(NSNotification *)notification{
     if (!_userPaused && _backgroundAudioEnabled) {
         if (_playerView) {
@@ -1600,6 +1632,20 @@
             [_playerViewController.player play];
         }
     }
+}
+
+// Route change
+- (void)audioRouteChanged:(NSNotification *)notification
+{
+  NSNumber *reason = [[notification userInfo] objectForKey:AVAudioSessionRouteChangeReasonKey];
+//  NSNumber *previousRoute = [[notification userInfo] objectForKey:AVAudioSessionRouteChangePreviousRouteKey];
+  if (reason.unsignedIntValue == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+      if (_playerView) {
+          [_playerView.player pause];
+      } else if (_playerViewController) {
+          [_playerViewController.player pause];
+      }
+  }
 }
 
 @end
