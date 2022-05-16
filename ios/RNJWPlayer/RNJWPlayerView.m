@@ -42,11 +42,8 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
         
         if (_playerViewController || _playerView) {
-            if (_playerViewController) {
-                [[_playerViewController.player currentItem] removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
-            } else if (_playerView) {
-                [[_playerView.player currentItem] removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
-                
+            [[_playerViewController.player currentItem] removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+            if (_playerView) {
                 [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:@"isPictureInPicturePossible" context:NULL];
             }
         }
@@ -54,12 +51,16 @@
        
     }
     
-    NSError *activationError = nil;
-    BOOL success = [_audioSession setActive:NO error:&activationError];
-    _audioSession = nil;
-    
     [self removePlayerView];
     [self dismissPlayerViewController];
+    
+    NSError* activationError = nil;
+    BOOL success = [_audioSession setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&activationError];
+    NSLog(@"setUnactive - success: @%@, error: @%@", @(success), activationError);
+    _audioSession = nil;
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nil;
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+
 }
 
 - (void)layoutSubviews
@@ -111,10 +112,10 @@
     _pipEnabled = config[@"pipEnabled"];
     if (_backgroundAudioEnabled || _pipEnabled) {
         id category = config[@"category"];
-        id mixWithOther = config[@"mixWithOther"];
+        id categoryOptions = config[@"categoryOptions"];
         id mode = config[@"mode"];
         
-        [self initializeAudioSession:category :mixWithOther :mode];
+        [self initializeAudioSession:category :categoryOptions :mode];
     }
     
     id viewOnly = config[@"viewOnly"];
@@ -698,6 +699,7 @@
 {
     if (_playerViewController) {
         [_playerViewController.player pause]; // hack for stop not always stopping on unmount
+        _playerViewController.enableLockScreenControls = NO;
         [_playerViewController.player stop];
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
@@ -1459,15 +1461,17 @@
 
 #pragma mark - JWPlayer audio session && interruption handling
 
-- (void)initializeAudioSession:(NSString*)category :(BOOL)mixWithOthers :(NSString*)mode
+- (void)initializeAudioSession:(NSString*)category :(NSArray*)categoryOptions :(NSString*)mode
 {
     [self setObservers];
     
-    [self setCategory:category mixWithOthers:mixWithOthers];
+    [self setCategory:category categoryOptions:categoryOptions];
     
     [self setMode:mode];
     
-    [_audioSession setActive:YES error:nil];
+    NSError* activationError = nil;
+    BOOL success = [_audioSession setActive:YES error:&activationError];
+    NSLog(@"setActive - success: @%@, error: @%@", @(success), activationError);
 }
 
 -(void)setObservers
@@ -1503,7 +1507,7 @@
                                                    object:nil];
 }
 
--(void)setCategory:(NSString *)categoryName mixWithOthers :(BOOL)mixWithOthers
+-(void)setCategory:(NSString *)categoryName categoryOptions :(NSArray *)categoryOptions
 {
     if (!_audioSession) {
         _audioSession = [AVAudioSession sharedInstance];
@@ -1526,15 +1530,32 @@
     } else {
         category = AVAudioSessionCategoryPlayback;
     }
-
-    if (mixWithOthers) {
-        [_audioSession setCategory:category
-                 withOptions:AVAudioSessionCategoryOptionMixWithOthers |
-                             AVAudioSessionCategoryOptionAllowBluetooth
-                       error:nil];
-    } else {
-        [_audioSession setCategory:category error:nil];
+    
+    int options = 0;
+    
+    if ([categoryOptions containsObject:@"MixWithOthers"]) {
+        options |= AVAudioSessionCategoryOptionMixWithOthers;
+    } else if ([categoryOptions containsObject:@"DuckOthers"]) {
+        options |= AVAudioSessionCategoryOptionDuckOthers;
+    }  else if ([categoryOptions containsObject:@"AllowBluetooth"]) {
+        options |= AVAudioSessionCategoryOptionAllowBluetooth;
+    }  else if ([categoryOptions containsObject:@"InterruptSpokenAudioAndMix"]) {
+        options |= AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers;
+    }  else if ([categoryOptions containsObject:@"AllowBluetoothA2DP"]) {
+        options |= AVAudioSessionCategoryOptionAllowBluetoothA2DP;
+    } else if ([categoryOptions containsObject:@"AllowAirPlay"]) {
+        options |= AVAudioSessionCategoryOptionAllowAirPlay;
+    } else if ([categoryOptions containsObject:@"OverrideMutedMicrophone"]) {
+        if (@available(iOS 14.5, *)) {
+            options |= AVAudioSessionCategoryOptionOverrideMutedMicrophoneInterruption;
+        } else {
+            // Fallback on earlier versions
+        }
     }
+
+    NSError* categoryError = nil;
+    BOOL success = [_audioSession setCategory:category withOptions:options error:&categoryError];
+    NSLog(@"setCategory - success: @%@, error: @%@", @(success), categoryError);
 }
 
 -(void)setMode:(NSString *)modeName
@@ -1561,10 +1582,18 @@
         mode = AVAudioSessionModeMoviePlayback;
     } else if ([modeName isEqual:@"SpokenAudio"]) {
         mode = AVAudioSessionModeSpokenAudio;
+    } else if ([modeName isEqual:@"VoicePrompt"]) {
+        if (@available(iOS 12.0, *)) {
+            mode = AVAudioSessionModeVoicePrompt;
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     if (mode) {
-        [_audioSession setMode:mode error:nil];
+        NSError* modeError = nil;
+        BOOL success = [_audioSession setMode:mode error:&modeError];
+        NSLog(@"setMode - success: @%@, error: @%@", @(success), modeError);
     }
 }
 

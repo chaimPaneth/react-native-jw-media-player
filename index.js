@@ -52,6 +52,35 @@ export default class JWPlayer extends Component {
     config: PropTypes.shape({
       license: PropTypes.string.isRequired,
       backgroundAudioEnabled: PropTypes.bool,
+      category: PropTypes.oneOf([
+        "Ambient",
+        "SoloAmbient",
+        "Playback",
+        "Record",
+        "PlayAndRecord",
+        "MultiRoute",
+      ]),
+      categoryOptions: PropTypes.arrayOf([
+        "MixWithOthers",
+        "DuckOthers",
+        "AllowBluetooth",
+        "DefaultToSpeaker",
+        "InterruptSpokenAudioAndMix",
+        "AllowBluetoothA2DP",
+        "AllowAirPlay",
+        "OverrideMutedMicrophone",
+      ]),
+      mode: PropTypes.oneOf([
+        "Default",
+        "VoiceChat",
+        "VideoChat",
+        "GameChat",
+        "VideoRecording",
+        "Measurement",
+        "MoviePlayback",
+        "SpokenAudio",
+        "VoicePrompt",
+      ]),
       pipEnabled: PropTypes.bool,
       viewOnly: PropTypes.bool,
       autostart: PropTypes.bool,
@@ -66,7 +95,7 @@ export default class JWPlayer extends Component {
               file: PropTypes.string,
               label: PropTypes.string,
               default: PropTypes.bool,
-            }),
+            })
           ),
           image: PropTypes.string,
           title: PropTypes.string,
@@ -78,13 +107,13 @@ export default class JWPlayer extends Component {
             PropTypes.shape({
               file: PropTypes.string,
               label: PropTypes.string,
-            }),
+            })
           ),
           adSchedule: PropTypes.arrayOf(
             PropTypes.shape({
               tag: PropTypes.string,
               offset: PropTypes.string,
-            }),
+            })
           ),
           adVmap: PropTypes.string,
           startTime: PropTypes.number,
@@ -96,7 +125,7 @@ export default class JWPlayer extends Component {
           PropTypes.shape({
             tag: PropTypes.string,
             offset: PropTypes.string,
-          }),
+          })
         ),
         adVmap: PropTypes.string,
         tag: PropTypes.string,
@@ -127,7 +156,13 @@ export default class JWPlayer extends Component {
             backgroundColor: PropTypes.string,
             fontColor: PropTypes.string,
             highlightColor: PropTypes.string,
-            edgeStyle: PropTypes.oneOf(['none', 'dropshadow', 'raised', 'depressed', 'uniform'])
+            edgeStyle: PropTypes.oneOf([
+              "none",
+              "dropshadow",
+              "raised",
+              "depressed",
+              "uniform",
+            ]),
           }),
           menuStyle: PropTypes.shape({
             font: PropTypes.shape({
@@ -143,14 +178,14 @@ export default class JWPlayer extends Component {
       }),
       nextUpStyle: PropTypes.shape({
         offsetSeconds: PropTypes.number,
-        offsetPercentage: PropTypes.number
+        offsetPercentage: PropTypes.number,
       }),
       offlineMessage: PropTypes.string,
       offlineImage: PropTypes.string,
       forceFullScreenOnLandscape: PropTypes.bool,
       forceLandscapeOnFullScreen: PropTypes.bool,
       enableLockScreenControls: PropTypes.bool,
-      stretching: PropTypes.oneOf(['uniform', 'exactFit', 'fill', 'none']),
+      stretching: PropTypes.oneOf(["uniform", "exactFit", "fill", "none"]),
       processSpcUrl: PropTypes.string,
       fairplayCertUrl: PropTypes.string,
       contentUUID: PropTypes.string,
@@ -208,7 +243,7 @@ export default class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    var {config, controls} = nextProps;
+    var { config, controls } = nextProps;
     var {
       file,
       image,
@@ -226,7 +261,7 @@ export default class JWPlayer extends Component {
       style,
       stretching,
     } = config || {};
-    var {displayTitle, displayDescription} = styling || {}
+    var { displayTitle, displayDescription } = styling || {};
 
     var thisConfig = this.props.config || {};
 
@@ -251,7 +286,7 @@ export default class JWPlayer extends Component {
     if (playlist && thisConfig.playlist) {
       return !this.arraysAreEqual(playlist, thisConfig.playlist);
     } else if (!playlist && thisConfig.playlist) {
-      return true
+      return true;
     }
 
     if (controls !== this.props.controls) {
@@ -271,8 +306,7 @@ export default class JWPlayer extends Component {
   }
 
   quite() {
-    if (RNJWPlayerManager && Platform.OS === "ios")
-      RNJWPlayerManager.quite();
+    if (RNJWPlayerManager && Platform.OS === "ios") RNJWPlayerManager.quite();
   }
 
   pause() {
@@ -315,7 +349,10 @@ export default class JWPlayer extends Component {
 
   setLockScreenControls(show) {
     if (RNJWPlayerManager && Platform.OS === "ios")
-      RNJWPlayerManager.setLockScreenControls(this.getRNJWPlayerBridgeHandle(), show);
+      RNJWPlayerManager.setLockScreenControls(
+        this.getRNJWPlayerBridgeHandle(),
+        show
+      );
   }
 
   seekTo(time) {
@@ -493,12 +530,6 @@ export default class JWPlayer extends Component {
 
   render() {
     const ref_key = `${RCT_RNJWPLAYER_REF}-${this._playerId}`;
-    return (
-      <RNJWPlayer
-        ref={ref_key}
-        key={ref_key}
-        {...this.props}
-      />
-    );
+    return <RNJWPlayer ref={ref_key} key={ref_key} {...this.props} />;
   }
 }
