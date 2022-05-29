@@ -329,7 +329,7 @@
     
     if (url && url.scheme && url.host) {
         [itemBuilder file:url];
-    } else {
+    } else if (newFile != nil) {
         NSString* encodedString = [newFile stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
         NSURL* encodedUrl = [NSURL URLWithString:encodedString];
         [itemBuilder file:encodedUrl];
@@ -347,19 +347,16 @@
                 NSString* label = [source objectForKey:@"label"];
                 bool isDefault = [source objectForKey:@"default"];
                 
-                JWVideoSource* sourceItem = [JWVideoSource init];
                 JWVideoSourceBuilder* sourceBuilder = [[JWVideoSourceBuilder alloc] init];
                 
                 [sourceBuilder file:fileUrl];
                 [sourceBuilder label:label];
                 [sourceBuilder defaultVideo:isDefault];
                 
-                sourceItem = [sourceBuilder buildAndReturnError:&error];
-                
-                [sourcesArray addObject:sourceItem];
+                [sourcesArray addObject:[sourceBuilder buildAndReturnError:&error]];
             }
             
-            [itemBuilder videoSources:itemSourcesArray];
+            [itemBuilder videoSources:sourcesArray];
         }
     }
     

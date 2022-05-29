@@ -122,9 +122,7 @@ const config = {
       },
     },
   },
-  playlist: {
-    [playlistItem],
-  },
+  playlist: [playlistItem],
 }
 
 ...
