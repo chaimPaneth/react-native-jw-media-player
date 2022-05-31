@@ -13,6 +13,8 @@ import {
 
 import JWPlayer from 'react-native-jw-media-player';
 
+import {IOS_API_KEY, ANDROID_API_KEY} from "@env";
+
 const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -114,10 +116,7 @@ export default class App extends Component {
         key={tag}
         style={styles.player}
         config={{
-          license:
-            Platform.OS === 'android'
-              ? 'YOUR_ANDROID_SDK_LICENSE'
-              : 'YOUR_IOS_SDK_LICENSE',
+          license: Platform.OS === 'android' ? ANDROID_API_KEY : IOS_API_KEY,
           backgroundAudioEnabled: true,
           // autostart: true,
           playlist: [

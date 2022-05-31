@@ -733,7 +733,12 @@ public class RNJWPlayerView extends RelativeLayout implements
         mPlayer.setup(playerConfig);
 
         if (mActivity != null && prop.hasKey("pipEnabled")) {
-            mPlayer.registerActivityForPip(mActivity, mActivity.getSupportActionBar());
+            boolean pipEnabled = prop.getBoolean("pipEnabled");
+            if (pipEnabled) {
+                mPlayer.registerActivityForPip(mActivity, mActivity.getSupportActionBar());
+            } else {
+                mPlayer.deregisterActivityForPip();
+            }
         }
 
         if (mColors != null) {
