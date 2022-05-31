@@ -707,11 +707,16 @@
 
 -(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
 {
-    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
-    [window.rootViewController addChildViewController:_playerViewController];
-    _playerViewController.view.frame = self.superview.frame;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.reactViewController) {
+            [self.reactViewController addChildViewController:self->_playerViewController];
+            [self->_playerViewController didMoveToParentViewController:self.reactViewController];
+        } else {
+            [self reactAddControllerToClosestParent:self->_playerViewController];
+        }
+    });
+    _playerViewController.view.frame = self.frame;
     [self addSubview:_playerViewController.view];
-    [_playerViewController didMoveToParentViewController:window.rootViewController];
     
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
