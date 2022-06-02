@@ -708,6 +708,8 @@ public class RNJWPlayerView extends RelativeLayout implements
         this.destroyPlayer();
 
         mPlayerView = new RNJWPlayer(simpleContext);
+        mPlayerView.setFocusable(true);
+        mPlayerView.setFocusableInTouchMode(true);
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mPlayerView.setLayoutParams(new LinearLayout.LayoutParams(
@@ -912,6 +914,10 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onFullscreen(FullscreenEvent fullscreenEvent) {
         if (fullscreenEvent.getFullscreen()) {
+            if(mPlayerView != null){
+                mPlayerView.requestFocus();
+            }
+
             WritableMap eventExitFullscreen = Arguments.createMap();
             eventExitFullscreen.putString("message", "onFullscreen");
             getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(
