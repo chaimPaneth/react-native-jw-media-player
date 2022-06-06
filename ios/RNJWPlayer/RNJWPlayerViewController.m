@@ -186,7 +186,10 @@
 #pragma mark - DRM Delegate
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    _parentView.contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
+    if (!_parentView.contentUUID) {
+        _parentView.contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
+    }
+    
     NSData *uuidData = [_parentView.contentUUID dataUsingEncoding:NSUTF8StringEncoding];
     handler(uuidData);
 }

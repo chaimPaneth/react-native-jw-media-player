@@ -127,6 +127,7 @@
 
     _processSpcUrl = config[@"processSpcUrl"];
     _fairplayCertUrl = config[@"fairplayCertUrl"];
+    _contentUUID = config[@"contentUUID"];
 }
 
 -(void)setControls:(BOOL)controls
@@ -944,7 +945,10 @@
 #pragma mark - DRM Delegate
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    _contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
+    if (!_contentUUID) {
+        _contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
+    }
+    
     NSData *uuidData = [_contentUUID dataUsingEncoding:NSUTF8StringEncoding];
     handler(uuidData);
 }

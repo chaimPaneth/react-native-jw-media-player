@@ -47,13 +47,7 @@ export default () => {
       <View style={styles.subContainer}>
         <View style={styles.playerContainer}>
           {isEmulator ? (
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'white',
-                padding: 20,
-                fontSize: 17,
-              }}>
+            <Text style={styles.errorText}>
               {"DRM Doesn't work in the simulator. Check out "}
               <Text
                 style={{textDecorationLine: 'underline', color: '#ff0000'}}
@@ -97,5 +91,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     margin: 40,
+  },
+  errorText: {
+    textAlign: 'center',
+    color: 'white',
+    padding: 20,
+    fontSize: 17,
   },
 });
