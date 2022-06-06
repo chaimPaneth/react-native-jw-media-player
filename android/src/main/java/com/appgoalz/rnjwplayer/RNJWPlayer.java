@@ -21,7 +21,6 @@ public class RNJWPlayer extends JWPlayerView {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && this.getPlayer().getFullscreen()) {
             if (event.getAction() == KeyEvent.ACTION_UP) {
                 this.getPlayer().setFullscreen(false,false);
-                return false;
             }
             return true;
         }
