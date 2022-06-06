@@ -207,22 +207,26 @@ Running the example project:
 | **`preload`**                  | The behavior of the preload.                                                                                                                                                                                                                                                                                                                                            | `'auto', 'none'`                                                                                                                                                                                                       | `iOS`                                       | `auto`     |
 | **`related`**                  | The related videos behaviors. Check out the [Related](#Related) section.                                                                                                                                                                                                                                                                                                | `Object`                                                                                                                                                                                                               | `iOS`                                       | `none`     |
 | **`hideUIGroup`**              | A way to hide a certain UI group in the player.                                                                                                                                                                                                                                                                                                                         | `'overlay', 'control_bar', 'center_controls', 'next_up', 'error', 'playlist', 'controls_container', 'settings_menu', 'quality_submenu', 'captions_submenu', 'playback_submenu', 'audiotracks_submenu', 'casting_menu'` | `Android`                                   | `none`     |
+| **`processSpcUrl`**            | Your DRM License URL. Checkout the [DRM](#DRM) section below.                                                                                                                                                                                                                                                                                                           | `String`                                                                                                                                                                                                               | `iOS`                                       | `none`     |
+| **`fairplayCertUrl`**          | Your DRM Certificate URL. Checkout the [DRM](#DRM) section below.                                                                                                                                                                                                                                                                                                       | `String`                                                                                                                                                                                                               | `iOS`                                       | `none`     |
+| **`contentUUID`**              | Your DRM content UUID. Checkout the [DRM](#DRM) section below.                                                                                                                                                                                                                                                                                                          | `String`                                                                                                                                                                                                               | `iOS`                                       | `none`     |
 
 ##### PlaylistItem
-| Prop                  | Description                                    | Type                                              |
-| --------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| **`mediaId`**         | The JW media id.                               | `Int`                                             |
-| **`startTime`**       | the player should start from a certain second. | `Int`                                             |
-| **`adVmap`**          | The url of ads VMAP xml.                       | `String`                                          |
-| **`adSchedule`**      | Array of tags and and offsets for ads.         | `{tag: String, offset: String}`                   |
-| **`description`**     | Description of the track.                      | `String`                                          |
-| **`file`**            | The url of the file to play.                   | `String`                                          |
-| **`tracks`**          | Array of caption tracks.                       | `{file: String, label: String}`                   |
-| **`sources`**         | Array of media sources.                        | `{file: String, label: String, default: Boolean}` |
-| **`image`**           | The url of the player thumbnail.               | `String`                                          |
-| **`title`**           | The title of the track.                        | `String`                                          |
-| **`recommendations`** | Url for recommended videos.                    | `String`                                          |
-| **`autostart`**       | Should the track auto start.                   | `Boolean`                                         |
+| Prop                  | Description                                                                                              | Type                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **`mediaId`**         | The JW media id.                                                                                         | `Int`                                             |
+| **`startTime`**       | the player should start from a certain second.                                                           | `Int`                                             |
+| **`adVmap`**          | The url of ads VMAP xml.                                                                                 | `String`                                          |
+| **`adSchedule`**      | Array of tags and and offsets for ads.                                                                   | `{tag: String, offset: String}`                   |
+| **`description`**     | Description of the track.                                                                                | `String`                                          |
+| **`file`**            | The url of the file to play.                                                                             | `String`                                          |
+| **`tracks`**          | Array of caption tracks.                                                                                 | `{file: String, label: String}`                   |
+| **`sources`**         | Array of media sources.                                                                                  | `{file: String, label: String, default: Boolean}` |
+| **`image`**           | The url of the player thumbnail.                                                                         | `String`                                          |
+| **`title`**           | The title of the track.                                                                                  | `String`                                          |
+| **`recommendations`** | Url for recommended videos.                                                                              | `String`                                          |
+| **`autostart`**       | Should the track auto start.                                                                             | `Boolean`                                         |
+| **`authUrl`**         | Only Available on **Android**, Used for Authorizing DRM content. Checkout the [DRM](#DRM) section below. | `String`                                          |
 
 ##### JWPlayerAdClients
   | Client                     | Value |
@@ -334,6 +338,20 @@ This is all handled automatically if using the default player controls, but thes
 ![Stretching Example](https://files.readme.io/ce19994-stretch-options.png)
 
 (image from JW Player docs - here use `exactFit` instead of `exactfit`)
+
+##### DRM
+
+Checkout the official DRM docs [iOS](https://developer.jwplayer.com/jwplayer/docs/ios-play-drm-protected-content) & [Android](https://developer.jwplayer.com/jwplayer/docs/android-play-drm-protected-content).
+
+As of now June 7, 2022 there is only support for **Fairplay** on iOS and **Widevine** for Android.
+
+In short when passing a protected file URL in the `file` prop you will also need to pass additional props for the player to be able to decode your encrypted content; per each respective platform.
+
+- iOS - your `processSpcUrl?: string` (License) and `fairplayCertUrl?: string` (Certificate) on the `config` prop. We will try to parse the `contentUUID` from the FPS server
+playback context (SPC), but you can override it by passing it in `config` along the other two props;
+- Android - your `authUrl?: string` on each **PlaylistItem** in the `playlist` prop;
+
+Checkout the DRMExample in the Example app. (The DRMExample cannot be run in the Simulator).
 
 ##### Advertising
 
