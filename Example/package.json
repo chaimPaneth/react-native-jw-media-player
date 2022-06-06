@@ -13,7 +13,7 @@
     "@react-navigation/native": "6.0.10",
     "@react-navigation/native-stack": "6.6.2",
     "react": "17.0.1",
-    "react-native": "0.64.2",
+    "react-native": "0.68.1",
     "react-native-bootsplash": "4.1.5",
     "react-native-device-info": "9.0.2",
     "react-native-fs": "2.16.6",

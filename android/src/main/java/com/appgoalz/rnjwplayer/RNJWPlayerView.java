@@ -514,6 +514,10 @@ public class RNJWPlayerView extends RelativeLayout implements
             itemBuilder.tracks(tracks);
         }
 
+        if (playlistItem.hasKey("authUrl")) {
+            itemBuilder.mediaDrmCallback(new WidevineCallback(playlistItem.getString("authUrl")));
+        }
+
         if (playlistItem.hasKey("adSchedule")) {
             ArrayList<AdBreak> adSchedule = new ArrayList<>();
             ReadableArray ad = playlistItem.getArray("adSchedule");
