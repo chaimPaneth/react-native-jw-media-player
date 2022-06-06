@@ -2,8 +2,12 @@ package com.rnjwplayer;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
+import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactRootView;
+import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
 
@@ -14,6 +18,19 @@ public class MainActivity extends ReactActivity {
   @Override
   protected String getMainComponentName() {
     return "RNJWPlayer";
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
+  }
+
+  public static class MainActivityDelegate extends ReactActivityDelegate {
+    @Override
+    protected void loadApp(String appKey) {
+      RNBootSplash.init(getPlainActivity());
+      super.loadApp(appKey);
+    }
   }
 
   @Override
