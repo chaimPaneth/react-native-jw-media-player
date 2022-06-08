@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bootsplash_background">#FFFFFF</color>
+    <color name="bootsplash_icon_background">#EC0041</color>
+</resources>
