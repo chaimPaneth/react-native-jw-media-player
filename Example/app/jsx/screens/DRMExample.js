@@ -1,14 +1,8 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Dimensions,
-  Linking,
-  Platform,
-} from 'react-native';
+import {StyleSheet, Text, Linking, Platform} from 'react-native';
 import Player from '../components/Player';
 import DeviceInfo from 'react-native-device-info';
+import PlayerContainer from '../components/PlayerContainer';
 
 export default () => {
   const playerRef = useRef([]);
@@ -23,7 +17,7 @@ export default () => {
     return (
       <Player
         ref={playerRef}
-        style={styles.player}
+        style={{flex: 1}}
         config={{
           autostart: true,
           playlist: [
@@ -42,15 +36,14 @@ export default () => {
   };
 
   const renderAndroidPlayer = () => {
-    const AuthUrl =
-      'https://cwip-shaka-proxy.appspot.com/no_auth';
+    const AuthUrl = 'https://cwip-shaka-proxy.appspot.com/no_auth';
     const StreamUrl =
       'https://storage.googleapis.com/shaka-demo-assets/sintel-widevine/dash.mpd';
 
     return (
       <Player
         ref={playerRef}
-        style={styles.player}
+        style={{flex: 1}}
         config={{
           autostart: true,
           playlist: [
@@ -78,53 +71,34 @@ export default () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.subContainer}>
-        <View style={styles.playerContainer}>
-          {isEmulator && Platform.OS === 'ios' ? (
-            <Text style={styles.errorText}>
-              {"DRM Doesn't work in the simulator. Check out "}
-              <Text
-                style={{textDecorationLine: 'underline', color: '#ff0000'}}
-                onPress={() =>
-                  Linking.openURL(
-                    'https://reactnative.dev/docs/running-on-device',
-                  )
-                }>
-                this
-              </Text>
-              {' link to run on a real device.'}
+    <PlayerContainer
+      children={
+        isEmulator && Platform.OS === 'ios' ? (
+          <Text style={styles.errorText}>
+            {"DRM Doesn't work in the simulator. Check out "}
+            <Text
+              style={{textDecorationLine: 'underline', color: '#ff0000'}}
+              onPress={() =>
+                Linking.openURL(
+                  'https://reactnative.dev/docs/running-on-device',
+                )
+              }>
+              this
             </Text>
-          ) : Platform.OS === 'ios' ? (
-            renderIOSPlayer()
-          ) : (
-            renderAndroidPlayer()
-          )}
-        </View>
-      </View>
-      <Text style={styles.text}>Welcome to react-native-jw-media-player</Text>
-    </View>
+            {' link to run on a real device.'}
+          </Text>
+        ) : Platform.OS === 'ios' ? (
+          renderIOSPlayer()
+        ) : (
+          renderAndroidPlayer()
+        )
+      }
+      text="Welcome to react-native-jw-media-player"
+    />
   );
 };
 
-const {width} = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  subContainer: {
-    backgroundColor: 'black',
-    alignItems: 'center',
-  },
-  playerContainer: {
-    height: 300,
-    width: width - 40,
-  },
-  player: {
-    flex: 1,
-  },
   text: {
     fontSize: 18,
     margin: 40,

@@ -9,7 +9,7 @@ export default forwardRef((props, ref) => {
   const {onLayout, tag, config, style} = props;
   const newProps = props.config;
   delete newProps.config;
-  
+
   return (
     <JWPlayer
       onLayout={onLayout}
@@ -25,6 +25,7 @@ export default forwardRef((props, ref) => {
         ...config,
       }}
       {...newProps}
+      onPlayerError={e => alert(e.nativeEvent?.error || 'Player Error.')}
     />
   );
 });

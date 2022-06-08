@@ -1,6 +1,9 @@
 import React, {useRef} from 'react';
-import {StyleSheet, View, Text, Dimensions, FlatList} from 'react-native';
+import {StyleSheet, View, Text, FlatList} from 'react-native';
 import Player from '../components/Player';
+
+/* styles */
+import {globalStyles} from '../../ui/styles/global.style';
 
 export default () => {
   const tags = ['JWPlayer-1', 'JWPlayer-2', 'JWPlayer-3'];
@@ -19,7 +22,7 @@ export default () => {
       <Player
         ref={el => (playerRef.current[tag] = el)}
         key={tag}
-        style={styles.player}
+        style={globalStyles.player}
         config={{
           playlist: [
             {
@@ -40,33 +43,22 @@ export default () => {
   };
 
   return (
-    <View>
-      <FlatList
-        contentContainerStyle={styles.flatList}
-        keyExtractor={(item, index) => `${item}-${index}`}
-        data={tags}
-        renderItem={({item, index}) => (
-          <View style={styles.playerContainer}>
-            {renderPlayer(item, index)}
-            <Text style={[styles.text, {color: 'white'}]}>This is {item}</Text>
-          </View>
-        )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </View>
+    <FlatList
+      contentContainerStyle={styles.flatList}
+      keyExtractor={(item, index) => `${item}-${index}`}
+      data={tags}
+      renderItem={({item, index}) => (
+        <View style={globalStyles.playerContainer}>
+          {renderPlayer(item, index)}
+          <Text style={[styles.text, {color: 'white'}]}>This is {item}</Text>
+        </View>
+      )}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    />
   );
 };
 
-const {width} = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  playerContainer: {
-    height: 300,
-    width: width - 40,
-  },
-  player: {
-    flex: 1,
-  },
   text: {
     fontSize: 18,
     margin: 40,
