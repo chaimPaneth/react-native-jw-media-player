@@ -60,7 +60,7 @@ export default class JWPlayer extends Component {
         "PlayAndRecord",
         "MultiRoute",
       ]),
-      categoryOptions: PropTypes.arrayOf([
+      categoryOptions: PropTypes.arrayOf(PropTypes.oneOf([
         "MixWithOthers",
         "DuckOthers",
         "AllowBluetooth",
@@ -69,7 +69,7 @@ export default class JWPlayer extends Component {
         "AllowBluetoothA2DP",
         "AllowAirPlay",
         "OverrideMutedMicrophone",
-      ]),
+      ])),
       mode: PropTypes.oneOf([
         "Default",
         "VoiceChat",
