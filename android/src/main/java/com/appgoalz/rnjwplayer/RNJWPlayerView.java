@@ -821,6 +821,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         if (backgroundAudioEnabled) {
             audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
             mMediaServiceController = new MediaServiceController.Builder((AppCompatActivity) mActivity, mPlayer).build();
+            doBindService();
         }
     }
 
