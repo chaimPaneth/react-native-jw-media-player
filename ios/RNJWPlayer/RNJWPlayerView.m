@@ -58,7 +58,7 @@
     BOOL success = [_audioSession setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&activationError];
     NSLog(@"setUnactive - success: @%@, error: @%@", @(success), activationError);
     _audioSession = nil;
-    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nil;
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = @{}.mutableCopy;
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
 
 }
