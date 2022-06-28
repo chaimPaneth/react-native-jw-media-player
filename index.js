@@ -206,8 +206,6 @@ export default class JWPlayer extends Component {
     connectedDevice: PropTypes.func,
     availableDevices: PropTypes.func,
     castState: PropTypes.func,
-    loadPlaylistItem: PropTypes.func,
-    loadPlaylist: PropTypes.func,
     seekTo: PropTypes.func,
     onBeforePlay: PropTypes.func,
     onBeforeComplete: PropTypes.func,
