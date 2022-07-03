@@ -7,12 +7,12 @@ import {globalStyles} from '../../ui/styles/global.style';
 
 export default () => {
   const tags = ['JWPlayer-1', 'JWPlayer-2', 'JWPlayer-3'];
-  const playerRef = useRef([]);
+  const playerRef = useRef({});
 
   const onBeforePlay = tag => {
     tags.map(player => {
       if (player !== tag) {
-        playerRef.current[tag]?.stop();
+        playerRef.current[player]?.pause();
       }
     });
   };

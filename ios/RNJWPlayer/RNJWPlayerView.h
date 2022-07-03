@@ -103,5 +103,6 @@
 /* Methods */
 -(void)setLicense:(id)license;
 -(void)toggleUIGroup:(UIView*)view :(NSString*)name :(NSString*)ofSubview :(BOOL)show;
+-(void)startDeinitProcess;
 
 @end

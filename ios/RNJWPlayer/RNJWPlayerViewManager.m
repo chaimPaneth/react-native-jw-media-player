@@ -525,8 +525,23 @@ RCT_EXPORT_METHOD(quite) {
                 RNJWPlayerView *rnjwView = view;
                 if (rnjwView.playerView) {
                     [rnjwView.playerView.player pause];
+                    [rnjwView.playerView.player stop];
                 } else if (rnjwView.playerViewController) {
                     [rnjwView.playerViewController.player pause];
+                    [rnjwView.playerViewController.player stop];
+                }
+            }
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(reset) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        for (id view in viewRegistry) {
+            if ([view isKindOfClass:[RNJWPlayerView class]]) {
+                RNJWPlayerView *rnjwView = view;
+                if (rnjwView) {
+                    [rnjwView startDeinitProcess];
                 }
             }
         }
