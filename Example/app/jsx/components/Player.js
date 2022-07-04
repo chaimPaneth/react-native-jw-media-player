@@ -7,8 +7,12 @@ import {IOS_API_KEY, ANDROID_API_KEY} from '@env';
 
 export default forwardRef((props, ref) => {
   const {onLayout, tag, config, style} = props;
-  const newProps = props.config;
+
+  const newProps = Object.assign({}, props);
+  delete newProps.ref;
+  delete newProps.key;
   delete newProps.config;
+  delete newProps.style;
 
   return (
     <JWPlayer
