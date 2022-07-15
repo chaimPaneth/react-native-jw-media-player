@@ -53,10 +53,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 
     // JWPlayer SDK
-    implementation 'com.jwplayer:jwplayer-core:4.5.1'
-    implementation 'com.jwplayer:jwplayer-common:4.5.1'
-    implementation 'com.jwplayer:jwplayer-chromecast:4.5.1'
-    implementation 'com.jwplayer:jwplayer-ima:4.5.1'
+    implementation 'com.jwplayer:jwplayer-core:4.6.0'
+    implementation 'com.jwplayer:jwplayer-common:4.6.0'
+    implementation 'com.jwplayer:jwplayer-chromecast:4.6.0'
+    implementation 'com.jwplayer:jwplayer-ima:4.6.0'
 
     // Ad dependencies
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.27.0'
