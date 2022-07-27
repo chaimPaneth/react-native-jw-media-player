@@ -3,7 +3,7 @@ import {StyleSheet, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 
-const SCREENS = ['Single', 'List', 'DRM', 'Local', 'Sources'];
+const SCREENS = ['Single', 'List', 'DRM', 'Local', 'Sources', 'Youtube'];
 
 export default () => {
   const navigation = useNavigation();
