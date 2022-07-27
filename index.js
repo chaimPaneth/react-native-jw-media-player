@@ -7,6 +7,7 @@ import {
   findNodeHandle,
 } from "react-native";
 import PropTypes from "prop-types";
+import _ from 'lodash';
 
 const RNJWPlayerManager =
   Platform.OS === "ios"
@@ -241,61 +242,18 @@ export default class JWPlayer extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    var { shouldComponentUpdate } = this.props;
+    if (shouldComponentUpdate) {
+      return shouldComponentUpdate(nextProps, nextState);
+    }
     var { config, controls } = nextProps;
-    var {
-      file,
-      image,
-      desc,
-      title,
-      mediaId,
-      autostart,
-      controls,
-      repeat,
-      mute,
-      styling,
-      nextUpDisplay,
-      playlistItem,
-      playlist,
-      style,
-      stretching,
-    } = config || {};
-    var { displayTitle, displayDescription } = styling || {};
-
     var thisConfig = this.props.config || {};
 
-    if (
-      file !== thisConfig.file ||
-      image !== thisConfig.image ||
-      desc !== thisConfig.desc ||
-      title !== thisConfig.title ||
-      mediaId !== thisConfig.mediaId ||
-      autostart !== thisConfig.autostart ||
-      controls !== thisConfig.controls ||
-      repeat !== thisConfig.repeat ||
-      displayTitle !== thisConfig.displayTitle ||
-      displayDescription !== thisConfig.displayDescription ||
-      nextUpDisplay !== thisConfig.nextUpDisplay ||
-      style !== thisConfig.style ||
-      stretching !== thisConfig.stretching
-    ) {
-      return true;
-    }
+    var result = !_.isEqualWith(config, thisConfig, (value1, value2, key) => {
+        return key === "startTime" ? true : undefined;
+    });
 
-    if (playlist && thisConfig.playlist) {
-      return !this.arraysAreEqual(playlist, thisConfig.playlist);
-    } else if (!playlist && thisConfig.playlist) {
-      return true;
-    }
-
-    if (controls !== this.props.controls) {
-      return true;
-    }
-
-    return false;
-  }
-
-  arraysAreEqual(ary1, ary2) {
-    return ary1?.join("") == ary2?.join("");
+    return result || controls !== this.props.controls;
   }
 
   componentWillUnmount() {

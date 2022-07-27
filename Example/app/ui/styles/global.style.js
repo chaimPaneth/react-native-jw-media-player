@@ -24,3 +24,7 @@ export const globalStyles = StyleSheet.create({
     margin: 40,
   },
 });
+
+export const colors = {
+  red: '#EC0041',
+};

@@ -6549,10 +6549,15 @@ react-native-gradle-plugin@^0.0.6:
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz#b61a9234ad2f61430937911003cddd7e15c72b45"
   integrity sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg==
 
-react-native-jw-media-player@0.2.19:
-  version "0.2.19"
-  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.19.tgz#2d783a072605a433db48df1f89acfeb3f67c6792"
-  integrity sha512-//ak1xeG3sQJcnpE1MNejDtj+B2bLQgl0Qa0vD6XaEsQIv2kJoiaR9AqfyvaRGBRChh5O/C8w7NKAU8uDQ2/Ag==
+react-native-iphone-x-helper@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz#20c603e9a0e765fd6f97396638bdeb0e5a60b010"
+  integrity sha512-HOf0jzRnq2/aFUcdCJ9w9JGzN3gdEg0zFE4FyYlp4jtidqU03D5X7ZegGKfT1EWteR0gPBGp9ye5T5FvSWi9Yg==
+
+react-native-jw-media-player@0.2.23:
+  version "0.2.23"
+  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.23.tgz#f7e4c7ff1febd4fb66f80f98d0b5c442f695399f"
+  integrity sha512-PfKfptvT/Q0JlirPgRP9Vp5WqN1AJrcYz/wOLqPnjSqOGtL8PFWMtS6adLJ1kYb0WbcbB/RLoNOCzTOshsWLWw==
 
 react-native-orientation-locker@1.4.0:
   version "1.4.0"
@@ -6571,6 +6576,11 @@ react-native-screens@3.13.1:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-status-bar-height@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-status-bar-height/-/react-native-status-bar-height-2.6.0.tgz#b6afd25b6e3d533c43d0fcdcfd5cafd775592cea"
+  integrity sha512-z3SGLF0mHT+OlJDq7B7h/jXPjWcdBT3V14Le5L2PjntjjWM3+EJzq2BcXDwV+v67KFNJic5pgA26cCmseYek6w==
 
 react-native-vector-icons@8.1.0:
   version "8.1.0"

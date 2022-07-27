@@ -20,6 +20,17 @@
     self.player.contentKeyDataSource = self;
 }
 
+-(void)removeDelegates
+{
+    self.delegate = nil;
+    self.playerView.delegate = nil;
+    self.player.delegate = nil;
+    self.player.playbackStateDelegate = nil;
+    self.player.adDelegate = nil;
+    self.player.avDelegate = nil;
+    self.player.contentKeyDataSource = nil;
+}
+
 #pragma mark - JWPlayer Delegate
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player

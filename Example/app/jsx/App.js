@@ -1,17 +1,5 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  Dimensions,
-  Platform,
-  StatusBar,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 /* navigation */
 import {NavigationContainer} from '@react-navigation/native';
@@ -24,6 +12,7 @@ import SingleExample from './screens/SingleExample';
 import DRMExample from './screens/DRMExample';
 import LocalFileExample from './screens/LocalFileExample';
 import SourcesExample from './screens/SourcesExample';
+import YoutubeExample from './screens/YoutubeExample';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +27,7 @@ export default class App extends Component {
           <Stack.Screen name="DRM" component={DRMExample} />
           <Stack.Screen name="Local" component={LocalFileExample} />
           <Stack.Screen name="Sources" component={SourcesExample} />
+          <Stack.Screen name="Youtube" component={YoutubeExample} />
         </Stack.Navigator>
       </NavigationContainer>
     );

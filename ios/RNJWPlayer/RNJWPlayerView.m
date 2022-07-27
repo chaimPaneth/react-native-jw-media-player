@@ -36,7 +36,7 @@
 -(void)reset
 {
     @try {
-        //[[NSNotificationCenter defaultCenter] removeObserver:self];
+//        [[NSNotificationCenter defaultCenter] removeObserver:self];
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionMediaServicesWereResetNotification object:_audioSession];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionInterruptionNotification object:_audioSession];
@@ -475,7 +475,7 @@
     }
     
     id autostart = config[@"autostart"];
-    if (autostart != nil && (autostart != (id)[NSNull null])) {
+    if ([autostart boolValue]) {
         [configBuilder autostart:autostart];
     }
     
@@ -701,9 +701,18 @@
 {
     if (_playerViewController) {
         [_playerViewController.player pause]; // hack for stop not always stopping on unmount
-        _playerViewController.enableLockScreenControls = NO;
         [_playerViewController.player stop];
+        _playerViewController.enableLockScreenControls = NO;
+        
+        // hack for stop not always stopping on unmount
+        JWPlayerConfigurationBuilder *configBuilder = [[JWPlayerConfigurationBuilder alloc] init];
+        [configBuilder playlist:@[]];
+        NSError* error = nil;
+        [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
+        
+        [_playerViewController removeDelegates];
         _playerViewController.parentView = nil;
+        
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
         [_playerViewController willMoveToParentViewController:nil];
@@ -759,8 +768,8 @@
     
     [self addSubview:self.playerView];
     
-    BOOL autostart = config[@"autostart"];
-    if (autostart) {
+    id autostart = config[@"autostart"];
+    if ([autostart boolValue]) {
         [_playerView.player play];
     }
     
