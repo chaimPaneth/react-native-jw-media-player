@@ -1251,11 +1251,11 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onCast(CastEvent castEvent) {
         WritableMap event = Arguments.createMap();
-        event.putString("message", "onCast");
+        event.putString("message", "onCasting");
         event.putString("device", castEvent.getDeviceName());
         event.putBoolean("active", castEvent.isActive());
         event.putBoolean("available", castEvent.isAvailable());
-        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCast", event);
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCasting", event);
     }
 
     // LifecycleEventListener
