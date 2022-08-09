@@ -186,6 +186,9 @@ public class RNJWPlayerView extends RelativeLayout implements
     boolean userPaused = false;
     boolean wasInterrupted = false;
 
+    private static int sessionDepth = 0;
+    boolean isInBackground = false;
+
     private final ReactApplicationContext mAppContext;
 
     private ThemedReactContext mThemedReactContext;
@@ -965,7 +968,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     private void updateWakeLock(boolean enable) {
         if (mWindow != null) {
-            if (enable) {
+            if (enable && !isInBackground) {
                 mWindow.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             } else {
                 mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -1001,6 +1004,10 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
+        if (backgroundAudioEnabled) {
+            doBindService();
+        }
+
         WritableMap event = Arguments.createMap();
         event.putString("message", "onBeforePlay");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforePlay", event);
@@ -1148,6 +1155,10 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
+        if (backgroundAudioEnabled) {
+            doBindService();
+        }
+
         currentPlayingIndex = playlistItemEvent.getIndex();
 
         WritableMap event = Arguments.createMap();
@@ -1240,23 +1251,30 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onCast(CastEvent castEvent) {
         WritableMap event = Arguments.createMap();
-        event.putString("message", "onCast");
+        event.putString("message", "onCasting");
         event.putString("device", castEvent.getDeviceName());
         event.putBoolean("active", castEvent.isActive());
         event.putBoolean("available", castEvent.isAvailable());
-        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCast", event);
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCasting", event);
     }
 
     // LifecycleEventListener
 
     @Override
     public void onHostResume() {
-
+        sessionDepth++;
+        if(sessionDepth == 1){
+            isInBackground = false;
+        }
     }
 
     @Override
     public void onHostPause() {
-
+        if (sessionDepth > 0)
+            sessionDepth--;
+        if (sessionDepth == 0) {
+            isInBackground = true;
+        }
     }
 
     @Override

@@ -113,8 +113,8 @@
     id license = config[@"license"];
     [self setLicense:license];
     
-    _backgroundAudioEnabled = config[@"backgroundAudioEnabled"];
-    _pipEnabled = config[@"pipEnabled"];
+    _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
+    _pipEnabled = [config[@"pipEnabled"] boolValue];
     if (_backgroundAudioEnabled || _pipEnabled) {
         id category = config[@"category"];
         id categoryOptions = config[@"categoryOptions"];
