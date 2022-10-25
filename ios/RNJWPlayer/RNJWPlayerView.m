@@ -481,7 +481,9 @@
     
     id repeatContent = config[@"repeat"];
     if (repeatContent != nil && (repeatContent != (id)[NSNull null])) {
-        [configBuilder repeatContent:repeatContent];
+        if ([repeatContent boolValue]) {
+            [configBuilder repeatContent:repeatContent];
+        }
     }
     
     id preload = config[@"preload"];
