@@ -899,18 +899,6 @@ public class RNJWPlayerView extends RelativeLayout implements
                         }
                     }
                     break;
-                case AudioManager.AUDIOFOCUS_LOSS:
-                    mPlayer.pause();
-                    wasInterrupted = true;
-                    hasAudioFocus = false;
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    mPlayer.pause();
-                    wasInterrupted = true;
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    setVolume(initVolume / 2);
-                    break;
             }
         }
     }
@@ -934,24 +922,6 @@ public class RNJWPlayerView extends RelativeLayout implements
                                 mPlayer.play();
                             }
                         }
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS:
-                        mPlayer.pause();
-                        synchronized(focusLock) {
-                            wasInterrupted = true;
-                            playbackDelayed = false;
-                        }
-                        hasAudioFocus = false;
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        mPlayer.pause();
-                        synchronized(focusLock) {
-                            wasInterrupted = true;
-                            playbackDelayed = false;
-                        }
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        setVolume(initVolume / 2);
                         break;
                 }
             } else {
