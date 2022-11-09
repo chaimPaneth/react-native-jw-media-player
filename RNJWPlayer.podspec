@@ -1,6 +1,6 @@
 require 'json'
 
-package = JSON.parse(File.read('../package.json'))
+package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
   s.name         = 'RNJWPlayer'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.platform     = :ios, "12.0"
   s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
-  s.source_files  = "RNJWPlayer/*.{h,m}"
+  s.source_files  = "ios/RNJWPlayer/*.{h,m}"
   s.dependency   'JWPlayerKit', '~> 4.6.2'
   s.dependency   'google-cast-sdk', '~> 4.7.0'
   s.dependency   'React'
