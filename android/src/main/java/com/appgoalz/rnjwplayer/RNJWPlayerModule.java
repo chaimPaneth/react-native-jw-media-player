@@ -277,12 +277,8 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
 
           if (playerView != null && playerView.mPlayerView != null) {
-            int maxValue = playerView.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            if (volume <= maxValue) {
-              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-            } else {
-              playerView.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxValue, 0);
-            }
+            // changed to adjust volume to correct value
+            playerView.mPlayerView.getPlayer().setVolume(volume);
           }
         }
       });
