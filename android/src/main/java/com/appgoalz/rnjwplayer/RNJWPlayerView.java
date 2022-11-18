@@ -1255,7 +1255,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         event.putString("device", castEvent.getDeviceName());
         event.putBoolean("active", castEvent.isActive());
         event.putBoolean("available", castEvent.isAvailable());
-        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCasting", event);
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topCasting", event);
     }
 
     // LifecycleEventListener
