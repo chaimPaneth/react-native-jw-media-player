@@ -153,7 +153,7 @@ declare module "react-native-jw-media-player" {
     processSpcUrl?: string;
     fairplayCertUrl?: string;
     contentUUID?: string;
-    viewOnly: boolean;
+    viewOnly?: boolean;
     enableLockScreenControls: boolean;
     pipEnabled: boolean;
   }
