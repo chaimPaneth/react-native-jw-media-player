@@ -258,7 +258,17 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     public Activity getActivity() {
-        return (Activity) getContext();
+        if (!contextHasBug(mAppContext.getCurrentActivity())) {
+            return mAppContext.getCurrentActivity();
+        } else if (contextHasBug(mThemedReactContext)) {
+            if (!contextHasBug(mThemedReactContext.getCurrentActivity())) {
+                return mThemedReactContext.getCurrentActivity();
+            } else if (!contextHasBug(mThemedReactContext.getApplicationContext())) {
+                return (Activity) mThemedReactContext.getApplicationContext();
+            }
+        }
+
+        return mThemedReactContext.getReactApplicationContext().getCurrentActivity();
     }
 
     public void destroyPlayer() {
