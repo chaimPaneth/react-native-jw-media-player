@@ -48,15 +48,18 @@ allprojects {
     }
 }
 
+ext.jwPlayerVersion = '4.6.1'
+ext.exoplayerVersion = '2.16.1'
+
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.google.code.gson:gson:2.8.9'
 
     // JWPlayer SDK
-    implementation 'com.jwplayer:jwplayer-core:4.8.0'
-    implementation 'com.jwplayer:jwplayer-common:4.8.0'
-    implementation 'com.jwplayer:jwplayer-chromecast:4.8.0'
-    implementation 'com.jwplayer:jwplayer-ima:4.8.0'
+    implementation "com.jwplayer:jwplayer-core:$jwPlayerVersion"
+    implementation "com.jwplayer:jwplayer-common:$jwPlayerVersion"
+    implementation "com.jwplayer:jwplayer-chromecast:$jwPlayerVersion"
+    implementation "com.jwplayer:jwplayer-ima:$jwPlayerVersion"
 
     // Ad dependencies
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.27.0'
@@ -64,11 +67,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-cast-framework:21.0.1'
 
     // ExoPlayer dependencies
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.1'
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-dash:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayerVersion"
 
     // JW Player Native UI dependencies
     implementation 'com.squareup.picasso:picasso:2.71828'
