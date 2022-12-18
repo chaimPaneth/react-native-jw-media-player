@@ -48,18 +48,15 @@ allprojects {
     }
 }
 
-ext.jwPlayerVersion = '4.6.1'
-ext.exoplayerVersion = '2.16.1'
-
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.google.code.gson:gson:2.8.9'
 
     // JWPlayer SDK
-    implementation "com.jwplayer:jwplayer-core:$jwPlayerVersion"
-    implementation "com.jwplayer:jwplayer-common:$jwPlayerVersion"
-    implementation "com.jwplayer:jwplayer-chromecast:$jwPlayerVersion"
-    implementation "com.jwplayer:jwplayer-ima:$jwPlayerVersion"
+    implementation "com.jwplayer:jwplayer-core:${safeExtGet('jwPlayerVersion', '4.6.1')}"
+    implementation "com.jwplayer:jwplayer-common:${safeExtGet('jwPlayerVersion', '4.6.1')}"
+    implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', '4.6.1')}"
+    implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', '4.6.1')}"
 
     // Ad dependencies
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.27.0'
@@ -67,11 +64,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-cast-framework:21.0.1'
 
     // ExoPlayer dependencies
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-dash:$exoplayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoplayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-core:${safeExtGet('exoplayerVersion', '2.16.1')}"
+    implementation "com.google.android.exoplayer:exoplayer-dash:${safeExtGet('exoplayerVersion', '2.16.1')}"
+    implementation "com.google.android.exoplayer:exoplayer-hls:${safeExtGet('exoplayerVersion', '2.16.1')}"
+    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${safeExtGet('exoplayerVersion', '2.16.1')}"
+    implementation "com.google.android.exoplayer:exoplayer-ui:${safeExtGet('exoplayerVersion', '2.16.1')}"
 
     // JW Player Native UI dependencies
     implementation 'com.squareup.picasso:picasso:2.71828'
