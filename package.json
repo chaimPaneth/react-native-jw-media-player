@@ -1,6 +1,6 @@
 {
   "name": "react-native-jw-media-player",
-  "version": "0.2.30",
+  "version": "0.2.31",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
   "main": "index.js",
   "types": "./index.d.ts",
