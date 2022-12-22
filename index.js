@@ -237,6 +237,7 @@ export default class JWPlayer extends Component {
     super(props);
 
     this._playerId = playerId++;
+    this.ref_key = `${RCT_RNJWPLAYER_REF}-${this._playerId}`;
 
     this.quite();
   }
@@ -246,6 +247,7 @@ export default class JWPlayer extends Component {
     if (shouldComponentUpdate) {
       return shouldComponentUpdate(nextProps, nextState);
     }
+
     var { config, controls } = nextProps;
     var thisConfig = this.props.config || {};
 
@@ -481,11 +483,10 @@ export default class JWPlayer extends Component {
   }
 
   getRNJWPlayerBridgeHandle() {
-    return findNodeHandle(this.refs[`${RCT_RNJWPLAYER_REF}-${this._playerId}`]);
+    return findNodeHandle(this[this.ref_key]);
   }
 
   render() {
-    const ref_key = `${RCT_RNJWPLAYER_REF}-${this._playerId}`;
-    return <RNJWPlayer ref={ref_key} key={ref_key} {...this.props} />;
+    return <RNJWPlayer ref={player => this[this.ref_key] = player} key={this.ref_key} {...this.props} />;
   }
 }
