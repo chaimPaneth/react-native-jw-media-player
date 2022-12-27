@@ -196,6 +196,7 @@ declare module "react-native-jw-media-player" {
     setControls(show: boolean): void;
     setLockScreenControls(show: boolean): void;
     seekTo(time: number): void;
+    loadPlaylist(playlistItems: PlaylistItem[]): void;
     setFullscreen(fullScreen: boolean): void;
     position(): Promise<number>;
     setUpCastController(): void;
