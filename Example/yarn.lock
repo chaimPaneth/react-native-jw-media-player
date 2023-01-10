@@ -6554,10 +6554,10 @@ react-native-iphone-x-helper@1.3.1:
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz#20c603e9a0e765fd6f97396638bdeb0e5a60b010"
   integrity sha512-HOf0jzRnq2/aFUcdCJ9w9JGzN3gdEg0zFE4FyYlp4jtidqU03D5X7ZegGKfT1EWteR0gPBGp9ye5T5FvSWi9Yg==
 
-react-native-jw-media-player@0.2.23:
-  version "0.2.23"
-  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.23.tgz#f7e4c7ff1febd4fb66f80f98d0b5c442f695399f"
-  integrity sha512-PfKfptvT/Q0JlirPgRP9Vp5WqN1AJrcYz/wOLqPnjSqOGtL8PFWMtS6adLJ1kYb0WbcbB/RLoNOCzTOshsWLWw==
+react-native-jw-media-player@0.2.33:
+  version "0.2.33"
+  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.33.tgz#ce2333088e5d8587a4176d39ea0ff231919561db"
+  integrity sha512-AXvnHBa6H69rQlNgJuDKrt4p+0bDgLEgNC7Q0X4zL2aQ6EeN/lh0mue4WvthsobDmG/+GHxFQtbjqEtMeQeY9w==
 
 react-native-orientation-locker@1.4.0:
   version "1.4.0"
