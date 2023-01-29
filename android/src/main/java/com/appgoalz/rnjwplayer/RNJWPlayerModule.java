@@ -8,15 +8,21 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.PlayerState;
+import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.media.audio.AudioTrack;
+import com.jwplayer.pub.api.media.playlists.PlaylistItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
@@ -34,6 +40,62 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   @Override
   public String getName() {
     return TAG;
+  }
+
+  @ReactMethod
+  public void loadPlaylist(final int reactTag, final ReadableArray playlistItems) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            JWPlayer player = playerView.mPlayerView.getPlayer();
+
+            PlayerConfig oldConfig = player.getConfig();
+            PlayerConfig config = new PlayerConfig.Builder()
+                    .autostart(oldConfig.getAutostart())
+                    .nextUpOffset(oldConfig.getNextUpOffset())
+                    .repeat(oldConfig.getRepeat())
+                    .relatedConfig(oldConfig.getRelatedConfig())
+                    .displayDescription(oldConfig.getDisplayDescription())
+                    .displayTitle(oldConfig.getDisplayTitle())
+                    .advertisingConfig(oldConfig.getAdvertisingConfig())
+                    .stretching(oldConfig.getStretching())
+                    .uiConfig(oldConfig.getUiConfig())
+                    .playlist(createPlaylist(playlistItems))
+                    .sharingConfig(oldConfig.getSharingConfig())
+                    .allowCrossProtocolRedirects(oldConfig.getAllowCrossProtocolRedirects())
+                    .preload(oldConfig.getPreload())
+                    .useTextureView(oldConfig.useTextureView())
+                    .thumbnailPreview(oldConfig.getThumbnailPreview())
+                    .mute(oldConfig.getMute())
+                    .build();
+
+            player.setup(config);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  private List<PlaylistItem> createPlaylist(ReadableArray playlistItems) {
+    List<PlaylistItem> playlist = new ArrayList<>();
+    if (playlistItems == null || playlistItems.size() <= 0)
+      return playlist;
+
+    int j = 0;
+    while (playlistItems.size() > j) {
+      ReadableMap playlistItem = playlistItems.getMap(j);
+
+      PlaylistItem newPlayListItem = RNJWPlayerView.getPlaylistItem((playlistItem));
+      playlist.add(newPlayListItem);
+      j++;
+    }
+    return playlist;
   }
 
   @ReactMethod

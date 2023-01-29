@@ -480,7 +480,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    public PlaylistItem getPlaylistItem (ReadableMap playlistItem) {
+    public static PlaylistItem getPlaylistItem (ReadableMap playlistItem) {
         PlaylistItem.Builder itemBuilder = new PlaylistItem.Builder();
 
         if (playlistItem.hasKey("file")) {

@@ -548,4 +548,26 @@ RCT_EXPORT_METHOD(reset) {
     }];
 }
 
+RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSNumber *)reactTag: (nonnull NSArray *)playlist) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]] || (view.playerView == nil && view.playerViewController == nil)) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
+            
+            for (id item in playlist) {
+                JWPlayerItem *playerItem = [view getPlayerItem:item];
+                [playlistArray addObject:playerItem];
+            }
+            
+            if (view.playerView) {
+                [view.playerView.player loadPlaylist:playlistArray];
+            } else if (view.playerViewController) {
+                [view.playerViewController.player loadPlaylist:playlistArray];
+            }
+        }
+    }];
+}
+
 @end
