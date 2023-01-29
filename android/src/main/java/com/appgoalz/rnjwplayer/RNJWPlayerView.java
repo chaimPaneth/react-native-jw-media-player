@@ -541,7 +541,8 @@ public class RNJWPlayerView extends RelativeLayout implements
                     if (trackProp.hasKey("file")) {
                         String file = trackProp.getString("file");
                         String label = trackProp.getString("label");
-                        Caption caption = new Caption.Builder().file(file).label(label).kind(CaptionType.CAPTIONS).isDefault(false).build();
+                        boolean isDefault = trackProp.getBoolean("default");
+                        Caption caption = new Caption.Builder().file(file).label(label).kind(CaptionType.CAPTIONS).isDefault(isDefault).build();
                         tracks.add(caption);
                     }
                 }

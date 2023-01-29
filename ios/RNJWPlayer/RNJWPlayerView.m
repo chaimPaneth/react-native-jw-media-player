@@ -407,11 +407,13 @@
                 NSString *file = [item objectForKey:@"file"];
                 NSURL *fileUrl = [NSURL URLWithString:file];
                 NSString *label = [item objectForKey:@"label"];
+                bool isDefault = [item objectForKey:@"default"];
                 
                 JWCaptionTrackBuilder* trackBuilder = [[JWCaptionTrackBuilder alloc] init];
                 
                 [trackBuilder file:fileUrl];
                 [trackBuilder label:label];
+                [trackBuilder defaultTrack:isDefault];
                 
                 JWMediaTrack *trackItem = [trackBuilder buildAndReturnError:&error];
                 

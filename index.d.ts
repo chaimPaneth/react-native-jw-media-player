@@ -21,6 +21,7 @@ declare module "react-native-jw-media-player" {
   interface Track {
     file: string;
     label: string;
+    default?: boolean;
   }
   interface AdSchedule {
     tag: string;
