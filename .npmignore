@@ -1,9 +1,9 @@
-/example
-/images
-/android/build
-/android/.settings
-/android/.classpath
-/android/.project
+Example
+images
+android/build
+android/.settings
+android/.classpath
+android/.project
 *.iml
 .eslintrc
 yarn-error.log

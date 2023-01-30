@@ -24,11 +24,10 @@ import {JWPlayerState} from 'react-native-jw-media-player';
 
 /* styles */
 import playerStyle from './player.style';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
-import {getBottomSpace, isIphoneX} from 'react-native-iphone-x-helper';
+import {getBottomInset, getTopInset} from 'rn-iphone-helper';
 const {height, width} = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const headerHeight = 40 + getStatusBarHeight();
+const headerHeight = 40 + getTopInset();
 
 class AnimatedPlayer extends Component {
   constructor(props) {
@@ -107,7 +106,7 @@ class AnimatedPlayer extends Component {
 
           var heightPercent = this.rangePercentage(
             dy,
-            50 + getBottomSpace(),
+            50 + getBottomInset(),
             height - headerHeight,
           );
           var vidHeightPercent = this.rangePercentage(dy, 50, 250);
@@ -261,7 +260,7 @@ class AnimatedPlayer extends Component {
           toValue: bottomFinal,
         }),
         Animated.timing(this.animHeight, {
-          toValue: 50 + getBottomSpace(),
+          toValue: 50 + getBottomInset(),
         }),
         Animated.timing(this.animVidWidth, {
           toValue: width / 4,

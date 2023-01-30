@@ -562,9 +562,28 @@ RCT_EXPORT_METHOD(loadPlaylist: (nonnull NSNumber *)reactTag: (nonnull NSArray *
             }
             
             if (view.playerView) {
-                [view.playerView.player loadPlaylist:playlistArray];
+                [view.playerView.player loadPlaylistWithItems:playlistArray];
             } else if (view.playerViewController) {
-                [view.playerViewController.player loadPlaylist:playlistArray];
+                [view.playerViewController.player loadPlaylistWithItems:playlistArray];
+            }
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fullscreen) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerView *> *viewRegistry) {
+        RNJWPlayerView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerView, got: %@", view);
+        } else {
+            if (view.playerViewController) {
+                if (fullscreen) {
+                    [view.playerViewController transitionToFullScreenAnimated:YES completion:nil];
+                } else {
+                    [view.playerViewController dismissFullScreenAnimated:YES completion:nil];
+                }
+            } else {
+                RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerViewController, got: %@", view);
             }
         }
     }];

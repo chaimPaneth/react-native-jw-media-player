@@ -2,7 +2,11 @@
 
 ### A react-native bridge for JWPlayer native SDK's
 
-<img width="200" alt="sample" src="./images/1.png">
+⚠️ Important you need a `JWPlayer` license to use this library https://jwplayer.com/
+
+<img width="150" alt="sample" src="./images/1.png">
+<img width="150" alt="sample" src="./images/2.png">
+<img width="150" alt="sample" src="./images/3.png">
 
 ## Getting started
 

@@ -473,7 +473,7 @@
             [playlistArray addObject:playerItem];
         }
         
-        [configBuilder playlist:playlistArray];
+        [configBuilder playlistWithItems:playlistArray];
     }
     
     id autostart = config[@"autostart"];
@@ -710,7 +710,7 @@
         
         // hack for stop not always stopping on unmount
         JWPlayerConfigurationBuilder *configBuilder = [[JWPlayerConfigurationBuilder alloc] init];
-        [configBuilder playlist:@[]];
+        [configBuilder playlistWithItems:@[]];
         NSError* error = nil;
         [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
         

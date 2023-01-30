@@ -7,6 +7,7 @@ buildscript {
         compileSdkVersion = 31
         targetSdkVersion = 31
         ndkVersion = "20.1.5948944"
+        kotlinVersion = "1.6.21"
     }
     repositories {
         google()
@@ -36,6 +37,14 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
         maven {
             url 'https://mvn.jwplayer.com/content/repositories/releases/'
+        }
+    }
+
+    def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
+
+    configurations.all {
+        resolutionStrategy {
+            force "com.facebook.react:react-native:" + REACT_NATIVE_VERSION
         }
     }
 }
