@@ -714,7 +714,6 @@
         NSError* error = nil;
         [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
         
-        [_playerViewController removeDelegates];
         _playerViewController.parentView = nil;
         
         [_playerViewController.view removeFromSuperview];
@@ -736,8 +735,6 @@
     });
     _playerViewController.view.frame = self.frame;
     [self addSubview:_playerViewController.view];
-    
-    [_playerViewController setDelegates];
     
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
@@ -850,13 +847,11 @@
     }
 }
 
-
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdWarning:(NSUInteger)code message:(NSString * _Nonnull)message {
     if (self.onPlayerAdWarning) {
         self.onPlayerAdWarning(@{@"warning": message});
     }
 }
-
 
 #pragma mark - JWPlayer View Delegate
 
