@@ -715,7 +715,7 @@
         [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
         
         _playerViewController.parentView = nil;
-        
+        [_playerViewController setVisibility:NO forControls:@[@(JWControlTypePictureInPictureButton)]];
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
         [_playerViewController willMoveToParentViewController:nil];
@@ -811,6 +811,22 @@
     }
 }
 
+- (void)setVisibility:(BOOL)isVisible forControls:(NSArray* _Nonnull)controls
+{
+    NSMutableArray<NSNumber *> * _controls = [[NSMutableArray alloc] init];
+    
+    for (id control in controls) {
+        JWControlType type = [RCTConvert JWControlType:control];
+        if (type) {
+            [_controls addObject:@(type)];
+        }
+    }
+    
+    if ([_controls count]) {
+        [_playerViewController setVisibility:isVisible forControls:_controls];
+    }
+}
+
 #pragma mark - JWPlayer Delegate
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player
@@ -847,11 +863,13 @@
     }
 }
 
+
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdWarning:(NSUInteger)code message:(NSString * _Nonnull)message {
     if (self.onPlayerAdWarning) {
         self.onPlayerAdWarning(@{@"warning": message});
     }
 }
+
 
 #pragma mark - JWPlayer View Delegate
 

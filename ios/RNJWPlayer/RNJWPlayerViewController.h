@@ -20,7 +20,7 @@
 
 @class RNJWPlayerView;
 
-@interface RNJWPlayerViewController : JWPlayerObjCViewController
+@interface RNJWPlayerViewController : JWPlayerObjCViewController <JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, JWTimeEventListener, AVPictureInPictureControllerDelegate>
 
 @property(nonatomic, weak)RNJWPlayerView *parentView;
 

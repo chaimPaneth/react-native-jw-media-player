@@ -45,4 +45,17 @@ RCT_ENUM_CONVERTER(JWRelatedOnComplete, (@{
     @"autoplay": @(JWRelatedOnCompleteAutoplay),
 }), JWRelatedOnCompleteShow, integerValue)
 
+RCT_ENUM_CONVERTER(JWControlType, (@{
+    @"forward": @(JWControlTypeFastForwardButton),
+    @"rewind": @(JWControlTypeRewindButton),
+    @"pip": @(JWControlTypePictureInPictureButton),
+    @"airplay": @(JWControlTypeAirplayButton),
+    @"chromecast": @(JWControlTypeChromecastButton),
+    @"next": @(JWControlTypeNextButton),
+    @"previous": @(JWControlTypePreviousButton),
+    @"settings": @(JWControlTypeSettingsButton),
+    @"languages": @(JWControlTypeLanguagesButton),
+    @"fullscreen": @(JWControlTypeFullscreenButton),
+}), JWControlTypeFullscreenButton, integerValue)
+
 @end

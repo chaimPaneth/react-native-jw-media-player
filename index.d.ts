@@ -129,6 +129,17 @@ declare module "react-native-jw-media-player" {
     | "MoviePlayback"
     | "SpokenAudio"
     | "VoicePrompt";
+  type JWControlType =
+    | "forward"
+    | "rewind"
+    | "pip"
+    | "airplay"
+    | "chromecast"
+    | "next"
+    | "previous"
+    | "settings"
+    | "languages"
+    | "fullscreen";
   interface Config {
     license: string;
     advertising?: Advertising;
@@ -210,5 +221,6 @@ declare module "react-native-jw-media-player" {
     getCurrentAudioTrack(): Promise<number | null>;
     setCurrentAudioTrack(index: number): void;
     setCurrentCaptions(index: number): void;
+    setVisibility(visibility: boolean, controls: JWControlType[]): void;
   }
 }
