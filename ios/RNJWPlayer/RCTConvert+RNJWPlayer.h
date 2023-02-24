@@ -22,4 +22,6 @@
 
 + (JWRelatedOnComplete)JWRelatedOnComplete:(id)json;
 
++ (JWControlType)JWControlType:(id)json;
+
 @end

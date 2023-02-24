@@ -33,7 +33,9 @@ maven{
     url 'https://mvn.jwplayer.com/content/repositories/releases/'
 }
 ```
+
 As so
+
 ```
 allprojects {
     repositories {
@@ -216,6 +218,7 @@ Running the example project:
 | **`contentUUID`**              | Your DRM content UUID. Checkout the [DRM](#DRM) section below.                                                                                                                                                                                                                                                                                                          | `String`                                                                                                                                                                                                               | `iOS`                                       | `none`     |
 
 ##### PlaylistItem
+
 | Prop                  | Description                                                                                              | Type                                              |
 | --------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | **`mediaId`**         | The JW media id.                                                                                         | `Int`                                             |
@@ -232,16 +235,33 @@ Running the example project:
 | **`autostart`**       | Should the track auto start.                                                                             | `Boolean`                                         |
 | **`authUrl`**         | Only Available on **Android**, Used for Authorizing DRM content. Checkout the [DRM](#DRM) section below. | `String`                                          |
 
+##### JWControlType
+
+| Key              | Value |
+| ---------------- | ----- |
+| **`forward`**    | 0     |
+| **`rewind`**     | 1     |
+| **`pip`**        | 2     |
+| **`airplay`**    | 3     |
+| **`chromecast`** | 4     |
+| **`next`**       | 5     |
+| **`previous`**   | 6     |
+| **`settings`**   | 7     |
+| **`languages`**  | 8     |
+| **`fullscreen`** | 9     |
+
 ##### JWPlayerAdClients
-  | Client                     | Value |
-  | -------------------------- | ----- |
-  | **`JWAdClientVast`**       | 0     |
-  | **`JWAdClientGoogima`**    | 1     |
-  | **`JWAdClientGoogimaDAI`** | 2     |
+
+| Client                     | Value |
+| -------------------------- | ----- |
+| **`JWAdClientVast`**       | 0     |
+| **`JWAdClientGoogima`**    | 1     |
+| **`JWAdClientGoogimaDAI`** | 2     |
 
 ##### JWPlayerState
 
 #### **iOS**
+
 | State                        | Value |
 | ---------------------------- | ----- |
 | **`JWPlayerStateUnknown`**   | 0     |
@@ -253,6 +273,7 @@ Running the example project:
 | **`JWPlayerStateError`**     | 6     |
 
 #### **Android**
+
 | State                        | Value |
 | ---------------------------- | ----- |
 | **`JWPlayerStateIdle`**      | 0     |
@@ -290,8 +311,8 @@ colors: PropTypes.shape({
     progress: PropTypes.string,
     rail: PropTypes.string,
     thumb: PropTypes.string,
-  })
-})
+  }),
+});
 ```
 
 ##### EdgeStyle
@@ -352,7 +373,7 @@ As of now June 7, 2022 there is only support for **Fairplay** on iOS and **Widev
 In short when passing a protected file URL in the `file` prop you will also need to pass additional props for the player to be able to decode your encrypted content; per each respective platform.
 
 - iOS - your `processSpcUrl?: string` (License) and `fairplayCertUrl?: string` (Certificate) on the `config` prop. We will try to parse the `contentUUID` from the FPS server
-playback context (SPC), but you can override it by passing it in `config` along the other two props;
+  playback context (SPC), but you can override it by passing it in `config` along the other two props;
 - Android - your `authUrl?: string` on each **PlaylistItem** in the `playlist` prop;
 
 Checkout the DRMExample in the Example app. (The DRMExample cannot be run in the Simulator).
@@ -368,16 +389,17 @@ Checkout the DRMExample in the Example app. (The DRMExample cannot be run in the
 
 ##### Related
 
-| Prop                  | Description                                                                                 | Type                         |
-| --------------------- | ------------------------------------------------------------------------------------------- | ---------------------------- |
-| **`onClick`**         | Sets the related content onClick action using a JWRelatedOnClick. Defaults to `play`        | `'play', 'link'`             |
-| **`onComplete`**      | Sets the related content onComplete action using a JWRelatedOnComplete. Defaults to  `show` | `'show', 'hide', 'autoplay'` |
-| **`heading`**         | Sets the related content heading using a String. Defaults to “Next up”.                     | `String`                     |
-| **`url`**             | Sets the related content url using a URL.                                                   | `String`                     |
-| **`autoplayMessage`** | Sets the related content autoplayMessage using a String. Defaults to `title`                | `String`                     |
-| **`autoplayTimer`**   | Sets the related content autoplayTimer using a Int. Defaults to 10 seconds.                 | `Int`                        |
+| Prop                  | Description                                                                                | Type                         |
+| --------------------- | ------------------------------------------------------------------------------------------ | ---------------------------- |
+| **`onClick`**         | Sets the related content onClick action using a JWRelatedOnClick. Defaults to `play`       | `'play', 'link'`             |
+| **`onComplete`**      | Sets the related content onComplete action using a JWRelatedOnComplete. Defaults to `show` | `'show', 'hide', 'autoplay'` |
+| **`heading`**         | Sets the related content heading using a String. Defaults to “Next up”.                    | `String`                     |
+| **`url`**             | Sets the related content url using a URL.                                                  | `String`                     |
+| **`autoplayMessage`** | Sets the related content autoplayMessage using a String. Defaults to `title`               | `String`                     |
+| **`autoplayTimer`**   | Sets the related content autoplayTimer using a Int. Defaults to 10 seconds.                | `Int`                        |
 
 ### AudioSessions iOS
+
 Check out the official apple docs for more information on [AVAudioSessions](https://developer.apple.com/documentation/avfaudio/avaudiosession?language=objc). Below is a summarized description of each value.
 
 ##### AudioSessionCategory
@@ -387,7 +409,7 @@ Check out the official apple docs for more information on [AVAudioSessions](http
 | Prop                | Description                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------- |
 | **`Ambient`**       | Use this category for background sounds such as rain, car engine noise, etc. Mixes with other music. |
-| **`SoloAmbient`**   | Use this category for background sounds.  Other music will stop playing.                             |
+| **`SoloAmbient`**   | Use this category for background sounds. Other music will stop playing.                              |
 | **`Playback`**      | Use this category for music tracks.                                                                  |
 | **`Record`**        | Use this category when recording audio.                                                              |
 | **`PlayAndRecord`** | Use this category when recording and playing back audio.                                             |
@@ -412,17 +434,17 @@ Check out the official apple docs for more information on [AVAudioSessions](http
 
 **Available on iOS**
 
-| Prop                 | Description                                                                                                                                                                                                                                                                                                                                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`Default`**        | The default mode.                                                                                                                                                                                                                                                                                                                                                                                         |
-| **`VoiceChat`**      | Only valid with AVAudioSessionCategoryPlayAndRecord.  Appropriate for Voice over IP (VoIP) applications.  Reduces the number of allowable audio routes to be only those that are appropriate for VoIP applications and may engage appropriate system-supplied signal processing.  Has the side effect of setting AVAudioSessionCategoryOptionAllowBluetooth.                                              |
-| **`VideoChat`**      | Only valid with kAudioSessionCategory_PlayAndRecord. Reduces the number of allowable audio routes to be only those that are appropriate for video chat applications. May engage appropriate system-supplied signal processing.  Has the side effect of setting AVAudioSessionCategoryOptionAllowBluetooth and AVAudioSessionCategoryOptionDefaultToSpeaker.                                               |
-| **`GameChat`**       | Set by Game Kit on behalf of an application that uses a GKVoiceChat object; valid only with the AVAudioSessionCategoryPlayAndRecord category. Do not set this mode directly. If you need similar behavior and are not using a GKVoiceChat object, use AVAudioSessionModeVoiceChat instead.                                                                                                                |
-| **`VideoRecording`** | Only valid with AVAudioSessionCategoryPlayAndRecord or AVAudioSessionCategoryRecord Modifies the audio routing options and may engage appropriate system-supplied signal processing.                                                                                                                                                                                                                      |
-| **`Measurement`**    | Appropriate for applications that wish to minimize the effect of system-supplied signal processing for input and/or output audio signals.                                                                                                                                                                                                                                                                 |
-| **`MoviePlayback`**  | Engages appropriate output signal processing for movie playback scenarios.  Currently only applied during playback over built-in speaker.                                                                                                                                                                                                                                                                 |
-| **`SpokenAudio`**    | Appropriate for applications which play spoken audio and wish to be paused (via audio session interruption) rather than ducked if another app (such as a navigation app) plays a spoken audio prompt.  Examples of apps that would use this are podcast players and audio books.  For more information, see the related category option AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers. |
-| **`VoicePrompt`**    | Appropriate for applications which play spoken audio and wish to be paused (via audio session interruption) rather than ducked if another app (such as a navigation app) plays a spoken audio prompt.  Examples of apps that would use this are podcast players and audio books.  For more information, see the related category option AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers. |
+| Prop                 | Description                                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`Default`**        | The default mode.                                                                                                                                                                                                                                                                                                                                                                                       |
+| **`VoiceChat`**      | Only valid with AVAudioSessionCategoryPlayAndRecord. Appropriate for Voice over IP (VoIP) applications. Reduces the number of allowable audio routes to be only those that are appropriate for VoIP applications and may engage appropriate system-supplied signal processing. Has the side effect of setting AVAudioSessionCategoryOptionAllowBluetooth.                                               |
+| **`VideoChat`**      | Only valid with kAudioSessionCategory_PlayAndRecord. Reduces the number of allowable audio routes to be only those that are appropriate for video chat applications. May engage appropriate system-supplied signal processing. Has the side effect of setting AVAudioSessionCategoryOptionAllowBluetooth and AVAudioSessionCategoryOptionDefaultToSpeaker.                                              |
+| **`GameChat`**       | Set by Game Kit on behalf of an application that uses a GKVoiceChat object; valid only with the AVAudioSessionCategoryPlayAndRecord category. Do not set this mode directly. If you need similar behavior and are not using a GKVoiceChat object, use AVAudioSessionModeVoiceChat instead.                                                                                                              |
+| **`VideoRecording`** | Only valid with AVAudioSessionCategoryPlayAndRecord or AVAudioSessionCategoryRecord Modifies the audio routing options and may engage appropriate system-supplied signal processing.                                                                                                                                                                                                                    |
+| **`Measurement`**    | Appropriate for applications that wish to minimize the effect of system-supplied signal processing for input and/or output audio signals.                                                                                                                                                                                                                                                               |
+| **`MoviePlayback`**  | Engages appropriate output signal processing for movie playback scenarios. Currently only applied during playback over built-in speaker.                                                                                                                                                                                                                                                                |
+| **`SpokenAudio`**    | Appropriate for applications which play spoken audio and wish to be paused (via audio session interruption) rather than ducked if another app (such as a navigation app) plays a spoken audio prompt. Examples of apps that would use this are podcast players and audio books. For more information, see the related category option AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers. |
+| **`VoicePrompt`**    | Appropriate for applications which play spoken audio and wish to be paused (via audio session interruption) rather than ducked if another app (such as a navigation app) plays a spoken audio prompt. Examples of apps that would use this are podcast players and audio books. For more information, see the related category option AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers. |
 
 ##### Picture-in-picture
 
@@ -443,37 +465,39 @@ public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Conf
 
 ## Available methods
 
-| Func                        | Description                                                                                                                                                                             | Argument                      |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **`seekTo`**                | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                         |
-| **`togglePIP`**             | Enter or exist Picture in picture mode.                                                                                                                                                 | `none`                        |
-| **`play`**                  | Starts playing.                                                                                                                                                                         | `none`                        |
-| **`pause`**                 | Pauses playing.                                                                                                                                                                         | `none`                        |
-| **`stop`**                  | Stops the player completely.                                                                                                                                                            | `none`                        |
-| **`playerState`**           | Returns promise that then returns the current state of the player. Check out the [JWPlayerState](#JWPlayerState) Object.                                                                | `none`                        |
-| **`position`**              | Returns promise that then returns the current position of the player in seconds.                                                                                                        | `none`                        |
-| **`toggleSpeed`**           | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                        |
-| **`setSpeed`**              | Sets the player speed.                                                                                                                                                                  | `Double`                      |
-| **`setVolume`**             | Sets the player volume.                                                                                                                                                                 | `Double`                      |
-| **`setPlaylistIndex`**      | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                         |
-| **`setControls`**           | Sets the display of the control buttons on the player.                                                                                                                                  | `Boolean`                     |
-| **`setLockScreenControls`** | *(iOS only)* Sets the locks screen controls for the currently playing media, can be used to control what player to show the controls for.                                               | `Boolean`                     |
-| **`setFullScreen`**         | Set full screen.                                                                                                                                                                        | `Boolean`                     |
-| **`loadPlaylist`**          | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`             |
-| **`loadPlaylistItem`**      | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem) |
-| **`getAudioTracks`**        | Returns promise that returns an array of [AudioTracks](#AudioTrack)                                                                                                                     | `none`                        |
-| **`getCurrentAudioTrack`**  | Returns promise that returns the index of the current audio track in array returned by getAudioTracks                                                                                   | `none`                        |
-| **`setCurrentAudioTrack`**  | Sets the current audio track to the audio track at the specified index in the array returned by getAudioTracks                                                                          | `Int`                         |
-| **`setCurrentCaptions`**    | Turns off captions when argument is 0. Setting argument to another integer, sets captions to track at playlistItem.tracks[integer - 1]                                                  | `Int`                         |
+| Func                        | Description                                                                                                                                                                             | Argument                                         |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **`seekTo`**                | Tells the player to seek to position, use in onPlaylistItem callback so player finishes buffering file.                                                                                 | `Int`                                            |
+| **`togglePIP`**             | Enter or exist Picture in picture mode.                                                                                                                                                 | `none`                                           |
+| **`play`**                  | Starts playing.                                                                                                                                                                         | `none`                                           |
+| **`pause`**                 | Pauses playing.                                                                                                                                                                         | `none`                                           |
+| **`stop`**                  | Stops the player completely.                                                                                                                                                            | `none`                                           |
+| **`playerState`**           | Returns promise that then returns the current state of the player. Check out the [JWPlayerState](#JWPlayerState) Object.                                                                | `none`                                           |
+| **`position`**              | Returns promise that then returns the current position of the player in seconds.                                                                                                        | `none`                                           |
+| **`toggleSpeed`**           | Toggles the player speed one of `0.5`, `1.0`, `1.5`, `2.0`.                                                                                                                             | `none`                                           |
+| **`setSpeed`**              | Sets the player speed.                                                                                                                                                                  | `Double`                                         |
+| **`setVolume`**             | Sets the player volume.                                                                                                                                                                 | `Double`                                         |
+| **`setPlaylistIndex`**      | Sets the current playing item in the loaded playlist.                                                                                                                                   | `Int`                                            |
+| **`setControls`**           | Sets the display of all the control buttons on the player.                                                                                                                              | `Boolean`                                        |
+| **`setVisibility`**         | _(iOS only)_ Sets the visibility of specific control buttons on the player. You pass `visibility: Boolean` && `controls` that is an array of [JWControlType](#JWControlType)            | `visibility: Boolean, controls: JWControlType[]` |
+| **`setLockScreenControls`** | _(iOS only)_ Sets the locks screen controls for the currently playing media, can be used to control what player to show the controls for.                                               | `Boolean`                                        |
+| **`setFullScreen`**         | Set full screen.                                                                                                                                                                        | `Boolean`                                        |
+| **`loadPlaylist`**          | Loads a playlist. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted).      | `[PlaylistItems]`                                |
+| **`loadPlaylistItem`**      | Loads a playlist item. (Using this function before the player has finished initializing may result in assert crash or blank screen, put in a timeout to make sure JWPlayer is mounted). | [PlaylistItem](#PlaylistItem)                    |
+| **`getAudioTracks`**        | Returns promise that returns an array of [AudioTracks](#AudioTrack)                                                                                                                     | `none`                                           |
+| **`getCurrentAudioTrack`**  | Returns promise that returns the index of the current audio track in array returned by getAudioTracks                                                                                   | `none`                                           |
+| **`setCurrentAudioTrack`**  | Sets the current audio track to the audio track at the specified index in the array returned by getAudioTracks                                                                          | `Int`                                            |
+| **`setCurrentCaptions`**    | Turns off captions when argument is 0. Setting argument to another integer, sets captions to track at playlistItem.tracks[integer - 1]                                                  | `Int`                                            |
 
 ## Available callbacks
 
 ###### All Callbacks with data are wrapped in native events for instance this is how to get the data from `onTime` callback ->
+
 ```
   onTime(event) {
     const {position, duration} = event.nativeEvent;
   }
-````
+```
 
 | Func                            | Description                                                                                                                                                                                                                | Argument                                                                                                                                                                                                                                                                                                                        |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -527,7 +551,7 @@ Edit your `Info.plist` with the following values:
 'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
 ```
 
-Enable *Access WiFi Information* capability under `Signing & Capabilities`
+Enable _Access WiFi Information_ capability under `Signing & Capabilities`
 
 #### Available methods
 
@@ -538,6 +562,7 @@ Enable *Access WiFi Information* capability under `Signing & Capabilities`
 | **`castState`** | Gets the cast state. | `int` check out [GCKCastState](#GCKCastState) |
 
 ##### GCKCastState
+
 ```
 typedef NS_ENUM(NSUInteger, GCKCastState) {
   /** No Cast session is established, and no Cast devices are available. */
@@ -569,9 +594,8 @@ typedef NS_ENUM(NSUInteger, GCKCastState) {
 
 ##### For Android
 
-| Func         | Description            | Payload                                                 |
-| ------------ | ---------------------- | ------------------------------------------------------- |
+| Func            | Description            | Payload                                                 |
+| --------------- | ---------------------- | ------------------------------------------------------- |
 | **`onCasting`** | Casting event occurred | `{active: Boolean, available: Boolean, device: String}` |
 
 #### [CHANGELOG](https://github.com/chaimPaneth/react-native-jw-media-player/releases)
-

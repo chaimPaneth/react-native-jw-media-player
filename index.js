@@ -212,6 +212,7 @@ export default class JWPlayer extends Component {
 		setSpeed: PropTypes.func,
 		setPlaylistIndex: PropTypes.func,
 		setControls: PropTypes.func,
+		setVisibility: PropTypes.func,
 		setLockScreenControls: PropTypes.func,
 		setFullscreen: PropTypes.func,
 		setUpCastController: PropTypes.func,
@@ -331,6 +332,15 @@ export default class JWPlayer extends Component {
 			RNJWPlayerManager.setControls(
 				this.getRNJWPlayerBridgeHandle(),
 				show
+			);
+	}
+
+	setVisibility(visibility, controls) {
+		if (RNJWPlayerManager && Platform.OS === 'ios')
+			RNJWPlayerManager.setVisibility(
+				this.getRNJWPlayerBridgeHandle(),
+				visibility,
+				controls
 			);
 	}
 

@@ -714,9 +714,8 @@
         NSError* error = nil;
         [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
         
-        [_playerViewController removeDelegates];
         _playerViewController.parentView = nil;
-        
+        [_playerViewController setVisibility:NO forControls:@[@(JWControlTypePictureInPictureButton)]];
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
         [_playerViewController willMoveToParentViewController:nil];
@@ -736,8 +735,6 @@
     });
     _playerViewController.view.frame = self.frame;
     [self addSubview:_playerViewController.view];
-    
-    [_playerViewController setDelegates];
     
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
@@ -811,6 +808,22 @@
         } else {
             [self toggleUIGroup:subview :name :ofSubview :show];
         }
+    }
+}
+
+- (void)setVisibility:(BOOL)isVisible forControls:(NSArray* _Nonnull)controls
+{
+    NSMutableArray<NSNumber *> * _controls = [[NSMutableArray alloc] init];
+    
+    for (id control in controls) {
+        JWControlType type = [RCTConvert JWControlType:control];
+        if (type) {
+            [_controls addObject:@(type)];
+        }
+    }
+    
+    if ([_controls count]) {
+        [_playerViewController setVisibility:isVisible forControls:_controls];
     }
 }
 
