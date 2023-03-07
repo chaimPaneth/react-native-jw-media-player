@@ -725,7 +725,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             ReadableArray uiGroupsArray = prop.getArray("hideUIGroups");
             UiConfig.Builder hideConfigBuilder = new UiConfig.Builder().displayAllControls();
             for (int i = 0; i < uiGroupsArray.size(); i++) {
-                UiGroup uiGroup = GROUP_TYPES.get(uiGroupsArray.getMap(i));
+                UiGroup uiGroup = GROUP_TYPES.get(uiGroupsArray.getString(i));
                 if (uiGroup != null) {
                    hideConfigBuilder.hide(uiGroup);
                 }
