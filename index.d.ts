@@ -161,7 +161,7 @@ declare module "react-native-jw-media-player" {
     related?: Related;
     preload?: Preloads;
     interfaceBehavior?: InterfaceBehaviors;
-    hideUIGroup?: UIGroups;
+    hideUIGroups?: UIGroups[];
     processSpcUrl?: string;
     fairplayCertUrl?: string;
     contentUUID?: string;

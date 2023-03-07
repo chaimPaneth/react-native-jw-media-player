@@ -721,15 +721,17 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
-        if (prop.hasKey("hideUIGroup")) {
-            UiGroup uiGroup = GROUP_TYPES.get(prop.getString("hideUIGroup"));
-            if (uiGroup != null) {
-                UiConfig hideJwControlbarUiConfig = new UiConfig.Builder()
-                        .displayAllControls()
-                        .hide(uiGroup)
-                        .build();
-                configBuilder.uiConfig(hideJwControlbarUiConfig);
+        if (prop.hasKey("hideUIGroups")) {
+            ReadableArray uiGroupsArray = prop.getArray("hideUIGroups");
+            UiConfig.Builder hideConfigBuilder = new UiConfig.Builder().displayAllControls();
+            for (int i = 0; i < uiGroupsArray.size(); i++) {
+                UiGroup uiGroup = GROUP_TYPES.get(uiGroupsArray.getMap(i));
+                if (uiGroup != null) {
+                   hideConfigBuilder.hide(uiGroup);
+                }
             }
+            UiConfig hideJwControlbarUiConfig =  hideConfigBuilder.build();
+            configBuilder.uiConfig(hideJwControlbarUiConfig);
         }
 
         PlayerConfig playerConfig = configBuilder.build();
