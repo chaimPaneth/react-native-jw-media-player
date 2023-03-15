@@ -714,7 +714,6 @@
         NSError* error = nil;
         [_playerViewController.player configurePlayerWith:[configBuilder buildAndReturnError:&error]];
         
-        [_playerViewController removeDelegates];
         _playerViewController.parentView = nil;
         [_playerViewController setVisibility:NO forControls:@[@(JWControlTypePictureInPictureButton)]];
         [_playerViewController.view removeFromSuperview];
@@ -736,8 +735,7 @@
     });
     _playerViewController.view.frame = self.frame;
     [self addSubview:_playerViewController.view];
-
-    [_playerViewController setDelegates]; 
+    
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
         
