@@ -6280,10 +6280,10 @@ react-native-dotenv@3.3.1:
   dependencies:
     dotenv "^10.0.0"
 
-react-native-fs@2.16.6:
-  version "2.16.6"
-  resolved "https://registry.npmjs.org/react-native-fs/-/react-native-fs-2.16.6.tgz"
-  integrity sha512-ZWOooD1AuFoAGY3HS2GY7Qx2LZo4oIg6AK0wbC68detxwvX75R/q9lRqThXNKP6vIo2VHWa0fYUo/SrLw80E8w==
+react-native-fs@2.20.0:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.20.0.tgz#05a9362b473bfc0910772c0acbb73a78dbc810f6"
+  integrity sha512-VkTBzs7fIDUiy/XajOSNk0XazFE9l+QlMAce7lGuebZcag5CnjszB+u4BdqzwaQOdcYb5wsJIsqq4kxInIRpJQ==
   dependencies:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
@@ -6304,10 +6304,10 @@ react-native-gradle-plugin@^0.0.6:
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz"
   integrity sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg==
 
-react-native-jw-media-player@0.2.33:
-  version "0.2.33"
-  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.33.tgz#ce2333088e5d8587a4176d39ea0ff231919561db"
-  integrity sha512-AXvnHBa6H69rQlNgJuDKrt4p+0bDgLEgNC7Q0X4zL2aQ6EeN/lh0mue4WvthsobDmG/+GHxFQtbjqEtMeQeY9w==
+react-native-jw-media-player@0.2.34:
+  version "0.2.34"
+  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.34.tgz#6f56a419312a67dea139bbf35ad1b90a6e4cc6aa"
+  integrity sha512-1pqu6KRibptah2lI91M4y9FhxHXnkB8zB0t6NnyaPhUY+9aoiKA3yydvUgTUpWhnbM3SbrNvjsUDSGa5M7tjxQ==
 
 react-native-orientation-locker@1.4.0:
   version "1.4.0"
