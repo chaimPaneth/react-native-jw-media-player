@@ -382,7 +382,8 @@
     
     id image = item[@"image"];
     if ((image != nil) && (image != (id)[NSNull null])) {
-        NSURL* imageUrl = [NSURL URLWithString:image];
+        NSString* urlTextEscaped = [image stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSURL* imageUrl = [NSURL URLWithString:urlTextEscaped];
         [itemBuilder posterImage:imageUrl];
     }
     
