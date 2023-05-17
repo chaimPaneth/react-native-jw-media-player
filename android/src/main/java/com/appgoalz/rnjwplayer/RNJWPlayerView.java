@@ -2,6 +2,7 @@ package com.appgoalz.rnjwplayer;
 
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -20,8 +21,9 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.appgoalz.rnjwplayer.session.RNJWMediaServiceController;
+import com.appgoalz.rnjwplayer.session.RNJWMediaSessionHelper;
+import com.appgoalz.rnjwplayer.session.RNJWNotificationHelper;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -36,7 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.UiGroup;
-import com.jwplayer.pub.api.background.MediaServiceController;
+import com.jwplayer.pub.api.background.ServiceMediaApi;
 import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.configuration.UiConfig;
 import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
@@ -193,7 +195,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     private ThemedReactContext mThemedReactContext;
 
-    private MediaServiceController mMediaServiceController;
+    private RNJWMediaServiceController mMediaServiceController;
 
     private void doBindService() {
         if (mMediaServiceController != null) {
@@ -739,7 +741,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         this.destroyPlayer();
 
         mPlayerView = new RNJWPlayer(simpleContext);
-        
+
         mPlayerView.setFocusable(true);
         mPlayerView.setFocusableInTouchMode(true);
 
@@ -824,7 +826,14 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         if (backgroundAudioEnabled) {
             audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
-            mMediaServiceController = new MediaServiceController.Builder((AppCompatActivity) mActivity, mPlayer).build();
+            ServiceMediaApi serviceMediaApi = new ServiceMediaApi(mPlayer);
+            RNJWNotificationHelper notificationHelper = new RNJWNotificationHelper.Builder((NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE)).build();
+            RNJWMediaSessionHelper RNJWMediaSessionHelper = new RNJWMediaSessionHelper(simpleContext, notificationHelper, serviceMediaApi);
+            RNJWMediaServiceController mediaServiceController = new RNJWMediaServiceController.Builder(mActivity, mPlayer)
+                    .serviceMediaApi(serviceMediaApi)
+                    .mediaSessionHelper(RNJWMediaSessionHelper)
+                    .notificationHelper(notificationHelper)
+                    .build();
             doBindService();
         }
     }
@@ -978,7 +987,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     // AdEvents
-    
+
     @Override
     public void onAdPause(AdPauseEvent adPauseEvent) {
         WritableMap event = Arguments.createMap();
