@@ -89,7 +89,7 @@ public class RNJWMediaServiceController implements ServiceConnection {
         private Builder(AppCompatActivity activity, JWPlayer player, a factory) {
             this.a = activity;
             this.f = factory;
-            this.b = (new RNJWNotificationHelper.Builder((NotificationManager)activity.getSystemService(Context.NOTIFICATION_SERVICE))).build();
+            this.b = (new RNJWNotificationHelper.Builder(this.a, (NotificationManager)activity.getSystemService(Context.NOTIFICATION_SERVICE))).build();
             this.d = new ServiceMediaApi(player);
             AppCompatActivity var10001 = activity;
             ServiceMediaApi player1 = this.d;

@@ -61,8 +61,8 @@ public class RNJWMediaSessionHelper implements AdvertisingEvents.OnAdCompleteLis
             Context var10001 = this.b;
             String var3 = RNJWMediaSessionHelper.class.getSimpleName();
             Context var2 = var10001;
-            this.a =  new b(MediaSessionSingleton.getInstance(var2));
-//            this.a = new b(new MediaSessionCompat(var2, var3));
+//            this.a =  new b(MediaSessionSingleton.getInstance(var2));
+            this.a = new b(new MediaSessionCompat(var2, var3));
             this.e = var1;
             this.a.a.setCallback(var1);
             this.c.addListeners(this, new EventType[]{EventType.PLAY, EventType.PAUSE, EventType.BUFFER, EventType.ERROR, EventType.PLAYLIST_ITEM, EventType.PLAYLIST_COMPLETE, EventType.AD_PLAY, EventType.AD_SKIPPED, EventType.AD_COMPLETE, EventType.AD_ERROR});
