@@ -829,9 +829,10 @@ public class RNJWPlayerView extends RelativeLayout implements
         if (backgroundAudioEnabled) {
             audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
             ServiceMediaApi serviceMediaApi = new ServiceMediaApi(mPlayer);
+
             RNJWNotificationHelper notificationHelper = new RNJWNotificationHelper.Builder(simpleContext, (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE)).build();
             RNJWMediaSessionHelper RNJWMediaSessionHelper = new RNJWMediaSessionHelper(simpleContext, notificationHelper, serviceMediaApi);
-            RNJWMediaServiceController mediaServiceController = new RNJWMediaServiceController.Builder(mActivity, mPlayer)
+            mMediaServiceController = new RNJWMediaServiceController.Builder(mActivity, mPlayer)
                     .serviceMediaApi(serviceMediaApi)
                     .mediaSessionHelper(RNJWMediaSessionHelper)
                     .notificationHelper(notificationHelper)

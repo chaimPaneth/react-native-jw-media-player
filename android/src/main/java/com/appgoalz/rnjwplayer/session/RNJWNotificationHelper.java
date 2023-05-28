@@ -81,11 +81,12 @@ public class RNJWNotificationHelper extends MediaSessionCompat.Callback {
         }
 
         private Builder(Context context, NotificationManager manager, a factory) {
-            this.c = drawable.ic_jw_play;
             this.h = context;
             int appIcon = this.h.getResources().getIdentifier("ic_app_icon", "drawable", this.h.getPackageName());
-            this.d = appIcon > 0 ? appIcon : 2005;
 
+            this.c = appIcon > 0 ? appIcon : drawable.ic_jw_play;
+
+            this.d = 2005;
             this.e = "NotificationBarController";
             this.f = "Player Notification";
             this.g = "Control playback of the media player";
