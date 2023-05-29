@@ -48,34 +48,37 @@ allprojects {
     }
 }
 
+def jwPlayerVersion = "4.11.1"
+def exoplayerVersion = "2.18.7"
+
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
 
     // JWPlayer SDK
-    implementation "com.jwplayer:jwplayer-core:${safeExtGet('jwPlayerVersion', '4.6.1')}"
-    implementation "com.jwplayer:jwplayer-common:${safeExtGet('jwPlayerVersion', '4.6.1')}"
-    implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', '4.6.1')}"
-    implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', '4.6.1')}"
+    implementation "com.jwplayer:jwplayer-core:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+    implementation "com.jwplayer:jwplayer-common:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+    implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+    implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
 
     // Ad dependencies
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.27.0'
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    implementation 'com.google.android.gms:play-services-cast-framework:21.0.1'
+    implementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
 
     // ExoPlayer dependencies
-    implementation "com.google.android.exoplayer:exoplayer-core:${safeExtGet('exoplayerVersion', '2.16.1')}"
-    implementation "com.google.android.exoplayer:exoplayer-dash:${safeExtGet('exoplayerVersion', '2.16.1')}"
-    implementation "com.google.android.exoplayer:exoplayer-hls:${safeExtGet('exoplayerVersion', '2.16.1')}"
-    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${safeExtGet('exoplayerVersion', '2.16.1')}"
-    implementation "com.google.android.exoplayer:exoplayer-ui:${safeExtGet('exoplayerVersion', '2.16.1')}"
+    implementation "com.google.android.exoplayer:exoplayer-core:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
+    implementation "com.google.android.exoplayer:exoplayer-dash:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
+    implementation "com.google.android.exoplayer:exoplayer-hls:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
+    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
+    implementation "com.google.android.exoplayer:exoplayer-ui:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
 
     // JW Player Native UI dependencies
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'com.android.volley:volley:1.2.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'androidx.mediarouter:mediarouter:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.mediarouter:mediarouter:1.4.0'
     implementation 'androidx.media:media:1.6.0'
 
     implementation project(':react-native-android-media-browser')

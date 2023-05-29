@@ -31,7 +31,7 @@ import com.jwplayer.pub.api.events.PlaylistItemEvent;
 import com.jwplayer.pub.api.events.listeners.AdvertisingEvents;
 import com.jwplayer.pub.api.events.listeners.VideoPlayerEvents;
 import com.jwplayer.pub.api.media.playlists.PlaylistItem;
-import com.longtailvideo.jwplayer.utils.f;
+import com.longtailvideo.jwplayer.o.f;
 import com.mediabrowser.MediaSessionSingleton;
 
 public class RNJWMediaSessionHelper implements AdvertisingEvents.OnAdCompleteListener, AdvertisingEvents.OnAdErrorListener, AdvertisingEvents.OnAdPlayListener, AdvertisingEvents.OnAdSkippedListener, VideoPlayerEvents.OnBufferListener, VideoPlayerEvents.OnErrorListener, VideoPlayerEvents.OnPauseListener, VideoPlayerEvents.OnPlayListener, VideoPlayerEvents.OnPlaylistCompleteListener, VideoPlayerEvents.OnPlaylistItemListener {
