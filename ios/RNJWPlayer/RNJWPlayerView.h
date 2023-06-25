@@ -36,7 +36,9 @@
 @property(nonatomic)NSString *audioCategory;
 @property(nonatomic)NSString *audioMode;
 @property(nonatomic, strong)NSArray* audioCategoryOptions;
-@property (nonatomic, strong) NSTimer *debounceTimer;
+@property(nonatomic)BOOL settingConfig;
+@property(nonatomic)BOOL pendingConfig;
+@property(nonatomic)NSDictionary* currentConfig;
 
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
@@ -112,5 +114,6 @@
 -(void)startDeinitProcess;
 -(JWPlayerItem*)getPlayerItem:item;
 - (void)setVisibility:(BOOL)isVisible forControls:(NSArray* _Nonnull)controls;
+- (void)setConfig:(NSDictionary*)config;
 
 @end

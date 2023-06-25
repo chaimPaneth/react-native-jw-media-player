@@ -106,31 +106,44 @@
 
 - (void)setConfig:(NSDictionary*)config
 {
-    id license = config[@"license"];
-    [self setLicense:license];
-    
-    _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
-    _pipEnabled = [config[@"pipEnabled"] boolValue];
-    if (_backgroundAudioEnabled || _pipEnabled) {
-        id category = config[@"category"];
-        id categoryOptions = config[@"categoryOptions"];
-        id mode = config[@"mode"];
+    if (![_currentConfig isEqualToDictionary:config]) {
+        _currentConfig = config;
         
-        [self initAudioSession:category :categoryOptions :mode];
-    } else {
-        [self deinitAudioSession];
-    }
-    
-    id viewOnly = config[@"viewOnly"];
-    if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
-        [self setupPlayerView:config :[self getPlayerConfiguration:config]];
-    } else {
-        [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
-    }
+        if (!_settingConfig) {
+            _pendingConfig = NO;
+            _settingConfig = YES;
+            
+            id license = config[@"license"];
+            [self setLicense:license];
+            
+            _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
+            _pipEnabled = [config[@"pipEnabled"] boolValue];
+            if (_backgroundAudioEnabled || _pipEnabled) {
+                id category = config[@"category"];
+                id categoryOptions = config[@"categoryOptions"];
+                id mode = config[@"mode"];
+                
+                [self initAudioSession:category :categoryOptions :mode];
+            } else {
+                [self deinitAudioSession];
+            }
+            
+            id viewOnly = config[@"viewOnly"];
+            if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
+                [self setupPlayerView:config :[self getPlayerConfiguration:config]];
+            } else {
+                [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
+            }
 
-    _processSpcUrl = config[@"processSpcUrl"];
-    _fairplayCertUrl = config[@"fairplayCertUrl"];
-    _contentUUID = config[@"contentUUID"];
+            _processSpcUrl = config[@"processSpcUrl"];
+            _fairplayCertUrl = config[@"fairplayCertUrl"];
+            _contentUUID = config[@"contentUUID"];
+        } else {
+            _pendingConfig = YES;
+        }
+    } else {
+        NSLog(@"Is same config!");
+    }
 }
 
 -(void)setControls:(BOOL)controls
@@ -829,8 +842,13 @@
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player
 {
+    _settingConfig = NO;
     if (self.onPlayerReady) {
         self.onPlayerReady(@{});
+    }
+    
+    if (_pendingConfig && _currentConfig) {
+        [self setConfig:_currentConfig];
     }
 }
 

@@ -15,8 +15,15 @@
 {
     [super jwplayerIsReady:player];
     
+    _parentView.settingConfig = NO;
+    
     if (_parentView.onPlayerReady) {
         _parentView.onPlayerReady(@{});
+    }
+    
+    
+    if (_parentView.pendingConfig && _parentView.currentConfig) {
+        [_parentView setConfig:_parentView.currentConfig];
     }
 }
 
