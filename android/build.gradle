@@ -29,7 +29,7 @@ android {
         }
     }
     lintOptions {
-       warning 'InvalidPackage'
+        warning 'InvalidPackage'
     }
 }
 
@@ -48,7 +48,7 @@ allprojects {
     }
 }
 
-def jwPlayerVersion = "4.11.1"
+def jwPlayerVersion = "4.12.0"
 def exoplayerVersion = "2.18.7"
 
 dependencies {
@@ -62,7 +62,7 @@ dependencies {
     implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
 
     // Ad dependencies
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.1'
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     implementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
 

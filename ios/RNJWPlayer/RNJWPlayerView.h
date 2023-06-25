@@ -28,9 +28,15 @@
 @property(nonatomic)JWInterfaceBehavior interfaceBehavior;
 
 /* DRM props */
-@property(nonatomic) NSString *fairplayCertUrl;
-@property(nonatomic) NSString *processSpcUrl;
-@property(nonatomic) NSString *contentUUID;
+@property(nonatomic)NSString *fairplayCertUrl;
+@property(nonatomic)NSString *processSpcUrl;
+@property(nonatomic)NSString *contentUUID;
+
+/* Config helpers */
+@property(nonatomic)NSString *audioCategory;
+@property(nonatomic)NSString *audioMode;
+@property(nonatomic, strong)NSArray* audioCategoryOptions;
+@property (nonatomic, strong) NSTimer *debounceTimer;
 
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
