@@ -104,45 +104,96 @@
     }
 }
 
+- (NSArray *)keysForDifferingValuesInDict1:(NSDictionary *)dict1 andDict2:(NSDictionary *)dict2 {
+    NSMutableArray *diffKeys = [NSMutableArray new];
+    for (NSString *key in dict1) {
+        if (![dict1[key] isEqual:dict2[key]]) {
+            [diffKeys addObject:key];
+        }
+    }
+    return [diffKeys copy];
+}
+
 - (void)setConfig:(NSDictionary*)config
 {
-    if (![_currentConfig isEqualToDictionary:config]) {
-        _currentConfig = config;
-        
-        if (!_settingConfig) {
-            _pendingConfig = NO;
-            _settingConfig = YES;
-            
-            id license = config[@"license"];
-            [self setLicense:license];
-            
-            _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
-            _pipEnabled = [config[@"pipEnabled"] boolValue];
-            if (_backgroundAudioEnabled || _pipEnabled) {
-                id category = config[@"category"];
-                id categoryOptions = config[@"categoryOptions"];
-                id mode = config[@"mode"];
-                
-                [self initAudioSession:category :categoryOptions :mode];
-            } else {
-                [self deinitAudioSession];
-            }
-            
-            id viewOnly = config[@"viewOnly"];
-            if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
-                [self setupPlayerView:config :[self getPlayerConfiguration:config]];
-            } else {
-                [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
-            }
+    // Create mutable copies of the dictionaries
+    NSMutableDictionary *configCopy = [config mutableCopy];
+    NSMutableDictionary *currentConfigCopy = [_currentConfig mutableCopy];
+    
+    // Remove the playlist key
+    [configCopy removeObjectForKey:@"playlist"];
+    [currentConfigCopy removeObjectForKey:@"playlist"];
 
-            _processSpcUrl = config[@"processSpcUrl"];
-            _fairplayCertUrl = config[@"fairplayCertUrl"];
-            _contentUUID = config[@"contentUUID"];
-        } else {
-            _pendingConfig = YES;
-        }
+    // Compare dictionaries without playlist key
+    if (![configCopy isEqualToDictionary:currentConfigCopy]) {
+        NSLog(@"There are differences other than the 'playlist' key.");
+        
+        NSArray *diffKeys = [self keysForDifferingValuesInDict1:configCopy andDict2:currentConfigCopy];
+        NSLog(@"There are differences in these keys: %@", diffKeys);
+        
+        [self setNewConfig:config];
     } else {
-        NSLog(@"Is same config!");
+        // Compare original dictionaries
+        if(![_currentConfig isEqualToDictionary:config]) {
+            NSLog(@"The only difference is the 'playlist' key.");
+            
+            if (_playerViewController || _playerView) {
+                NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
+                
+                for (id item in config[@"playlist"]) {
+                    JWPlayerItem *playerItem = [self getPlayerItem:item];
+                    [playlistArray addObject:playerItem];
+                }
+                
+                if (_playerViewController) {
+                    [_playerViewController.player loadPlaylistWithItems:playlistArray];
+                } else { // if (_playerView)
+                    [_playerView.player loadPlaylistWithItems:playlistArray];
+                }
+            } else {
+                [self setNewConfig:config];
+            }
+        } else {
+            NSLog(@"There are no differences.");
+        }
+    }
+}
+
+-(void)setNewConfig:(NSDictionary*)config
+{
+    _currentConfig = config;
+    
+    if (!_settingConfig) {
+        _pendingConfig = NO;
+        _settingConfig = YES;
+        
+        id license = config[@"license"];
+        [self setLicense:license];
+        
+        _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
+        _pipEnabled = [config[@"pipEnabled"] boolValue];
+        if (_backgroundAudioEnabled || _pipEnabled) {
+            id category = config[@"category"];
+            id categoryOptions = config[@"categoryOptions"];
+            id mode = config[@"mode"];
+            
+            [self initAudioSession:category :categoryOptions :mode];
+        } else {
+            [self deinitAudioSession];
+        }
+        
+        id viewOnly = config[@"viewOnly"];
+        if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
+            [self setupPlayerView:config :[self getPlayerConfiguration:config]];
+        } else {
+            [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
+        }
+
+        _processSpcUrl = config[@"processSpcUrl"];
+        _fairplayCertUrl = config[@"fairplayCertUrl"];
+        _contentUUID = config[@"contentUUID"];
+    } else {
+        _pendingConfig = YES;
     }
 }
 
@@ -646,6 +697,30 @@
     if (_playerViewController == nil) {
         _playerViewController = [RNJWPlayerViewController new];
         _playerViewController.parentView = self;
+        
+//        static dispatch_once_t t;
+//
+//        dispatch_once ( & t, ^ {
+//            if (self.reactViewController) {
+//                [self.reactViewController addChildViewController:self.playerViewController];
+//                [self.playerViewController didMoveToParentViewController:self.reactViewController];
+//            } else {
+//                [self reactAddControllerToClosestParent:self.playerViewController];
+//            }
+//        });
+        
+        // Execute block of code only once
+//        static dispatch_once_t onceToken;
+//        dispatch_once(&onceToken, ^{
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                if (self.reactViewController) {
+//                    [self.reactViewController addChildViewController:self.playerViewController];
+//                    [self.playerViewController didMoveToParentViewController:self.reactViewController];
+//                } else {
+//                    [self reactAddControllerToClosestParent:self.playerViewController];
+//                }
+//            });
+//        });
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.reactViewController) {
