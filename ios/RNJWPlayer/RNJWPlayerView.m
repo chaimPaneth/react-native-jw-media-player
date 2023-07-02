@@ -59,12 +59,7 @@
     [self removePlayerView];
     [self dismissPlayerViewController];
     
-    NSError* activationError = nil;
-    BOOL success = [_audioSession setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&activationError];
-    NSLog(@"setUnactive - success: @%@, error: @%@", @(success), activationError);
-    _audioSession = nil;
-    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = @{}.mutableCopy;
-    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+    [self deinitAudioSession];
 
 }
 
@@ -108,31 +103,97 @@
     }
 }
 
--(void)setConfig:(NSDictionary*)config
-{
-    id license = config[@"license"];
-    [self setLicense:license];
-    
-    _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
-    _pipEnabled = [config[@"pipEnabled"] boolValue];
-    if (_backgroundAudioEnabled || _pipEnabled) {
-        id category = config[@"category"];
-        id categoryOptions = config[@"categoryOptions"];
-        id mode = config[@"mode"];
-        
-        [self initializeAudioSession:category :categoryOptions :mode];
+- (NSArray *)keysForDifferingValuesInDict1:(NSDictionary *)dict1 andDict2:(NSDictionary *)dict2 {
+    NSMutableArray *diffKeys = [NSMutableArray new];
+    for (NSString *key in dict1) {
+        if (![dict1[key] isEqual:dict2[key]]) {
+            [diffKeys addObject:key];
+        }
     }
-    
-    id viewOnly = config[@"viewOnly"];
-    if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
-        [self setupPlayerView:config :[self getPlayerConfiguration:config]];
-    } else {
-        [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
-    }
+    return [diffKeys copy];
+}
 
-    _processSpcUrl = config[@"processSpcUrl"];
-    _fairplayCertUrl = config[@"fairplayCertUrl"];
-    _contentUUID = config[@"contentUUID"];
+- (void)setConfig:(NSDictionary*)config
+{
+    // Create mutable copies of the dictionaries
+    NSMutableDictionary *configCopy = [config mutableCopy];
+    NSMutableDictionary *currentConfigCopy = [_currentConfig mutableCopy];
+    
+    // Remove the playlist key
+    [configCopy removeObjectForKey:@"playlist"];
+    [currentConfigCopy removeObjectForKey:@"playlist"];
+
+    // Compare dictionaries without playlist key
+    if (![configCopy isEqualToDictionary:currentConfigCopy]) {
+        NSLog(@"There are differences other than the 'playlist' key.");
+        
+        NSArray *diffKeys = [self keysForDifferingValuesInDict1:configCopy andDict2:currentConfigCopy];
+        NSLog(@"There are differences in these keys: %@", diffKeys);
+        
+        [self setNewConfig:config];
+    } else {
+        // Compare original dictionaries
+        if(![_currentConfig isEqualToDictionary:config]) {
+            NSLog(@"The only difference is the 'playlist' key.");
+            
+            if (_playerViewController || _playerView) {
+                NSMutableArray <JWPlayerItem *> *playlistArray = [[NSMutableArray alloc] init];
+                
+                for (id item in config[@"playlist"]) {
+                    JWPlayerItem *playerItem = [self getPlayerItem:item];
+                    [playlistArray addObject:playerItem];
+                }
+                
+                if (_playerViewController) {
+                    [_playerViewController.player loadPlaylistWithItems:playlistArray];
+                } else { // if (_playerView)
+                    [_playerView.player loadPlaylistWithItems:playlistArray];
+                }
+            } else {
+                [self setNewConfig:config];
+            }
+        } else {
+            NSLog(@"There are no differences.");
+        }
+    }
+}
+
+-(void)setNewConfig:(NSDictionary*)config
+{
+    _currentConfig = config;
+    
+    if (!_settingConfig) {
+        _pendingConfig = NO;
+        _settingConfig = YES;
+        
+        id license = config[@"license"];
+        [self setLicense:license];
+        
+        _backgroundAudioEnabled = [config[@"backgroundAudioEnabled"] boolValue];
+        _pipEnabled = [config[@"pipEnabled"] boolValue];
+        if (_backgroundAudioEnabled || _pipEnabled) {
+            id category = config[@"category"];
+            id categoryOptions = config[@"categoryOptions"];
+            id mode = config[@"mode"];
+            
+            [self initAudioSession:category :categoryOptions :mode];
+        } else {
+            [self deinitAudioSession];
+        }
+        
+        id viewOnly = config[@"viewOnly"];
+        if ((viewOnly != nil) && (viewOnly != (id)[NSNull null])) {
+            [self setupPlayerView:config :[self getPlayerConfiguration:config]];
+        } else {
+            [self setupPlayerViewController:config :[self getPlayerConfiguration:config]];
+        }
+
+        _processSpcUrl = config[@"processSpcUrl"];
+        _fairplayCertUrl = config[@"fairplayCertUrl"];
+        _contentUUID = config[@"contentUUID"];
+    } else {
+        _pendingConfig = YES;
+    }
 }
 
 -(void)setControls:(BOOL)controls
@@ -382,8 +443,7 @@
     
     id image = item[@"image"];
     if ((image != nil) && (image != (id)[NSNull null])) {
-        NSString* urlTextEscaped = [image stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        NSURL* imageUrl = [NSURL URLWithString:urlTextEscaped];
+        NSURL* imageUrl = [NSURL URLWithString:image];
         [itemBuilder posterImage:imageUrl];
     }
     
@@ -633,10 +693,21 @@
 
 -(void)setupPlayerViewController:config :(JWPlayerConfiguration*)playerConfig
 {
-    [self dismissPlayerViewController];
-    
-    _playerViewController = [RNJWPlayerViewController new];
-    _playerViewController.parentView = self;
+    if (_playerViewController == nil) {
+        _playerViewController = [RNJWPlayerViewController new];
+        _playerViewController.parentView = self;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.reactViewController) {
+                [self.reactViewController addChildViewController:self.playerViewController];
+                [self.playerViewController didMoveToParentViewController:self.reactViewController];
+            } else {
+                [self reactAddControllerToClosestParent:self.playerViewController];
+            }
+        });
+        _playerViewController.view.frame = self.frame;
+        [self addSubview:_playerViewController.view];
+    }
     
     id interfaceBehavior = config[@"interfaceBehavior"];
     if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
@@ -726,17 +797,6 @@
 
 -(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.reactViewController) {
-            [self.reactViewController addChildViewController:self->_playerViewController];
-            [self->_playerViewController didMoveToParentViewController:self.reactViewController];
-        } else {
-            [self reactAddControllerToClosestParent:self->_playerViewController];
-        }
-    });
-    _playerViewController.view.frame = self.frame;
-    [self addSubview:_playerViewController.view];
-    
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
         
@@ -832,8 +892,13 @@
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player
 {
+    _settingConfig = NO;
     if (self.onPlayerReady) {
         self.onPlayerReady(@{});
+    }
+    
+    if (_pendingConfig && _currentConfig) {
+        [self setConfig:_currentConfig];
     }
 }
 
@@ -1515,50 +1580,75 @@
 
 #pragma mark - JWPlayer audio session && interruption handling
 
-- (void)initializeAudioSession:(NSString*)category :(NSArray*)categoryOptions :(NSString*)mode
+- (void)initAudioSession:(NSString*)category :(NSArray*)categoryOptions :(NSString*)mode
 {
     [self setObservers];
     
-    [self setCategory:category categoryOptions:categoryOptions];
+    BOOL somethingChanged = NO;
     
-    [self setMode:mode];
+    if (![category isEqualToString:_audioCategory] || ![categoryOptions isEqualToArray:_audioCategoryOptions]) {
+        somethingChanged = YES;
+        _audioCategory = category;
+        _audioCategoryOptions = categoryOptions;
+        [self setCategory:category categoryOptions:categoryOptions];
+    }
     
+    if (![mode isEqualToString:_audioMode]) {
+        somethingChanged = YES;
+        _audioMode = mode;
+        [self setMode:mode];
+    }
+    
+    if (somethingChanged) {
+        NSError* activationError = nil;
+        BOOL success = [_audioSession setActive:YES error:&activationError];
+        NSLog(@"setActive - success: @%@, error: @%@", @(success), activationError);
+    }
+}
+
+- (void)deinitAudioSession
+{
     NSError* activationError = nil;
-    BOOL success = [_audioSession setActive:YES error:&activationError];
-    NSLog(@"setActive - success: @%@, error: @%@", @(success), activationError);
+    BOOL success = [_audioSession setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&activationError];
+    NSLog(@"setUnactive - success: @%@, error: @%@", @(success), activationError);
+    _audioSession = nil;
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = @{}.mutableCopy;
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
 }
 
 -(void)setObservers
 {
-    _audioSession = [AVAudioSession sharedInstance];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(handleMediaServicesReset)
-                                                 name:AVAudioSessionMediaServicesWereResetNotification
-                                               object:_audioSession];
-    
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(audioSessionInterrupted:)
-                                                 name: AVAudioSessionInterruptionNotification
-                                               object: _audioSession];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationWillResignActive:)
-                                                     name:UIApplicationWillResignActiveNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationDidEnterBackground:)
-                                                     name:UIApplicationDidEnterBackgroundNotification
-                                                   object:nil];
+    if (_audioSession == nil) {
+        _audioSession = [AVAudioSession sharedInstance];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleMediaServicesReset)
+                                                     name:AVAudioSessionMediaServicesWereResetNotification
+                                                   object:_audioSession];
+        
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(audioSessionInterrupted:)
+                                                     name: AVAudioSessionInterruptionNotification
+                                                   object: _audioSession];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(applicationWillResignActive:)
+                                                         name:UIApplicationWillResignActiveNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(applicationDidEnterBackground:)
+                                                         name:UIApplicationDidEnterBackgroundNotification
+                                                       object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationWillEnterForeground:)
-                                                     name:UIApplicationWillEnterForegroundNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(audioRouteChanged:)
-                                                     name:AVAudioSessionRouteChangeNotification
-                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(applicationWillEnterForeground:)
+                                                         name:UIApplicationWillEnterForegroundNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(audioRouteChanged:)
+                                                         name:AVAudioSessionRouteChangeNotification
+                                                       object:nil];
+    }
 }
 
 -(void)setCategory:(NSString *)categoryName categoryOptions :(NSArray *)categoryOptions

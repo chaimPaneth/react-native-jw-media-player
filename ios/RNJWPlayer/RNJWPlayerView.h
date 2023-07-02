@@ -28,9 +28,17 @@
 @property(nonatomic)JWInterfaceBehavior interfaceBehavior;
 
 /* DRM props */
-@property(nonatomic) NSString *fairplayCertUrl;
-@property(nonatomic) NSString *processSpcUrl;
-@property(nonatomic) NSString *contentUUID;
+@property(nonatomic)NSString *fairplayCertUrl;
+@property(nonatomic)NSString *processSpcUrl;
+@property(nonatomic)NSString *contentUUID;
+
+/* Config helpers */
+@property(nonatomic)NSString *audioCategory;
+@property(nonatomic)NSString *audioMode;
+@property(nonatomic, strong)NSArray* audioCategoryOptions;
+@property(nonatomic)BOOL settingConfig;
+@property(nonatomic)BOOL pendingConfig;
+@property(nonatomic)NSDictionary* currentConfig;
 
 /* casting objects */
 @property(nonatomic, strong)JWCastController *castController;
@@ -106,5 +114,6 @@
 -(void)startDeinitProcess;
 -(JWPlayerItem*)getPlayerItem:item;
 - (void)setVisibility:(BOOL)isVisible forControls:(NSArray* _Nonnull)controls;
+- (void)setConfig:(NSDictionary*)config;
 
 @end
