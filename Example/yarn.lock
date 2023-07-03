@@ -6304,10 +6304,10 @@ react-native-gradle-plugin@^0.0.6:
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz"
   integrity sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg==
 
-react-native-jw-media-player@0.2.33:
-  version "0.2.33"
-  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.33.tgz#ce2333088e5d8587a4176d39ea0ff231919561db"
-  integrity sha512-AXvnHBa6H69rQlNgJuDKrt4p+0bDgLEgNC7Q0X4zL2aQ6EeN/lh0mue4WvthsobDmG/+GHxFQtbjqEtMeQeY9w==
+react-native-jw-media-player@0.2.36:
+  version "0.2.36"
+  resolved "https://registry.yarnpkg.com/react-native-jw-media-player/-/react-native-jw-media-player-0.2.36.tgz#14ef5777d7b11cb98c22e74c922c35f90a63be9e"
+  integrity sha512-RUTaoM9kLeUjeC4//wOOUR4YcNegp8Tsqy5xJoSTa/94zNVjtxlWYcDsnTziHtt+pUpuip8JzhvUHudvOs4pRQ==
 
 react-native-orientation-locker@1.4.0:
   version "1.4.0"

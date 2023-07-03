@@ -78,7 +78,7 @@ PODS:
     - Protobuf (~> 3.13)
   - google-cast-sdk/Core (4.7.0):
     - Protobuf (~> 3.13)
-  - JWPlayerKit (4.9.0)
+  - JWPlayerKit (4.13.0)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
   - Protobuf (3.21.12)
@@ -370,9 +370,9 @@ PODS:
     - React
   - RNGestureHandler (2.4.2):
     - React-Core
-  - RNJWPlayer (0.2.33):
+  - RNJWPlayer (0.2.36):
     - google-cast-sdk (~> 4.7.0)
-    - JWPlayerKit (~> 4.9.0)
+    - JWPlayerKit (~> 4.13.0)
     - React
   - RNScreens (3.13.1):
     - React-Core
@@ -571,7 +571,7 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
   google-cast-sdk: 6731e9a206ce43e0f4433d15598ad8a19f0371d5
-  JWPlayerKit: 7b4c679dc71166d7b0f39dbfa704f94834e542a2
+  JWPlayerKit: cfc3559afa6aed5314e046bce83f35973c2520db
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
@@ -606,7 +606,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 1e3f62b9ec32f7754fac60bd06b8f8a27124e7f0
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 61628a2c859172551aa2100d3e73d1e57878392f
-  RNJWPlayer: 1f7766231a9e8063311f7b15b6227ecfa1ef5dee
+  RNJWPlayer: cd1846f78dc1e996fe7e93462ac140e46ca417c6
   RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608

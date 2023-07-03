@@ -284,7 +284,7 @@ class AnimatedPlayer extends Component {
     });
   }
 
-  isisMinimized() {
+  isCollapsed() {
     return this.state.isMinimized;
   }
 
@@ -584,7 +584,7 @@ class AnimatedPlayer extends Component {
           {...this.panResponder.panHandlers}
           style={playerStyle.subCont}>
           <TouchableWithoutFeedback
-            disabled={!this.isisMinimized()}
+            disabled={!this.isCollapsed()}
             onPress={() => {
               this.isMinimized ? this.animateUp() : null;
             }}>
