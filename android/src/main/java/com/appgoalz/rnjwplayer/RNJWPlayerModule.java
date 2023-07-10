@@ -65,7 +65,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
                     .stretching(oldConfig.getStretching())
                     .uiConfig(oldConfig.getUiConfig())
                     .playlist(createPlaylist(playlistItems))
-                    .sharingConfig(oldConfig.getSharingConfig())
                     .allowCrossProtocolRedirects(oldConfig.getAllowCrossProtocolRedirects())
                     .preload(oldConfig.getPreload())
                     .useTextureView(oldConfig.useTextureView())
