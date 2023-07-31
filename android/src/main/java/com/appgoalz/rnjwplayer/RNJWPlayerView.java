@@ -92,6 +92,7 @@ import com.jwplayer.ui.views.CueMarkerSeekbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -480,116 +481,74 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    public static PlaylistItem getPlaylistItem (ReadableMap playlistItem) {
-        PlaylistItem.Builder itemBuilder = new PlaylistItem.Builder();
 
-        if (playlistItem.hasKey("file")) {
-            String file = playlistItem.getString("file");
-            itemBuilder.file(file);
-        }
-
-        if (playlistItem.hasKey("sources")) {
-            ArrayList<MediaSource> sources = new ArrayList<>();
-            ReadableArray sourcesArray = playlistItem.getArray("sources");
-            if (sourcesArray != null) {
-                for (int i = 0; i < sourcesArray.size(); i++) {
-                    ReadableMap sourceProp = sourcesArray.getMap(i);
-                    if (sourceProp.hasKey("file")) {
-                        String file = sourceProp.getString("file");
-                        String label = sourceProp.getString("label");
-                        boolean isDefault = sourceProp.getBoolean("default");
-                        MediaSource source = new MediaSource.Builder().file(file).label(label).isDefault(isDefault).build();
-                        sources.add(source);
-                    }
-                }
-            }
-
-            itemBuilder.sources(sources);
-        }
-
-        if (playlistItem.hasKey("title")) {
-            String title = playlistItem.getString("title");
-            itemBuilder.title(title);
-        }
-
-        if (playlistItem.hasKey("description")) {
-            String desc = playlistItem.getString("description");
-            itemBuilder.description(desc);
-        }
-
-        if (playlistItem.hasKey("image")) {
-            String image = playlistItem.getString("image");
-            itemBuilder.image(image);
-        }
-
-        if (playlistItem.hasKey("mediaId")) {
-            String mediaId = playlistItem.getString("mediaId");
-            itemBuilder.mediaId(mediaId);
-        }
-
-        if (playlistItem.hasKey("startTime")) {
-            double startTime = playlistItem.getDouble("startTime");
-            itemBuilder.startTime(startTime);
-        }
-
-        if (playlistItem.hasKey("tracks")) {
-            ArrayList<Caption> tracks = new ArrayList<>();
-            ReadableArray track = playlistItem.getArray("tracks");
-            if (track != null) {
-                for (int i = 0; i < track.size(); i++) {
-                    ReadableMap trackProp = track.getMap(i);
-                    if (trackProp.hasKey("file")) {
-                        String file = trackProp.getString("file");
-                        String label = trackProp.getString("label");
-                        boolean isDefault = trackProp.getBoolean("default");
-                        Caption caption = new Caption.Builder().file(file).label(label).kind(CaptionType.CAPTIONS).isDefault(isDefault).build();
-                        tracks.add(caption);
-                    }
-                }
-            }
-
-            itemBuilder.tracks(tracks);
-        }
-
-        if (playlistItem.hasKey("authUrl")) {
-            itemBuilder.mediaDrmCallback(new WidevineCallback(playlistItem.getString("authUrl")));
-        }
-
-        if (playlistItem.hasKey("adSchedule")) {
-            ArrayList<AdBreak> adSchedule = new ArrayList<>();
-            ReadableArray ad = playlistItem.getArray("adSchedule");
-
-            for (int i = 0; i < ad.size(); i++) {
-                ReadableMap adBreakProp = ad.getMap(i);
-                String offset = adBreakProp.hasKey("offset") ? adBreakProp.getString("offset") : "pre";
-                if (adBreakProp.hasKey("tag")) {
-                    AdBreak adBreak = new AdBreak.Builder().offset(offset).tag(adBreakProp.getString("tag")).build();
-                    adSchedule.add(adBreak);
-                }
-            }
-
-            itemBuilder.adSchedule(adSchedule);
-        }
-
-        String recommendations;
-        if (playlistItem.hasKey("recommendations")) {
-            recommendations = playlistItem.getString("recommendations");
-            itemBuilder.recommendations(recommendations);
-        }
-
-        return itemBuilder.build();
-    }
 
     public void setConfig(ReadableMap prop) {
-        if (prop.hasKey("license")) {
-            new LicenseUtil().setLicenseKey(getReactContext(), prop.getString("license"));
+        if (mConfig == null || !mConfig.equals(prop)) {
+            if (mConfig != null && isOnlyDiff(prop, "playlist") && mPlayer != null) {
+                mPlaylistProp = prop.getArray("playlist");
+                PlayerConfig oldConfig = mPlayer.getConfig();
+                PlayerConfig config = new PlayerConfig.Builder()
+                        .autostart(oldConfig.getAutostart())
+                        .nextUpOffset(oldConfig.getNextUpOffset())
+                        .repeat(oldConfig.getRepeat())
+                        .relatedConfig(oldConfig.getRelatedConfig())
+                        .displayDescription(oldConfig.getDisplayDescription())
+                        .displayTitle(oldConfig.getDisplayTitle())
+                        .advertisingConfig(oldConfig.getAdvertisingConfig())
+                        .stretching(oldConfig.getStretching())
+                        .uiConfig(oldConfig.getUiConfig())
+                        .playlist(Util.createPlaylist(mPlaylistProp))
+                        .allowCrossProtocolRedirects(oldConfig.getAllowCrossProtocolRedirects())
+                        .preload(oldConfig.getPreload())
+                        .useTextureView(oldConfig.useTextureView())
+                        .thumbnailPreview(oldConfig.getThumbnailPreview())
+                        .mute(oldConfig.getMute())
+                        .build();
+
+                mPlayer.setup(config);
+            } else {
+                if (prop.hasKey("license")) {
+                    new LicenseUtil().setLicenseKey(getReactContext(), prop.getString("license"));
+                } else {
+                    Log.e(TAG, "JW SDK license not set");
+                }
+
+                // The entire config is different (other than the "playlist" key)
+                this.setupPlayer(prop);
+            }
         } else {
-            Log.e(TAG, "JW SDK license not set");
+            // No change
         }
 
-        if (mConfig == null || (mConfig != prop && !mConfig.equals(prop))) {
-            this.setupPlayer(prop);
+        mConfig = prop;
+    }
+
+    public boolean isOnlyDiff(ReadableMap prop, String keyName) {
+        // Convert ReadableMap to HashMap
+        Map<String, Object> mConfigMap = mConfig.toHashMap();
+        Map<String, Object> propMap = prop.toHashMap();
+
+        Map<String, Object> differences = new HashMap<>();
+
+        // Find keys in mConfig that aren't in prop or have different values
+        for (Map.Entry<String, Object> entry : mConfigMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (!propMap.containsKey(key) || !propMap.get(key).equals(value)) {
+                differences.put(key, value);
+            }
         }
+
+        // Find keys in prop that aren't in mConfig
+        for (String key : propMap.keySet()) {
+            if (!mConfigMap.containsKey(key)) {
+                differences.put(key, propMap.get(key));
+            }
+        }
+
+        return differences.size() == 1 && differences.containsKey(keyName);
     }
 
     boolean playlistNotTheSame(ReadableMap prop) {
@@ -608,7 +567,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 while (mPlaylistProp.size() > j) {
                     ReadableMap playlistItem = mPlaylistProp.getMap(j);
 
-                    PlaylistItem newPlayListItem = this.getPlaylistItem((playlistItem));
+                    PlaylistItem newPlayListItem = Util.getPlaylistItem((playlistItem));
                     playlist.add(newPlayListItem);
                     j++;
                 }
