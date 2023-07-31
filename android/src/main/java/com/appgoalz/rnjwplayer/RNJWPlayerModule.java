@@ -64,7 +64,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
                     .advertisingConfig(oldConfig.getAdvertisingConfig())
                     .stretching(oldConfig.getStretching())
                     .uiConfig(oldConfig.getUiConfig())
-                    .playlist(createPlaylist(playlistItems))
+                    .playlist(Util.createPlaylist(playlistItems))
                     .allowCrossProtocolRedirects(oldConfig.getAllowCrossProtocolRedirects())
                     .preload(oldConfig.getPreload())
                     .useTextureView(oldConfig.useTextureView())
@@ -79,22 +79,6 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
     } catch (IllegalViewOperationException e) {
       throw e;
     }
-  }
-
-  private List<PlaylistItem> createPlaylist(ReadableArray playlistItems) {
-    List<PlaylistItem> playlist = new ArrayList<>();
-    if (playlistItems == null || playlistItems.size() <= 0)
-      return playlist;
-
-    int j = 0;
-    while (playlistItems.size() > j) {
-      ReadableMap playlistItem = playlistItems.getMap(j);
-
-      PlaylistItem newPlayListItem = RNJWPlayerView.getPlaylistItem((playlistItem));
-      playlist.add(newPlayListItem);
-      j++;
-    }
-    return playlist;
   }
 
   @ReactMethod
