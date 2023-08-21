@@ -715,6 +715,11 @@
         _interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
     }
     
+    id interfaceFadeDelay = config[@"interfaceFadeDelay"];
+    if ((interfaceFadeDelay != nil) && (interfaceFadeDelay != (id)[NSNull null])) {
+        _playerViewController.interfaceFadeDelay = [interfaceFadeDelay doubleValue];
+    }
+    
     id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
     if (forceFullScreenOnLandscape != nil && forceFullScreenOnLandscape != (id)[NSNull null]) {
         _playerViewController.forceFullScreenOnLandscape = forceFullScreenOnLandscape;
