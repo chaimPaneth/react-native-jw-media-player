@@ -697,30 +697,6 @@
         _playerViewController = [RNJWPlayerViewController new];
         _playerViewController.parentView = self;
         
-//        static dispatch_once_t t;
-//
-//        dispatch_once ( & t, ^ {
-//            if (self.reactViewController) {
-//                [self.reactViewController addChildViewController:self.playerViewController];
-//                [self.playerViewController didMoveToParentViewController:self.reactViewController];
-//            } else {
-//                [self reactAddControllerToClosestParent:self.playerViewController];
-//            }
-//        });
-        
-        // Execute block of code only once
-//        static dispatch_once_t onceToken;
-//        dispatch_once(&onceToken, ^{
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                if (self.reactViewController) {
-//                    [self.reactViewController addChildViewController:self.playerViewController];
-//                    [self.playerViewController didMoveToParentViewController:self.reactViewController];
-//                } else {
-//                    [self reactAddControllerToClosestParent:self.playerViewController];
-//                }
-//            });
-//        });
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.reactViewController) {
                 [self.reactViewController addChildViewController:self.playerViewController];
@@ -731,11 +707,17 @@
         });
         _playerViewController.view.frame = self.frame;
         [self addSubview:_playerViewController.view];
+        [_playerViewController setDelegates];
     }
     
     id interfaceBehavior = config[@"interfaceBehavior"];
     if ((interfaceBehavior != nil) && (interfaceBehavior != (id)[NSNull null])) {
         _interfaceBehavior = [RCTConvert JWInterfaceBehavior:interfaceBehavior];
+    }
+    
+    id interfaceFadeDelay = config[@"interfaceFadeDelay"];
+    if ((interfaceFadeDelay != nil) && (interfaceFadeDelay != (id)[NSNull null])) {
+        _playerViewController.interfaceFadeDelay = [interfaceFadeDelay doubleValue];
     }
     
     id forceFullScreenOnLandscape = config[@"fullScreenOnLandscape"];
@@ -815,6 +797,7 @@
         [_playerViewController.view removeFromSuperview];
         [_playerViewController removeFromParentViewController];
         [_playerViewController willMoveToParentViewController:nil];
+        [_playerViewController removeDelegates];
         _playerViewController = nil;
     }
 }
