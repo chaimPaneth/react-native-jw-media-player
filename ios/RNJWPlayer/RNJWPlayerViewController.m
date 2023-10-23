@@ -217,38 +217,46 @@
 #pragma mark - DRM Delegate
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    if (!_parentView.contentUUID) {
-        _parentView.contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
-    }
-    
-    NSData *uuidData = [_parentView.contentUUID dataUsingEncoding:NSUTF8StringEncoding];
-    handler(uuidData);
+    NSData *data = [url.host dataUsingEncoding:NSUTF8StringEncoding];
+    handler(data);
 }
 
 - (void)appIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
-    NSURL *certURL = [NSURL URLWithString:_parentView.fairplayCertUrl];
-    NSData *certData = [NSData dataWithContentsOfURL:certURL];
-    handler(certData);
+    if (_parentView.fairplayCertUrl == nil) {
+        return;
+    }
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:_parentView.fairplayCertUrl]];
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"DRM cert request error - %@", error.localizedDescription);
+        }
+        handler(data);
+    }];
+
+    [task resume];
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _parentView.processSpcUrl, _parentView.contentUUID, (NSInteger)currentTime];
-    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
+    if (_parentView.processSpcUrl == nil) {
+        return;
+    }
+
+    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_parentView.processSpcUrl]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
     [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
-    
+ 
     [[[NSURLSession sharedSession] dataTaskWithRequest:ckcRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        if (error != nil || (httpResponse != nil && !NSLocationInRange(httpResponse.statusCode , NSMakeRange(200, (299 - 200))))) {
+        if (error != nil || (httpResponse != nil && httpResponse.statusCode != 200)) {
+            NSLog(@"DRM ckc request error - %@", error);
             handler(nil, nil, nil);
             return;
         }
- 
-        handler(data, nil, nil);
+        handler(data, nil, @"application/octet-stream");
     }] resume];
 }
+
 
 #pragma mark - AV Picture In Picture Delegate
 
