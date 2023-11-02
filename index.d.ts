@@ -29,7 +29,7 @@ declare module "react-native-jw-media-player" {
   }
   type ClientTypes = "vast" | "ima" | "ima_dai";
   interface Advertising {
-    adSchedule?: AdSchedule;
+    adSchedule?: AdSchedule[];
     adVmap?: string;
     tag?: string;
     openBrowserOnAdClick?: boolean;
@@ -42,7 +42,7 @@ declare module "react-native-jw-media-player" {
     title?: string;
     description?: string;
     mediaId?: string;
-    adSchedule?: AdSchedule;
+    adSchedule?: AdSchedule[];
     adVmap?: string;
     tracks?: Track[];
     recommendations?: string;
