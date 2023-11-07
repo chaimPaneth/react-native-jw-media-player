@@ -18,6 +18,7 @@ import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.PlayerState;
+import com.jwplayer.pub.api.media.adaptive.QualityLevel;
 import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.media.audio.AudioTrack;
 import com.jwplayer.pub.api.media.playlists.PlaylistItem;
@@ -154,6 +155,84 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
           if (playerView != null && playerView.mPlayerView != null) {
             playerView.mPlayerView.getPlayer().setPlaybackRate(speed);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+
+  @ReactMethod
+  public void getCurrentQuality(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            int quality = playerView.mPlayerView.getPlayer().getCurrentQuality();
+            promise.resolve(quality);
+          } else {
+            promise.reject("RNJW Error", "getCurrentQuality() Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void setCurrentQuality(final int reactTag, final int index) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            playerView.mPlayerView.getPlayer().setCurrentQuality(index);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+
+  @ReactMethod
+  public void getQualityLevels(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute (NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayerView != null) {
+            List<QualityLevel> qualityLevelsList = playerView.mPlayerView.getPlayer().getQualityLevels();
+            if (qualityLevelsList == null) { //if qualitylevels are null than pass empty array.
+              promise.resolve(null);
+              return;
+            }
+            WritableArray qualityLevels = Arguments.createArray();
+            for (int i = 0; i < qualityLevelsList.size(); i++) {
+              WritableMap qualityLevel = Arguments.createMap();
+              QualityLevel level = qualityLevelsList.get(i);
+              qualityLevel.putInt("playListPosition", level.getPlaylistPosition());
+              qualityLevel.putInt("bitRate", level.getBitrate());
+              qualityLevel.putString("label", level.getLabel());
+              qualityLevel.putInt("height", level.getHeight());
+              qualityLevel.putInt("width", level.getWidth());
+              qualityLevel.putInt("index", level.getTrackIndex());
+              qualityLevels.pushMap(qualityLevel);
+            }
+            promise.resolve(qualityLevels);
+          } else {
+            promise.reject("RNJW Error", "getQualityLevels() Player is null");
           }
         }
       });

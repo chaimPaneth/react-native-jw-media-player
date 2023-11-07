@@ -9,6 +9,16 @@ declare module "react-native-jw-media-player" {
     language: string;
     name: string;
   }
+
+  export interface QualityLevel {
+    playListPosition: number;
+    bitRate: number;
+    label: string;
+    height: number;
+    width: number;
+    index: number;
+  }
+
   interface CastingDevice {
     name?: string;
     identifier?: string;
@@ -203,6 +213,9 @@ declare module "react-native-jw-media-player" {
     stop(): void;
     toggleSpeed(): void;
     setSpeed(speed: number): void;
+    setCurrentQuality(index: number): void;
+    currentQuality(): number;
+    getQualityLevels(): Promise<QualityLevel[] | null>;
     setVolume(volume: number): void;
     setPlaylistIndex(index: number): void;
     setControls(show: boolean): void;
