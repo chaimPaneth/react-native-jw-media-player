@@ -133,6 +133,11 @@ public class Util {
             itemBuilder.startTime(startTime);
         }
 
+        if (playlistItem.hasKey("duration")) {
+            int duration = playlistItem.getInt("duration");
+            itemBuilder.duration(duration);
+        }
+
         if (playlistItem.hasKey("tracks")) {
             ArrayList<Caption> tracks = new ArrayList<>();
             ReadableArray track = playlistItem.getArray("tracks");

@@ -120,8 +120,7 @@ public class RNJWMediaSessionHelper implements AdvertisingEvents.OnAdCompleteLis
             default:
                 var8 = PlaybackStateCompat.STATE_STOPPED;
         }
-
-        long var9 = (long)this.c.getPosition();
+        long var9 = (long)this.c.getPosition() * 1000; // (long)(this.c.getPosition() * 1000.0);
         var2.a.setState(var8, var9, 1.0F);
         b var10000 = this.a;
         c var10 = new c(var2.a.build());
@@ -138,7 +137,8 @@ public class RNJWMediaSessionHelper implements AdvertisingEvents.OnAdCompleteLis
 
     private void a(PlaylistItem var1) {
         MediaMetadataCompat var2 = null;
-        var2 = (null == null ? new MediaMetadataCompat.Builder() : new MediaMetadataCompat.Builder(var2)).putString("android.media.metadata.DISPLAY_TITLE", var1.getTitle()).putString("android.media.metadata.DISPLAY_SUBTITLE", var1.getDescription()).putString("android.media.metadata.MEDIA_ID", var1.getMediaId()).putString("android.media.metadata.ARTIST", this.c.getPlaylistItem().getDescription()).putString("android.media.metadata.TITLE", this.c.getPlaylistItem().getTitle()).build();
+        long duration = (this.c.getPlaylistItem() != null && this.c.getPlaylistItem().getDuration() != null && this.c.getPlaylistItem().getDuration() > 0) ? (long) (this.c.getPlaylistItem().getDuration() * 1000) : 0L;
+        var2 = (null == null ? new MediaMetadataCompat.Builder() : new MediaMetadataCompat.Builder(var2)).putString("android.media.metadata.DISPLAY_TITLE", var1.getTitle()).putString("android.media.metadata.DISPLAY_SUBTITLE", var1.getDescription()).putString("android.media.metadata.MEDIA_ID", var1.getMediaId()).putString("android.media.metadata.ARTIST", this.c.getPlaylistItem().getDescription()).putString("android.media.metadata.TITLE", this.c.getPlaylistItem().getTitle()).putLong("android.media.metadata.DURATION", duration).build();
         this.a.a.setMetadata(var2);
         if (this.d != null) {
             this.d.cancel(true);
