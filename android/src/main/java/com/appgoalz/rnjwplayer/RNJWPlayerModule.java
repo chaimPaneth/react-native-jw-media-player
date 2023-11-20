@@ -347,15 +347,17 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
           if (playerView != null && playerView.mPlayer != null) {
             List<AudioTrack> audioTrackList = playerView.mPlayer.getAudioTracks();
             WritableArray audioTracks = Arguments.createArray();
-            for (int i = 0; i < audioTrackList.size(); i++) {
-              WritableMap audioTrack = Arguments.createMap();
-              AudioTrack track = audioTrackList.get(i);
-              audioTrack.putString("name", track.getName());
-              audioTrack.putString("language", track.getLanguage());
-              audioTrack.putString("groupId", track.getGroupId());
-              audioTrack.putBoolean("defaultTrack", track.isDefaultTrack());
-              audioTrack.putBoolean("autoSelect", track.isAutoSelect());
-              audioTracks.pushMap(audioTrack);
+            if (audioTrackList != null) {
+              for (int i = 0; i < audioTrackList.size(); i++) {
+                WritableMap audioTrack = Arguments.createMap();
+                AudioTrack track = audioTrackList.get(i);
+                audioTrack.putString("name", track.getName());
+                audioTrack.putString("language", track.getLanguage());
+                audioTrack.putString("groupId", track.getGroupId());
+                audioTrack.putBoolean("defaultTrack", track.isDefaultTrack());
+                audioTrack.putBoolean("autoSelect", track.isAutoSelect());
+                audioTracks.pushMap(audioTrack);
+              }
             }
             promise.resolve(audioTracks);
           } else {
