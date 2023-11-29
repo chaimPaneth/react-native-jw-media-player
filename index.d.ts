@@ -9,6 +9,16 @@ declare module "react-native-jw-media-player" {
     language: string;
     name: string;
   }
+
+  export interface QualityLevel {
+    playListPosition: number;
+    bitRate: number;
+    label: string;
+    height: number;
+    width: number;
+    index: number;
+  }
+
   interface CastingDevice {
     name?: string;
     identifier?: string;
@@ -29,7 +39,7 @@ declare module "react-native-jw-media-player" {
   }
   type ClientTypes = "vast" | "ima" | "ima_dai";
   interface Advertising {
-    adSchedule?: AdSchedule;
+    adSchedule?: AdSchedule[];
     adVmap?: string;
     tag?: string;
     openBrowserOnAdClick?: boolean;
@@ -42,7 +52,7 @@ declare module "react-native-jw-media-player" {
     title?: string;
     description?: string;
     mediaId?: string;
-    adSchedule?: AdSchedule;
+    adSchedule?: AdSchedule[];
     adVmap?: string;
     tracks?: Track[];
     recommendations?: string;
@@ -204,6 +214,9 @@ declare module "react-native-jw-media-player" {
     stop(): void;
     toggleSpeed(): void;
     setSpeed(speed: number): void;
+    setCurrentQuality(index: number): void;
+    currentQuality(): number;
+    getQualityLevels(): Promise<QualityLevel[] | null>;
     setVolume(volume: number): void;
     setPlaylistIndex(index: number): void;
     setControls(show: boolean): void;
