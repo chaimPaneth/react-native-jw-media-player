@@ -465,7 +465,12 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         @Override
         public void onAllowRotationChanged(boolean b) {
-            Log.e(TAG, "onAllowRotationChanged: "+b );
+            Log.e(TAG, "onAllowRotationChanged: " + b );
+        }
+
+        @Override
+        public void onAllowFullscreenPortraitChanged(boolean allowFullscreenPortrait) {
+            Log.e(TAG, "onAllowFullscreenPortraitChanged: " + allowFullscreenPortrait );
         }
 
         @Override
