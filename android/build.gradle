@@ -48,7 +48,7 @@ allprojects {
     }
 }
 
-def jwPlayerVersion = "4.13.0"
+def jwPlayerVersion = "4.15.1"
 def exoplayerVersion = "2.18.7"
 
 dependencies {
