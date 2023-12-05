@@ -3,7 +3,3 @@
 #else
 #import "RCTViewManager.h"
 #endif
-
-@interface RNJWPlayerViewManager: RCTViewManager
-
-@end
