@@ -14,14 +14,17 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/RNJWPlayer/*.{h,m,swift}"
   s.dependency   'JWPlayerKit', '~> 4.17.0'
   s.dependency   'google-cast-sdk', '~> 4.8'
-  s.dependency   'React'
-  # s.static_framework = true
+  s.dependency   'React-Core'
   s.info_plist = {
     'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
     'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
     'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
     'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
     'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
+  }
+  s.static_framework = true
+  s.xcconfig = {
+    'OTHER_LDFLAGS': '-ObjC',
   }
   
 end

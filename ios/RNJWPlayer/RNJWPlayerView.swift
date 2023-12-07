@@ -5,19 +5,19 @@
 //  Created by Chaim Paneth on 3/30/22.
 //
 
-import UIKit
 import AVFoundation
 import AVKit
-import MediaPlayer
-import React
 import GoogleCast
 import JWPlayerKit
+import MediaPlayer
+import React
+import UIKit
 
-class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate {
-    
+class RNJWPlayerView: UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate {
     // MARK: - RNJWPlayer allocation
-
-    var playerViewController:RNJWPlayerViewController!
+    
+    private var _eventDispatcher: RCTEventDispatcher?
+    var playerViewController: RNJWPlayerViewController!
     var playerView: JWPlayerView!
     var audioSession: AVAudioSession!
     var pipEnabled: Bool = true
@@ -33,61 +33,62 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     var audioCategoryOptions: [String]!
     var settingConfig: Bool = false
     var pendingConfig: Bool = false
-    var currentConfig: [String : Any]!
+    var currentConfig: [String: Any]!
     var castController: JWCastController!
     var isCasting: Bool = false
     var availableDevices: [AnyObject]!
     
-    @objc var onBuffer:RCTDirectEventBlock?
-    @objc var onUpdateBuffer:RCTDirectEventBlock?
-    @objc var onPlay:RCTDirectEventBlock?
-    @objc var onBeforePlay:RCTDirectEventBlock?
-    @objc var onAttemptPlay:RCTDirectEventBlock?
-    @objc var onPause:RCTDirectEventBlock?
-    @objc var onIdle:RCTDirectEventBlock?
-    @objc var onPlaylistItem:RCTDirectEventBlock?
-    @objc var onLoaded:RCTDirectEventBlock?
-    @objc var onVisible:RCTDirectEventBlock?
-    @objc var onTime:RCTDirectEventBlock?
-    @objc var onSeek:RCTDirectEventBlock?
-    @objc var onSeeked:RCTDirectEventBlock?
-    @objc var onPlaylist:RCTDirectEventBlock?
-    @objc var onPlaylistComplete:RCTDirectEventBlock?
-    @objc var onBeforeComplete:RCTDirectEventBlock?
-    @objc var onComplete:RCTDirectEventBlock?
-    @objc var onAudioTracks:RCTDirectEventBlock?
-    @objc var onPlayerReady:RCTDirectEventBlock?
-    @objc var onSetupPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdError:RCTDirectEventBlock?
-    @objc var onAdEvent:RCTDirectEventBlock?
-    @objc var onAdTime:RCTDirectEventBlock?
-    @objc var onScreenTapped:RCTDirectEventBlock?
-    @objc var onControlBarVisible:RCTDirectEventBlock?
-    @objc var onFullScreen:RCTDirectEventBlock?
-    @objc var onFullScreenRequested:RCTDirectEventBlock?
-    @objc var onFullScreenExit:RCTDirectEventBlock?
-    @objc var onFullScreenExitRequested:RCTDirectEventBlock?
-    @objc var onPlayerSizeChange:RCTDirectEventBlock?
-    @objc var onCastingDevicesAvailable:RCTDirectEventBlock?
-    @objc var onConnectedToCastingDevice:RCTDirectEventBlock?
-    @objc var onDisconnectedFromCastingDevice:RCTDirectEventBlock?
-    @objc var onConnectionTemporarilySuspended:RCTDirectEventBlock?
-    @objc var onConnectionRecovered:RCTDirectEventBlock?
-    @objc var onConnectionFailed:RCTDirectEventBlock?
-    @objc var onCasting:RCTDirectEventBlock?
-    @objc var onCastingEnded:RCTDirectEventBlock?
-    @objc var onCastingFailed:RCTDirectEventBlock?
+    @objc var onBuffer: RCTDirectEventBlock?
+    @objc var onUpdateBuffer: RCTDirectEventBlock?
+    @objc var onPlay: RCTDirectEventBlock?
+    @objc var onBeforePlay: RCTDirectEventBlock?
+    @objc var onAttemptPlay: RCTDirectEventBlock?
+    @objc var onPause: RCTDirectEventBlock?
+    @objc var onIdle: RCTDirectEventBlock?
+    @objc var onPlaylistItem: RCTDirectEventBlock?
+    @objc var onLoaded: RCTDirectEventBlock?
+    @objc var onVisible: RCTDirectEventBlock?
+    @objc var onTime: RCTDirectEventBlock?
+    @objc var onSeek: RCTDirectEventBlock?
+    @objc var onSeeked: RCTDirectEventBlock?
+    @objc var onPlaylist: RCTDirectEventBlock?
+    @objc var onPlaylistComplete: RCTDirectEventBlock?
+    @objc var onBeforeComplete: RCTDirectEventBlock?
+    @objc var onComplete: RCTDirectEventBlock?
+    @objc var onAudioTracks: RCTDirectEventBlock?
+    @objc var onPlayerReady: RCTDirectEventBlock?
+    @objc var onSetupPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdError: RCTDirectEventBlock?
+    @objc var onAdEvent: RCTDirectEventBlock?
+    @objc var onAdTime: RCTDirectEventBlock?
+    @objc var onScreenTapped: RCTDirectEventBlock?
+    @objc var onControlBarVisible: RCTDirectEventBlock?
+    @objc var onFullScreen: RCTDirectEventBlock?
+    @objc var onFullScreenRequested: RCTDirectEventBlock?
+    @objc var onFullScreenExit: RCTDirectEventBlock?
+    @objc var onFullScreenExitRequested: RCTDirectEventBlock?
+    @objc var onPlayerSizeChange: RCTDirectEventBlock?
+    @objc var onCastingDevicesAvailable: RCTDirectEventBlock?
+    @objc var onConnectedToCastingDevice: RCTDirectEventBlock?
+    @objc var onDisconnectedFromCastingDevice: RCTDirectEventBlock?
+    @objc var onConnectionTemporarilySuspended: RCTDirectEventBlock?
+    @objc var onConnectionRecovered: RCTDirectEventBlock?
+    @objc var onConnectionFailed: RCTDirectEventBlock?
+    @objc var onCasting: RCTDirectEventBlock?
+    @objc var onCastingEnded: RCTDirectEventBlock?
+    @objc var onCastingFailed: RCTDirectEventBlock?
     
-    init() {
+    init(eventDispatcher: RCTEventDispatcher!) {
         super.init(frame: CGRect(x: 20, y: 0, width: UIScreen.main.bounds.width - 40, height: 300))
+        self._eventDispatcher = eventDispatcher
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     deinit {
@@ -97,81 +98,80 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     override func removeFromSuperview() {
         self.startDeinitProcess()
     }
-
+    
     func startDeinitProcess() {
-        NotificationCenter.default.removeObserver(self, name:UIDevice.orientationDidChangeNotification, object:nil)
-
+        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+        
         self.reset()
         super.removeFromSuperview()
     }
-
+    
     func reset() {
-        NotificationCenter.default.removeObserver(self, name:AVAudioSession.mediaServicesWereResetNotification, object:audioSession)
-        NotificationCenter.default.removeObserver(self, name:AVAudioSession.interruptionNotification, object:audioSession)
-
-        NotificationCenter.default.removeObserver(self, name:UIApplication.willResignActiveNotification, object:nil)
-        NotificationCenter.default.removeObserver(self, name:UIApplication.didEnterBackgroundNotification, object:nil)
-        NotificationCenter.default.removeObserver(self, name:UIApplication.willEnterForegroundNotification, object:nil)
-        NotificationCenter.default.removeObserver(self, name:AVAudioSession.routeChangeNotification, object:nil)
-
-        if (playerViewController != nil) || (playerView != nil) {
-//            playerViewController.player.currentItem!.removeObserver(self, forKeyPath:"playbackLikelyToKeepUp", context:nil)
-            if (playerView != nil) {
-                NotificationCenter.default.removeObserver(self, forKeyPath:"isPictureInPicturePossible", context:nil)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.mediaServicesWereResetNotification, object: self.audioSession)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: self.audioSession)
+        
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
+        
+        if (self.playerViewController != nil) || (self.playerView != nil) {
+            //            playerViewController.player.currentItem!.removeObserver(self, forKeyPath:"playbackLikelyToKeepUp", context:nil)
+            if self.playerView != nil {
+                NotificationCenter.default.removeObserver(self, forKeyPath: "isPictureInPicturePossible", context: nil)
             }
         }
-
+        
         self.removePlayerView()
         self.dismissPlayerViewController()
-
+        
         self.deinitAudioSession()
-
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         if self.playerView != nil {
             self.playerView.frame = self.frame
         }
-
+        
         if self.playerViewController != nil {
             self.playerViewController.view.frame = self.frame
         }
     }
-
+    
     @objc func rotated(notification: Notification) {
         if UIDevice.current.orientation.isLandscape {
             print("Landscape")
         }
-
+        
         if UIDevice.current.orientation.isPortrait {
             print("Portrait")
         }
-
+        
         self.layoutSubviews()
     }
-
+    
     func shouldAutorotate() -> Bool {
         return false
     }
-
+    
     // MARK: - RNJWPlayer props
-
-    func setLicense(license:String?) {
-        if (license != nil) {
+    
+    func setLicense(license: String?) {
+        if license != nil {
             JWPlayerKitLicense.setLicenseKey(license!)
         } else {
             print("JW SDK License key not set.")
         }
     }
-
+    
     func keysForDifferingValues(in dict1: [String: Any], and dict2: [String: Any]) -> [String] {
         var diffKeys = [String]()
-
+        
         for key in dict1.keys {
             if let value1 = dict1[key], let value2 = dict2[key] {
-                if !areEqual(value1, value2) {
+                if !self.areEqual(value1, value2) {
                     diffKeys.append(key)
                 }
             } else {
@@ -179,65 +179,64 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 diffKeys.append(key)
             }
         }
-
+        
         return diffKeys
     }
-
+    
     func areEqual(_ value1: Any, _ value2: Any) -> Bool {
         let mirror1 = Mirror(reflecting: value1)
         let mirror2 = Mirror(reflecting: value2)
-
+        
         if mirror1.displayStyle != mirror2.displayStyle {
             // Different types
             return false
         }
-
+        
         switch (value1, value2) {
         case let (dict1 as [String: Any], dict2 as [String: Any]):
             // Both are dictionaries, recursively compare
-            return keysForDifferingValues(in: dict1, and: dict2).isEmpty
+            return self.keysForDifferingValues(in: dict1, and: dict2).isEmpty
         case let (array1 as [Any], array2 as [Any]):
             // Both are arrays, compare elements
-            return array1.count == array2.count && zip(array1, array2).allSatisfy(areEqual)
+            return array1.count == array2.count && zip(array1, array2).allSatisfy(self.areEqual)
         default:
             // Use default String description for comparison
             return String(describing: value1) == String(describing: value2)
         }
     }
-
     
     func dictionariesAreEqual(_ dict1: [String: Any]?, _ dict2: [String: Any]?) -> Bool {
         return NSDictionary(dictionary: dict1 ?? [:]).isEqual(to: dict2 ?? [:])
     }
-
+    
     @objc func setConfig(_ config: [String: Any]) {
         // Create mutable copies of the dictionaries
         var configCopy = config
-        var currentConfigCopy = currentConfig
-
+        var currentConfigCopy = self.currentConfig
+        
         // Remove the playlist key
         configCopy.removeValue(forKey: "playlist")
         currentConfigCopy?.removeValue(forKey: "playlist")
-
+        
         // Compare dictionaries without the playlist key
-        if (currentConfigCopy == nil) || !dictionariesAreEqual(configCopy, currentConfigCopy!) {
+        if (currentConfigCopy == nil) || !self.dictionariesAreEqual(configCopy, currentConfigCopy!) {
             print("There are differences other than the 'playlist' key.")
-
-            if (currentConfigCopy != nil) {
-                let diffKeys = keysForDifferingValues(in: configCopy, and: currentConfigCopy!)
+            
+            if currentConfigCopy != nil {
+                let diffKeys = self.keysForDifferingValues(in: configCopy, and: currentConfigCopy!)
                 print("There are differences in these keys: \(diffKeys)")
             } else {
                 print("It's a new config")
             }
-
-            setNewConfig(config: config)
+            
+            self.setNewConfig(config: config)
         } else {
             // Compare original dictionaries
-            if !dictionariesAreEqual(currentConfig, config) {
+            if !self.dictionariesAreEqual(self.currentConfig, config) {
                 print("The only difference is the 'playlist' key.")
-
+                
                 var playlistArray = [JWPlayerItem]()
-
+                
                 if let playlist = config["playlist"] as? [AnyObject] {
                     for item in playlist {
                         if let playerItem = try? getPlayerItem(item: item as! [String: Any]) {
@@ -245,106 +244,106 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                         }
                     }
                 }
-
+                
                 if let playerViewController = playerViewController {
                     playerViewController.player.loadPlaylist(items: playlistArray)
                 } else if let playerView = playerView {
                     playerView.player.loadPlaylist(items: playlistArray)
                 } else {
-                    setNewConfig(config: config)
+                    self.setNewConfig(config: config)
                 }
             } else {
                 print("There are no differences.")
             }
         }
     }
-
-    func setNewConfig(config: [String : Any]) {
-        currentConfig = config
-
-        if !settingConfig {
-            pendingConfig = false
-            settingConfig = true
-
+    
+    func setNewConfig(config: [String: Any]) {
+        self.currentConfig = config
+        
+        if !self.settingConfig {
+            self.pendingConfig = false
+            self.settingConfig = true
+            
             let license = config["license"] as? String
             self.setLicense(license: license)
             
             if let bae = config["backgroundAudioEnabled"] as? Bool, let pe = config["pipEnabled"] as? Bool {
-                backgroundAudioEnabled = bae
-                pipEnabled = pe
+                self.backgroundAudioEnabled = bae
+                self.pipEnabled = pe
             }
             
-            if backgroundAudioEnabled || pipEnabled {
+            if self.backgroundAudioEnabled || self.pipEnabled {
                 let category = config["category"] as? String
                 let categoryOptions = config["categoryOptions"] as? [String]
                 let mode = config["mode"] as? String
-
+                
                 self.initAudioSession(category: category, categoryOptions: categoryOptions, mode: mode)
             } else {
                 self.deinitAudioSession()
             }
-
+            
             do {
                 let viewOnly = config["viewOnly"] as? Bool
                 if viewOnly == true {
-                    self.setupPlayerView(config: config, playerConfig: try self.getPlayerConfiguration(config: config))
+                    try self.setupPlayerView(config: config, playerConfig: self.getPlayerConfiguration(config: config))
                 } else {
-                    self.setupPlayerViewController(config: config, playerConfig: try self.getPlayerConfiguration(config: config))
+                    try self.setupPlayerViewController(config: config, playerConfig: self.getPlayerConfiguration(config: config))
                 }
             } catch {
                 print(error)
             }
-
-            processSpcUrl = config["processSpcUrl"] as? String
-            fairplayCertUrl = config["fairplayCertUrl"] as? String
-            contentUUID = config["contentUUID"] as? String
+            
+            self.processSpcUrl = config["processSpcUrl"] as? String
+            self.fairplayCertUrl = config["fairplayCertUrl"] as? String
+            self.contentUUID = config["contentUUID"] as? String
         } else {
-            pendingConfig = true
+            self.pendingConfig = true
         }
     }
-
-    @objc func setControls(controls:Bool) {
-        self.toggleUIGroup(view: playerViewController.view, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
+    
+    @objc func setControls(_ controls: Bool) {
+        self.toggleUIGroup(view: self.playerViewController.view, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
     }
-
+    
     // MARK: - RNJWPlayer styling
-
-    func colorWithHexString(hex:String!) -> UIColor! {
+    
+    func colorWithHexString(hex: String!) -> UIColor! {
         var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-
+        
         // String should be 6 or 8 characters
         if cString.count < 6 {
             return UIColor.gray
         }
-
+        
         // Strip 0X if it appears
         if cString.hasPrefix("0X") {
             cString = String(cString.dropFirst(2))
         }
-
+        
         if cString.count != 6 {
             return UIColor.gray
         }
-
+        
         // Separate into r, g, b substrings
         let startIndex = cString.startIndex
         let endIndex = cString.index(startIndex, offsetBy: 2)
         let rString = String(cString[startIndex..<endIndex])
-
+        
         let startIndexG = cString.index(startIndex, offsetBy: 2)
         let endIndexG = cString.index(startIndexG, offsetBy: 2)
         let gString = String(cString[startIndexG..<endIndexG])
-
+        
         let startIndexB = cString.index(startIndexG, offsetBy: 2)
         let endIndexB = cString.index(startIndexB, offsetBy: 2)
         let bString = String(cString[startIndexB..<endIndexB])
-
+        
         // Scan values
         var r: UInt64 = 0, g: UInt64 = 0, b: UInt64 = 0
         Scanner(string: rString).scanHexInt64(&r)
         Scanner(string: gString).scanHexInt64(&g)
         Scanner(string: bString).scanHexInt64(&b)
-
+        
         return UIColor(
             red: CGFloat(r) / 255.0,
             green: CGFloat(g) / 255.0,
@@ -352,78 +351,78 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             alpha: 1.0
         )
     }
-
+    
     func setStyling(styling: [String: Any]) {
         let skinStylingBuilder = JWPlayerSkinBuilder()
-
+        
         let colors: AnyObject! = styling["colors"] as AnyObject
         if let colorsDict = colors as? [String: AnyObject] {
             let timeSlider: AnyObject! = colorsDict["timeslider"] as AnyObject
             if let timeSliderDict = timeSlider as? [String: AnyObject] {
                 let timeSliderStyleBuilder = JWTimeSliderStyleBuilder()
-
+                
                 if let progress = timeSliderDict["progress"] as? String {
                     timeSliderStyleBuilder.minimumTrackColor(self.colorWithHexString(hex: progress))
                 }
-
+                
                 if let rail = timeSliderDict["rail"] as? String {
                     timeSliderStyleBuilder.maximumTrackColor(self.colorWithHexString(hex: rail))
                 }
-
+                
                 if let thumb = timeSliderDict["thumb"] as? String {
                     timeSliderStyleBuilder.thumbColor(self.colorWithHexString(hex: thumb))
                 }
-
+                
                 // Build the time slider style and set it in the skin styling builder
                 do {
                     let timeSliderStyle: JWTimeSliderStyle = try timeSliderStyleBuilder.build()
                     skinStylingBuilder.timeSliderStyle(timeSliderStyle)
-                } catch let error {
+                } catch {
                     // Handle error when building time slider style
                     print("Error building time slider style: \(error.localizedDescription)")
                 }
-
+                
                 let buttons: AnyObject! = colorsDict["buttons"] as AnyObject
                 if let buttonsColor = buttons as? String {
                     skinStylingBuilder.buttonsColor(self.colorWithHexString(hex: buttonsColor))
                 }
-
+                
                 let backgroundColor: AnyObject! = colorsDict["backgroundColor"] as AnyObject
                 if let bgColor = backgroundColor as? String {
                     skinStylingBuilder.backgroundColor(self.colorWithHexString(hex: bgColor))
                 }
-
+                
                 let fontColor: AnyObject! = colorsDict["fontColor"] as AnyObject
                 if let fontColorValue = fontColor as? String {
                     skinStylingBuilder.fontColor(self.colorWithHexString(hex: fontColorValue))
                 }
             }
         }
-
+        
         let font: AnyObject! = styling["font"] as AnyObject
         if let fontDict = font as? [String: AnyObject] {
             let name: AnyObject! = fontDict["name"] as AnyObject
             let size: AnyObject! = fontDict["size"] as AnyObject
-
+            
             if let fontName = name as? String, let fontSize = size as? CGFloat {
                 skinStylingBuilder.font(UIFont(name: fontName, size: fontSize)!)
             }
         }
-
+        
         let showTitle: AnyObject! = styling["displayTitle"] as AnyObject
         if let titleVisible = showTitle as? Bool {
             skinStylingBuilder.titleIsVisible(titleVisible)
         }
-
+        
         let showDesc: AnyObject! = styling["displayDescription"] as AnyObject
         if let descVisible = showDesc as? Bool {
             skinStylingBuilder.descriptionIsVisible(descVisible)
         }
-
+        
         let capStyle: AnyObject! = styling["captionsStyle"] as AnyObject
         if let capStyleDict = capStyle as? [String: AnyObject] {
             let capStyleBuilder: JWCaptionStyleBuilder! = JWCaptionStyleBuilder()
-
+            
             let font: AnyObject! = capStyleDict["font"] as AnyObject
             if let fontDict = font as? [String: AnyObject] {
                 let name: AnyObject! = fontDict["name"] as AnyObject
@@ -432,22 +431,22 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                     capStyleBuilder.font(UIFont(name: fontName, size: fontSize)!)
                 }
             }
-
+            
             let fontColor: AnyObject! = capStyleDict["fontColor"] as AnyObject
             if let fontColorString = fontColor as? String {
                 capStyleBuilder.fontColor(self.colorWithHexString(hex: fontColorString))
             }
-
+            
             let backgroundColor: AnyObject! = capStyleDict["backgroundColor"] as AnyObject
             if let bgColorString = backgroundColor as? String {
                 capStyleBuilder.backgroundColor(self.colorWithHexString(hex: bgColorString))
             }
-
+            
             let highlightColor: AnyObject! = capStyleDict["highlightColor"] as AnyObject
             if let highlightColorString = highlightColor as? String {
                 capStyleBuilder.highlightColor(self.colorWithHexString(hex: highlightColorString))
             }
-
+            
             let edgeStyle: AnyObject! = capStyleDict["edgeStyle"] as AnyObject
             if let edgeStyleString = edgeStyle as? String {
                 capStyleBuilder.edgeStyle(RCTConvert.JWCaptionEdgeStyle(edgeStyleString))
@@ -456,26 +455,27 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             do {
                 let captionStyle = try capStyleBuilder.build()
                 skinStylingBuilder.captionStyle(captionStyle)
-            } catch let error {
+            } catch {
                 // Handle error when building time slider style
                 print("Error building caption style: \(error.localizedDescription)")
             }
         }
-
+        
         let menuStyle: AnyObject! = styling["menuStyle"] as AnyObject
         if let menuStyleDict = menuStyle as? [String: AnyObject] {
             let menuStyleBuilder: JWMenuStyleBuilder! = JWMenuStyleBuilder()
-
+            
             if let font = menuStyleDict["font"] as? [String: AnyObject],
-                let name = font["name"] as? String,
-                let size = font["size"] as? CGFloat {
+               let name = font["name"] as? String,
+               let size = font["size"] as? CGFloat
+            {
                 menuStyleBuilder.font(UIFont(name: name, size: size)!)
             }
-
+            
             if let fontColorString = menuStyleDict["fontColor"] as? String {
                 menuStyleBuilder.fontColor(self.colorWithHexString(hex: fontColorString))
             }
-
+            
             if let backgroundColorString = menuStyleDict["backgroundColor"] as? String {
                 menuStyleBuilder.backgroundColor(self.colorWithHexString(hex: backgroundColorString))
             }
@@ -483,40 +483,41 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             do {
                 let jwMenuStyle = try menuStyleBuilder.build()
                 skinStylingBuilder.menuStyle(jwMenuStyle)
-            } catch let error {
+            } catch {
                 // Handle error when building time slider style
                 print("Error building menu style: \(error.localizedDescription)")
             }
         }
-
+        
         do {
             let skinStyling = try skinStylingBuilder.build()
             DispatchQueue.main.async { [self] in
-                playerViewController.styling = skinStyling
+                self.playerViewController.styling = skinStyling
             }
         } catch {
             print(error)
         }
     }
-
+    
     // MARK: - RNJWPlayer config helpers
-
+    
     func getPlayerItem(item: [String: Any]) throws -> JWPlayerItem {
         let itemBuilder = JWPlayerItemBuilder()
-
+        
         if let newFile = item["file"] as? String,
-           let url = URL(string: newFile) {
-
+           let url = URL(string: newFile)
+        {
             if url.scheme != nil && url.host != nil {
                 itemBuilder.file(url)
             } else {
                 if let encodedString = newFile.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
-                   let encodedUrl = URL(string: encodedString) {
+                   let encodedUrl = URL(string: encodedString)
+                {
                     itemBuilder.file(encodedUrl)
                 }
             }
         }
-
+        
         // Process sources
         if let itemSources = item["sources"] as? [AnyObject], !itemSources.isEmpty {
             var sourcesArray = [JWVideoSource]()
@@ -525,8 +526,8 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 if let file = source["file"] as? String,
                    let fileURL = URL(string: file),
                    let label = source["label"] as? String,
-                   let isDefault = source["default"] as? Bool {
-                    
+                   let isDefault = source["default"] as? Bool
+                {
                     let sourceBuilder = JWVideoSourceBuilder()
                     sourceBuilder.file(fileURL)
                     sourceBuilder.label(label)
@@ -540,32 +541,32 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             
             itemBuilder.videoSources(sourcesArray)
         }
-
+        
         // Process other properties
         if let mediaId = item["mediaId"] as? String {
             itemBuilder.mediaId(mediaId)
         }
-
+        
         if let title = item["title"] as? String {
             itemBuilder.title(title)
         }
-
+        
         if let description = item["description"] as? String {
             itemBuilder.description(description)
         }
-
+        
         if let image = item["image"] as? String, let imageURL = URL(string: image) {
             itemBuilder.posterImage(imageURL)
         }
-
+        
         if let startTime = item["startTime"] as? Double {
             itemBuilder.startTime(startTime)
         }
-
+        
         if let recommendations = item["recommendations"] as? String, let recURL = URL(string: recommendations) {
             itemBuilder.recommendations(recURL)
         }
-
+        
         // Process tracks
         if let tracksItem = item["tracks"] as? [AnyObject], !tracksItem.isEmpty {
             var tracksArray = [JWMediaTrack]()
@@ -574,8 +575,8 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 if let file = trackItem["file"] as? String,
                    let fileURL = URL(string: file),
                    let label = trackItem["label"] as? String,
-                   let isDefault = trackItem["default"] as? Bool {
-                    
+                   let isDefault = trackItem["default"] as? Bool
+                {
                     let trackBuilder = JWCaptionTrackBuilder()
                     trackBuilder.file(fileURL)
                     trackBuilder.label(label)
@@ -589,7 +590,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             
             itemBuilder.mediaTracks(tracksArray)
         }
-
+        
         // Process adSchedule
         if let adsItem = item["adSchedule"] as? [AnyObject], !adsItem.isEmpty {
             var adsArray = [JWAdBreak]()
@@ -598,8 +599,8 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 if let offsetString = adItem["offset"] as? String,
                    let tag = adItem["tag"] as? String,
                    let tagURL = URL(string: tag),
-                   let offset = JWAdOffset.from(string: offsetString) {
-                    
+                   let offset = JWAdOffset.from(string: offsetString)
+                {
                     let adBreakBuilder = JWAdBreakBuilder()
                     adBreakBuilder.offset(offset)
                     adBreakBuilder.tags([tagURL])
@@ -614,23 +615,22 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 itemBuilder.adSchedule(breaks: adsArray)
             }
         }
-
+        
         // Process adVmap
         if let adVmap = item["adVmap"] as? String, let adVmapURL = URL(string: adVmap) {
             itemBuilder.adSchedule(vmapURL: adVmapURL)
         }
-
+        
         let playerItem = try itemBuilder.build()
-
+        
         return playerItem
-
     }
-
+    
     func getPlayerConfiguration(config: [String: Any]) throws -> JWPlayerConfiguration {
-        let configBuilder:JWPlayerConfigurationBuilder! = JWPlayerConfigurationBuilder()
-
+        let configBuilder: JWPlayerConfigurationBuilder! = JWPlayerConfigurationBuilder()
+        
         var playlistArray = [JWPlayerItem]()
-
+        
         if let playlist = config["playlist"] as? [[String: Any]] {
             for item in playlist {
                 if let playerItem = try? self.getPlayerItem(item: item) {
@@ -639,66 +639,67 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             }
             configBuilder.playlist(items: playlistArray)
         }
-
+        
         if let autostart = config["autostart"] as? Bool {
             configBuilder.autostart(autostart)
         }
-
+        
         if let repeatContent = config["repeat"] as? Bool, repeatContent {
             configBuilder.repeatContent(repeatContent)
         }
-
+        
         if let preload = config["preload"] as? String {
             configBuilder.preload(RCTConvert.JWPreload(preload))
         }
-
+        
         if let related = config["related"] as? [String: Any] {
             let relatedBuilder = JWRelatedContentConfigurationBuilder()
-
+            
             relatedBuilder.onClick(RCTConvert.JWRelatedOnClick(related["onClick"] as! String))
             relatedBuilder.onComplete(RCTConvert.JWRelatedOnComplete(related["onComplete"] as! String))
             relatedBuilder.heading(related["heading"] as! String)
             relatedBuilder.url(URL(string: related["url"] as? String ?? "")!)
             relatedBuilder.autoplayMessage(related["autoplayMessage"] as! String)
             relatedBuilder.autoplayTimer(related["autoplayTimer"] as? Int ?? 0)
-
+            
             let relatedContent = relatedBuilder.build()
             configBuilder.related(relatedContent)
         }
-
+        
         let ads = config["advertising"] as? [String: Any]
-//        if let adClient = ads?["adClient"] as? Int {
-//            var jwAdClient: JWAdClient = .unknown
-//
-//            switch adClient {
-//            case 0:
-//                jwAdClient = .JWPlayer
-//            case 1:
-//                jwAdClient = .GoogleIMA
-//            case 2:
-//                jwAdClient = .GoogleIMADAI
-//            default:
-//                break
-//            }
-//
-//
-//        }
+        //        if let adClient = ads?["adClient"] as? Int {
+        //            var jwAdClient: JWAdClient = .unknown
+        //
+        //            switch adClient {
+        //            case 0:
+        //                jwAdClient = .JWPlayer
+        //            case 1:
+        //                jwAdClient = .GoogleIMA
+        //            case 2:
+        //                jwAdClient = .GoogleIMADAI
+        //            default:
+        //                break
+        //            }
+        //
+        //
+        //        }
         
         let adConfigBuilder = JWAdsAdvertisingConfigBuilder()
-
+        
         if let schedule = ads?["adSchedule"] as? [[String: Any]] {
             _ = schedule.compactMap { item -> JWAdBreak? in
                 guard let offsetString = item["offset"] as? String,
                       let tag = item["tag"] as? String,
                       let tagUrl = URL(string: tag),
-                      let offset = JWAdOffset.from(string: offsetString) else {
+                      let offset = JWAdOffset.from(string: offsetString)
+                else {
                     return nil
                 }
-
+                
                 let adBreakBuilder = JWAdBreakBuilder()
                 adBreakBuilder.offset(offset)
                 adBreakBuilder.tags([tagUrl])
-
+                
                 do {
                     return try adBreakBuilder.build()
                 } catch {
@@ -708,33 +709,33 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 }
             }
         }
-
+        
         if let tag = ads?["tag"] as? String {
             adConfigBuilder.tag(URL(string: tag)!)
         }
-
+        
         if let adVmap = ads?["adVmap"] as? String {
             adConfigBuilder.vmapURL(URL(string: adVmap)!)
         }
-
+        
         if let openBrowserOnAdClick = ads?["openBrowserOnAdClick"] as? Bool {
             adConfigBuilder.openBrowserOnAdClick(openBrowserOnAdClick)
         }
-
+        
         let advertising = try adConfigBuilder.build()
         configBuilder.advertising(advertising)
-
+        
         let playerConfig = try configBuilder.build()
-
+        
         return playerConfig
     }
-
+    
     // MARK: - JWPlayer View Controller helpers
-
+    
     func setupPlayerViewController(config: [String: Any], playerConfig: JWPlayerConfiguration) {
-        if playerViewController == nil {
-            playerViewController = RNJWPlayerViewController()
-            playerViewController.parentView = self
+        if self.playerViewController == nil {
+            self.playerViewController = RNJWPlayerViewController()
+            self.playerViewController.parentView = self
             
             DispatchQueue.main.async { [self] in
                 if self.reactViewController() != nil {
@@ -745,239 +746,237 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 }
             }
             
-            playerViewController.view.frame = self.frame
-            self.addSubview(playerViewController.view)
-            playerViewController.setDelegates()
+            self.playerViewController.view.frame = self.frame
+            self.addSubview(self.playerViewController.view)
+            self.playerViewController.setDelegates()
         }
-
+        
         if let ib = config["interfaceBehavior"] as? String {
-            interfaceBehavior = RCTConvert.JWInterfaceBehavior(ib)
+            self.interfaceBehavior = RCTConvert.JWInterfaceBehavior(ib)
         }
-
+        
         if let interfaceFadeDelay = config["interfaceFadeDelay"] as? NSNumber {
-            playerViewController.interfaceFadeDelay = interfaceFadeDelay.doubleValue
+            self.playerViewController.interfaceFadeDelay = interfaceFadeDelay.doubleValue
         }
-
+        
         if let forceFullScreenOnLandscape = config["fullScreenOnLandscape"] as? Bool {
-            playerViewController.forceFullScreenOnLandscape = forceFullScreenOnLandscape
+            self.playerViewController.forceFullScreenOnLandscape = forceFullScreenOnLandscape
         }
-
+        
         if let forceLandscapeOnFullScreen = config["landscapeOnFullScreen"] as? Bool {
-            playerViewController.forceLandscapeOnFullScreen = forceLandscapeOnFullScreen
+            self.playerViewController.forceLandscapeOnFullScreen = forceLandscapeOnFullScreen
         }
-
+        
         if let enableLockScreenControls = config["enableLockScreenControls"] as? Bool {
-            playerViewController.enableLockScreenControls = enableLockScreenControls && backgroundAudioEnabled
+            self.playerViewController.enableLockScreenControls = enableLockScreenControls && self.backgroundAudioEnabled
         }
-
+        
         if let allowsPictureInPicturePlayback = config["allowsPictureInPicturePlayback"] as? Bool {
-            playerViewController.allowsPictureInPicturePlayback = allowsPictureInPicturePlayback
+            self.playerViewController.allowsPictureInPicturePlayback = allowsPictureInPicturePlayback
         }
-
+        
         if let styling = config["styling"] as? [String: Any] {
             self.setStyling(styling: styling)
         }
-
+        
         if let nextUpStyle = config["nextUpStyle"] as? [String: Any] {
             let nextUpBuilder = JWNextUpStyleBuilder()
-
+            
             if let offsetSeconds = nextUpStyle["offsetSeconds"] as? Double {
                 nextUpBuilder.timeOffset(seconds: offsetSeconds)
             }
-
+            
             if let offsetPercentage = nextUpStyle["offsetPercentage"] as? Double {
                 nextUpBuilder.timeOffset(seconds: offsetPercentage)
             }
-
+            
             do {
-                playerViewController.nextUpStyle = try nextUpBuilder.build()
+                self.playerViewController.nextUpStyle = try nextUpBuilder.build()
             } catch {
                 print(error)
             }
         }
-
-    //    playerViewController.adInterfaceStyle
-    //    playerViewController.logo
-    //    playerView.videoGravity = 0;
-    //    playerView.captionStyle
-
+        
+        //    playerViewController.adInterfaceStyle
+        //    playerViewController.logo
+        //    playerView.videoGravity = 0;
+        //    playerView.captionStyle
+        
         if let offlineMsg = config["offlineMessage"] as? String {
-            playerViewController.offlineMessage = offlineMsg
+            self.playerViewController.offlineMessage = offlineMsg
         }
-
+        
         if let offlineImg = config["offlineImage"] as? String {
             if let imageUrl = URL(string: offlineImg), imageUrl.isFileURL {
                 if let imageData = try? Data(contentsOf: imageUrl),
-                   let image = UIImage(data: imageData) {
-                    playerViewController.offlinePosterImage = image
+                   let image = UIImage(data: imageData)
+                {
+                    self.playerViewController.offlinePosterImage = image
                 }
             }
         }
-
+        
         self.presentPlayerViewController(configuration: playerConfig)
     }
-
+    
     func dismissPlayerViewController() {
-        if (playerViewController != nil) {
-            playerViewController.player.pause() // hack for stop not always stopping on unmount
-            playerViewController.player.stop()
-            playerViewController.enableLockScreenControls = false
-
+        if self.playerViewController != nil {
+            self.playerViewController.player.pause() // hack for stop not always stopping on unmount
+            self.playerViewController.player.stop()
+            self.playerViewController.enableLockScreenControls = false
+            
             // hack for stop not always stopping on unmount
-            let configBuilder:JWPlayerConfigurationBuilder! = JWPlayerConfigurationBuilder()
+            let configBuilder: JWPlayerConfigurationBuilder! = JWPlayerConfigurationBuilder()
             configBuilder.playlist(items: [])
             
             do {
                 let configuration: JWPlayerConfiguration = try configBuilder.build()
-                playerViewController.player.configurePlayer(with: configuration)
+                self.playerViewController.player.configurePlayer(with: configuration)
             } catch {
                 print(error)
             }
             
-
-            playerViewController.parentView = nil
-            playerViewController.setVisibility(.hidden, for:[.pictureInPictureButton])
-            playerViewController.view.removeFromSuperview()
-            playerViewController.removeFromParent()
-            playerViewController.willMove(toParent: nil)
-            playerViewController.removeDelegates()
-            playerViewController = nil
+            self.playerViewController.parentView = nil
+            self.playerViewController.setVisibility(.hidden, for: [.pictureInPictureButton])
+            self.playerViewController.view.removeFromSuperview()
+            self.playerViewController.removeFromParent()
+            self.playerViewController.willMove(toParent: nil)
+            self.playerViewController.removeDelegates()
+            self.playerViewController = nil
         }
     }
-
+    
     func presentPlayerViewController(configuration: JWPlayerConfiguration!) {
         if configuration != nil {
-            playerViewController.player.configurePlayer(with: configuration)
-            if (interfaceBehavior != nil) {
-                playerViewController.interfaceBehavior = interfaceBehavior
+            self.playerViewController.player.configurePlayer(with: configuration)
+            if self.interfaceBehavior != nil {
+                self.playerViewController.interfaceBehavior = self.interfaceBehavior
             }
         }
     }
-
+    
     // MARK: - JWPlayer View helpers
-
+    
     func setupPlayerView(config: [String: Any], playerConfig: JWPlayerConfiguration) {
-        playerView = JWPlayerView(frame:self.superview!.frame)
-
-        playerView.delegate = self
-        playerView.player.delegate = self
-        playerView.player.playbackStateDelegate = self
-        playerView.player.adDelegate = self
-        playerView.player.avDelegate = self
-        playerView.player.contentKeyDataSource = self
-
-        playerView.player.configurePlayer(with: playerConfig)
-
-        if pipEnabled {
-            let pipController:AVPictureInPictureController! = playerView.pictureInPictureController
+        self.playerView = JWPlayerView(frame: self.superview!.frame)
+        
+        self.playerView.delegate = self
+        self.playerView.player.delegate = self
+        self.playerView.player.playbackStateDelegate = self
+        self.playerView.player.adDelegate = self
+        self.playerView.player.avDelegate = self
+        self.playerView.player.contentKeyDataSource = self
+        
+        self.playerView.player.configurePlayer(with: playerConfig)
+        
+        if self.pipEnabled {
+            let pipController: AVPictureInPictureController! = self.playerView.pictureInPictureController
             pipController.delegate = self
-
-            pipController.addObserver(self, forKeyPath:"isPictureInPicturePossible", options:[.new, .initial], context:nil)
+            
+            pipController.addObserver(self, forKeyPath: "isPictureInPicturePossible", options: [.new, .initial], context: nil)
         }
-
+        
         self.addSubview(self.playerView)
-
+        
         if let autostart = config["autostart"] as? Bool, autostart {
-            playerView.player.play()
+            self.playerView.player.play()
         }
-
+        
         // Time observers
-        weak var weakSelf:RNJWPlayerView! = self
-        playerView.player.adTimeObserver = { (time:JWTimeData!) in
+        weak var weakSelf: RNJWPlayerView! = self
+        self.playerView.player.adTimeObserver = { (time: JWTimeData!) in
             weakSelf.onAdTime?(["position": time.position, "duration": time.duration])
         }
-
-        playerView.player.mediaTimeObserver = { (time:JWTimeData!) in
+        
+        self.playerView.player.mediaTimeObserver = { (time: JWTimeData!) in
             weakSelf.onTime?(["position": time.position, "duration": time.duration])
         }
     }
-
+    
     func removePlayerView() {
-        if (playerView != nil) {
-            playerView.player.stop()
-            playerView.removeFromSuperview()
-            playerView = nil
+        if self.playerView != nil {
+            self.playerView.player.stop()
+            self.playerView.removeFromSuperview()
+            self.playerView = nil
         }
     }
-
+    
     func toggleUIGroup(view: UIView, name: String, ofSubview: String?, show: Bool) {
         let subviews = view.subviews
-
+        
         for subview in subviews {
             if NSStringFromClass(subview.classForCoder) == name && (ofSubview == nil || NSStringFromClass(subview.superview!.classForCoder) == name) {
                 subview.isHidden = !show
             } else {
-                toggleUIGroup(view: subview, name: name, ofSubview: ofSubview, show: show)
+                self.toggleUIGroup(view: subview, name: name, ofSubview: ofSubview, show: show)
             }
         }
     }
-
-    func setVisibility(isVisible:Bool, forControls controls:[String]) {
-        var _controls:[JWControlType]! = [JWControlType]()
-
-        for control:String? in controls {
-            if (control != nil && !control!.isEmpty) {
-                let type:JWControlType = RCTConvert.JWControlType(control!)
+    
+    func setVisibility(isVisible: Bool, forControls controls: [String]) {
+        var _controls: [JWControlType]! = [JWControlType]()
+        
+        for control: String? in controls {
+            if control != nil && !control!.isEmpty {
+                let type: JWControlType = RCTConvert.JWControlType(control!)
                 _controls.append(type)
             }
-         }
-
-        if (_controls.count > 0) {
-            playerViewController.setVisibility(isVisible ? .visible : .hidden, for: _controls!)
+        }
+        
+        if _controls.count > 0 {
+            self.playerViewController.setVisibility(isVisible ? .visible : .hidden, for: _controls!)
         }
     }
-
+    
     // MARK: - JWPlayer Delegate
-
-    func jwplayerIsReady(_ player:JWPlayer) {
-        settingConfig = false
+    
+    func jwplayerIsReady(_ player: JWPlayer) {
+        self.settingConfig = false
         self.onPlayerReady?([:])
-
-        if pendingConfig && currentConfig != nil {
-            self.setConfig(currentConfig)
+        
+        if self.pendingConfig && self.currentConfig != nil {
+            self.setConfig(self.currentConfig)
         }
     }
-
-    func jwplayer(_ player:JWPlayer, failedWithError code:UInt, message:String) {
+    
+    func jwplayer(_ player: JWPlayer, failedWithError code: UInt, message: String) {
         self.onPlayerError?(["error": message])
     }
-
-    func jwplayer(_ player:JWPlayer, failedWithSetupError code:UInt, message:String) {
+    
+    func jwplayer(_ player: JWPlayer, failedWithSetupError code: UInt, message: String) {
         self.onSetupPlayerError?(["error": message])
     }
-
-    func jwplayer(_ player:JWPlayer, encounteredWarning code:UInt, message:String) {
+    
+    func jwplayer(_ player: JWPlayer, encounteredWarning code: UInt, message: String) {
         self.onPlayerWarning?(["warning": message])
     }
-
-    func jwplayer(_ player:JWPlayer, encounteredAdError code:UInt, message:String) {
+    
+    func jwplayer(_ player: JWPlayer, encounteredAdError code: UInt, message: String) {
         self.onPlayerAdError?(["error": message])
     }
-
-
-    func jwplayer(_ player:JWPlayer, encounteredAdWarning code:UInt, message:String) {
+    
+    func jwplayer(_ player: JWPlayer, encounteredAdWarning code: UInt, message: String) {
         self.onPlayerAdWarning?(["warning": message])
     }
-
-
+    
     // MARK: - JWPlayer View Delegate
-
-    func playerView(_ view:JWPlayerView, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
+    
+    func playerView(_ view: JWPlayerView, sizeChangedFrom oldSize: CGSize, to newSize: CGSize) {
         let oldSizeDict: [String: Any] = [
             "width": oldSize.width,
             "height": oldSize.height
         ]
-
+        
         let newSizeDict: [String: Any] = [
             "width": newSize.width,
             "height": newSize.height
         ]
-
+        
         let sizesDict: [String: Any] = [
             "oldSize": oldSizeDict,
             "newSize": newSizeDict
         ]
-
+        
         do {
             let data = try JSONSerialization.data(withJSONObject: sizesDict, options: .prettyPrinted)
             self.onPlayerSizeChange?(["sizes": data])
@@ -985,25 +984,25 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
-
+    
     // MARK: - JWPlayer View Controller Delegate
-
-    func playerViewController(_ controller:JWPlayerViewController, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
+    
+    func playerViewController(_ controller: JWPlayerViewController, sizeChangedFrom oldSize: CGSize, to newSize: CGSize) {
         let oldSizeDict: [String: Any] = [
             "width": oldSize.width,
             "height": oldSize.height
         ]
-
+        
         let newSizeDict: [String: Any] = [
             "width": newSize.width,
             "height": newSize.height
         ]
-
+        
         let sizesDict: [String: Any] = [
             "oldSize": oldSizeDict,
             "newSize": newSizeDict
         ]
-
+        
         do {
             let data = try JSONSerialization.data(withJSONObject: sizesDict, options: .prettyPrinted)
             self.onPlayerSizeChange?(["sizes": data])
@@ -1011,68 +1010,62 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
-
-    func playerViewController(_ controller:JWPlayerViewController, screenTappedAt position:CGPoint) {
+    
+    func playerViewController(_ controller: JWPlayerViewController, screenTappedAt position: CGPoint) {
         self.onScreenTapped?(["x": position.x, "y": position.y])
     }
-
-    func playerViewController(_ controller:JWPlayerViewController, controlBarVisibilityChanged isVisible:Bool, frame:CGRect) {
+    
+    func playerViewController(_ controller: JWPlayerViewController, controlBarVisibilityChanged isVisible: Bool, frame: CGRect) {
         self.onControlBarVisible?(["visible": isVisible])
     }
-
-    func playerViewControllerWillGoFullScreen(_ controller:JWPlayerViewController) -> JWFullScreenViewController? {
+    
+    func playerViewControllerWillGoFullScreen(_ controller: JWPlayerViewController) -> JWFullScreenViewController? {
         self.onFullScreenRequested?([:])
         return nil
     }
-
-    func playerViewControllerDidGoFullScreen(_ controller:JWPlayerViewController) {
+    
+    func playerViewControllerDidGoFullScreen(_ controller: JWPlayerViewController) {
         self.onFullScreen?([:])
     }
-
-    func playerViewControllerWillDismissFullScreen(_ controller:JWPlayerViewController) {
+    
+    func playerViewControllerWillDismissFullScreen(_ controller: JWPlayerViewController) {
         self.onFullScreenExitRequested?([:])
     }
-
-    func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
+    
+    func playerViewControllerDidDismissFullScreen(_ controller: JWPlayerViewController) {
         self.onFullScreenExit?([:])
     }
-
-    func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method: JWRelatedInteraction) {
-
-    }
-
-    func playerViewController(_ controller: JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerItem], withMethod method: JWRelatedInteraction) {
-        
-    }
     
-    func playerViewController(_ controller: JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerItem, atIndex index: Int, withMethod method: JWRelatedMethod) {
-        
-    }
+    func playerViewController(_ controller: JWPlayerViewController, relatedMenuClosedWithMethod method: JWRelatedInteraction) {}
+    
+    func playerViewController(_ controller: JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerItem], withMethod method: JWRelatedInteraction) {}
+    
+    func playerViewController(_ controller: JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerItem, atIndex index: Int, withMethod method: JWRelatedMethod) {}
     
     // MARK: Time events
-
-    func onAdTimeEvent(time:JWTimeData) {
+    
+    func onAdTimeEvent(time: JWTimeData) {
         self.onAdTime?(["position": time.position, "duration": time.duration])
     }
-
-    func onMediaTimeEvent(time:JWTimeData) {
+    
+    func onMediaTimeEvent(time: JWTimeData) {
         self.onTime?(["position": time.position, "duration": time.duration])
     }
-
+    
     // MARK: - DRM Delegate
-
+    
     func contentIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
-        let data:Data! = url.host?.data(using: String.Encoding.utf8)
+        let data: Data! = url.host?.data(using: String.Encoding.utf8)
         handler(data)
     }
-
+    
     func appIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
         guard let fairplayCertUrlString = fairplayCertUrl, let finalUrl = URL(string: fairplayCertUrlString) else {
             return
         }
         
         let request = URLRequest(url: finalUrl)
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
                 print("DRM cert request error - \(error.localizedDescription)")
             }
@@ -1080,153 +1073,139 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
         task.resume()
     }
-
+    
     func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
         if processSpcUrl == nil {
             return
         }
-
+        
         guard let processSpcUrl = URL(string: processSpcUrl) else {
             print("Invalid processSpcUrl")
             handler(nil, nil, nil)
             return
         }
-
+        
         var ckcRequest = URLRequest(url: processSpcUrl)
         ckcRequest.httpMethod = "POST"
         ckcRequest.httpBody = spcData
         ckcRequest.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-
-        URLSession.shared.dataTask(with: ckcRequest) { (data, response, error) in
-            if let httpResponse = response as? HTTPURLResponse, (error != nil || httpResponse.statusCode != 200) {
+        
+        URLSession.shared.dataTask(with: ckcRequest) { data, response, error in
+            if let httpResponse = response as? HTTPURLResponse, error != nil || httpResponse.statusCode != 200 {
                 print("DRM ckc request error - %@", error?.localizedDescription ?? "Unknown error")
                 handler(nil, nil, nil)
                 return
             }
-
+            
             handler(data, nil, "application/octet-stream")
         }.resume()
     }
-
+    
     // MARK: - AV Picture In Picture Delegate
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-//        if let playerView = playerView {
-//            if keyPath == "playbackLikelyToKeepUp" {
-//                playerView.player.play()
-//            }
-//        } else if let playerViewController = playerViewController {
-//            if keyPath == "playbackLikelyToKeepUp" {
-//                playerViewController.player.play()
-//            }
-//        }
-//
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        //        if let playerView = playerView {
+        //            if keyPath == "playbackLikelyToKeepUp" {
+        //                playerView.player.play()
+        //            }
+        //        } else if let playerViewController = playerViewController {
+        //            if keyPath == "playbackLikelyToKeepUp" {
+        //                playerViewController.player.play()
+        //            }
+        //        }
+        //
         if let keyPath = keyPath, keyPath == "isPictureInPicturePossible", let playerView = playerView, object as? AVPictureInPictureController == playerView.pictureInPictureController {
             // Your code here for handling isPictureInPicturePossible
         }
     }
-
-    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
-
-    }
-
-    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
-
-    }
-
-    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
-
-    }
-
-    func pictureInPictureController(pictureInPictureController:AVPictureInPictureController!, failedToStartPictureInPictureWithError error:NSError!) {
-
-    }
-
-    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
-
-    }
-
-    func pictureInPictureController(_ pictureInPictureController:AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler:@escaping (Bool) -> Void) {
-
+    
+    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {}
+    
+    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {}
+    
+    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {}
+    
+    func pictureInPictureController(pictureInPictureController: AVPictureInPictureController!, failedToStartPictureInPictureWithError error: NSError!) {}
+    
+    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {}
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {}
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {}
+    
+    // MARK: - JWPlayer State Delegate
+    
+    func jwplayerContentIsBuffering(_ player: JWPlayer) {
+        self.onBuffer?([:])
     }
     
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
-        
-    }
-
-    // MARK: - JWPlayer State Delegate
-
-    func jwplayerContentIsBuffering(_ player:JWPlayer) {
+    func jwplayer(_ player: JWPlayer, isBufferingWithReason reason: JWBufferReason) {
         self.onBuffer?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, isBufferingWithReason reason:JWBufferReason) {
-        self.onBuffer?([:])
-    }
-
-    func jwplayer(_ player:JWPlayer, updatedBuffer percent:Double, position time:JWTimeData) {
+    
+    func jwplayer(_ player: JWPlayer, updatedBuffer percent: Double, position time: JWTimeData) {
         self.onUpdateBuffer?(["percent": percent, "position": time])
     }
-
-    func jwplayer(_ player:JWPlayer, didFinishLoadingWithTime loadTime:TimeInterval) {
+    
+    func jwplayer(_ player: JWPlayer, didFinishLoadingWithTime loadTime: TimeInterval) {
         self.onLoaded?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, isAttemptingToPlay playlistItem:JWPlayerItem, reason:JWPlayReason) {
+    
+    func jwplayer(_ player: JWPlayer, isAttemptingToPlay playlistItem: JWPlayerItem, reason: JWPlayReason) {
         self.onAttemptPlay?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, isPlayingWithReason reason:JWPlayReason) {
+    
+    func jwplayer(_ player: JWPlayer, isPlayingWithReason reason: JWPlayReason) {
         self.onPlay?([:])
-
-        userPaused = false
-        wasInterrupted = false
+        
+        self.userPaused = false
+        self.wasInterrupted = false
     }
-
-    func jwplayer(_ player:JWPlayer, willPlayWithReason reason:JWPlayReason) {
+    
+    func jwplayer(_ player: JWPlayer, willPlayWithReason reason: JWPlayReason) {
         self.onBeforePlay?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, didPauseWithReason reason:JWPauseReason) {
+    
+    func jwplayer(_ player: JWPlayer, didPauseWithReason reason: JWPauseReason) {
         self.onPause?([:])
-
-        if !wasInterrupted {
-            userPaused = true
+        
+        if !self.wasInterrupted {
+            self.userPaused = true
         }
     }
-
-    func jwplayer(_ player:JWPlayer, didBecomeIdleWithReason reason:JWIdleReason) {
+    
+    func jwplayer(_ player: JWPlayer, didBecomeIdleWithReason reason: JWIdleReason) {
         self.onIdle?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, isVisible:Bool) {
+    
+    func jwplayer(_ player: JWPlayer, isVisible: Bool) {
         self.onVisible?(["visible": isVisible])
     }
-
-    func jwplayerContentWillComplete(_ player:JWPlayer) {
+    
+    func jwplayerContentWillComplete(_ player: JWPlayer) {
         self.onBeforeComplete?([:])
     }
-
-    func jwplayerContentDidComplete(_ player:JWPlayer) {
+    
+    func jwplayerContentDidComplete(_ player: JWPlayer) {
         self.onComplete?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, didLoadPlaylistItem item:JWPlayerItem, at index:UInt) {
+    
+    func jwplayer(_ player: JWPlayer, didLoadPlaylistItem item: JWPlayerItem, at index: UInt) {
         var sourceDict: [String: Any] = [:]
         var file: String?
-
+        
         for source in item.videoSources {
             sourceDict["file"] = source.file?.absoluteString
             sourceDict["label"] = source.label
             sourceDict["default"] = source.defaultVideo
-
+            
             if source.defaultVideo {
                 file = source.file?.absoluteString
             }
         }
-
+        
         var schedDict: [String: Any] = [:]
-
+        
         if let schedules = item.adSchedule {
             for sched in schedules {
                 schedDict["offset"] = sched.offset
@@ -1236,7 +1215,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
         
         var trackDict: [String: Any] = [:]
-
+        
         if let tracks = item.mediaTracks {
             for track in tracks {
                 trackDict["file"] = track.file?.absoluteString
@@ -1244,7 +1223,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 trackDict["default"] = track.defaultTrack
             }
         }
-
+        
         let itemDict: [String: Any] = [
             "file": file ?? "",
             "mediaId": item.mediaId as Any,
@@ -1258,36 +1237,36 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             "adSchedule": schedDict,
             "tracks": trackDict
         ]
-
+        
         do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: itemDict as Any, options:.prettyPrinted)
-
-            self.onPlaylistItem?(["playlistItem": String(data:data, encoding:String.Encoding.utf8) as Any, "index": index])
+            let data: Data! = try JSONSerialization.data(withJSONObject: itemDict as Any, options: .prettyPrinted)
+            
+            self.onPlaylistItem?(["playlistItem": String(data: data, encoding: String.Encoding.utf8) as Any, "index": index])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
-
-//        item.addObserver(self, forKeyPath:"playbackLikelyToKeepUp", options:.new, context:nil)
+        
+        //        item.addObserver(self, forKeyPath:"playbackLikelyToKeepUp", options:.new, context:nil)
     }
-
-    func jwplayer(_ player:JWPlayer, didLoadPlaylist playlist:[JWPlayerItem]) {
-        let playlistArray:NSMutableArray! = NSMutableArray()
-
-        for item:JWPlayerItem? in playlist {
-            var file:String!
-
+    
+    func jwplayer(_ player: JWPlayer, didLoadPlaylist playlist: [JWPlayerItem]) {
+        let playlistArray: NSMutableArray! = NSMutableArray()
+        
+        for item: JWPlayerItem? in playlist {
+            var file: String!
+            
             var sourceDict: [String: Any] = [:]
-
+            
             for source in item?.videoSources ?? [] {
                 sourceDict["file"] = source.file?.absoluteString
                 sourceDict["label"] = source.label
                 sourceDict["default"] = source.defaultVideo
-
+                
                 if source.defaultVideo {
                     file = source.file?.absoluteString ?? ""
                 }
             }
-
+            
             var schedDict: [String: Any] = [:]
             if let adSchedule = item?.adSchedule {
                 for sched in adSchedule {
@@ -1296,9 +1275,9 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                     schedDict["type"] = sched.type
                 }
             }
-
+            
             var trackDict: [String: Any] = [:]
-
+            
             if let mediaTracks = item?.mediaTracks {
                 for track in mediaTracks {
                     trackDict["file"] = track.file?.absoluteString
@@ -1306,7 +1285,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                     trackDict["default"] = track.defaultTrack
                 }
             }
-
+            
             let itemDict: [String: Any] = [
                 "file": file ?? "",
                 "mediaId": item?.mediaId ?? "",
@@ -1320,315 +1299,295 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 "adSchedule": trackDict,
                 "tracks": schedDict
             ]
-
+            
             playlistArray.add(itemDict)
-         }
-
+        }
+        
         do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: playlistArray as Any, options:.prettyPrinted)
-
-            self.onPlaylist?(["playlist": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            let data: Data! = try JSONSerialization.data(withJSONObject: playlistArray as Any, options: .prettyPrinted)
+            
+            self.onPlaylist?(["playlist": String(data: data as Data, encoding: String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
-
-    func jwplayerPlaylistHasCompleted(_ player:JWPlayer) {
+    
+    func jwplayerPlaylistHasCompleted(_ player: JWPlayer) {
         self.onPlaylistComplete?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, usesMediaType type:JWMediaType) {
-
-    }
+    
+    func jwplayer(_ player: JWPlayer, usesMediaType type: JWMediaType) {}
     
     func jwplayer(_ player: JWPlayer, playbackRateChangedTo rate: Double, at time: TimeInterval) {
-//        self.onSeek(["from": oldPosition, "to": newPosition])
+        //        self.onSeek(["from": oldPosition, "to": newPosition])
     }
-
-//    func jwplayer(_ player:JWPlayer, playbackRateChangedTo oldPosition:TimeInterval, at_  newPosition:TimeInterval) {
-//        self.onSeek(["from": oldPosition, "to": newPosition])
-//    }
-
-    func jwplayerHasSeeked(_ player:JWPlayer) {
+    
+    //    func jwplayer(_ player:JWPlayer, playbackRateChangedTo oldPosition:TimeInterval, at_  newPosition:TimeInterval) {
+    //        self.onSeek(["from": oldPosition, "to": newPosition])
+    //    }
+    
+    func jwplayerHasSeeked(_ player: JWPlayer) {
         self.onSeeked?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, seekedFrom rate:Double, to time:TimeInterval) {
-        
-    }
-
-    func jwplayer(_ player:JWPlayer, updatedCues cues:[JWCue]) {
-
-    }
-
+    
+    func jwplayer(_ player: JWPlayer, seekedFrom rate: Double, to time: TimeInterval) {}
+    
+    func jwplayer(_ player: JWPlayer, updatedCues cues: [JWCue]) {}
+    
     // MARK: - JWPlayer Ad Delegate
-
-    func jwplayer(_ player:JWPlayer, adEvent event:JWAdEvent) {
+    
+    func jwplayer(_ player: JWPlayer, adEvent event: JWAdEvent) {
         self.onAdEvent?(["client": event.client, "type": event.type])
     }
-
-// pragma Mark - Casting methods
-
+    
+    // pragma Mark - Casting methods
+    
     func setUpCastController() {
-        if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
-           castController = JWCastController(player:playerView.player)
-           castController.delegate = self
-       }
-
-       self.scanForDevices()
+        if (self.playerView != nil) && self.playerView.player as! Bool && (self.castController == nil) {
+            self.castController = JWCastController(player: self.playerView.player)
+            self.castController.delegate = self
+        }
+        
+        self.scanForDevices()
     }
-
+    
     func scanForDevices() {
-       if castController != nil {
-           castController.startDiscovery()
-       }
+        if self.castController != nil {
+            self.castController.startDiscovery()
+        }
     }
-
+    
     func stopScanForDevices() {
-       if castController != nil {
-           castController.stopDiscovery()
-       }
+        if self.castController != nil {
+            self.castController.stopDiscovery()
+        }
     }
-
+    
     func presentCastDialog() {
         GCKCastContext.sharedInstance().presentCastDialog()
     }
-
+    
     func startDiscovery() {
         GCKCastContext.sharedInstance().discoveryManager.startDiscovery()
     }
-
+    
     func stopDiscovery() {
         GCKCastContext.sharedInstance().discoveryManager.stopDiscovery()
     }
-
+    
     func discoveryActive() -> Bool {
         return GCKCastContext.sharedInstance().discoveryManager.discoveryActive
     }
-
+    
     func hasDiscoveredDevices() -> Bool {
         return GCKCastContext.sharedInstance().discoveryManager.hasDiscoveredDevices
     }
-
+    
     func discoveryState() -> GCKDiscoveryState {
         return GCKCastContext.sharedInstance().discoveryManager.discoveryState
     }
-
-    func setPassiveScan(passive:Bool) {
+    
+    func setPassiveScan(passive: Bool) {
         GCKCastContext.sharedInstance().discoveryManager.passiveScan = passive
     }
-
+    
     func castState() -> GCKCastState {
         return GCKCastContext.sharedInstance().castState
     }
-
+    
     func deviceCount() -> UInt {
         return GCKCastContext.sharedInstance().discoveryManager.deviceCount
     }
-
+    
     func getAvailableDevices() -> [JWCastingDevice]! {
-        return castController.availableDevices
+        return self.castController.availableDevices
     }
-
+    
     func connectedDevice() -> JWCastingDevice! {
-        return castController.connectedDevice
+        return self.castController.connectedDevice
     }
-
-    func connectToDevice(device:JWCastingDevice!) {
-        return castController.connectToDevice(device)
+    
+    func connectToDevice(device: JWCastingDevice!) {
+        return self.castController.connectToDevice(device)
     }
-
+    
     func cast() {
-        return castController.cast()
+        return self.castController.cast()
     }
-
+    
     func stopCasting() {
-        return castController.stopCasting()
+        return self.castController.stopCasting()
     }
-
+    
     // MARK: - JWPlayer Cast Delegate
     
     func castController(_ controller: JWCastController, castingBeganWithDevice device: JWCastingDevice) {
         self.onCasting?([:])
     }
     
-    func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
+    func castController(_ controller: JWCastController, castingEndedWithError error: Error?) {
         self.onCastingEnded?(["error": error as Any])
     }
-
-    func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
+    
+    func castController(_ controller: JWCastController, castingFailedWithError error: Error) {
         self.onCastingFailed?(["error": error as Any])
     }
-
-    func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
-        let dict:NSMutableDictionary! = NSMutableDictionary()
-
-        dict.setObject(device.name, forKey:"name" as NSCopying)
-        dict.setObject(device.identifier, forKey:"identifier" as NSCopying)
-
+    
+    func castController(_ controller: JWCastController, connectedTo device: JWCastingDevice) {
+        let dict: NSMutableDictionary! = NSMutableDictionary()
+        
+        dict.setObject(device.name, forKey: "name" as NSCopying)
+        dict.setObject(device.identifier, forKey: "identifier" as NSCopying)
+        
         do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
-
-            self.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            let data: Data! = try JSONSerialization.data(withJSONObject: dict as Any, options: .prettyPrinted)
+            
+            self.onConnectedToCastingDevice?(["device": String(data: data as Data, encoding: String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
     
-    func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
+    func castController(_ controller: JWCastController, connectionFailedWithError error: Error) {
         self.onConnectionFailed?(["error": error as Any])
     }
-
-    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
+    
+    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device: JWCastingDevice) {
         self.onConnectionRecovered?([:])
     }
-
+    
     func castController(_ controller: JWCastController, connectionSuspendedWithDevice device: JWCastingDevice) {
         self.onConnectionTemporarilySuspended?([:])
     }
-
-    func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
+    
+    func castController(_ controller: JWCastController, devicesAvailable devices: [JWCastingDevice]) {
         self.availableDevices = devices
-
+        
         var devicesInfo: [[String: Any]] = []
         for device in devices {
             var dict: [String: Any] = [:]
-
+            
             dict["name"] = device.name
             dict["identifier"] = device.identifier
-
+            
             devicesInfo.append(dict)
         }
-
+        
         do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
-
-            self.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            let data: Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options: .prettyPrinted)
+            
+            self.onCastingDevicesAvailable?(["devices": String(data: data as Data, encoding: String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
     
-    func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
+    func castController(_ controller: JWCastController, disconnectedWithError error: Error?) {
         self.onDisconnectedFromCastingDevice?(["error": error as Any])
     }
-
+    
     // MARK: - JWPlayer AV Delegate
-
-    func jwplayer(_ player:JWPlayer, audioTracksUpdated levels:[JWMediaSelectionOption]) {
+    
+    func jwplayer(_ player: JWPlayer, audioTracksUpdated levels: [JWMediaSelectionOption]) {
         self.onAudioTracks?([:])
     }
-
-    func jwplayer(_ player:JWPlayer, audioTrackChanged currentLevel:Int) {
-
-    }
     
-    func jwplayer(_ player: JWPlayer, captionPresented caption: [String], at time: JWTimeData) {
-        
-    }
-
-    func jwplayer(_ player:JWPlayer, captionTrackChanged index:Int) {
-
-    }
-
-    func jwplayer(_ player: JWPlayer, visualQualityChanged currentVisualQuality: JWVisualQuality) {
-        
-    }
+    func jwplayer(_ player: JWPlayer, audioTrackChanged currentLevel: Int) {}
     
-    func jwplayer(_ player:JWPlayer, qualityLevelChanged currentLevel:Int) {
-
-    }
+    func jwplayer(_ player: JWPlayer, captionPresented caption: [String], at time: JWTimeData) {}
     
-    func jwplayer(_ player:JWPlayer, qualityLevelsUpdated levels:[JWVideoSource]) {
-
-    }
-
-    func jwplayer(_ player:JWPlayer, updatedCaptionList options:[JWMediaSelectionOption]) {
-
-    }
-
+    func jwplayer(_ player: JWPlayer, captionTrackChanged index: Int) {}
+    
+    func jwplayer(_ player: JWPlayer, visualQualityChanged currentVisualQuality: JWVisualQuality) {}
+    
+    func jwplayer(_ player: JWPlayer, qualityLevelChanged currentLevel: Int) {}
+    
+    func jwplayer(_ player: JWPlayer, qualityLevelsUpdated levels: [JWVideoSource]) {}
+    
+    func jwplayer(_ player: JWPlayer, updatedCaptionList options: [JWMediaSelectionOption]) {}
+    
     // MARK: - JWPlayer audio session && interruption handling
-
-    func initAudioSession(category:String?, categoryOptions:[String]?, mode:String?) {
+    
+    func initAudioSession(category: String?, categoryOptions: [String]?, mode: String?) {
         self.setObservers()
-
-        var somethingChanged:Bool = false
-
-        if !(category == audioCategory) || (categoryOptions != nil && !categoryOptions!.elementsEqual(audioCategoryOptions)) {
+        
+        var somethingChanged = false
+        
+        if !(category == self.audioCategory) || (categoryOptions != nil && !categoryOptions!.elementsEqual(self.audioCategoryOptions)) {
             somethingChanged = true
-            audioCategory = category
-            audioCategoryOptions = categoryOptions
-            self.setCategory(categoryName: category, categoryOptions:categoryOptions)
+            self.audioCategory = category
+            self.audioCategoryOptions = categoryOptions
+            self.setCategory(categoryName: category, categoryOptions: categoryOptions)
         }
-
-        if !(mode == audioMode) {
+        
+        if !(mode == self.audioMode) {
             somethingChanged = true
-            audioMode = mode
+            self.audioMode = mode
             self.setMode(modeName: mode)
         }
-
+        
         if somethingChanged {
             do {
-                try audioSession.setActive(true)
+                try self.audioSession.setActive(true)
                 print("setActive - success")
             } catch {
                 print("setActive - error: @%@", error)
             }
         }
     }
-
+    
     func deinitAudioSession() {
         do {
-            try audioSession?.setActive(false, options: .notifyOthersOnDeactivation)
+            try self.audioSession?.setActive(false, options: .notifyOthersOnDeactivation)
             print("setUnactive - success")
         } catch {
             print("setUnactive - error: @%@", error)
         }
-        audioSession = nil
+        self.audioSession = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
-
+    
     func setObservers() {
-        if audioSession == nil {
-            audioSession = AVAudioSession.sharedInstance()
-
+        if self.audioSession == nil {
+            self.audioSession = AVAudioSession.sharedInstance()
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector:#selector(handleMediaServicesReset),
-                                                   name:AVAudioSession.mediaServicesWereResetNotification,
-                                                       object:audioSession)
-
+                                                   selector: #selector(self.handleMediaServicesReset),
+                                                   name: AVAudioSession.mediaServicesWereResetNotification,
+                                                   object: self.audioSession)
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(audioSessionInterrupted(_:)),
+                                                   selector: #selector(self.audioSessionInterrupted(_:)),
                                                    name: AVAudioSession.interruptionNotification,
-                                                       object: audioSession)
-
+                                                   object: self.audioSession)
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector:#selector(applicationWillResignActive(_:)),
-                                                   name:UIApplication.willResignActiveNotification, object:nil)
-
+                                                   selector: #selector(self.applicationWillResignActive(_:)),
+                                                   name: UIApplication.willResignActiveNotification, object: nil)
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector:#selector(applicationDidEnterBackground(_:)),
-                                                   name:UIApplication.didEnterBackgroundNotification,
-                                                           object:nil)
-
+                                                   selector: #selector(self.applicationDidEnterBackground(_:)),
+                                                   name: UIApplication.didEnterBackgroundNotification,
+                                                   object: nil)
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector:#selector(applicationWillEnterForeground(_:)),
-                                                   name:UIApplication.willEnterForegroundNotification, object:nil)
-
+                                                   selector: #selector(self.applicationWillEnterForeground(_:)),
+                                                   name: UIApplication.willEnterForegroundNotification, object: nil)
+            
             NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(audioRouteChanged(_:)),
+                                                   selector: #selector(self.audioRouteChanged(_:)),
                                                    name: AVAudioSession.routeChangeNotification,
                                                    object: nil)
         }
     }
-
-    func setCategory(categoryName:String!, categoryOptions:[String]!) {
-        if (audioSession == nil) {
-            audioSession = AVAudioSession.sharedInstance()
+    
+    func setCategory(categoryName: String!, categoryOptions: [String]!) {
+        if self.audioSession == nil {
+            self.audioSession = AVAudioSession.sharedInstance()
         }
-
-        var category:AVAudioSession.Category! = nil
+        
+        var category: AVAudioSession.Category! = nil
         if categoryName.isEqual("Ambient") {
             category = .ambient
         } else if categoryName.isEqual("SoloAmbient") {
@@ -1644,7 +1603,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         } else {
             category = .playback
         }
-
+        
         var options: AVAudioSession.CategoryOptions = []
         if categoryOptions.contains("MixWithOthers") {
             options.insert(.mixWithOthers)
@@ -1673,20 +1632,20 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
         
         do {
-            try audioSession.setCategory(category, options: options)
+            try self.audioSession.setCategory(category, options: options)
             print("setCategory - success")
         } catch {
             print("setCategory - error: @%@", error)
         }
     }
-
-    func setMode(modeName:String!) {
-        if (audioSession == nil) {
-            audioSession = AVAudioSession.sharedInstance()
+    
+    func setMode(modeName: String!) {
+        if self.audioSession == nil {
+            self.audioSession = AVAudioSession.sharedInstance()
         }
-
-        var mode:AVAudioSession.Mode! = nil
-
+        
+        var mode: AVAudioSession.Mode! = nil
+        
         if modeName.isEqual("Default") {
             mode = .default
         } else if modeName.isEqual("VoiceChat") {
@@ -1710,10 +1669,10 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
                 // Fallback on earlier versions
             }
         }
-
-        if (mode != nil) {
+        
+        if mode != nil {
             do {
-                try audioSession.setMode(mode)
+                try self.audioSession.setMode(mode)
                 print("setMode - success")
             } catch {
                 print("setMode - error: @%@", error)
@@ -1723,46 +1682,46 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     
     @objc func audioSessionInterrupted(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
-            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-                return
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+        else {
+            return
         }
         
         switch type {
         case .began:
             DispatchQueue.main.async { [self] in
-                wasInterrupted = true
-
-                if (playerView != nil) {
-                    playerView.player.pause()
-                } else if (playerViewController != nil) {
-                    playerViewController.player.pause()
+                self.wasInterrupted = true
+                
+                if self.playerView != nil {
+                    self.playerView.player.pause()
+                } else if self.playerViewController != nil {
+                    self.playerViewController.player.pause()
                 }
                 print("handleInterruption :- Pause")
             }
         case .ended:
             guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-            if options.contains(.shouldResume) && !userPaused && backgroundAudioEnabled {
+            if options.contains(.shouldResume) && !self.userPaused && self.backgroundAudioEnabled {
                 // Interruption ended. Playback should resume.
                 DispatchQueue.main.async { [self] in
-                    if (playerView != nil) {
-                        playerView.player.play()
-                    } else if (playerViewController != nil) {
-                        playerViewController.player.play()
+                    if self.playerView != nil {
+                        self.playerView.player.play()
+                    } else if self.playerViewController != nil {
+                        self.playerViewController.player.play()
                     }
                     print("handleInterruption :- Play")
                 }
-            }
-            else {
+            } else {
                 // Interruption ended. Playback should not resume.
                 DispatchQueue.main.async { [self] in
-                    wasInterrupted = true
-
-                    if (playerView != nil) {
-                        playerView.player.pause()
-                    } else if (playerViewController != nil) {
-                        playerViewController.player.pause()
+                    self.wasInterrupted = true
+                    
+                    if self.playerView != nil {
+                        self.playerView.player.pause()
+                    } else if self.playerViewController != nil {
+                        self.playerViewController.player.pause()
                     }
                     print("handleInterruption :- Pause")
                 }
@@ -1771,52 +1730,49 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             break
         }
     }
-
+    
     // Service reset
     @objc func handleMediaServicesReset() {
         // • Handle this notification by fully reconfiguring audio
     }
-
+    
     // Inactive
     // Hack for ios 14 stopping audio when going to background
     @objc func applicationWillResignActive(_ notification: Notification) {
-        if !userPaused && backgroundAudioEnabled {
-            if (playerView != nil) && playerView.player.getState() == .playing {
-                playerView.player.play()
-            } else if (playerViewController != nil) && playerViewController.player.getState() == .playing {
-                playerViewController.player.play()
+        if !self.userPaused && self.backgroundAudioEnabled {
+            if (self.playerView != nil) && self.playerView.player.getState() == .playing {
+                self.playerView.player.play()
+            } else if (self.playerViewController != nil) && self.playerViewController.player.getState() == .playing {
+                self.playerViewController.player.play()
             }
         }
     }
-
+    
     // Background
-    @objc func applicationDidEnterBackground(_ notification: Notification) {
-
-    }
-
+    @objc func applicationDidEnterBackground(_ notification: Notification) {}
+    
     // Active
     @objc func applicationWillEnterForeground(_ notification: Notification) {
-        if !userPaused && backgroundAudioEnabled {
-            if (playerView != nil) && playerView.player.getState() == .playing {
-                playerView.player.play()
-            } else if (playerViewController != nil) && playerViewController.player.getState() == .playing {
-                playerViewController.player.play()
+        if !self.userPaused && self.backgroundAudioEnabled {
+            if (self.playerView != nil) && self.playerView.player.getState() == .playing {
+                self.playerView.player.play()
+            } else if (self.playerViewController != nil) && self.playerViewController.player.getState() == .playing {
+                self.playerViewController.player.play()
             }
         }
     }
-
+    
     // Route change
     @objc func audioRouteChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo else { return }
         guard let reason = userInfo[AVAudioSessionRouteChangeReasonKey] as? Int else { return }
-
+        
         if reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.hashValue {
-            if (playerView != nil) {
-                playerView.player.pause()
-            } else if (playerViewController != nil) {
-                playerViewController.player.pause()
+            if self.playerView != nil {
+                self.playerView.player.pause()
+            } else if self.playerViewController != nil {
+                self.playerViewController.player.pause()
             }
         }
     }
-
 }
