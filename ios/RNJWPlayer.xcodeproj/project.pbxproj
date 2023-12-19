@@ -11,6 +11,7 @@
 		2AA52BE726C144B200AD26AE /* RNJWPlayerViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52BE226C144B200AD26AE /* RNJWPlayerViewManager.m */; };
 		3BC75FCC1E43B1DB0011FBAA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */; };
 		3BC75FD11E43B3090011FBAA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FD01E43B3090011FBAA /* Foundation.framework */; };
+		86182A312B2AFA170040739A /* RNJWPlayerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86182A302B2AFA170040739A /* RNJWPlayerModels.swift */; };
 		8650D60D2B1CD21000DD1C7E /* RNJWPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D60C2B1CD21000DD1C7E /* RNJWPlayerView.swift */; };
 		8650D61E2B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D6192B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift */; };
 		8650D61F2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D61A2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift */; };
@@ -35,11 +36,12 @@
 		2AA52BE226C144B200AD26AE /* RNJWPlayerViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerViewManager.m; path = RNJWPlayer/RNJWPlayerViewManager.m; sourceTree = "<group>"; };
 		3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3BC75FD01E43B3090011FBAA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		86182A302B2AFA170040739A /* RNJWPlayerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RNJWPlayerModels.swift; path = RNJWPlayer/RNJWPlayerModels.swift; sourceTree = "<group>"; };
+		86182A322B2AFA660040739A /* RNJWPlayer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RNJWPlayer-Bridging-Header.h"; path = "RNJWPlayer/RNJWPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		8650D60C2B1CD21000DD1C7E /* RNJWPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNJWPlayerView.swift; path = RNJWPlayer/RNJWPlayerView.swift; sourceTree = "<group>"; };
 		8650D6192B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNJWPlayerViewController.swift; path = RNJWPlayer/RNJWPlayerViewController.swift; sourceTree = "<group>"; };
 		8650D61A2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "RCTConvert+RNJWPlayer.swift"; path = "RNJWPlayer/RCTConvert+RNJWPlayer.swift"; sourceTree = "<group>"; };
 		8650D61B2B1D1E1E00DD1C7E /* RNJWPlayerViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNJWPlayerViewManager.swift; path = RNJWPlayer/RNJWPlayerViewManager.swift; sourceTree = "<group>"; };
-		86C824762B21F7C400A612CB /* RNJWPlayer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RNJWPlayer-Bridging-Header.h"; path = "RNJWPlayer/RNJWPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,9 +79,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				86C824762B21F7C400A612CB /* RNJWPlayer-Bridging-Header.h */,
+				86182A322B2AFA660040739A /* RNJWPlayer-Bridging-Header.h */,
 				2AA52BE226C144B200AD26AE /* RNJWPlayerViewManager.m */,
 				8650D61B2B1D1E1E00DD1C7E /* RNJWPlayerViewManager.swift */,
+				86182A302B2AFA170040739A /* RNJWPlayerModels.swift */,
 				8650D60C2B1CD21000DD1C7E /* RNJWPlayerView.swift */,
 				8650D6192B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift */,
 				8650D61A2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift */,
@@ -151,6 +154,7 @@
 				8650D61E2B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift in Sources */,
 				8650D60D2B1CD21000DD1C7E /* RNJWPlayerView.swift in Sources */,
 				2AA52BE726C144B200AD26AE /* RNJWPlayerViewManager.m in Sources */,
+				86182A312B2AFA170040739A /* RNJWPlayerModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,7 +258,7 @@
 				);
 				PRODUCT_NAME = RNJWPlayer;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNJWPlayer/RNJWPlayer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "RNJWPlayer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -283,7 +287,7 @@
 				);
 				PRODUCT_NAME = RNJWPlayer;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNJWPlayer/RNJWPlayer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "RNJWPlayer-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

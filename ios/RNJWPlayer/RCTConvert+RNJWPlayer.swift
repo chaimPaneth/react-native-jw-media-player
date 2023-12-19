@@ -10,7 +10,7 @@ import React
 import JWPlayerKit
 
 extension RCTConvert {
-    
+
     static func JWAdClient(_ value: String) -> JWAdClient {
         switch value {
         case "vast":
@@ -23,7 +23,7 @@ extension RCTConvert {
             return .unknown
         }
     }
-    
+
     static func JWInterfaceBehavior(_ value: String) -> JWInterfaceBehavior {
         switch value {
         case "normal":
@@ -36,7 +36,7 @@ extension RCTConvert {
             return .normal
         }
     }
-    
+
     static func JWCaptionEdgeStyle(_ value: String) -> JWCaptionEdgeStyle {
         switch value {
         case "none":
@@ -53,7 +53,7 @@ extension RCTConvert {
             return .undefined
         }
     }
-    
+
     static func JWPreload(_ value: String) -> JWPreload {
         switch value {
         case "auto":
@@ -64,7 +64,7 @@ extension RCTConvert {
             return .none
         }
     }
-    
+
     static func JWRelatedOnClick(_ value: String) -> JWRelatedOnClick {
         switch value {
         case "play":
@@ -75,7 +75,7 @@ extension RCTConvert {
             return .play
         }
     }
-    
+
     static func JWRelatedOnComplete(_ value: String) -> JWRelatedOnComplete {
         switch value {
         case "show":
@@ -88,7 +88,7 @@ extension RCTConvert {
             return .show
         }
     }
-    
+
     static func JWControlType(_ value: String) -> JWControlType {
         switch value {
         case "forward":
@@ -115,5 +115,5 @@ extension RCTConvert {
             return .fullscreenButton
         }
     }
-    
+
 }

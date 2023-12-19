@@ -1,2 +1,5 @@
+#if __has_include("React/RCTViewManager.h")
 #import "React/RCTViewManager.h"
-#import "RCTEventDispatcher.h"
+#else
+#import "RCTViewManager.h"
+#endif

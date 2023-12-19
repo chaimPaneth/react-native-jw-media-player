@@ -1,8 +1,12 @@
-#import <React/RCTBridge.h>
+#if __has_include("React/RCTViewManager.h")
 #import "React/RCTViewManager.h"
-#import "RCTUIManager.h"
+#else
+#import "RCTViewManager.h"
+#endif
 
 #import <JWPlayerKit/JWPlayerKit-swift.h>
+
+#import "RCTUIManager.h"
 
 @interface RCT_EXTERN_MODULE(RNJWPlayerViewManager, RCTViewManager)
 
@@ -11,6 +15,7 @@ RCT_EXPORT_VIEW_PROPERTY(onTime, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onLoaded, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeeked, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onRateChanged, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylistComplete, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onBeforeComplete, RCTDirectEventBlock);
@@ -66,76 +71,76 @@ RCT_EXPORT_VIEW_PROPERTY(onCastingFailed, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(config, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 
-RCT_EXTERN_METHOD(state:(nonnull NSNumber*)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(state: (nonnull NSNumber*)reactTag
+                 stateWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(pause:(nonnull NSNumber*)reactTag)
+RCT_EXTERN_METHOD(pause: (nonnull NSNumber*)reactTag)
 
-RCT_EXTERN_METHOD(play:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(play: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(stop:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(stop: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(position:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(position: (nonnull NSNumber *)reactTag
+                 positionResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(toggleSpeed:(nonnull NSNumber*)reactTag)
+RCT_EXTERN_METHOD(toggleSpeed: (nonnull NSNumber*)reactTag)
 
-RCT_EXTERN_METHOD(setSpeed:(nonnull NSNumber*)reactTag speed:(double)speed)
+RCT_EXTERN_METHOD(setSpeed: (nonnull NSNumber*)reactTag: (double)speed)
 
-RCT_EXTERN_METHOD(setPlaylistIndex:(nonnull NSNumber *)reactTag index:(nonnull NSNumber *)index)
+RCT_EXTERN_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index)
 
-RCT_EXTERN_METHOD(seekTo:(nonnull NSNumber *)reactTag time:(nonnull NSNumber *)time)
+RCT_EXTERN_METHOD(seekTo: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)time)
 
-RCT_EXTERN_METHOD(setVolume:(nonnull NSNumber *)reactTag volume:(nonnull NSNumber *)volume)
+RCT_EXTERN_METHOD(setVolume: (nonnull NSNumber *)reactTag :(nonnull NSNumber *)volume)
 
-RCT_EXTERN_METHOD(togglePIP:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(togglePIP: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(setUpCastController:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(setUpCastController: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(presentCastDialog:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(presentCastDialog: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(connectedDevice:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(connectedDevice: (nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 rejecte:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(availableDevices:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(availableDevices: (nonnull NSNumber *)reactTag
+                 solve:(RCTPromiseResolveBlock)resolve
+                 eject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(castState:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(castState: (nonnull NSNumber *)reactTag
+                 solver:(RCTPromiseResolveBlock)resolve
+                 ejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getAudioTracks:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAudioTracks: (nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 eject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getCurrentAudioTrack:(nonnull NSNumber *)reactTag
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getCurrentAudioTrack: (nonnull NSNumber *)reactTag
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(setCurrentAudioTrack:(nonnull NSNumber *)reactTag index:(nonnull NSNumber *)index)
+RCT_EXTERN_METHOD(setCurrentAudioTrack: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index)
 
-RCT_EXTERN_METHOD(setControls:(nonnull NSNumber *)reactTag show:(BOOL)show)
+RCT_EXTERN_METHOD(setControls: (nonnull NSNumber *)reactTag: (BOOL)show)
 
-RCT_EXTERN_METHOD(setVisibility:(nonnull NSNumber *)reactTag visibilty:(BOOL)visibilty controls:(nonnull NSArray *)controls)
+RCT_EXTERN_METHOD(setVisibility: (nonnull NSNumber *)reactTag: (BOOL)visibilty: (nonnull NSArray *)controls)
 
-RCT_EXTERN_METHOD(setLockScreenControls:(nonnull NSNumber *)reactTag show:(BOOL)show)
+RCT_EXTERN_METHOD(setLockScreenControls: (nonnull NSNumber *)reactTag: (BOOL)show)
 
-RCT_EXTERN_METHOD(setCurrentCaptions:(nonnull NSNumber *)reactTag index:(nonnull NSNumber *)index)
+RCT_EXTERN_METHOD(setCurrentCaptions: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index)
 
-RCT_EXTERN_METHOD(setCurrentCaptions:(nonnull NSNumber *)reactTag index:(nonnull NSNumber *)index)
+RCT_EXTERN_METHOD(setCurrentCaptions: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index)
 
-RCT_EXTERN_METHOD(setLicenseKey:(nonnull NSNumber *)reactTag license:(nonnull NSString *)license)
+RCT_EXTERN_METHOD(setLicenseKey: (nonnull NSNumber *)reactTag: (nonnull NSString *)license)
 
 RCT_EXTERN_METHOD(quite)
 
 RCT_EXTERN_METHOD(reset)
 
-RCT_EXTERN_METHOD(loadPlaylist:(nonnull NSNumber *)reactTag playlist:(nonnull NSArray *)playlist)
+RCT_EXTERN_METHOD(loadPlaylist: (nonnull NSNumber *)reactTag: (nonnull NSArray *)playlist)
 
-RCT_EXTERN_METHOD(setFullscreen:(nonnull NSNumber *)reactTag fullscreen:(BOOL)fullscreen)
+RCT_EXTERN_METHOD(setFullscreen: (nonnull NSNumber *)reactTag: (BOOL)fullscreen)
 
 @end
