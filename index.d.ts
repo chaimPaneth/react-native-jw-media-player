@@ -33,18 +33,70 @@ declare module "react-native-jw-media-player" {
     label: string;
     default?: boolean;
   }
+  interface JWAdSettings {
+    allowsBackgroundPlayback?: boolean;
+    // Add other ad settings properties as needed
+  }
+  interface IMASettings {
+    locale?: string;
+    ppid?: string;
+    maxRedirects?: number;
+    sessionID?: string;
+    debugMode?: boolean;
+  }
   interface AdSchedule {
     tag: string;
     offset: string;
   }
+  // interface CompanionAdSlot {
+  //   viewId: string; // Reference to a UIView in the application
+  //   size?: { width: number; height: number };
+  // }
+  interface GoogleDAIStream {
+    videoID?: string;
+    cmsID?: string;
+    assetKey?: string;
+    apiKey?: string;
+    adTagParameters?: { [key: string]: string };
+  }
+  interface AdRule {
+    startOn: number;
+    frequency: number;
+    timeBetweenAds: number;
+    startOnSeek: 'none' | 'pre'; // Mapped from JWAdShownOnSeek
+  }
+  // interface FriendlyObstruction {
+  //   viewId: string;
+  //   purpose: 'mediaControls' | 'closeAd' | 'notVisible' | 'other'; // Mapped from JWFriendlyObstructionPurpose
+  //   reason?: string;
+  // }
   type ClientTypes = "vast" | "ima" | "ima_dai";
-  interface Advertising {
+  interface VASTAdvertising {
     adSchedule?: AdSchedule[];
     adVmap?: string;
-    tag?: string;
+    tag?: string; // Vast xml url
     openBrowserOnAdClick?: boolean;
-    adClient?: ClientTypes;
+    adClient: "vast";
+    adRules?: AdRule;
+    adSettings?: JWAdSettings;
   }
+  interface IMAAdvertising {
+    adSchedule?: AdSchedule[];
+    adVmap?: string;
+    tag?: string; // Vast xml url
+    adClient: "ima";
+    adRules?: AdRule;
+    imaSettings?: IMASettings;
+    // companionAdSlots?: CompanionAdSlot[];
+    // friendlyObstructions?: FriendlyObstruction[];
+  }
+  interface IMA_DAIAdvertising {
+    adClient: "ima_dai";
+    imaSettings?: IMASettings;
+    // friendlyObstructions?: FriendlyObstruction[];
+    googleDAIStream?: GoogleDAIStream;
+  }  
+  type Advertising = VASTAdvertising | IMAAdvertising | IMA_DAIAdvertising;
   interface PlaylistItem {
     file: string;
     sources?: Source[];
@@ -180,6 +232,8 @@ declare module "react-native-jw-media-player" {
     enableLockScreenControls: boolean;
     pipEnabled: boolean;
   }
+  type NativeError = (event: { nativeEvent: { code: string, error: string } })  => void;
+  type NativeWarning = (event: { nativeEvent: { code: string, warning: string } })  => void;
   interface PropsType {
     config: Config;
     style?: ViewStyle;
@@ -190,8 +244,11 @@ declare module "react-native-jw-media-player" {
     onBeforeComplete?: (event: any) => void;
     onPlay?: (event: any) => void;
     onPause?: (event: any) => void;
-    onSetupPlayerError?: (setupPlayerError: { error: string }) => void;
-    onPlayerError?: (playerError: { error: string }) => void;
+    onSetupPlayerError?: NativeError;
+    onPlayerError?: NativeError;
+    onPlayerWarning?: NativeWarning;
+    onPlayerAdError?: NativeError;
+    onPlayerAdWarning?: NativeWarning;
     onBuffer?: (event: any) => void;
     onTime?: (event: any) => void;
     onComplete?: (event: any) => void;

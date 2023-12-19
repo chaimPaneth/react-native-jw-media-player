@@ -494,17 +494,20 @@
             for (id item in adsAr) {
                 NSString *offsetString = [item objectForKey:@"offset"];
                 NSString *tag = [item objectForKey:@"tag"];
-                NSURL* tagUrl = [NSURL URLWithString:tag];
+                NSString* encodedString = [tag stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+                NSURL* tagUrl = [NSURL URLWithString:encodedString];
                 
-                JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
-                JWAdOffset* offset = [JWAdOffset fromString:offsetString];
-                
-                [adBreakBuilder offset:offset];
-                [adBreakBuilder tags:@[tagUrl]];
-                
-                JWAdBreak *adBreak = [adBreakBuilder buildAndReturnError:&error];
-                
-                [adsArray addObject:adBreak];
+                if (tagUrl != nil) {
+                    JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
+                    JWAdOffset* offset = [JWAdOffset fromString:offsetString];
+                    
+                    [adBreakBuilder offset:offset];
+                    [adBreakBuilder tags:@[tagUrl]];
+                    
+                    JWAdBreak *adBreak = [adBreakBuilder buildAndReturnError:&error];
+                    
+                    [adsArray addObject:adBreak];
+                }
             }
             
             if (adsArray.count > 0) {
@@ -515,8 +518,12 @@
 
     id adVmap = item[@"adVmap"];
     if (adVmap != nil && (adVmap != (id)[NSNull null])) {
-        NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
-        [itemBuilder adScheduleWithVmapURL:adVmapUrl];
+        NSString* encodedString = [adVmap stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+        NSURL* adVmapUrl = [NSURL URLWithString:encodedString];
+        
+        if (adVmapUrl != nil) {
+            [itemBuilder adScheduleWithVmapURL:adVmapUrl];
+        }
     }
     
     return [itemBuilder buildAndReturnError:&error];
@@ -602,90 +609,38 @@
     
     id ads = config[@"advertising"];
     if (ads != nil && (ads != (id)[NSNull null])) {
-        JWAdvertisingConfig* advertising;
-        JWAdsAdvertisingConfigBuilder* adConfigBuilder = [[JWAdsAdvertisingConfigBuilder alloc] init];
-                 
-         id adClient = ads[@"adClient"];
-         if ((adClient != nil) && (adClient != (id)[NSNull null])) {
-             int clientType = (int)[RCTConvert JWAdClient:adClient];
-             JWAdClient jwAdClient;
-             switch (clientType) {
-                 case 0:
-                     jwAdClient = JWAdClientJWPlayer;
-                     break;
-                 case 1:
-    //                 JWImaAdvertisingConfigBuilder
-                     jwAdClient = JWAdClientGoogleIMA;
-                     break;
-                 case 2:
-    //                 JWImaDaiAdvertisingConfigBuilder
-                     jwAdClient = JWAdClientGoogleIMADAI;
-                     break;
-                 case 3:
-                     jwAdClient = JWAdClientUnknown;
-                     break;
+        JWAdvertisingConfig* advertisingConfig = nil;
+        
+        JWAdClient jwAdClient = JWAdClientUnknown;
+        NSString* adClientString = ads[@"adClient"];
+        if (adClientString) {
+            jwAdClient = [RCTConvert JWAdClient:adClientString];
+        }
 
-                 default:
-                     jwAdClient = JWAdClientUnknown;
-                     break;
-             }
-         } else {
-
-         }
-        
-        // [adConfigBuilder adRules:(JWAdRules * _Nonnull)];
-        
-        id schedule = ads[@"adSchedule"];
-        if(schedule != nil && (schedule != (id)[NSNull null])) {
-            NSArray* scheduleAr = (NSArray*)schedule;
-            if (scheduleAr.count > 0) {
-                NSMutableArray <JWAdBreak*>* scheduleArray = [[NSMutableArray alloc] init];
-                
-                for (id item in scheduleAr) {
-                    NSString *offsetString = [item objectForKey:@"offset"];
-                    NSString *tag = [item objectForKey:@"tag"];
-                    NSURL* tagUrl = [NSURL URLWithString:tag];
-                    
-                    JWAdBreakBuilder* adBreakBuilder = [[JWAdBreakBuilder alloc] init];
-                    JWAdOffset* offset = [JWAdOffset fromString:offsetString];
-                    
-                    [adBreakBuilder offset:offset];
-                    [adBreakBuilder tags:@[tagUrl]];
-                    
-                    JWAdBreak *adBreak = [adBreakBuilder buildAndReturnError:&error];
-                    
-                    [scheduleArray addObject:adBreak];
-                }
-            
-                if (scheduleArray.count > 0) {
-                    [adConfigBuilder schedule:scheduleArray];
-                }
-            }
+        switch (jwAdClient) {
+            case JWAdClientJWPlayer:
+                advertisingConfig = [RNJWPlayerAds configureVASTWithAds:ads error:&error];
+                break;
+            case JWAdClientGoogleIMA:
+                advertisingConfig = [RNJWPlayerAds configureIMAWithAds:ads error:&error];
+                break;
+            case JWAdClientGoogleIMADAI:
+                advertisingConfig = [RNJWPlayerAds configureIMADAIWithAds:ads error:&error];
+                break;
+            default:
+                // Handle unknown or unsupported ad client
+                break;
         }
         
-        id tag = ads[@"tag"];
-        if (tag != nil && (tag != (id)[NSNull null])) {
-            NSURL* tagUrl = [NSURL URLWithString:tag];
-            [adConfigBuilder tag:tagUrl];
-        }
-                
-        id adVmap = ads[@"adVmap"];
-        if (adVmap != nil && (adVmap != (id)[NSNull null])) {
-            NSURL* adVmapUrl = [NSURL URLWithString:adVmap];
-            [adConfigBuilder vmapURL:adVmapUrl];
+        // Handle error if any
+        if (error) {
+            NSLog(@"Error configuring ads: %@", error);
         }
         
-        id openBrowserOnAdClick = ads[@"openBrowserOnAdClick"];
-        if (openBrowserOnAdClick != nil && (openBrowserOnAdClick != (id)[NSNull null])) {
-            [adConfigBuilder openBrowserOnAdClick:openBrowserOnAdClick];
-        }
-        
-        advertising = [adConfigBuilder buildAndReturnError:&error];
-        [configBuilder advertising:advertising];
+        [configBuilder advertising:advertisingConfig];
     }
     
     JWPlayerConfiguration* playerConfig = [configBuilder buildAndReturnError:&error];
-    
     return playerConfig;
 }
 
@@ -912,34 +867,34 @@
 - (void)jwplayer:(id<JWPlayer>)player failedWithError:(NSUInteger)code message:(NSString *)message
 {
     if (self.onPlayerError) {
-        self.onPlayerError(@{@"error": message});
+        self.onPlayerError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player failedWithSetupError:(NSUInteger)code message:(NSString *)message
 {
     if (self.onSetupPlayerError) {
-        self.onSetupPlayerError(@{@"error": message});
+        self.onSetupPlayerError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player encounteredWarning:(NSUInteger)code message:(NSString *)message
 {
     if (self.onPlayerWarning) {
-        self.onPlayerWarning(@{@"warning": message});
+        self.onPlayerWarning(@{@"code": [NSNumber numberWithInteger:code], @"warning": message});
     }
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdError:(NSUInteger)code message:(NSString * _Nonnull)message {
     if (self.onPlayerAdError) {
-        self.onPlayerAdError(@{@"error": message});
+        self.onPlayerAdError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdWarning:(NSUInteger)code message:(NSString * _Nonnull)message {
     if (self.onPlayerAdWarning) {
-        self.onPlayerAdWarning(@{@"warning": message});
+        self.onPlayerAdWarning(@{@"code": [NSNumber numberWithInteger:code], @"warning": message});
     }
 }
 
@@ -1042,7 +997,7 @@
     
 }
 
-- (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedInteraction)method
+- (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedMethod)method
 {
     
 }
@@ -1371,12 +1326,14 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
 {
-    
+//    if (_playerViewController) {
+//        [_playerViewController jwplayer:player updatedCues:cues];
+//    }
 }
 
 #pragma mark - JWPlayer Ad Delegate
 
-- (void)jwplayer:(id _Nonnull)player adEvent:(JWAdEvent * _Nonnull)event {
+- (void)jwplayer:(id<JWPlayer>)player adEvent:(JWAdEvent *)event {
     if (self.onAdEvent) {
         self.onAdEvent(@{@"client": @(event.client), @"type": @(event.type)});
     }

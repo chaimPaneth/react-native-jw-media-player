@@ -53,7 +53,7 @@
     [super jwplayer:player failedWithError:code message:message];
     
     if (_parentView.onPlayerError) {
-        _parentView.onPlayerError(@{@"error": message});
+        _parentView.onPlayerError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
@@ -62,7 +62,7 @@
     [super jwplayer:player failedWithSetupError:code message:message];
     
     if (_parentView.onSetupPlayerError) {
-        _parentView.onSetupPlayerError(@{@"error": message});
+        _parentView.onSetupPlayerError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
@@ -71,7 +71,7 @@
     [super jwplayer:player encounteredWarning:code message:message];
     
     if (_parentView.onPlayerWarning) {
-        _parentView.onPlayerWarning(@{@"warning": message});
+        _parentView.onPlayerWarning(@{@"code": [NSNumber numberWithInteger:code], @"warning": message});
     }
 }
 
@@ -79,7 +79,7 @@
     [super jwplayer:player encounteredAdError:code message:message];
     
     if (_parentView.onPlayerAdError) {
-        _parentView.onPlayerAdError(@{@"error": message});
+        _parentView.onPlayerAdError(@{@"code": [NSNumber numberWithInteger:code], @"error": message});
     }
 }
 
@@ -88,7 +88,7 @@
     [super jwplayer:player encounteredAdWarning:code message:message];
     
     if (_parentView.onPlayerAdWarning) {
-        _parentView.onPlayerAdWarning(@{@"warning": message});
+        _parentView.onPlayerAdWarning(@{@"code": [NSNumber numberWithInteger:code], @"warning": message});
     }
 }
 
@@ -193,7 +193,7 @@
     
 }
 
-- (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedInteraction)method
+- (void)playerViewController:(JWPlayerViewController *)controller relatedItemBeganPlaying:(JWPlayerItem *)item atIndex:(NSInteger)index withMethod:(enum JWRelatedMethod)method
 {
     
 }
@@ -572,7 +572,7 @@
 
 #pragma mark - JWPlayer Ad Delegate
 
-- (void)jwplayer:(id _Nonnull)player adEvent:(JWAdEvent * _Nonnull)event {
+- (void)jwplayer:(id<JWPlayer>)player adEvent:(JWAdEvent *)event {
     [super jwplayer:player adEvent:event];
     
     if (_parentView.onAdEvent) {

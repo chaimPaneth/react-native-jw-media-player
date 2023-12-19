@@ -9,6 +9,7 @@
 #import <JWPlayerKit/JWPlayerKit-swift.h>
 #import <GoogleCast/GoogleCast.h>
 #import "RNJWPlayerViewController.h"
+#import "RNJWPlayerAds.h"
 
 @class RNJWPlayerViewController;
 
