@@ -1321,7 +1321,9 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-    
+    if (self.onRateChanged) {
+        self.onRateChanged(@{@"rate": [NSNumber numberWithDouble:rate], @"at": [NSNumber numberWithDouble:time]});
+    }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
@@ -1365,6 +1367,7 @@
    }
 }
 
+#if USE_GOOGLE_CAST
 - (void)presentCastDialog
 {
     [GCKCastContext.sharedInstance presentCastDialog];
@@ -1409,6 +1412,7 @@
 {
     return [[GCKCastContext.sharedInstance discoveryManager] deviceCount];
 }
+#endif
 
 - (NSArray <JWCastingDevice *>*)availableDevices
 {

@@ -563,6 +563,10 @@
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
     [super jwplayer:player playbackRateChangedTo:rate at:time];
+    
+    if (_parentView.onRateChanged) {
+        _parentView.onRateChanged(@{@"rate": [NSNumber numberWithDouble:rate], @"at": [NSNumber numberWithDouble:time]});
+    }
 }
 
 - (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues

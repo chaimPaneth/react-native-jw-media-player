@@ -258,6 +258,7 @@ declare module "react-native-jw-media-player" {
     onFullScreenExit?: (event: any) => void;
     onSeek?: (seek: { position: number; offset: number }) => void;
     onSeeked?: (seeked?: { position: number }) => void;
+    onRateChanged?: (changed?: { rate: number, at: number }) => void;
     onPlaylistItem?: (playlistItem: PlaylistItem) => void;
     onControlBarVisible?: (event: any) => void;
     onPlaylistComplete?: (event: any) => void;

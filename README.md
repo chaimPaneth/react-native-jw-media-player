@@ -381,12 +381,20 @@ Checkout the DRMExample in the Example app. (The DRMExample cannot be run in the
 
 ##### Advertising
 
-| Prop                       | Description                                                                               | Type                            |
-| -------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------- |
-| **`adVmap`**               | The url of ads VMAP xml.                                                                  | `String`                        |
-| **`adSchedule`**           | Array of tags and and offsets for ads.                                                    | `{tag: String, offset: String}` |
-| **`openBrowserOnAdClick`** | Should the player open the browser when clicking on an ad.                                | `Boolean`                       |
-| **`adClient`**             | The ad client. One of [JWPlayerAdClients](#JWPlayerAdClients), defaults to JWAdClientVast | `'vast', 'ima", 'ima_dai'`      |
+### Note for iOS
+When using an **IMA** ad client you need to add `$RNJWPlayerUseGoogleIMA = true` to your Podfile, this will add `GoogleAds-IMA-iOS-SDK` pod.
+
+| Prop                          | Description                                                                                              | Type                                          | Availability            |
+|-------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------|-------------------------|
+| **`adVmap`**                  | The URL of the ads VMAP XML.                                                                             | `String`                                      | All Clients             |
+| **`adSchedule`**              | Array of tags and offsets for ads.                                                                       | `{tag: String, offset: String}[]`             | All Clients             |
+| **`openBrowserOnAdClick`**    | Should the player open the browser when clicking on an ad.                                               | `Boolean`                                     | All Clients             |
+| **`adClient`**                | The ad client. One of `vast`, `ima`, or `ima_dai`, check out [JWPlayerAdClients](#JWPlayerAdClients), defaults to `vast`.                                  | `'vast'`, `'ima'`, `'ima_dai'`               | All Clients             |
+| **`adRules`**                 | Ad rules for VAST client.                                                                                | `{startOn: Number, frequency: Number, timeBetweenAds: Number, startOnSeek: 'none' \| 'pre'}` | VAST only               |
+| **`imaSettings`**             | Settings specific to Google IMA SDK.                                                                     | `{locale: String, ppid: String, maxRedirects: Number, sessionID: String, debugMode: Boolean}` | IMA and IMA DAI         |
+| **`companionAdSlots`**        | Array of objects representing companion ad slots.                                                        | `{viewId: String, size?: {width: Number, height: Number}}[]` | IMA only                |
+| **`friendlyObstructions`**    | Array of objects representing friendly obstructions for viewability measurement.                         | `{viewId: String, purpose: 'mediaControls' \| 'closeAd' \| 'notVisible' \| 'other', reason?: String}[]` | IMA and IMA DAI         |
+| **`googleDAIStream`**         | Stream configuration for Google DAI (Dynamic Ad Insertion).                                              | `{videoID?: String, cmsID?: String, assetKey?: String, apiKey?: String, adTagParameters?: {[key: string]: string}}` | IMA DAI only            |
 
 ##### Related
 
@@ -511,6 +519,7 @@ public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Conf
 | **`onPause`**                   | Player paused playing.                                                                                                                                                                                                     | `none`                                                                                                                                                                                                                                                                                                                          |
 | **`onSeek`**                    | Seek event requested from user.                                                                                                                                                                                            | `{position: Double, offset: Double}`                                                                                                                                                                                                                                                                                            |
 | **`onSeeked`**                  | Player finished seeking to a new position.                                                                                                                                                                                 | On **iOS** `none`, On **Android** `{position: Double}`                                                                                                                                                                                                                                                                          |
+| **`onRateChanged`**                  | Player speed was changed by the user from the settings menu.                                                                                                                                                                                 | On **iOS** `{rate: Double, at: Double}`, On **Android** `{rate: Double, at: Double}`                                                                                                                                                                                                                                                                          |
 | **`onSetupPlayerError`**        | Player faced and error while setting up the player.                                                                                                                                                                        | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onPlayerError`**             | Player faced an error after setting up the player but when attempting to start playing.                                                                                                                                    | `{error: String}`                                                                                                                                                                                                                                                                                                               |
 | **`onBuffer`**                  | The player is buffering.                                                                                                                                                                                                   | `none`                                                                                                                                                                                                                                                                                                                          |
@@ -540,9 +549,11 @@ JWPlayer enables casting by default with a casting button (if you pass the `view
 
 ###### iOS
 
-Follow the instruction [here](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices) on the official JWPlayer site.
+1: Follow the instruction [here](https://developer.jwplayer.com/jwplayer/docs/ios-enable-casting-to-chromecast-devices) on the official JWPlayer site.
 
-Edit your `Info.plist` with the following values:
+2: Add `$RNJWPlayerUseGoogleCast = true` to your Podfile, this will install `google-cast-sdk` pod.
+
+3: Edit your `Info.plist` with the following values:
 
 ```
 'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
@@ -552,7 +563,7 @@ Edit your `Info.plist` with the following values:
 'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
 ```
 
-Enable _Access WiFi Information_ capability under `Signing & Capabilities`
+4: Enable _Access WiFi Information_ capability under `Signing & Capabilities`
 
 #### Available methods
 
