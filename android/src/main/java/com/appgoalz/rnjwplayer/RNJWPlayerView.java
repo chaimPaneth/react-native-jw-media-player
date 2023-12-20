@@ -40,12 +40,22 @@ import com.jwplayer.pub.api.background.MediaServiceController;
 import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.configuration.UiConfig;
 import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.VastAdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.VmapAdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.dai.ImaDaiAdvertisingConfig;
-import com.jwplayer.pub.api.configuration.ads.ima.ImaAdvertisingConfig;
+import com.jwplayer.pub.api.events.AdBreakEndEvent;
+import com.jwplayer.pub.api.events.AdBreakStartEvent;
+import com.jwplayer.pub.api.events.AdClickEvent;
+import com.jwplayer.pub.api.events.AdCompanionsEvent;
+import com.jwplayer.pub.api.events.AdCompleteEvent;
+import com.jwplayer.pub.api.events.AdErrorEvent;
+import com.jwplayer.pub.api.events.AdImpressionEvent;
+import com.jwplayer.pub.api.events.AdMetaEvent;
 import com.jwplayer.pub.api.events.AdPauseEvent;
 import com.jwplayer.pub.api.events.AdPlayEvent;
+import com.jwplayer.pub.api.events.AdRequestEvent;
+import com.jwplayer.pub.api.events.AdScheduleEvent;
+import com.jwplayer.pub.api.events.AdSkippedEvent;
+import com.jwplayer.pub.api.events.AdStartedEvent;
+import com.jwplayer.pub.api.events.AdTimeEvent;
+import com.jwplayer.pub.api.events.AdViewableImpressionEvent;
 import com.jwplayer.pub.api.events.AudioTrackChangedEvent;
 import com.jwplayer.pub.api.events.AudioTracksEvent;
 import com.jwplayer.pub.api.events.BeforeCompleteEvent;
@@ -68,6 +78,7 @@ import com.jwplayer.pub.api.events.PauseEvent;
 import com.jwplayer.pub.api.events.PipCloseEvent;
 import com.jwplayer.pub.api.events.PipOpenEvent;
 import com.jwplayer.pub.api.events.PlayEvent;
+import com.jwplayer.pub.api.events.PlaybackRateChangedEvent;
 import com.jwplayer.pub.api.events.PlaylistCompleteEvent;
 import com.jwplayer.pub.api.events.PlaylistEvent;
 import com.jwplayer.pub.api.events.PlaylistItemEvent;
@@ -82,11 +93,6 @@ import com.jwplayer.pub.api.events.listeners.PipPluginEvents;
 import com.jwplayer.pub.api.events.listeners.VideoPlayerEvents;
 import com.jwplayer.pub.api.fullscreen.FullscreenHandler;
 import com.jwplayer.pub.api.license.LicenseUtil;
-import com.jwplayer.pub.api.media.ads.AdBreak;
-import com.jwplayer.pub.api.media.ads.AdClient;
-import com.jwplayer.pub.api.media.captions.Caption;
-import com.jwplayer.pub.api.media.captions.CaptionType;
-import com.jwplayer.pub.api.media.playlists.MediaSource;
 import com.jwplayer.pub.api.media.playlists.PlaylistItem;
 import com.jwplayer.ui.views.CueMarkerSeekbar;
 
@@ -118,34 +124,34 @@ public class RNJWPlayerView extends RelativeLayout implements
         VideoPlayerEvents.OnFirstFrameListener,
         VideoPlayerEvents.OnSeekListener,
         VideoPlayerEvents.OnSeekedListener,
+        VideoPlayerEvents.OnPlaybackRateChangedListener,
         VideoPlayerEvents.OnCaptionsListListener,
         VideoPlayerEvents.OnCaptionsChangedListener,
         VideoPlayerEvents.OnMetaListener,
-
-        AdvertisingEvents.OnBeforePlayListener,
-        AdvertisingEvents.OnBeforeCompleteListener,
-        AdvertisingEvents.OnAdPauseListener,
-        AdvertisingEvents.OnAdPlayListener,
 
         CastingEvents.OnCastListener,
 
         PipPluginEvents.OnPipCloseListener,
         PipPluginEvents.OnPipOpenListener,
 
-//        AdvertisingEvents.OnAdRequestListener,
-//        AdvertisingEvents.OnAdScheduleListener,
-//        AdvertisingEvents.OnAdStartedListener,
-//        AdvertisingEvents.OnAdBreakStartListener,
-//        AdvertisingEvents.OnAdBreakEndListener,
-//        AdvertisingEvents.OnAdClickListener,
-//        AdvertisingEvents.OnAdCompleteListener,
-//        AdvertisingEvents.OnAdCompanionsListener,
-//        AdvertisingEvents.OnAdErrorListener,
-//        AdvertisingEvents.OnAdImpressionListener,
-//        AdvertisingEvents.OnAdMetaListener,
-//        AdvertisingEvents.OnAdSkippedListener,
-//        AdvertisingEvents.OnAdTimeListener,
-//        AdvertisingEvents.OnAdViewableImpressionListener,
+        AdvertisingEvents.OnBeforePlayListener,
+        AdvertisingEvents.OnBeforeCompleteListener,
+        AdvertisingEvents.OnAdPauseListener,
+        AdvertisingEvents.OnAdPlayListener,
+        AdvertisingEvents.OnAdRequestListener,
+        AdvertisingEvents.OnAdScheduleListener,
+        AdvertisingEvents.OnAdStartedListener,
+        AdvertisingEvents.OnAdBreakStartListener,
+        AdvertisingEvents.OnAdBreakEndListener,
+        AdvertisingEvents.OnAdClickListener,
+        AdvertisingEvents.OnAdCompleteListener,
+        AdvertisingEvents.OnAdCompanionsListener,
+        AdvertisingEvents.OnAdErrorListener,
+        AdvertisingEvents.OnAdImpressionListener,
+        AdvertisingEvents.OnAdMetaListener,
+        AdvertisingEvents.OnAdSkippedListener,
+        AdvertisingEvents.OnAdTimeListener,
+        AdvertisingEvents.OnAdViewableImpressionListener,
 
         AudioManager.OnAudioFocusChangeListener,
 
@@ -300,11 +306,30 @@ public class RNJWPlayerView extends RelativeLayout implements
                     EventType.CAPTIONS_LIST,
                     EventType.CAPTIONS_CHANGED,
                     EventType.META,
+
                     // Ad events
                     EventType.BEFORE_PLAY,
                     EventType.BEFORE_COMPLETE,
-                    EventType.AD_PLAY,
+                    EventType.AD_BREAK_START,
+                    EventType.AD_BREAK_END,
+                    EventType.AD_BREAK_IGNORED,
+                    EventType.AD_CLICK,
+                    EventType.AD_COMPANIONS,
+                    EventType.AD_COMPLETE,
+                    EventType.AD_ERROR,
+                    EventType.AD_IMPRESSION,
+                    EventType.AD_WARNING,
+                    EventType.AD_LOADED,
+                    EventType.AD_LOADED_XML,
+                    EventType.AD_META,
                     EventType.AD_PAUSE,
+                    EventType.AD_PLAY,
+                    EventType.AD_REQUEST,
+                    EventType.AD_SCHEDULE,
+                    EventType.AD_SKIPPED,
+                    EventType.AD_STARTED,
+                    EventType.AD_TIME,
+                    EventType.AD_VIEWABLE_IMPRESSION,
                     // Cast event
                     EventType.CAST,
                     // Pip events
@@ -363,8 +388,26 @@ public class RNJWPlayerView extends RelativeLayout implements
                     // Ad events
                     EventType.BEFORE_PLAY,
                     EventType.BEFORE_COMPLETE,
-                    EventType.AD_PLAY,
+                    EventType.AD_BREAK_START,
+                    EventType.AD_BREAK_END,
+                    EventType.AD_BREAK_IGNORED,
+                    EventType.AD_CLICK,
+                    EventType.AD_COMPANIONS,
+                    EventType.AD_COMPLETE,
+                    EventType.AD_ERROR,
+                    EventType.AD_IMPRESSION,
+                    EventType.AD_WARNING,
+                    EventType.AD_LOADED,
+                    EventType.AD_LOADED_XML,
+                    EventType.AD_META,
                     EventType.AD_PAUSE,
+                    EventType.AD_PLAY,
+                    EventType.AD_REQUEST,
+                    EventType.AD_SCHEDULE,
+                    EventType.AD_SKIPPED,
+                    EventType.AD_STARTED,
+                    EventType.AD_TIME,
+                    EventType.AD_VIEWABLE_IMPRESSION,
                     // Cast event
                     EventType.CAST,
                     // Pip events
@@ -619,55 +662,10 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
-        List<AdBreak> adScheduleList = new ArrayList<>();
-        AdClient client;
-        AdvertisingConfig advertisingConfig;
-
         if (prop.hasKey("advertising")) {
             ReadableMap ads = prop.getMap("advertising");
-            if (ads != null && ads.hasKey("adSchedule")) {
-                ReadableArray adSchedule = ads.getArray("adSchedule");
-                for(int i = 0; i < adSchedule.size(); i++){
-                    ReadableMap adBreakProp = adSchedule.getMap(i);
-                    String offset = adBreakProp.hasKey("offset") ? adBreakProp.getString("offset") : "pre";
-                    if(adBreakProp.hasKey("tag")){
-                        AdBreak adBreak = new AdBreak.Builder().offset(offset).tag(adBreakProp.getString("tag")).build();
-                        adScheduleList.add(adBreak);
-                    }
-                }
-
-                if (ads.hasKey("adClient") &&
-                        ads.getString("adClient") != null &&
-                        CLIENT_TYPES.get(ads.getString("adClient")) != null) {
-                    Integer clientType = CLIENT_TYPES.get(ads.getString("adClient"));
-                    switch (clientType) {
-                        case 1:
-                            client = AdClient.IMA;
-                            advertisingConfig = new ImaAdvertisingConfig.Builder().schedule(adScheduleList).build();
-                            break;
-                        case 2:
-                            client = AdClient.IMA_DAI;
-                            advertisingConfig = new ImaDaiAdvertisingConfig.Builder().build();
-                            break;
-                        default:
-                            client = AdClient.VAST;
-                            advertisingConfig = new VastAdvertisingConfig.Builder()
-                                    .schedule(adScheduleList)
-                                    .build();
-                            break;
-                    }
-                } else {
-                    client = AdClient.VAST;
-                    advertisingConfig = new VastAdvertisingConfig.Builder()
-                            .schedule(adScheduleList)
-                            .build();
-                }
-
-                configBuilder.advertisingConfig(advertisingConfig);
-            } else if (ads != null && ads.hasKey("adVmap")) {
-                String adVmap = ads.getString("adVmap");
-                advertisingConfig = new VmapAdvertisingConfig.Builder().tag(adVmap).build();
-
+            AdvertisingConfig advertisingConfig = RNJWPlayerAds.getAdvertisingConfig(ads);
+            if (advertisingConfig != null) {
                 configBuilder.advertisingConfig(advertisingConfig);
             }
         }
@@ -943,20 +941,146 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    // AdEvents
-    
+    // Ad events
+
     @Override
     public void onAdPause(AdPauseEvent adPauseEvent) {
         WritableMap event = Arguments.createMap();
-        event.putString("message", "onAdPause");
-        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdPause", event);
+        event.putString("message", "onAdEvent");
+        event.putString("reason", adPauseEvent.getAdPauseReason().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypePause));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
     }
 
     @Override
     public void onAdPlay(AdPlayEvent adPlayEvent) {
         WritableMap event = Arguments.createMap();
-        event.putString("message", "onAdPlay");
-        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdPlay", event);
+        event.putString("message", "onAdEvent");
+        event.putString("reason", adPlayEvent.getAdPlayReason().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypePlay));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdBreakEnd(AdBreakEndEvent adBreakEndEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adBreakEndEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeAdBreakEnd));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdBreakStart(AdBreakStartEvent adBreakStartEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adBreakStartEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeAdBreakStart));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdClick(AdClickEvent adClickEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adClickEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeClicked));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdCompanions(AdCompanionsEvent adCompanionsEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeCompanion));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdComplete(AdCompleteEvent adCompleteEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adCompleteEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeComplete));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdError(AdErrorEvent adErrorEvent) {
+        //onPlayerAdError
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onPlayerAdError");
+        event.putInt("code", adErrorEvent.getCode());
+        event.putInt("adErrorCode", adErrorEvent.getAdErrorCode());
+        event.putString("error", adErrorEvent.getMessage());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerAdError", event);
+    }
+
+    @Override
+    public void onAdImpression(AdImpressionEvent adImpressionEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adImpressionEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeImpression));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdMeta(AdMetaEvent adMetaEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adMetaEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeMeta));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdRequest(AdRequestEvent adRequestEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adRequestEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeRequest));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdSchedule(AdScheduleEvent adScheduleEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adScheduleEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeSchedule));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdSkipped(AdSkippedEvent adSkippedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adSkippedEvent.getClient().toString());
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeSkipped));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdStarted(AdStartedEvent adStartedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putInt("type", Util.getEventTypeValue(Util.AdEventType.JWAdEventTypeStarted));
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdTime(AdTimeEvent adTimeEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdTime");
+        event.putDouble("position", adTimeEvent.getPosition());
+        event.putDouble("duration", adTimeEvent.getDuration());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdTime", event);
+    }
+
+    @Override
+    public void onAdViewableImpression(AdViewableImpressionEvent adViewableImpressionEvent) {
+        // send everything?
     }
 
     @Override
@@ -964,7 +1088,6 @@ public class RNJWPlayerView extends RelativeLayout implements
         WritableMap event = Arguments.createMap();
         event.putString("message", "onBeforeComplete");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topBeforeComplete", event);
-
 
         updateWakeLock(false);
     }
@@ -1166,6 +1289,14 @@ public class RNJWPlayerView extends RelativeLayout implements
         event.putString("message", "onSeeked");
         event.putDouble("position", seekedEvent.getPosition());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topSeeked", event);
+    }
+
+    @Override
+    public void onPlaybackRateChanged(PlaybackRateChangedEvent playbackRateChangedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onRateChange");
+        event.putDouble("rate", playbackRateChangedEvent.getPlaybackRate());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topRateChanged", event);
     }
 
     @Override

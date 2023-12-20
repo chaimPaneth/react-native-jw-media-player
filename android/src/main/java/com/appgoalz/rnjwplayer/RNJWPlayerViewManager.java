@@ -55,6 +55,18 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onSetupPlayerError")))
+            .put("topPlayerAdError",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlayerAdError")))
+            .put("topAdEvent",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onAdEvent")))
+            .put("topAdTime",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onAdTime")))
             .put("topTime",
                     MapBuilder.of(
                             "phasedRegistrationNames",
@@ -107,6 +119,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onSeeked")))
+            .put("topRateChanged",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onRateChanged")))
             .put("topControlBarVisible",
                     MapBuilder.of(
                             "phasedRegistrationNames",

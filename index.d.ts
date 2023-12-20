@@ -249,6 +249,8 @@ declare module "react-native-jw-media-player" {
     onPlayerWarning?: NativeWarning;
     onPlayerAdError?: NativeError;
     onPlayerAdWarning?: NativeWarning;
+    onAdEvent?: (event: {client: string?, reason: string?, type: number}) => void;
+    onAdTime?: (event: {position: number, duration: number}) => void;
     onBuffer?: (event: any) => void;
     onTime?: (event: any) => void;
     onComplete?: (event: any) => void;

@@ -62,6 +62,7 @@
 #if !USE_GOOGLE_IMA
     assert("Error: GoogleAds-IMA-iOS-SDK is not installed. Add $RNJWPlayerUseGoogleIMA = true; to your podfile");
 #endif
+    
     JWImaAdvertisingConfigBuilder* adConfigBuilder = [[JWImaAdvertisingConfigBuilder alloc] init];
     
     // Configure Google IMA specific settings here
@@ -106,6 +107,10 @@
 }
 
 + (JWAdvertisingConfig *)configureIMADAIWithAds:(NSDictionary *)ads error:(JWError **)error {
+#if !USE_GOOGLE_IMA
+    assert("Error: GoogleAds-IMA-iOS-SDK is not installed. Add $RNJWPlayerUseGoogleIMA = true; to your podfile");
+#endif
+    
     JWImaDaiAdvertisingConfigBuilder* adConfigBuilder = [[JWImaDaiAdvertisingConfigBuilder alloc] init];
     
     // Configure Google IMA DAI specific settings here

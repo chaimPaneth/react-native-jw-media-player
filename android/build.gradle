@@ -15,6 +15,9 @@ def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
+def useIMA = safeExtGet("RNJWPlayerUseGoogleIMA", "")?.toBoolean() ?: false
+def useCast = safeExtGet("RNJWPlayerUseGoogleCast", "")?.toBoolean() ?: false
+
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 28)
     buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
@@ -26,6 +29,20 @@ android {
         versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
+        }
+    }
+    buildTypes {
+        debug {
+            // Set the build config fields for the debug build type
+            buildConfigField "boolean", "USE_IMA", useIMA.toString()
+            buildConfigField "boolean", "USE_CAST", useCast.toString()
+            // ... other debug configurations
+        }
+        release {
+            // Set the build config fields for the release build type
+            buildConfigField "boolean", "USE_IMA", useIMA.toString()
+            buildConfigField "boolean", "USE_CAST", useCast.toString()
+            // ... other release configurations
         }
     }
     lintOptions {
@@ -58,13 +75,19 @@ dependencies {
     // JWPlayer SDK
     implementation "com.jwplayer:jwplayer-core:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
     implementation "com.jwplayer:jwplayer-common:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
-    implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
-    implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
 
     // Ad dependencies
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    implementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
+    if (useIMA) {
+        implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+        implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
+        implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    }
+
+    // Cast dependencies
+    if (useCast) {
+        implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+        implementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
+    }
 
     // ExoPlayer dependencies
     implementation "com.google.android.exoplayer:exoplayer-core:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
