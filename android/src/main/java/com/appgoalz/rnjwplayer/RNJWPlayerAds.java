@@ -1,7 +1,5 @@
 package com.appgoalz.rnjwplayer;
 
-// Import statements ...
-
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
@@ -31,16 +29,28 @@ public class RNJWPlayerAds {
         String adClientType = ads.getString("adClient");
         switch (adClientType) {
             case "ima":
-                return configureImaAdvertising(ads);
+                try {
+                    return configureImaAdvertising(ads);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             case "ima_dai":
-                return configureImaDaiAdvertising(ads);
+                try {
+                    return configureImaDaiAdvertising(ads);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             default: // Defaulting to VAST
                 return configureVastAdvertising(ads);
         }
     }
 
     // Configure IMA Advertising
-    private static ImaAdvertisingConfig configureImaAdvertising(ReadableMap ads) {
+    private static ImaAdvertisingConfig configureImaAdvertising(ReadableMap ads) throws Exception {
+        if (!BuildConfig.USE_IMA) {
+            throw new Exception("Error: Google ads services is not installed. Add RNJWPlayerUseGoogleIMA = true to your app/build.gradle ext {}");
+        }
+
         ImaAdvertisingConfig.Builder builder = new ImaAdvertisingConfig.Builder();
 
         List<AdBreak> adScheduleList = getAdSchedule(ads);
@@ -56,7 +66,11 @@ public class RNJWPlayerAds {
     }
 
     // Configure IMA DAI Advertising
-    private static ImaDaiAdvertisingConfig configureImaDaiAdvertising(ReadableMap ads) {
+    private static ImaDaiAdvertisingConfig configureImaDaiAdvertising(ReadableMap ads) throws Exception {
+        if (!BuildConfig.USE_IMA) {
+            throw new Exception("Error: Google ads services is not installed. Add RNJWPlayerUseGoogleIMA = true to your app/build.gradle ext {}");
+        }
+
         ImaDaiAdvertisingConfig.Builder builder = new ImaDaiAdvertisingConfig.Builder();
 
         if (ads.hasKey("imaSettings")) {

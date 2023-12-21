@@ -59,6 +59,10 @@ public class RNJWPlayerViewManager extends SimpleViewManager<RNJWPlayerView> {
                     MapBuilder.of(
                             "phasedRegistrationNames",
                             MapBuilder.of("bubbled", "onPlayerAdError")))
+            .put("topPlayerAdWarning",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onPlayerAdWarning")))
             .put("topAdEvent",
                     MapBuilder.of(
                             "phasedRegistrationNames",

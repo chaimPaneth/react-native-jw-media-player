@@ -31,6 +31,13 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
+    sourceSets {
+        main {
+            if (useCast) {
+                manifest.srcFile 'src/main/xml/cast_enabled_manifest.xml'
+            }
+        }
+    }
     buildTypes {
         debug {
             // Set the build config fields for the debug build type
@@ -75,17 +82,17 @@ dependencies {
     // JWPlayer SDK
     implementation "com.jwplayer:jwplayer-core:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
     implementation "com.jwplayer:jwplayer-common:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+    implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
+    implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
 
     // Ad dependencies
     if (useIMA) {
-        implementation "com.jwplayer:jwplayer-ima:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
         implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
         implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     }
 
     // Cast dependencies
     if (useCast) {
-        implementation "com.jwplayer:jwplayer-chromecast:${safeExtGet('jwPlayerVersion', jwPlayerVersion)}"
         implementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
     }
 

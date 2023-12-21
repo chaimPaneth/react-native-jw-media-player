@@ -41,12 +41,15 @@ import com.jwplayer.pub.api.configuration.PlayerConfig;
 import com.jwplayer.pub.api.configuration.UiConfig;
 import com.jwplayer.pub.api.configuration.ads.AdvertisingConfig;
 import com.jwplayer.pub.api.events.AdBreakEndEvent;
+import com.jwplayer.pub.api.events.AdBreakIgnoredEvent;
 import com.jwplayer.pub.api.events.AdBreakStartEvent;
 import com.jwplayer.pub.api.events.AdClickEvent;
 import com.jwplayer.pub.api.events.AdCompanionsEvent;
 import com.jwplayer.pub.api.events.AdCompleteEvent;
 import com.jwplayer.pub.api.events.AdErrorEvent;
 import com.jwplayer.pub.api.events.AdImpressionEvent;
+import com.jwplayer.pub.api.events.AdLoadedEvent;
+import com.jwplayer.pub.api.events.AdLoadedXmlEvent;
 import com.jwplayer.pub.api.events.AdMetaEvent;
 import com.jwplayer.pub.api.events.AdPauseEvent;
 import com.jwplayer.pub.api.events.AdPlayEvent;
@@ -56,6 +59,7 @@ import com.jwplayer.pub.api.events.AdSkippedEvent;
 import com.jwplayer.pub.api.events.AdStartedEvent;
 import com.jwplayer.pub.api.events.AdTimeEvent;
 import com.jwplayer.pub.api.events.AdViewableImpressionEvent;
+import com.jwplayer.pub.api.events.AdWarningEvent;
 import com.jwplayer.pub.api.events.AudioTrackChangedEvent;
 import com.jwplayer.pub.api.events.AudioTracksEvent;
 import com.jwplayer.pub.api.events.BeforeCompleteEvent;
@@ -152,6 +156,10 @@ public class RNJWPlayerView extends RelativeLayout implements
         AdvertisingEvents.OnAdSkippedListener,
         AdvertisingEvents.OnAdTimeListener,
         AdvertisingEvents.OnAdViewableImpressionListener,
+        AdvertisingEvents.OnAdBreakIgnoredListener,
+        AdvertisingEvents.OnAdWarningListener,
+        AdvertisingEvents.OnAdLoadedListener,
+        AdvertisingEvents.OnAdLoadedXmlListener,
 
         AudioManager.OnAudioFocusChangeListener,
 
@@ -944,6 +952,22 @@ public class RNJWPlayerView extends RelativeLayout implements
     // Ad events
 
     @Override
+    public void onAdLoaded(AdLoadedEvent adLoadedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adLoadedEvent.getClient().toString());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
+    public void onAdLoadedXml(AdLoadedXmlEvent adLoadedXmlEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adLoadedXmlEvent.getClient().toString());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
     public void onAdPause(AdPauseEvent adPauseEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onAdEvent");
@@ -980,6 +1004,15 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     @Override
+    public void onAdBreakIgnored(AdBreakIgnoredEvent adBreakIgnoredEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onAdEvent");
+        event.putString("client", adBreakIgnoredEvent.getClient().toString());
+        // missing type code
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdEvent", event);
+    }
+
+    @Override
     public void onAdClick(AdClickEvent adClickEvent) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "onAdEvent");
@@ -1007,13 +1040,22 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onAdError(AdErrorEvent adErrorEvent) {
-        //onPlayerAdError
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlayerAdError");
         event.putInt("code", adErrorEvent.getCode());
         event.putInt("adErrorCode", adErrorEvent.getAdErrorCode());
         event.putString("error", adErrorEvent.getMessage());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerAdError", event);
+    }
+
+    @Override
+    public void onAdWarning(AdWarningEvent adWarningEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onPlayerAdWarning");
+        event.putInt("code", adWarningEvent.getCode());
+        event.putInt("adErrorCode", adWarningEvent.getAdErrorCode());
+        event.putString("error", adWarningEvent.getMessage());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerAdWarning", event);
     }
 
     @Override
