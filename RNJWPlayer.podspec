@@ -11,11 +11,24 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.platform     = :ios, "14.0"
   s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
-  s.source_files  = "ios/RNJWPlayer/*.{h,m}"
+  s.source_files = "ios/RNJWPlayer/*.{h,m}"
   s.dependency   'JWPlayerKit', '~> 4.17.0'
-  s.dependency   'google-cast-sdk', '~> 4.8'
   s.dependency   'React'
-  # s.static_framework = true
+  if defined?($RNJWPlayerUseGoogleCast)
+    Pod::UI.puts "RNJWPlayer: enable Google Cast"
+    s.dependency 'google-cast-sdk', '~> 4.5.3'
+    s.pod_target_xcconfig = {
+      'OTHER_SWIFT_FLAGS' => '$(inherited) -D USE_GOOGLE_CAST'
+    }
+  end
+  if defined?($RNJWPlayerUseGoogleIMA)
+    Pod::UI.puts "RNJWPlayer: enable IMA SDK"
+    s.dependency 'GoogleAds-IMA-iOS-SDK', '~>3.19.1'
+    s.pod_target_xcconfig = {
+      'OTHER_SWIFT_FLAGS' => '$(inherited) -D USE_GOOGLE_IMA'
+    }
+  end
+  s.static_framework = true
   s.info_plist = {
     'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
     'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',

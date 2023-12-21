@@ -13,7 +13,6 @@
 
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
-#import <GoogleCast/GoogleCast.h>
 #import <JWPlayerKit/JWPlayerKit.h>
 #import "JWPlayerKit/JWPlayerObjCViewController.h"
 #import "RNJWPlayerView.h"

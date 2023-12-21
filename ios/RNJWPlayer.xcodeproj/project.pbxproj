@@ -13,6 +13,7 @@
 		2AA52BE826C144B200AD26AE /* RNJWPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52BE426C144B200AD26AE /* RNJWPlayerView.m */; };
 		3BC75FCC1E43B1DB0011FBAA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */; };
 		3BC75FD11E43B3090011FBAA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC75FD01E43B3090011FBAA /* Foundation.framework */; };
+		86182A342B31877B0040739A /* RNJWPlayerAds.m in Sources */ = {isa = PBXBuildFile; fileRef = 86182A332B31877B0040739A /* RNJWPlayerAds.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +39,8 @@
 		2AA52BE426C144B200AD26AE /* RNJWPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerView.m; path = RNJWPlayer/RNJWPlayerView.m; sourceTree = "<group>"; };
 		3BC75FCB1E43B1DB0011FBAA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3BC75FD01E43B3090011FBAA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		86182A332B31877B0040739A /* RNJWPlayerAds.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNJWPlayerAds.m; path = RNJWPlayer/RNJWPlayerAds.m; sourceTree = "<group>"; };
+		86182A352B3187A80040739A /* RNJWPlayerAds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNJWPlayerAds.h; path = RNJWPlayer/RNJWPlayerAds.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +82,8 @@
 				2AA52BE426C144B200AD26AE /* RNJWPlayerView.m */,
 				2AA52BE326C144B200AD26AE /* RNJWPlayerViewManager.h */,
 				2AA52BE226C144B200AD26AE /* RNJWPlayerViewManager.m */,
+				86182A352B3187A80040739A /* RNJWPlayerAds.h */,
+				86182A332B31877B0040739A /* RNJWPlayerAds.m */,
 				2A5DC7BE272B5DB6003BF3E4 /* RCTConvert+RNJWPlayer.h */,
 				2A5DC7BF272B5DB6003BF3E4 /* RCTConvert+RNJWPlayer.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -143,6 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86182A342B31877B0040739A /* RNJWPlayerAds.m in Sources */,
 				2AA52BE826C144B200AD26AE /* RNJWPlayerView.m in Sources */,
 				2A5DC7C0272B5DB6003BF3E4 /* RCTConvert+RNJWPlayer.m in Sources */,
 				2AA52BE726C144B200AD26AE /* RNJWPlayerViewManager.m in Sources */,

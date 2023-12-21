@@ -23,6 +23,7 @@ RCT_EXPORT_VIEW_PROPERTY(onTime, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onLoaded, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeek, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSeeked, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onRateChanged, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylist, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaylistComplete, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onBeforeComplete, RCTBubblingEventBlock);
@@ -380,7 +381,12 @@ RCT_REMAP_METHOD(castState,
             NSError *error = [[NSError alloc] init];
             reject(@"no_player", @"There is no player", error);
         } else {
-            resolve([NSNumber numberWithInt:[view castState]]);
+            #if USE_GOOGLE_CAST
+                resolve([NSNumber numberWithInt:[view castState]]);
+            #else
+                NSError *error = [[NSError alloc] init];
+                reject(@"missing_google_cast_pod", @"GoogleCast is not installed.", error);
+            #endif
         }
     }];
 }

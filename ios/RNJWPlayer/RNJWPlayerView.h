@@ -7,8 +7,13 @@
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
 #import <JWPlayerKit/JWPlayerKit-swift.h>
-#import <GoogleCast/GoogleCast.h>
 #import "RNJWPlayerViewController.h"
+#import "RNJWPlayerAds.h"
+
+#if USE_GOOGLE_CAST
+    #import <GoogleCast/GoogleCast.h>
+#endif
+
 
 @class RNJWPlayerViewController;
 
@@ -59,6 +64,7 @@
 @property(nonatomic, copy)RCTBubblingEventBlock onTime;
 @property(nonatomic, copy)RCTBubblingEventBlock onSeek;
 @property(nonatomic, copy)RCTBubblingEventBlock onSeeked;
+@property(nonatomic, copy)RCTBubblingEventBlock onRateChanged;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylist;
 @property(nonatomic, copy)RCTBubblingEventBlock onPlaylistComplete;
 @property(nonatomic, copy)RCTBubblingEventBlock onBeforeComplete;
@@ -104,7 +110,9 @@
 /* casting methods */
 - (void)setUpCastController;
 - (void)presentCastDialog;
+#if USE_GOOGLE_CAST
 - (GCKCastState)castState;
+#endif
 - (JWCastingDevice*)connectedDevice;
 - (NSArray <JWCastingDevice *>*)availableDevices;
 
