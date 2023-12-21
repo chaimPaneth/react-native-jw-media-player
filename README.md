@@ -224,8 +224,8 @@ Running the example project:
 | --------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | **`mediaId`**         | The JW media id.                                                                                         | `Int`                                             |
 | **`startTime`**       | the player should start from a certain second.                                                           | `Int`                                             |
-| **`adVmap`**          | The url of ads VMAP xml.                                                                                 | `String`                                          |
-| **`adSchedule`**      | Array of tags and and offsets for ads.                                                                   | `{tag: String, offset: String}`                   |
+| **`adVmap`**          | The url of ads VMAP xml. (iOS only)                                                                                 | `String`                                          |
+| **`adSchedule`**      | Array of tags and and offsets for ads. (iOS only)                                                                   | `{tag: String, offset: String}`                   |
 | **`description`**     | Description of the track.                                                                                | `String`                                          |
 | **`file`**            | The url of the file to play.                                                                             | `String`                                          |
 | **`tracks`**          | Array of caption tracks.                                                                                 | `{file: String, label: String}`                   |
@@ -381,12 +381,17 @@ Checkout the DRMExample in the Example app. (The DRMExample cannot be run in the
 
 ##### Advertising
 
-### Note for iOS
-When using an **IMA** ad client you need to add `$RNJWPlayerUseGoogleIMA = true` to your Podfile, this will add `GoogleAds-IMA-iOS-SDK` pod.
+### Important
+When using an **IMA** ad client you need to do some additional setup.
+
+- **iOS**: Add `$RNJWPlayerUseGoogleIMA = true` to your Podfile, this will add `GoogleAds-IMA-iOS-SDK` pod.
+
+- **Android**: Add `RNJWPlayerUseGoogleIMA = true` in your *app/build.gradle* `ext {}` this will add `'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'`
+        and `'com.google.android.gms:play-services-ads-identifier:18.0.1'`.
 
 | Prop                          | Description                                                                                              | Type                                          | Availability            |
 |-------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------|-------------------------|
-| **`adVmap`**                  | The URL of the ads VMAP XML.                                                                             | `String`                                      | All Clients             |
+| **`adVmap`**                  | The URL of the ads VMAP XML.                                                                             | `String`                                      | All Clients (iOS only)             |
 | **`adSchedule`**              | Array of tags and offsets for ads.                                                                       | `{tag: String, offset: String}[]`             | All Clients             |
 | **`openBrowserOnAdClick`**    | Should the player open the browser when clicking on an ad.                                               | `Boolean`                                     | All Clients             |
 | **`adClient`**                | The ad client. One of `vast`, `ima`, or `ima_dai`, check out [JWPlayerAdClients](#JWPlayerAdClients), defaults to `vast`.                                  | `'vast'`, `'ima'`, `'ima_dai'`               | All Clients             |
@@ -395,6 +400,7 @@ When using an **IMA** ad client you need to add `$RNJWPlayerUseGoogleIMA = true`
 | **`companionAdSlots`**        | Array of objects representing companion ad slots.                                                        | `{viewId: String, size?: {width: Number, height: Number}}[]` | IMA only                |
 | **`friendlyObstructions`**    | Array of objects representing friendly obstructions for viewability measurement.                         | `{viewId: String, purpose: 'mediaControls' \| 'closeAd' \| 'notVisible' \| 'other', reason?: String}[]` | IMA and IMA DAI         |
 | **`googleDAIStream`**         | Stream configuration for Google DAI (Dynamic Ad Insertion).                                              | `{videoID?: String, cmsID?: String, assetKey?: String, apiKey?: String, adTagParameters?: {[key: string]: string}}` | IMA DAI only            |
+| **`tag`**         | Vast xml URL.                                              | `String` | Vast only (iOS only)            |
 
 ##### Related
 
@@ -564,6 +570,9 @@ JWPlayer enables casting by default with a casting button (if you pass the `view
 ```
 
 4: Enable _Access WiFi Information_ capability under `Signing & Capabilities`
+
+###### Android
+1: Add `RNJWPlayerUseGoogleCast = true` to your *app/build.gradle* in `ext {}`, this will add `com.google.android.gms:play-services-cast-framework:21.3.0`.
 
 #### Available methods
 

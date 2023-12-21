@@ -14,6 +14,7 @@ import com.jwplayer.pub.api.media.ads.AdBreak;
 import com.jwplayer.pub.api.media.ads.dai.ImaDaiSettings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,11 +92,26 @@ public class RNJWPlayerAds {
         String assetKey = imaDaiSettingsMap.hasKey("assetKey") ? imaDaiSettingsMap.getString("assetKey") : null;
         String apiKey = imaDaiSettingsMap.hasKey("apiKey") ? imaDaiSettingsMap.getString("apiKey") : null;
 
-        // Assuming adTagParameters is a map in JSON format
-        Map<String, String> adTagParameters = null; // Extract this map from imaDaiSettingsMap if present
+        // Extracting adTagParameters from imaDaiSettingsMap if present
+        Map<String, String> adTagParameters = null;
+        if (imaDaiSettingsMap.hasKey("adTagParameters") && imaDaiSettingsMap.getMap("adTagParameters") != null) {
+            adTagParameters = new HashMap<>();
+            ReadableMap adTagParamsMap = imaDaiSettingsMap.getMap("adTagParameters");
+            for (Map.Entry<String, Object> entry : adTagParamsMap.toHashMap().entrySet()) {
+                if (entry.getValue() instanceof String) {
+                    adTagParameters.put(entry.getKey(), (String) entry.getValue());
+                }
+            }
+        }
 
-        ImaDaiSettings.StreamType streamType = ImaDaiSettings.StreamType.HLS; // Default value, adjust based on your logic
-
+        // Handling streamType
+        ImaDaiSettings.StreamType streamType = ImaDaiSettings.StreamType.HLS; // Default to HLS
+        if (imaDaiSettingsMap.hasKey("streamType")) {
+            String streamTypeStr = imaDaiSettingsMap.getString("streamType");
+            if ("DASH".equalsIgnoreCase(streamTypeStr)) {
+                streamType = ImaDaiSettings.StreamType.DASH;
+            }
+        }
         // Create ImaDaiSettings based on the provided values
         ImaDaiSettings imaDaiSettings = (assetKey != null) ?
                 new ImaDaiSettings(assetKey, streamType, apiKey) :
