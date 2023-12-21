@@ -232,39 +232,79 @@ declare module "react-native-jw-media-player" {
     enableLockScreenControls: boolean;
     pipEnabled: boolean;
   }
-  type NativeError = (event: { nativeEvent: { code: string, error: string } })  => void;
-  type NativeWarning = (event: { nativeEvent: { code: string, warning: string } })  => void;
+  interface BaseEvent<T> {
+    nativeEvent: T;
+  }
+  interface SeekEventProps {
+    position: number;
+    offset: number;
+  }
+  interface SeekedEventProps {
+    position: number;
+  }
+  interface RateChangedEventProps {
+    rate: number;
+    at: number;
+  }
+  interface TimeEventProps {
+    position: number;
+    duration: number;
+  }
+  interface ControlBarVisibleEventProps {
+    visible: boolean;
+  }
+  interface PlaylistEventProps {
+    playlist: PlaylistItem[]
+  }
+  interface PlaylistItemEventProps {
+    playlistItem: PlaylistItem
+  }
+  interface PlayerErrorEventProps {
+    code: string;
+    error: string;
+  }
+  interface PlayerWarningEventProps {
+    code: string;
+    warning: string;
+  }
+  interface AdEventProps {
+    client?: string;
+    reason?: string;
+    type: number;
+  }
+  type NativeError = (event: BaseEvent<PlayerErrorEventProps>) => void;
+  type NativeWarning = (event: BaseEvent<PlayerWarningEventProps>) => void;
   interface PropsType {
     config: Config;
     style?: ViewStyle;
     controls?: boolean;
-    onPlayerReady?: (event: any) => void;
-    onPlaylist?: (playlist: PlaylistItem[]) => void;
-    onBeforePlay?: (event: any) => void;
-    onBeforeComplete?: (event: any) => void;
-    onPlay?: (event: any) => void;
-    onPause?: (event: any) => void;
+    onPlayerReady?: () => void;
+    onPlaylist?: (event: BaseEvent<PlaylistEventProps>) => void;
+    onBeforePlay?: () => void;
+    onBeforeComplete?: () => void;
+    onComplete?: () => void;
+    onPlay?: () => void;
+    onPause?: () => void;
+    onSeek?: (event: BaseEvent<SeekEventProps>) => void;
+    onSeeked?: (event?: BaseEvent<SeekedEventProps>) => void;
+    onRateChanged?: (event?: BaseEvent<RateChangedEventProps>) => void;
     onSetupPlayerError?: NativeError;
     onPlayerError?: NativeError;
     onPlayerWarning?: NativeWarning;
     onPlayerAdError?: NativeError;
     onPlayerAdWarning?: NativeWarning;
-    onAdEvent?: (event: {client: string?, reason: string?, type: number}) => void;
-    onAdTime?: (event: {position: number, duration: number}) => void;
-    onBuffer?: (event: any) => void;
-    onTime?: (event: any) => void;
-    onComplete?: (event: any) => void;
-    onFullScreenRequested?: (event: any) => void;
-    onFullScreen?: (event: any) => void;
-    onFullScreenExitRequested?: (event: any) => void;
-    onFullScreenExit?: (event: any) => void;
-    onSeek?: (seek: { position: number; offset: number }) => void;
-    onSeeked?: (seeked?: { position: number }) => void;
-    onRateChanged?: (changed?: { rate: number, at: number }) => void;
-    onPlaylistItem?: (playlistItem: PlaylistItem) => void;
-    onControlBarVisible?: (event: any) => void;
-    onPlaylistComplete?: (event: any) => void;
-    onAudioTracks?: (event: any) => void;
+    onAdEvent?: (event: BaseEvent<AdEventProps>) => void;
+    onAdTime?: (event: BaseEvent<TimeEventProps>) => void;
+    onBuffer?: () => void;
+    onTime?: (event: BaseEvent<TimeEventProps>) => void;
+    onFullScreenRequested?: () => void;
+    onFullScreen?: () => void;
+    onFullScreenExitRequested?: () => void;
+    onFullScreenExit?: () => void;
+    onControlBarVisible?: (event: BaseEvent<ControlBarVisibleEventProps>) => void;
+    onPlaylistComplete?: () => void;
+    onPlaylistItem?: (event: BaseEvent<PlaylistItemEventProps>) => void;
+    onAudioTracks?: () => void;
     shouldComponentUpdate?: (nextProps: any, nextState: any) => boolean;
   }
 
