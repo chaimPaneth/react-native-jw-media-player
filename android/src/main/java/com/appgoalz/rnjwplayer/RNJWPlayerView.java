@@ -1336,7 +1336,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onPlaybackRateChanged(PlaybackRateChangedEvent playbackRateChangedEvent) {
         WritableMap event = Arguments.createMap();
-        event.putString("message", "onRateChange");
+        event.putString("message", "onRateChanged");
         event.putDouble("rate", playbackRateChangedEvent.getPlaybackRate());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topRateChanged", event);
     }
