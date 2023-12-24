@@ -73,11 +73,15 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - google-cast-sdk (4.8.0):
-    - google-cast-sdk/Core (= 4.8.0)
+  - google-cast-sdk (4.5.3):
+    - google-cast-sdk/Core (= 4.5.3)
+    - GTMSessionFetcher/Core (~> 1.1)
     - Protobuf (~> 3.13)
-  - google-cast-sdk/Core (4.8.0):
+  - google-cast-sdk/Core (4.5.3):
+    - GTMSessionFetcher/Core (~> 1.1)
     - Protobuf (~> 3.13)
+  - GoogleAds-IMA-iOS-SDK (3.19.2)
+  - GTMSessionFetcher/Core (1.7.2)
   - JWPlayerKit (4.17.0)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
@@ -367,9 +371,10 @@ PODS:
   - RNGestureHandler (2.12.1):
     - React-Core
   - RNJWPlayer (0.2.39):
-    - google-cast-sdk (~> 4.8)
+    - google-cast-sdk (~> 4.5.3)
+    - GoogleAds-IMA-iOS-SDK (~> 3.19.1)
     - JWPlayerKit (~> 4.17.0)
-    - React
+    - React-Core
   - RNScreens (3.25.0):
     - React-Core
     - React-RCTImage
@@ -460,6 +465,8 @@ SPEC REPOS:
     - FlipperKit
     - fmt
     - google-cast-sdk
+    - GoogleAds-IMA-iOS-SDK
+    - GTMSessionFetcher
     - JWPlayerKit
     - libevent
     - OpenSSL-Universal
@@ -566,7 +573,9 @@ SPEC CHECKSUMS:
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
-  google-cast-sdk: afeb1aac0744b1bc4f70bc3db8468e33fabbff38
+  google-cast-sdk: f94c5df87564f71d4342400b8487665e9bed27c6
+  GoogleAds-IMA-iOS-SDK: 0e817c05ab26f1b9285c80f4a75e1350a916d50b
+  GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   JWPlayerKit: b0fd3f2abf99f40f8cf8292d550864be4b5df3f9
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
@@ -602,13 +611,13 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 1e3f62b9ec32f7754fac60bd06b8f8a27124e7f0
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: c0d04458598fcb26052494ae23dda8f8f5162b13
-  RNJWPlayer: b1d2e429f23fb84c1ee12cf876479381fc3107e1
+  RNJWPlayer: fd86a3c64d0ba00d4c0ab783df7fb432443fa33b
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 17cd9a50243093b547c1e539c749928dd68152da
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 0312f3bc93221dbcdcb28d35875a0e2e57051f6a
+PODFILE CHECKSUM: 0aa82ae79746645e542b17a02524e6691f65694a
 
 COCOAPODS: 1.14.3

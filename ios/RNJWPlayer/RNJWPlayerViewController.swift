@@ -153,6 +153,18 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
         parentView.onFullScreenExit?([:])
     }
+    
+    func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method:JWRelatedInteraction) {
+
+    }
+    
+    func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerKit.JWPlayerItem], withMethod method: JWPlayerKit.JWRelatedInteraction) {
+        
+    }
+    
+    func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerKit.JWPlayerItem, atIndex index: Int, withMethod method: JWPlayerKit.JWRelatedMethod) {
+        
+    }
 
     // MARK: Time events
 
@@ -188,18 +200,6 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         task.resume()
     }
     
-    func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method:JWRelatedInteraction) {
-
-    }
-    
-    func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerKit.JWPlayerItem], withMethod method: JWPlayerKit.JWRelatedInteraction) {
-        
-    }
-    
-    func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerKit.JWPlayerItem, atIndex index: Int, withMethod method: JWPlayerKit.JWRelatedMethod) {
-        
-    }
-
     func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
         if parentView.processSpcUrl == nil {
             return

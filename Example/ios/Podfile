@@ -4,6 +4,9 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '14.0'
 install! 'cocoapods', :deterministic_uuids => false
 
+$RNJWPlayerUseGoogleIMA = true
+$RNJWPlayerUseGoogleCast = true
+
 target 'RNJWPlayer' do
   config = use_native_modules!
 

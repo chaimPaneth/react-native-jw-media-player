@@ -210,6 +210,15 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     func dictionariesAreEqual(_ dict1: [String: Any]?, _ dict2: [String: Any]?) -> Bool {
         return NSDictionary(dictionary: dict1 ?? [:]).isEqual(to: dict2 ?? [:])
     }
+    
+    @objc func setJsonConfig(_ config: JSONObject) {
+        do {
+            var configuration = try JWPlayerConfigurationBuilder().configuration(json: config).build()
+            playerViewController.player.configurePlayer(with: configuration)
+        } catch {
+            print(error)
+        }
+    }
 
     @objc func setConfig(_ config: [String: Any]) {
         // Create mutable copies of the dictionaries
@@ -260,7 +269,12 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func setNewConfig(config: [String : Any]) {        
+    func setNewConfig(config: [String : Any]) {
+//        let data:Data! = try? JSONSerialization.data(withJSONObject: config, options:.prettyPrinted)
+//        let c = try? JSONDecoder().decode(Config.self, from: data)
+//
+//        let myModel = try? Config(config)
+        
         currentConfig = config
 
         if !settingConfig {
@@ -594,23 +608,23 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         // Process adSchedule
         if let adsItem = item["adSchedule"] as? [AnyObject], !adsItem.isEmpty {
             var adsArray = [JWAdBreak]()
-            
+
             for adItem in adsItem.compactMap({ $0 as? [String: Any] }) {
                 if let offsetString = adItem["offset"] as? String,
                    let tag = adItem["tag"] as? String,
-                   let tagURL = URL(string: tag),
+                   let encodedString = tag.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+                   let tagURL = URL(string: encodedString),
                    let offset = JWAdOffset.from(string: offsetString) {
-                    
                     let adBreakBuilder = JWAdBreakBuilder()
                     adBreakBuilder.offset(offset)
                     adBreakBuilder.tags([tagURL])
-                    
+
                     if let adBreak = try? adBreakBuilder.build() {
                         adsArray.append(adBreak)
                     }
                 }
             }
-            
+
             if !adsArray.isEmpty {
                 itemBuilder.adSchedule(breaks: adsArray)
             }
@@ -667,63 +681,37 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             configBuilder.related(relatedContent)
         }
 
-        let ads = config["advertising"] as? [String: Any]
-//        if let adClient = ads?["adClient"] as? Int {
-//            var jwAdClient: JWAdClient = .unknown
-//
-//            switch adClient {
-//            case 0:
-//                jwAdClient = .JWPlayer
-//            case 1:
-//                jwAdClient = .GoogleIMA
-//            case 2:
-//                jwAdClient = .GoogleIMADAI
-//            default:
-//                break
-//            }
-//
-//
-//        }
-        
-        let adConfigBuilder = JWAdsAdvertisingConfigBuilder()
+        var error: Error?
 
-        if let schedule = ads?["adSchedule"] as? [[String: Any]] {
-            _ = schedule.compactMap { item -> JWAdBreak? in
-                guard let offsetString = item["offset"] as? String,
-                      let tag = item["tag"] as? String,
-                      let tagUrl = URL(string: tag),
-                      let offset = JWAdOffset.from(string: offsetString) else {
-                    return nil
-                }
+        if let ads = config["advertising"] as? [String: Any] {
+            var advertisingConfig: JWAdvertisingConfig?
 
-                let adBreakBuilder = JWAdBreakBuilder()
-                adBreakBuilder.offset(offset)
-                adBreakBuilder.tags([tagUrl])
+            var jwAdClient = JWAdClient.unknown
+            if let adClientString = ads["adClient"] as? String {
+                jwAdClient = RCTConvert.JWAdClient(adClientString)
+            }
 
-                do {
-                    return try adBreakBuilder.build()
-                } catch {
-                    // Handle the error here, log it, print it, or take appropriate action
-                    print("Error building ad break: \(error)")
-                    return nil
-                }
+            switch jwAdClient {
+            case .JWPlayer:
+                advertisingConfig = RNJWPlayerAds.configureVAST(with: ads)
+            case .GoogleIMA:
+                advertisingConfig = RNJWPlayerAds.configureIMA(with: ads)
+            case .GoogleIMADAI:
+                advertisingConfig = RNJWPlayerAds.configureIMADAI(with: ads)
+            default:
+                advertisingConfig = RNJWPlayerAds.configureVAST(with: ads)
+                break
+            }
+
+            // Handle error if any
+            if let error = error {
+                print("Error configuring ads: \(error.localizedDescription)")
+            }
+
+            if (advertisingConfig != nil) {
+                configBuilder.advertising(advertisingConfig!)
             }
         }
-
-        if let tag = ads?["tag"] as? String {
-            adConfigBuilder.tag(URL(string: tag)!)
-        }
-
-        if let adVmap = ads?["adVmap"] as? String {
-            adConfigBuilder.vmapURL(URL(string: adVmap)!)
-        }
-
-        if let openBrowserOnAdClick = ads?["openBrowserOnAdClick"] as? Bool {
-            adConfigBuilder.openBrowserOnAdClick(openBrowserOnAdClick)
-        }
-
-        let advertising = try adConfigBuilder.build()
-        configBuilder.advertising(advertising)
 
         let playerConfig = try configBuilder.build()
 
