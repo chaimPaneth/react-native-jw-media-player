@@ -11,9 +11,21 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.platform     = :ios, "14.0"
   s.source       = { :git => "https://github.com/chaimPaneth/react-native-jw-media-player.git", :tag => "v#{s.version}" }
-  s.source_files = "ios/RNJWPlayer/*.{h,m}"
+  s.source_files  = "ios/RNJWPlayer/*.{h,m,swift}"
   s.dependency   'JWPlayerKit', '~> 4.17.0'
-  s.dependency   'React'
+  s.dependency   'React-Core'
+  s.static_framework = true
+  s.info_plist = {
+    'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
+    'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
+    'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
+    'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
+    'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
+  }
+  s.xcconfig = {
+    'OTHER_LDFLAGS': '-ObjC',
+  }
+
   if defined?($RNJWPlayerUseGoogleCast)
     Pod::UI.puts "RNJWPlayer: enable Google Cast"
     s.dependency 'google-cast-sdk', '~> 4.5.3'
@@ -28,13 +40,5 @@ Pod::Spec.new do |s|
       'OTHER_SWIFT_FLAGS' => '$(inherited) -D USE_GOOGLE_IMA'
     }
   end
-  s.static_framework = true
-  s.info_plist = {
-    'NSBluetoothAlwaysUsageDescription' => 'We will use your Bluetooth for media casting.',
-    'NSBluetoothPeripheralUsageDescription' => 'We will use your Bluetooth for media casting.',
-    'NSLocalNetworkUsageDescription' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
-    'Privacy - Local Network Usage Description' => 'We will use the local network to discover Cast-enabled devices on your WiFi network.',
-    'NSMicrophoneUsageDescription' => 'We will use your Microphone for media casting.'
-  }
   
 end
