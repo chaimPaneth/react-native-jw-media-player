@@ -370,7 +370,7 @@ PODS:
     - React
   - RNGestureHandler (2.12.1):
     - React-Core
-  - RNJWPlayer (0.2.39):
+  - RNJWPlayer (0.2.42):
     - google-cast-sdk (~> 4.5.3)
     - GoogleAds-IMA-iOS-SDK (~> 3.19.1)
     - JWPlayerKit (~> 4.17.0)
@@ -611,7 +611,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 1e3f62b9ec32f7754fac60bd06b8f8a27124e7f0
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: c0d04458598fcb26052494ae23dda8f8f5162b13
-  RNJWPlayer: fd86a3c64d0ba00d4c0ab783df7fb432443fa33b
+  RNJWPlayer: 78ba87f0d9c4f4b39c8bbc03fe04d73587acd7e8
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
