@@ -8,6 +8,14 @@ class RNJWPlayerViewManager: RCTViewManager {
     override func view() -> UIView {
         return RNJWPlayerView()
     }
+    
+    func methodQueue() -> DispatchQueue {
+        return bridge.uiManager.methodQueue
+    }
+    
+    override class func requiresMainQueueSetup() -> Bool {
+        return true
+    }
 
     @objc func state(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { (_, viewRegistry) in
