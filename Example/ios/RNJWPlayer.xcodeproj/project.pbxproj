@@ -10,11 +10,11 @@
 		00E356F31AD99517003FC87E /* RNJWPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RNJWPlayerTests.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		212AA1595635E4B8C0DCBD8C /* libPods-RNJWPlayer-RNJWPlayerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE6F3E5E9AF19D49EF4FFBBB /* libPods-RNJWPlayer-RNJWPlayerTests.a */; };
+		217E0166DFE6367F2AC89BC4 /* libPods-RNJWPlayer-RNJWPlayerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E81FF475BE03082DE02905F9 /* libPods-RNJWPlayer-RNJWPlayerTests.a */; };
 		2A34EFE9284DFD390003191C /* local_file.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2A34EFE8284DFD390003191C /* local_file.mp4 */; };
 		2A87E26C284E800C005A938C /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2A87E26B284E800C005A938C /* AppDelegate.mm */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		A96B48CABCFBC087B7528704 /* libPods-RNJWPlayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D8011DD82356F8AABC1BD3FC /* libPods-RNJWPlayer.a */; };
+		C06A5ED4261C0BD5169BDF13 /* libPods-RNJWPlayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DE6AC75A891F30B6A897F01 /* libPods-RNJWPlayer.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,14 +38,14 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RNJWPlayer/main.m; sourceTree = "<group>"; };
 		2A34EFE8284DFD390003191C /* local_file.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = local_file.mp4; sourceTree = "<group>"; };
 		2A87E26B284E800C005A938C /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = RNJWPlayer/AppDelegate.mm; sourceTree = "<group>"; };
-		58A8192B43D4B36422FB7402 /* Pods-RNJWPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer.release.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer.release.xcconfig"; sourceTree = "<group>"; };
-		60646759BED7DCE00F87BE64 /* Pods-RNJWPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer.debug.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer.debug.xcconfig"; sourceTree = "<group>"; };
-		749A9AC5C02438DDEFD62839 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig"; sourceTree = "<group>"; };
+		6B7033D1AAFD64A817575A30 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RNJWPlayer/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		C5784F090BFAC73DB451EAE0 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D8011DD82356F8AABC1BD3FC /* libPods-RNJWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNJWPlayer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9DE6AC75A891F30B6A897F01 /* libPods-RNJWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNJWPlayer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4EBD7B0B2AFA5D28A596B0B /* Pods-RNJWPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer.release.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer.release.xcconfig"; sourceTree = "<group>"; };
+		E7FB36BC688A1F0102D63535 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E81FF475BE03082DE02905F9 /* libPods-RNJWPlayer-RNJWPlayerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNJWPlayer-RNJWPlayerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB31023A55B67F0DB6AFA970 /* Pods-RNJWPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNJWPlayer.debug.xcconfig"; path = "Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		EE6F3E5E9AF19D49EF4FFBBB /* libPods-RNJWPlayer-RNJWPlayerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNJWPlayer-RNJWPlayerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				212AA1595635E4B8C0DCBD8C /* libPods-RNJWPlayer-RNJWPlayerTests.a in Frameworks */,
+				217E0166DFE6367F2AC89BC4 /* libPods-RNJWPlayer-RNJWPlayerTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A96B48CABCFBC087B7528704 /* libPods-RNJWPlayer.a in Frameworks */,
+				C06A5ED4261C0BD5169BDF13 /* libPods-RNJWPlayer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,8 +111,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				D8011DD82356F8AABC1BD3FC /* libPods-RNJWPlayer.a */,
-				EE6F3E5E9AF19D49EF4FFBBB /* libPods-RNJWPlayer-RNJWPlayerTests.a */,
+				9DE6AC75A891F30B6A897F01 /* libPods-RNJWPlayer.a */,
+				E81FF475BE03082DE02905F9 /* libPods-RNJWPlayer-RNJWPlayerTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -151,10 +151,10 @@
 		CDB74D25A358615E36B2D15B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				60646759BED7DCE00F87BE64 /* Pods-RNJWPlayer.debug.xcconfig */,
-				58A8192B43D4B36422FB7402 /* Pods-RNJWPlayer.release.xcconfig */,
-				C5784F090BFAC73DB451EAE0 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */,
-				749A9AC5C02438DDEFD62839 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */,
+				EB31023A55B67F0DB6AFA970 /* Pods-RNJWPlayer.debug.xcconfig */,
+				D4EBD7B0B2AFA5D28A596B0B /* Pods-RNJWPlayer.release.xcconfig */,
+				E7FB36BC688A1F0102D63535 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */,
+				6B7033D1AAFD64A817575A30 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -166,12 +166,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RNJWPlayerTests" */;
 			buildPhases = (
-				0D1DCBAE536D840ABCFA1D85 /* [CP] Check Pods Manifest.lock */,
+				53A5810E01457BD018EE955F /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				843A320632117A13D34F0CB0 /* [CP] Embed Pods Frameworks */,
-				032180FBE0C03300CCF8AE96 /* [CP] Copy Pods Resources */,
+				885F86D6B7025FA725F89CF6 /* [CP] Embed Pods Frameworks */,
+				057B8A41BD19154CDB0FED85 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -187,14 +187,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RNJWPlayer" */;
 			buildPhases = (
-				BE4BDB11A6E11F8516377717 /* [CP] Check Pods Manifest.lock */,
+				DA9DD72213E5E1A933E2BA80 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				89F5777DF607A51D57CEBD60 /* [CP] Embed Pods Frameworks */,
-				66CB463811C7C353E6190EC5 /* [CP] Copy Pods Resources */,
+				11218E13A3DF3181B61CBC66 /* [CP] Embed Pods Frameworks */,
+				A7B97ECD68023AA8780802B7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -276,7 +276,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		032180FBE0C03300CCF8AE96 /* [CP] Copy Pods Resources */ = {
+		057B8A41BD19154CDB0FED85 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -293,7 +293,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0D1DCBAE536D840ABCFA1D85 /* [CP] Check Pods Manifest.lock */ = {
+		11218E13A3DF3181B61CBC66 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		53A5810E01457BD018EE955F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -315,24 +332,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		66CB463811C7C353E6190EC5 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		843A320632117A13D34F0CB0 /* [CP] Embed Pods Frameworks */ = {
+		885F86D6B7025FA725F89CF6 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -349,24 +349,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer-RNJWPlayerTests/Pods-RNJWPlayer-RNJWPlayerTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		89F5777DF607A51D57CEBD60 /* [CP] Embed Pods Frameworks */ = {
+		A7B97ECD68023AA8780802B7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNJWPlayer/Pods-RNJWPlayer-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BE4BDB11A6E11F8516377717 /* [CP] Check Pods Manifest.lock */ = {
+		DA9DD72213E5E1A933E2BA80 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -440,7 +440,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C5784F090BFAC73DB451EAE0 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */;
+			baseConfigurationReference = E7FB36BC688A1F0102D63535 /* Pods-RNJWPlayer-RNJWPlayerTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -467,7 +467,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 749A9AC5C02438DDEFD62839 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */;
+			baseConfigurationReference = 6B7033D1AAFD64A817575A30 /* Pods-RNJWPlayer-RNJWPlayerTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -491,7 +491,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 60646759BED7DCE00F87BE64 /* Pods-RNJWPlayer.debug.xcconfig */;
+			baseConfigurationReference = EB31023A55B67F0DB6AFA970 /* Pods-RNJWPlayer.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -566,7 +566,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 58A8192B43D4B36422FB7402 /* Pods-RNJWPlayer.release.xcconfig */;
+			baseConfigurationReference = D4EBD7B0B2AFA5D28A596B0B /* Pods-RNJWPlayer.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
