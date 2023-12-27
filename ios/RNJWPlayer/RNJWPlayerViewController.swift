@@ -589,4 +589,20 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     override func jwplayer(_ player:JWPlayer, updatedCaptionList options:[JWMediaSelectionOption]) {
         super.jwplayer(player, updatedCaptionList:options)
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { _ in
+            let orientation = UIDevice.current.orientation
+            switch orientation {             
+            case .portrait, .portraitUpsideDown:
+                if self.parentView.currentConfig["exitFullScreenOnPortrait"] as? Bool ?? false {
+                    super.dismissFullScreen(animated: true)
+                }
+            default:
+                break
+            }
+        })
+    }
+    
 }
