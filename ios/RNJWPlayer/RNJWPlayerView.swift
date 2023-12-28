@@ -318,7 +318,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    @objc func setControls(controls:Bool) {
+    @objc func setControls(_ controls:Bool) {
         self.toggleUIGroup(view: playerViewController.view, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
     }
 
