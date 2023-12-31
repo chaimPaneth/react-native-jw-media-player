@@ -12,8 +12,8 @@
   "dependencies": {
     "@react-navigation/native": "6.1.7",
     "@react-navigation/native-stack": "6.9.13",
-    "react": "17.0.1",
-    "react-native": "0.68.1",
+    "react": "18.1.0",
+    "react-native": "0.70.14",
     "react-native-bootsplash": "4.1.5",
     "react-native-device-info": "9.0.2",
     "react-native-fs": "2.16.6",
@@ -32,9 +32,9 @@
     "babel-jest": "^27.0.6",
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
-    "metro-react-native-babel-preset": "^0.66.2",
+    "metro-react-native-babel-preset": "^0.72.4",
     "react-native-dotenv": "3.3.1",
-    "react-test-renderer": "17.0.1"
+    "react-test-renderer": "18.1.0"
   },
   "jest": {
     "preset": "react-native"
