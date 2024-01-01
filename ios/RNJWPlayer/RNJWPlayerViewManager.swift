@@ -17,7 +17,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         return true
     }
 
-    @objc func state(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func state(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { (_, viewRegistry) in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: nil)
@@ -83,7 +83,8 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func position(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func position(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
+        print("position")
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no playerView"])
@@ -125,7 +126,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setSpeed(_ reactTag: NSNumber, speed: Double) {
+    @objc func setSpeed(_ reactTag: NSNumber, _ speed: Double) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -140,7 +141,8 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setPlaylistIndex(_ reactTag: NSNumber, index: NSNumber) {
+    @objc func setPlaylistIndex(_ reactTag: NSNumber, _ index: NSNumber) {
+        print("SET PLAY LIST INDEX")
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -155,7 +157,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func seekTo(_ reactTag: NSNumber, time: NSNumber) {
+    @objc func seekTo(_ reactTag: NSNumber, _ time: NSNumber) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -170,7 +172,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
     
-    @objc func setVolume(_ reactTag: NSNumber, volume: Double) {
+    @objc func setVolume(_ reactTag: NSNumber, _ volume: Double) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -225,7 +227,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func connectedDevice(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func connectedDevice(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no player"])
@@ -251,7 +253,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func availableDevices(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func availableDevices(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no player"])
@@ -282,7 +284,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func castState(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func castState(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no player"])
@@ -294,7 +296,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func getAudioTracks(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func getAudioTracks(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no player"])
@@ -328,7 +330,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
     
-    @objc func getCurrentAudioTrack(_ reactTag: NSNumber, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc func getCurrentAudioTrack(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "There is no player"])
@@ -347,7 +349,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setCurrentAudioTrack(_ reactTag: NSNumber, index: NSNumber) {
+    @objc func setCurrentAudioTrack(_ reactTag: NSNumber, _ index: NSNumber) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -362,7 +364,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
     
-    @objc func setControls(_ reactTag: NSNumber, show: Bool) {
+    @objc func setControls(_ reactTag: NSNumber, _ show: Bool) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -375,7 +377,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setVisibility(_ reactTag: NSNumber, visibility: Bool, controls: [String]) {
+    @objc func setVisibility(_ reactTag: NSNumber, _ visibility: Bool, _ controls: [String]) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -388,7 +390,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setLockScreenControls(_ reactTag: NSNumber, show: Bool) {
+    @objc func setLockScreenControls(_ reactTag: NSNumber, _ show: Bool) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -401,7 +403,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setCurrentCaptions(_ reactTag: NSNumber, index: NSNumber) {
+    @objc func setCurrentCaptions(_ reactTag: NSNumber, _ index: NSNumber) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -416,7 +418,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setLicenseKey(_ reactTag: NSNumber, license: String) {
+    @objc func setLicenseKey(_ reactTag: NSNumber, _ license: String) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -453,7 +455,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func loadPlaylist(_ reactTag: NSNumber, playlist: [Any]) {
+    @objc func loadPlaylist(_ reactTag: NSNumber, _ playlist: [Any]) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")
@@ -476,7 +478,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
-    @objc func setFullscreen(_ reactTag: NSNumber, fullscreen: Bool) {
+    @objc func setFullscreen(_ reactTag: NSNumber, _ fullscreen: Bool) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
                 print("Invalid view returned from registry, expecting RNJWPlayerView, got: \(String(describing: viewRegistry?[reactTag]))")

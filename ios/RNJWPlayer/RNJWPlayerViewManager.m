@@ -71,9 +71,7 @@ RCT_EXPORT_VIEW_PROPERTY(onCastingFailed, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(config, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(controls, BOOL);
 
-RCT_EXTERN_METHOD(state: (nonnull NSNumber*)reactTag
-                 stateWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(state: (nonnull NSNumber*) reactTag: (RCTPromiseResolveBlock)resolve :(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(pause: (nonnull NSNumber*)reactTag)
 
@@ -81,9 +79,7 @@ RCT_EXTERN_METHOD(play: (nonnull NSNumber *)reactTag)
 
 RCT_EXTERN_METHOD(stop: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(position: (nonnull NSNumber *)reactTag
-                 positionResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(position: (nonnull NSNumber *)reactTag: (RCTPromiseResolveBlock)resolve: (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(toggleSpeed: (nonnull NSNumber*)reactTag)
 
@@ -101,25 +97,15 @@ RCT_EXTERN_METHOD(setUpCastController: (nonnull NSNumber *)reactTag)
 
 RCT_EXTERN_METHOD(presentCastDialog: (nonnull NSNumber *)reactTag)
 
-RCT_EXTERN_METHOD(connectedDevice: (nonnull NSNumber *)reactTag
-                 resolve:(RCTPromiseResolveBlock)resolve
-                 rejecte:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(connectedDevice: (nonnull NSNumber *)reactTag :(RCTPromiseResolveBlock)resolve :(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(availableDevices: (nonnull NSNumber *)reactTag
-                 solve:(RCTPromiseResolveBlock)resolve
-                 eject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(availableDevices: (nonnull NSNumber *)reactTag: (RCTPromiseResolveBlock)resolve: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(castState: (nonnull NSNumber *)reactTag
-                 solver:(RCTPromiseResolveBlock)resolve
-                 ejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(castState: (nonnull NSNumber *)reactTag :(RCTPromiseResolveBlock)resolve :(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getAudioTracks: (nonnull NSNumber *)reactTag
-                 resolve:(RCTPromiseResolveBlock)resolve
-                 eject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAudioTracks: (nonnull NSNumber *)reactTag: (RCTPromiseResolveBlock)resolve: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getCurrentAudioTrack: (nonnull NSNumber *)reactTag
-                 resolve:(RCTPromiseResolveBlock)resolve
-                 reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getCurrentAudioTrack: (nonnull NSNumber *)reactTag :(RCTPromiseResolveBlock)resolve :(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(setCurrentAudioTrack: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index)
 
