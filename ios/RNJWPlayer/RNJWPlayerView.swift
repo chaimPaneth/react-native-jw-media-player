@@ -213,7 +213,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     
     @objc func setJsonConfig(_ config: JSONObject) {
         do {
-            var configuration = try JWPlayerConfigurationBuilder().configuration(json: config).build()
+            let configuration = try JWPlayerConfigurationBuilder().configuration(json: config).build()
             playerViewController.player.configurePlayer(with: configuration)
         } catch {
             print(error)
@@ -318,7 +318,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    @objc func setControls(controls:Bool) {
+    @objc func setControls(_ controls:Bool) {
         self.toggleUIGroup(view: playerViewController.view, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
     }
 
@@ -681,8 +681,6 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             configBuilder.related(relatedContent)
         }
 
-        var error: Error?
-
         if let ads = config["advertising"] as? [String: Any] {
             var advertisingConfig: JWAdvertisingConfig?
 
@@ -701,11 +699,6 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             default:
                 advertisingConfig = RNJWPlayerAds.configureVAST(with: ads)
                 break
-            }
-
-            // Handle error if any
-            if let error = error {
-                print("Error configuring ads: \(error.localizedDescription)")
             }
 
             if (advertisingConfig != nil) {

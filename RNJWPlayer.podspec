@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
 
   if defined?($RNJWPlayerUseGoogleCast)
     Pod::UI.puts "RNJWPlayer: enable Google Cast"
-    s.dependency 'google-cast-sdk', '~> 4.5.3'
+    s.dependency 'google-cast-sdk', '~> 4.8'
     s.pod_target_xcconfig = {
       'OTHER_SWIFT_FLAGS' => '$(inherited) -D USE_GOOGLE_CAST'
     }
