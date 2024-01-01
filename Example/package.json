@@ -8,7 +8,8 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "postinstall": "rm -rf ./node_modules/react-native-jw-media-player/Example ./node_modules/react-native-jw-media-player/images ./node_modules/react-native-jw-media-player/node_modules ./node_modules/react-native-jw-media-player/yarn.lock"
+    "postinstall": "rm -rf ./node_modules/react-native-jw-media-player/Example ./node_modules/react-native-jw-media-player/images ./node_modules/react-native-jw-media-player/node_modules ./node_modules/react-native-jw-media-player/yarn.lock patch-package",
+    "prepare": "patch-package"
   },
   "dependencies": {
     "@react-navigation/native": "6.1.7",
@@ -34,6 +35,8 @@
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
     "metro-react-native-babel-preset": "^0.72.4",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "react-native-dotenv": "3.3.1",
     "react-test-renderer": "18.1.0"
   },
