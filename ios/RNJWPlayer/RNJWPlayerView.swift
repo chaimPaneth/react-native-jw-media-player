@@ -34,6 +34,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     var settingConfig: Bool = false
     var pendingConfig: Bool = false
     var currentConfig: [String : Any]!
+    var playerFailed = false
     var castController: JWCastController!
     var isCasting: Bool = false
     var availableDevices: [AnyObject]!
@@ -221,6 +222,12 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     }
 
     @objc func setConfig(_ config: [String: Any]) {
+        if (playerFailed) {
+            playerFailed = false
+            setNewConfig(config: config)
+            return
+        }
+        
         // Create mutable copies of the dictionaries
         var configCopy = config
         var currentConfigCopy = currentConfig
@@ -922,10 +929,12 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     func jwplayer(_ player:JWPlayer, failedWithError code:UInt, message:String) {
         self.onPlayerError?(["error": message])
+        playerFailed = true
     }
 
     func jwplayer(_ player:JWPlayer, failedWithSetupError code:UInt, message:String) {
         self.onSetupPlayerError?(["error": message])
+        playerFailed = true
     }
 
     func jwplayer(_ player:JWPlayer, encounteredWarning code:UInt, message:String) {

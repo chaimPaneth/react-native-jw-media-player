@@ -42,38 +42,40 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     override func jwplayerIsReady(_ player:JWPlayer) {
         super.jwplayerIsReady(player)
 
-        parentView.settingConfig = false
-        parentView.onPlayerReady?([:])
+        parentView?.settingConfig = false
+        parentView?.onPlayerReady?([:])
 
-        if parentView.pendingConfig && (parentView.currentConfig != nil) {
-            parentView.setConfig(parentView.currentConfig)
+        if parentView?.pendingConfig == true && (parentView?.currentConfig != nil) {
+            parentView?.setConfig(parentView!.currentConfig)
         }
     }
 
     override func jwplayer(_ player:JWPlayer, failedWithError code:UInt, message:String) {
         super.jwplayer(player, failedWithError:code, message:message)
-        parentView.onPlayerError?(["error": message])
+        parentView?.onPlayerError?(["error": message])
+        parentView?.playerFailed = true
     }
 
     override func jwplayer(_ player:JWPlayer, failedWithSetupError code:UInt, message:String) {
         super.jwplayer(player, failedWithSetupError:code, message:message)
-        parentView.onSetupPlayerError?(["error": message])
+        parentView?.onSetupPlayerError?(["error": message])
+        parentView?.playerFailed = true
     }
 
     override func jwplayer(_ player:JWPlayer, encounteredWarning code:UInt, message:String) {
         super.jwplayer(player, encounteredWarning:code, message:message)
-        parentView.onPlayerWarning?(["warning": message])
+        parentView?.onPlayerWarning?(["warning": message])
     }
 
     override func jwplayer(_ player:JWPlayer, encounteredAdError code:UInt, message:String) {
         super.jwplayer(player, encounteredAdError:code, message:message)
-        parentView.onPlayerAdError?(["error": message])
+        parentView?.onPlayerAdError?(["error": message])
     }
 
 
     override func jwplayer(_ player:JWPlayer, encounteredAdWarning code:UInt, message:String) {
         super.jwplayer(player, encounteredAdWarning:code, message:message)
-        parentView.onPlayerAdWarning?(["warning": message])
+        parentView?.onPlayerAdWarning?(["warning": message])
     }
 
 
@@ -97,7 +99,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
         do {
             let data = try JSONSerialization.data(withJSONObject: sizesDict, options: .prettyPrinted)
-            parentView.onPlayerSizeChange?(["sizes": data])
+            parentView?.onPlayerSizeChange?(["sizes": data])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
@@ -123,35 +125,35 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
         do {
             let data = try JSONSerialization.data(withJSONObject: sizesDict, options: .prettyPrinted)
-            parentView.onPlayerSizeChange?(["sizes": data])
+            parentView?.onPlayerSizeChange?(["sizes": data])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
     }
 
     func playerViewController(_ controller:JWPlayerViewController, screenTappedAt position:CGPoint) {
-        parentView.onScreenTapped?(["x": position.x, "y": position.y])
+        parentView?.onScreenTapped?(["x": position.x, "y": position.y])
     }
 
     func playerViewController(_ controller:JWPlayerViewController, controlBarVisibilityChanged isVisible:Bool, frame:CGRect) {
-        parentView.onControlBarVisible?(["visible": isVisible])
+        parentView?.onControlBarVisible?(["visible": isVisible])
     }
 
     func playerViewControllerWillGoFullScreen(_ controller:JWPlayerViewController) -> JWFullScreenViewController? {
-        parentView.onFullScreenRequested?([:])
+        parentView?.onFullScreenRequested?([:])
         return nil
     }
 
     func playerViewControllerDidGoFullScreen(_ controller:JWPlayerViewController) {
-        parentView.onFullScreen?([:])
+        parentView?.onFullScreen?([:])
     }
 
     func playerViewControllerWillDismissFullScreen(_ controller:JWPlayerViewController) {
-        parentView.onFullScreenExitRequested?([:])
+        parentView?.onFullScreenExitRequested?([:])
     }
 
     func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
-        parentView.onFullScreenExit?([:])
+        parentView?.onFullScreenExit?([:])
     }
     
     func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method:JWRelatedInteraction) {
@@ -170,12 +172,12 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     func onAdTimeEvent(time:JWTimeData) {
         super.onAdTimeEvent(time)
-        parentView.onAdTime?(["position": time.position, "duration": time.duration])
+        parentView?.onAdTime?(["position": time.position, "duration": time.duration])
     }
 
     func onMediaTimeEvent(time:JWTimeData) {
         super.onMediaTimeEvent(time)
-        parentView.onTime?(["position": time.position, "duration": time.duration])
+        parentView?.onTime?(["position": time.position, "duration": time.duration])
     }
 
     // MARK: - DRM Delegate
@@ -186,7 +188,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     }
 
     func appIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
-        guard let fairplayCertUrlString = parentView.fairplayCertUrl, let fairplayCertUrl = URL(string: fairplayCertUrlString) else {
+        guard let fairplayCertUrlString = parentView?.fairplayCertUrl, let fairplayCertUrl = URL(string: fairplayCertUrlString) else {
             return
         }
         
@@ -201,24 +203,26 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     }
     
     func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
-        if parentView.processSpcUrl == nil {
+        if parentView?.processSpcUrl == nil {
             return
         }
 
-        let ckcRequest = NSMutableURLRequest(url: NSURL(string: parentView.processSpcUrl)! as URL)
-        ckcRequest.httpMethod = "POST"
-        ckcRequest.httpBody = spcData
-        ckcRequest.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-
-        URLSession.shared.dataTask(with: ckcRequest as URLRequest) { (data, response, error) in
-            if let httpResponse = response as? HTTPURLResponse, (error != nil || httpResponse.statusCode != 200) {
-                NSLog("DRM ckc request error - %@", error.debugDescription)
-                handler(nil, nil, nil)
-                return
-            }
-
-            handler(data, nil, "application/octet-stream")
-        }.resume()
+        if let processSpcUrl = parentView?.processSpcUrl {
+            let ckcRequest = NSMutableURLRequest(url: NSURL(string: processSpcUrl)! as URL)
+            ckcRequest.httpMethod = "POST"
+            ckcRequest.httpBody = spcData
+            ckcRequest.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+            
+            URLSession.shared.dataTask(with: ckcRequest as URLRequest) { (data, response, error) in
+                if let httpResponse = response as? HTTPURLResponse, (error != nil || httpResponse.statusCode != 200) {
+                    NSLog("DRM ckc request error - %@", error.debugDescription)
+                    handler(nil, nil, nil)
+                    return
+                }
+                
+                handler(data, nil, "application/octet-stream")
+            }.resume()
+        }
     }
 
     // MARK: - AV Picture In Picture Delegate
@@ -226,7 +230,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
 //        if (keyPath == "playbackLikelyToKeepUp") {
-//            parentView.playerViewController.player.play()
+//            parentView?.playerViewController.player.play()
 //        }
     }
 
@@ -258,70 +262,72 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayerContentIsBuffering(_ player:JWPlayer) {
         super.jwplayerContentIsBuffering(player)
-        parentView.onBuffer?([:])
+        parentView?.onBuffer?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, isBufferingWithReason reason:JWBufferReason) {
         super.jwplayer(player, isBufferingWithReason:reason)
-        parentView.onBuffer?([:])
+        parentView?.onBuffer?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, updatedBuffer percent:Double, position time:JWTimeData) {
         super.jwplayer(player, updatedBuffer:percent, position:time)
-        parentView.onUpdateBuffer?(["percent": percent, "position": time as Any])
+        parentView?.onUpdateBuffer?(["percent": percent, "position": time as Any])
     }
 
     override func jwplayer(_ player:JWPlayer, didFinishLoadingWithTime loadTime:TimeInterval) {
         super.jwplayer(player, didFinishLoadingWithTime:loadTime)
-        parentView.onLoaded?([:])
+        parentView?.onLoaded?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, isAttemptingToPlay playlistItem:JWPlayerItem, reason:JWPlayReason) {
         super.jwplayer(player, isAttemptingToPlay:playlistItem, reason:reason)
-        parentView.onAttemptPlay?([:])
+        parentView?.onAttemptPlay?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, isPlayingWithReason reason:JWPlayReason) {
         super.jwplayer(player, isPlayingWithReason:reason)
         
-        parentView.onPlay?([:])
+        parentView?.onPlay?([:])
 
-        parentView.userPaused = false
-        parentView.wasInterrupted = false
+        parentView?.userPaused = false
+        parentView?.wasInterrupted = false
     }
 
     override func jwplayer(_ player:JWPlayer, willPlayWithReason reason:JWPlayReason) {
         super.jwplayer(player, willPlayWithReason:reason)
-        parentView.onBeforePlay?([:])
+        parentView?.onBeforePlay?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, didPauseWithReason reason:JWPauseReason) {
         super.jwplayer(player, didPauseWithReason:reason)
-        parentView.onPause?([:])
+        parentView?.onPause?([:])
 
-        if !parentView.wasInterrupted {
-            parentView.userPaused = true
+        if let wasInterrupted = parentView?.wasInterrupted {
+            if !wasInterrupted {
+                parentView?.userPaused = true
+            }
         }
     }
 
     override func jwplayer(_ player:JWPlayer, didBecomeIdleWithReason reason:JWIdleReason) {
         super.jwplayer(player, didBecomeIdleWithReason:reason)
-        parentView.onIdle?([:])
+        parentView?.onIdle?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, isVisible:Bool) {
         super.jwplayer(player, isVisible:isVisible)
-        parentView.onVisible?(["visible": isVisible])
+        parentView?.onVisible?(["visible": isVisible])
     }
 
     override func jwplayerContentWillComplete(_ player:JWPlayer) {
         super.jwplayerContentWillComplete(player)
-        parentView.onBeforeComplete?([:])
+        parentView?.onBeforeComplete?([:])
     }
 
     override func jwplayerContentDidComplete(_ player:JWPlayer) {
         super.jwplayerContentDidComplete(player)
-        parentView.onComplete?([:])
+        parentView?.onComplete?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, didLoadPlaylistItem item:JWPlayerItem, at index:UInt) {
@@ -377,7 +383,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         do {
             let data:Data! = try JSONSerialization.data(withJSONObject: item.toJSONObject(), options:.prettyPrinted)
 
-            parentView.onPlaylistItem?(["playlistItem": String(data:data, encoding:String.Encoding.utf8) as Any, "index": index])
+            parentView?.onPlaylistItem?(["playlistItem": String(data:data, encoding:String.Encoding.utf8) as Any, "index": index])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
@@ -444,7 +450,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         do {
             let data:Data! = try JSONSerialization.data(withJSONObject: playlistArray as Any, options:.prettyPrinted)
 
-            parentView.onPlaylist?(["playlist": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            parentView?.onPlaylist?(["playlist": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
@@ -452,7 +458,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayerPlaylistHasCompleted(_ player:JWPlayer) {
         super.jwplayerPlaylistHasCompleted(player)
-        parentView.onPlaylistComplete?([:])
+        parentView?.onPlaylistComplete?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, usesMediaType type:JWMediaType) {
@@ -461,17 +467,17 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayer(_ player:JWPlayer, seekedFrom oldPosition:TimeInterval, to newPosition:TimeInterval) {
         super.jwplayer(player, seekedFrom:oldPosition, to:newPosition)
-        parentView.onSeek?(["from": oldPosition, "to": newPosition])
+        parentView?.onSeek?(["from": oldPosition, "to": newPosition])
     }
 
     override func jwplayerHasSeeked(_ player:JWPlayer) {
         super.jwplayerHasSeeked(player)
-        parentView.onSeeked?([:])
+        parentView?.onSeeked?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, playbackRateChangedTo rate:Double, at time:TimeInterval) {
         super.jwplayer(player, playbackRateChangedTo:rate, at:time)
-        parentView.onRateChanged?(["rate": rate, "at": time])
+        parentView?.onRateChanged?(["rate": rate, "at": time])
     }
 
     override func jwplayer(_ player:JWPlayer, updatedCues cues:[JWCue]) {
@@ -482,24 +488,24 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayer(_ player: JWPlayer, adEvent event: JWAdEvent) {
         super.jwplayer(player, adEvent:event)
-        parentView.onAdEvent?(["client": event.client, "type": event.type])
+        parentView?.onAdEvent?(["client": event.client, "type": event.type])
     }
 
     // MARK: - JWPlayer Cast Delegate
 
     override func castController(_ controller:JWCastController, castingBeganWithDevice device:JWCastingDevice) {
         super.castController(controller, castingBeganWithDevice:device)
-        parentView.onCasting?([:])
+        parentView?.onCasting?([:])
     }
 
     override func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
         super.castController(controller, castingEndedWithError:error)
-        parentView.onCastingEnded?(["error": error as Any])
+        parentView?.onCastingEnded?(["error": error as Any])
     }
 
     override func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
         super.castController(controller, castingFailedWithError:error)
-        parentView.onCastingFailed?(["error": error as Any])
+        parentView?.onCastingFailed?(["error": error as Any])
     }
 
     override func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
@@ -511,7 +517,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         do {
             let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
 
-            parentView.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            parentView?.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
@@ -519,21 +525,21 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
         super.castController(controller, connectionFailedWithError:error)
-        parentView.onConnectionFailed?(["error": error as Any])
+        parentView?.onConnectionFailed?(["error": error as Any])
     }
 
     override func castController(_ controller:JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
         super.castController(controller, connectionRecoveredWithDevice:device)
-        parentView.onConnectionRecovered?([:])
+        parentView?.onConnectionRecovered?([:])
     }
 
     override func castController(_ controller:JWCastController, connectionSuspendedWithDevice device:JWCastingDevice) {
         super.castController(controller, connectionSuspendedWithDevice:device)
-        parentView.onConnectionTemporarilySuspended?([:])
+        parentView?.onConnectionTemporarilySuspended?([:])
     }
     
     override func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
-        parentView.availableDevices = devices
+        parentView?.availableDevices = devices
 
         var devicesInfo: [[String: Any]] = []
         for device in devices {
@@ -548,7 +554,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         do {
             let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
 
-            parentView.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+            parentView?.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
         } catch {
             print("Error converting dictionary to JSON data: \(error)")
         }
@@ -556,14 +562,14 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
         super.castController(controller, disconnectedWithError:error)
-        parentView.onDisconnectedFromCastingDevice?(["error": error as Any])
+        parentView?.onDisconnectedFromCastingDevice?(["error": error as Any])
     }
 
     // MARK: - JWPlayer AV Delegate
 
     override func jwplayer(_ player:JWPlayer, audioTracksUpdated levels:[JWMediaSelectionOption]) {
         super.jwplayer(player, audioTracksUpdated:levels)
-        parentView.onAudioTracks?([:])
+        parentView?.onAudioTracks?([:])
     }
 
     override func jwplayer(_ player:JWPlayer, audioTrackChanged currentLevel:Int) {
@@ -596,7 +602,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
             let orientation = UIDevice.current.orientation
             switch orientation {             
             case .portrait, .portraitUpsideDown:
-                if self.parentView.currentConfig["exitFullScreenOnPortrait"] as? Bool ?? false {
+                if self.parentView?.currentConfig["exitFullScreenOnPortrait"] as? Bool ?? false {
                     super.dismissFullScreen(animated: true)
                 }
             default:
