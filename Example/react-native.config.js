@@ -1,0 +1,51 @@
+module.exports = {
+  project: {
+    android: {
+      unstable_reactLegacyComponentNames: [
+        'react-native-bootsplash',
+        'react-native-device-info',
+        'react-native-fs',
+        'react-native-gesture-handler',
+        'react-native-jw-media-player',
+        'react-native-orientation-locker',
+        'react-native-safe-area-context',
+        'react-native-screens',
+        'react-native-vector-icons',
+        'rn-iphone-helper',
+        '@react-navigation/native',
+        '@react-navigation/native-stack',
+      ],
+    },
+    ios: {
+      unstable_reactLegacyComponentNames: [
+        'react-native-bootsplash',
+        'react-native-device-info',
+        'react-native-fs',
+        'react-native-gesture-handler',
+        'react-native-jw-media-player',
+        'react-native-orientation-locker',
+        'react-native-safe-area-context',
+        'react-native-screens',
+        'react-native-vector-icons',
+        'rn-iphone-helper',
+        '@react-navigation/native',
+        '@react-navigation/native-stack',
+      ],
+    },
+  },
+};
+
+// "@react-navigation/native": "6.1.7",
+//  "@react-navigation/native-stack": "6.9.13",
+//     "react": "18.2.0",
+//     "react-native": "0.73.2",
+//     "react-native-bootsplash": "4.1.5",
+//     "react-native-device-info": "9.0.2",
+//     "react-native-fs": "2.16.6",
+//     "react-native-gesture-handler": "2.12.1",
+//     "react-native-jw-media-player": "../../react-native-jw-media-player",
+//     "react-native-orientation-locker": "1.5.0",
+//     "react-native-safe-area-context": "4.7.2",
+//     "react-native-screens": "3.25.0",
+//     "react-native-vector-icons": "10.0.0",
+//     "rn-iphone-helper": "2.0.0"
