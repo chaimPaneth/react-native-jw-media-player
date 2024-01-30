@@ -12,13 +12,6 @@
     <!--    READ_MEDIA_IMAGES, READ_MEDIA_VIDEO or READ_MEDIA_AUDIO.-->
 
     <application>
-        <receiver 
-            android:name="androidx.media.session.MediaButtonReceiver" 
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
         <service
             android:name="com.jwplayer.pub.api.background.MediaService"
             android:exported="false">
