@@ -276,6 +276,7 @@ declare module "react-native-jw-media-player" {
   type NativeWarning = (event: BaseEvent<PlayerWarningEventProps>) => void;
   interface PropsType {
     config: Config;
+    jwConfig: object; // JSON object (JW player config)
     style?: ViewStyle;
     controls?: boolean;
     onPlayerReady?: () => void;

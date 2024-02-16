@@ -34,6 +34,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.jwplayer.pub.api.JsonHelper;
 import com.jwplayer.pub.api.JWPlayer;
 import com.jwplayer.pub.api.UiGroup;
 import com.jwplayer.pub.api.background.MediaServiceController;
@@ -105,6 +106,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
 
 public class RNJWPlayerView extends RelativeLayout implements
         VideoPlayerEvents.OnFullscreenListener,
@@ -616,6 +619,53 @@ public class RNJWPlayerView extends RelativeLayout implements
     private void setupPlayer(ReadableMap prop) {
         PlayerConfig.Builder configBuilder = new PlayerConfig.Builder();
 
+        // Dump old player and setback up
+        Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+        this.destroyPlayer();
+        mPlayerView = new RNJWPlayer(simpleContext);
+
+        mPlayerView.setFocusable(true);
+        mPlayerView.setFocusableInTouchMode(true);
+
+        setLayoutParams(
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mPlayerView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+        addView(mPlayerView);
+
+        if (prop.hasKey("controls")) { // Hack for controls hiding not working right away
+            mPlayerView.getPlayer().setControls(prop.getBoolean("controls"));
+        }
+
+        if (prop.hasKey("fullScreenOnLandscape")) {
+            fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
+            mPlayerView.fullScreenOnLandscape = fullScreenOnLandscape;
+        }
+
+        if (prop.hasKey("exitFullScreenOnPortrait")) {
+            exitFullScreenOnPortrait = prop.getBoolean("exitFullScreenOnPortrait");
+            mPlayerView.exitFullScreenOnPortrait = exitFullScreenOnPortrait;
+        }
+
+        mPlayer = mPlayerView.getPlayer();
+        // END dump old player and setback up
+
+        // TODO check if I'm a JW config before doign below
+        JSONObject obj;
+        PlayerConfig temp = null;
+        try {
+            obj = MapUtil.toJSONObject(prop);
+            temp = JsonHelper.parseConfigJson(obj);
+        } catch (Exception ex) {
+            Log.e("RNJWPlayerView", ex.toString());
+        }
+        if (temp != null) {
+            mPlayer.setup(temp);
+            return;
+        } 
+
+        // MOVE ON TO NON-JW CONFIG
         if (playlistNotTheSame(prop)) {
             List<PlaylistItem> playlist = new ArrayList<>();
             mPlaylistProp = prop.getArray("playlist");
@@ -707,38 +757,6 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
 
         PlayerConfig playerConfig = configBuilder.build();
-
-        Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
-
-        this.destroyPlayer();
-
-        mPlayerView = new RNJWPlayer(simpleContext);
-        
-        mPlayerView.setFocusable(true);
-        mPlayerView.setFocusableInTouchMode(true);
-
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mPlayerView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT));
-        addView(mPlayerView);
-
-        if (prop.hasKey("controls")) { // Hack for controls hiding not working right away
-            mPlayerView.getPlayer().setControls(prop.getBoolean("controls"));
-        }
-
-        if (prop.hasKey("fullScreenOnLandscape")) {
-            fullScreenOnLandscape = prop.getBoolean("fullScreenOnLandscape");
-            mPlayerView.fullScreenOnLandscape = fullScreenOnLandscape;
-        }
-
-        if (prop.hasKey("exitFullScreenOnPortrait")) {
-            exitFullScreenOnPortrait = prop.getBoolean("exitFullScreenOnPortrait");
-            mPlayerView.exitFullScreenOnPortrait = exitFullScreenOnPortrait;
-        }
-
-        mPlayer = mPlayerView.getPlayer();
-        mPlayer.setup(playerConfig);
 
         if (mActivity != null && prop.hasKey("pipEnabled")) {
             boolean pipEnabled = prop.getBoolean("pipEnabled");
