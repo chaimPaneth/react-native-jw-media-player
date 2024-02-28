@@ -1,11 +1,11 @@
 {
   "name": "react-native-jw-media-player",
-  "version": "0.2.44",
+  "version": "0.2.43",
   "description": "React-native Android/iOS plugin for JWPlayer SDK (https://www.jwplayer.com/)",
-  "main": "index.js",
-  "types": "./index.d.ts",
+  "main": "src/index.js",
+  "types": "src/types.ts",
   "scripts": {
-    "lint": "eslint index.js example/index.js example/src"
+    "lint": "eslint index.js Example/index.js Example/src"
   },
   "pre-commit": [
     "lint"
@@ -36,5 +36,27 @@
     "react": ">= 18.2.0",
     "react-native": ">= 0.72.5",
     "lodash": ">= 4.17.21"
+  },
+  "files": [
+    "src",
+    "android",
+    "ios",
+    "RNJWPlayer.podspec",
+    "!android/build",
+    "!ios/build",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "common/",
+    "lib/",
+    "react-native.config.js"
+  ],
+  "codegenConfig": {
+    "name": "rnjwplayer",
+    "type": "components",
+    "jsSrcsDir": "./src",
+    "android": {
+      "javaPackageName": "com.appgoalz.rnjwplayer"
+    }
   }
 }

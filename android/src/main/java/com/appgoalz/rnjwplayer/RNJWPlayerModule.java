@@ -222,7 +222,7 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
             for (int i = 0; i < qualityLevelsList.size(); i++) {
               WritableMap qualityLevel = Arguments.createMap();
               QualityLevel level = qualityLevelsList.get(i);
-              qualityLevel.putInt("playListPosition", level.getPlaylistPosition());
+              qualityLevel.putInt("playlistPosition", level.getPlaylistPosition());
               qualityLevel.putInt("bitRate", level.getBitrate());
               qualityLevel.putString("label", level.getLabel());
               qualityLevel.putInt("height", level.getHeight());
