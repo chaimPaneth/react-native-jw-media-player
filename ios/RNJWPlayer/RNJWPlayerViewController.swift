@@ -10,8 +10,11 @@ import AVFoundation
 import AVKit
 import MediaPlayer
 import React
-import GoogleCast
 import JWPlayerKit
+
+#if USE_GOOGLE_CAST
+    import GoogleCast
+#endif
 
 class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource {
 
@@ -492,7 +495,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     }
 
     // MARK: - JWPlayer Cast Delegate
-
+#if USE_GOOGLE_CAST
     override func castController(_ controller:JWCastController, castingBeganWithDevice device:JWCastingDevice) {
         super.castController(controller, castingBeganWithDevice:device)
         parentView?.onCasting?([:])
@@ -564,6 +567,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         super.castController(controller, disconnectedWithError:error)
         parentView?.onDisconnectedFromCastingDevice?(["error": error as Any])
     }
+#endif
 
     // MARK: - JWPlayer AV Delegate
 
