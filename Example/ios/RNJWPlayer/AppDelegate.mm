@@ -7,18 +7,23 @@
 #import "Orientation.h"
 #import "RNFSManager.h"
 #import "RNBootSplash.h"
-#import <GoogleCast/GoogleCast.h>
 
-static NSString *const kReceiverAppID = @"RNJWPlayer";
+#if USE_GOOGLE_CAST
+  #import <GoogleCast/GoogleCast.h>
+
+  static NSString *const kReceiverAppID = @"RNJWPlayer";
+#endif
 
 @implementation AppDelegate
 
 -(void)initApis:(UIApplication *)application launchOptions:(NSDictionary *)launchOptions
 {
-  GCKDiscoveryCriteria *criteria = [[GCKDiscoveryCriteria alloc]
-                                    initWithApplicationID:kReceiverAppID];
-  GCKCastOptions *options = [[GCKCastOptions alloc] initWithDiscoveryCriteria:criteria];
-  [GCKCastContext setSharedInstanceWithOptions:options];
+  #if USE_GOOGLE_CAST
+    GCKDiscoveryCriteria *criteria = [[GCKDiscoveryCriteria alloc]
+                                      initWithApplicationID:kReceiverAppID];
+    GCKCastOptions *options = [[GCKCastOptions alloc] initWithDiscoveryCriteria:criteria];
+    [GCKCastContext setSharedInstanceWithOptions:options];
+  #endif
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

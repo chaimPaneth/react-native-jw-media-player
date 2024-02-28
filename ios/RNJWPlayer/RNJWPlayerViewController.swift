@@ -10,11 +10,14 @@ import AVFoundation
 import AVKit
 import MediaPlayer
 import React
-import GoogleCast
 import JWPlayerKit
 
+#if USE_GOOGLE_CAST
+    import GoogleCast
+#endif
+
 class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource {
-    
+
     var parentView:RNJWPlayerView!
 
     func setDelegates() {
@@ -155,27 +158,27 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
         parentView?.onFullScreenExit?([:])
     }
-    
+
     func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method:JWRelatedInteraction) {
 
     }
-    
+
     func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerKit.JWPlayerItem], withMethod method: JWPlayerKit.JWRelatedInteraction) {
-        
+
     }
-    
+
     func playerViewController(_ controller: JWPlayerKit.JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerKit.JWPlayerItem, atIndex index: Int, withMethod method: JWPlayerKit.JWRelatedMethod) {
-        
+
     }
 
     // MARK: Time events
 
-    func onAdTimeEvent(time:JWTimeData) {
+    override func onAdTimeEvent(_ time:JWTimeData) {
         super.onAdTimeEvent(time)
         parentView?.onAdTime?(["position": time.position, "duration": time.duration])
     }
 
-    func onMediaTimeEvent(time:JWTimeData) {
+    override func onMediaTimeEvent(_ time:JWTimeData) {
         super.onMediaTimeEvent(time)
         parentView?.onTime?(["position": time.position, "duration": time.duration])
     }
@@ -191,7 +194,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         guard let fairplayCertUrlString = parentView?.fairplayCertUrl, let fairplayCertUrl = URL(string: fairplayCertUrlString) else {
             return
         }
-        
+
         let request = URLRequest(url: fairplayCertUrl)
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
@@ -201,7 +204,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         }
         task.resume()
     }
-    
+
     func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
         if parentView?.processSpcUrl == nil {
             return
@@ -212,21 +215,21 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
             ckcRequest.httpMethod = "POST"
             ckcRequest.httpBody = spcData
             ckcRequest.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-            
+
             URLSession.shared.dataTask(with: ckcRequest as URLRequest) { (data, response, error) in
                 if let httpResponse = response as? HTTPURLResponse, (error != nil || httpResponse.statusCode != 200) {
                     NSLog("DRM ckc request error - %@", error.debugDescription)
                     handler(nil, nil, nil)
                     return
                 }
-                
+
                 handler(data, nil, "application/octet-stream")
             }.resume()
         }
     }
 
     // MARK: - AV Picture In Picture Delegate
-    
+
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
 //        if (keyPath == "playbackLikelyToKeepUp") {
@@ -287,7 +290,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayer(_ player:JWPlayer, isPlayingWithReason reason:JWPlayReason) {
         super.jwplayer(player, isPlayingWithReason:reason)
-        
+
         parentView?.onPlay?([:])
 
         parentView?.userPaused = false
@@ -332,7 +335,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayer(_ player:JWPlayer, didLoadPlaylistItem item:JWPlayerItem, at index:UInt) {
         super.jwplayer(player, didLoadPlaylistItem: item, at: index)
-        
+
 //        var sourceDict: [String: Any] = [:]
 //        var file: String?
 //
@@ -393,7 +396,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
 
     override func jwplayer(_ player:JWPlayer, didLoadPlaylist playlist:[JWPlayerItem]) {
         super.jwplayer(player, didLoadPlaylist: playlist)
-        
+
         let playlistArray:NSMutableArray! = NSMutableArray()
 
         for item:JWPlayerItem? in playlist {
@@ -492,7 +495,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     }
 
     // MARK: - JWPlayer Cast Delegate
-
+#if USE_GOOGLE_CAST
     override func castController(_ controller:JWCastController, castingBeganWithDevice device:JWCastingDevice) {
         super.castController(controller, castingBeganWithDevice:device)
         parentView?.onCasting?([:])
@@ -537,7 +540,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         super.castController(controller, connectionSuspendedWithDevice:device)
         parentView?.onConnectionTemporarilySuspended?([:])
     }
-    
+
     override func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
         parentView?.availableDevices = devices
 
@@ -564,6 +567,7 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
         super.castController(controller, disconnectedWithError:error)
         parentView?.onDisconnectedFromCastingDevice?(["error": error as Any])
     }
+#endif
 
     // MARK: - JWPlayer AV Delegate
 
@@ -595,12 +599,12 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
     override func jwplayer(_ player:JWPlayer, updatedCaptionList options:[JWMediaSelectionOption]) {
         super.jwplayer(player, updatedCaptionList:options)
     }
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         coordinator.animate(alongsideTransition: { _ in
             let orientation = UIDevice.current.orientation
-            switch orientation {             
+            switch orientation {
             case .portrait, .portraitUpsideDown:
                 if self.parentView?.currentConfig["exitFullScreenOnPortrait"] as? Bool ?? false {
                     super.dismissFullScreen(animated: true)
@@ -610,5 +614,5 @@ class RNJWPlayerViewController : JWPlayerViewController, JWPlayerViewControllerD
             }
         })
     }
-    
+
 }

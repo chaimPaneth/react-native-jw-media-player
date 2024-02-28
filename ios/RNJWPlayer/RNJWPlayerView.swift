@@ -10,8 +10,11 @@ import AVFoundation
 import AVKit
 import MediaPlayer
 import React
-import GoogleCast
 import JWPlayerKit
+
+#if USE_GOOGLE_CAST
+    import GoogleCast
+#endif
 
 class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate {
     
@@ -326,7 +329,9 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     }
 
     @objc func setControls(_ controls:Bool) {
-        self.toggleUIGroup(view: playerViewController.view, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
+        if let playerViewControllerView = playerViewController?.view {
+            self.toggleUIGroup(view: playerViewControllerView, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
+        }
     }
 
     // MARK: - RNJWPlayer styling
@@ -1039,14 +1044,14 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     func playerViewController(_ controller: JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerItem, atIndex index: Int, withMethod method: JWRelatedMethod) {
         
     }
-    
+
     // MARK: Time events
 
-    func onAdTimeEvent(time:JWTimeData) {
+    override func onAdTimeEvent(_ time:JWTimeData) {
         self.onAdTime?(["position": time.position, "duration": time.duration])
     }
 
-    func onMediaTimeEvent(time:JWTimeData) {
+    override func onMediaTimeEvent(_ time:JWTimeData) {
         self.onTime?(["position": time.position, "duration": time.duration])
     }
 
@@ -1354,7 +1359,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     }
 
 // pragma Mark - Casting methods
-
+#if USE_GOOGLE_CAST
     func setUpCastController() {
         if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
            castController = JWCastController(player:playerView.player)
@@ -1498,6 +1503,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
         self.onDisconnectedFromCastingDevice?(["error": error as Any])
     }
+#endif
 
     // MARK: - JWPlayer AV Delegate
 
