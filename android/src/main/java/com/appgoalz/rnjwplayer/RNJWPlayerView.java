@@ -172,7 +172,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     private ViewGroup mRootView;
 
-    //Props
+    // Props
     ReadableMap mConfig = null;
     ReadableArray mPlaylistProp = null;
     ReadableMap mColors = null;
@@ -232,9 +232,8 @@ public class RNJWPlayerView extends RelativeLayout implements
                 context.getResources().getConfiguration() == null;
     }
 
-
     private static Context getNonBuggyContext(ThemedReactContext reactContext,
-                                              ReactApplicationContext appContext) {
+            ReactApplicationContext appContext) {
         Context superContext = reactContext;
         if (!contextHasBug(appContext.getCurrentActivity())) {
             superContext = appContext.getCurrentActivity();
@@ -463,7 +462,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
 
             // Initialize a new rendering surface.
-//                        mPlayerView.initializeSurface();
+            // mPlayerView.initializeSurface();
 
             // Add the JWPlayerView to the RootView as soon as the UI thread is ready.
             mRootView.post(new Runnable() {
@@ -471,8 +470,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 public void run() {
                     mRootView.addView(mPlayerView, new ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                    ));
+                            ViewGroup.LayoutParams.MATCH_PARENT));
                 }
             });
 
@@ -505,9 +503,9 @@ public class RNJWPlayerView extends RelativeLayout implements
                 public void run() {
                     mPlayerViewContainer.addView(mPlayerView, new ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                    ));
-                    mPlayerView.layout(mPlayerViewContainer.getLeft(), mPlayerViewContainer.getTop(), mPlayerViewContainer.getRight(), mPlayerViewContainer.getBottom());
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    mPlayerView.layout(mPlayerViewContainer.getLeft(), mPlayerViewContainer.getTop(),
+                            mPlayerViewContainer.getRight(), mPlayerViewContainer.getBottom());
                 }
             });
 
@@ -531,23 +529,23 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         @Override
         public void updateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "updateLayoutParams: "+layoutParams );
+            // View.setSystemUiVisibility(int).
+            // Log.e(TAG, "updateLayoutParams: "+layoutParams );
         }
 
         @Override
         public void setUseFullscreenLayoutFlags(boolean b) {
-//        View.setSystemUiVisibility(int).
-//        Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
+            // View.setSystemUiVisibility(int).
+            // Log.e(TAG, "setUseFullscreenLayoutFlags: "+b );
         }
     }
 
-
-
     public void setConfig(ReadableMap prop) {
         if (mConfig == null || !mConfig.equals(prop)) {
-            if (mConfig != null && isOnlyDiff(prop, "playlist") && mPlayer != null) {
-                mPlaylistProp = prop.getArray("playlist");
+            // TODO what if playlist is a url or something?
+            // TODO How to handle a jwConfig vs old config
+            if (mConfig != null && isOnlyDiff(prop, "playlist") && mPlayer != null) { // still safe check, even with JW
+                                                                                      // JSON change
                 PlayerConfig oldConfig = mPlayer.getConfig();
                 PlayerConfig config = new PlayerConfig.Builder()
                         .autostart(oldConfig.getAutostart())
@@ -613,15 +611,136 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     boolean playlistNotTheSame(ReadableMap prop) {
-        return prop.hasKey("playlist") && mPlaylistProp != prop.getArray("playlist") && !Arrays.deepEquals(new ReadableArray[]{mPlaylistProp}, new ReadableArray[]{prop.getArray("playlist")});
+        return prop.hasKey("playlist") && mPlaylistProp != prop.getArray("playlist") && !Arrays
+                .deepEquals(new ReadableArray[] { mPlaylistProp }, new ReadableArray[] { prop.getArray("playlist") });
     }
 
     private void setupPlayer(ReadableMap prop) {
+        // Legacy
         PlayerConfig.Builder configBuilder = new PlayerConfig.Builder();
 
-        // Dump old player and setback up
+        // TODO check if I'm a JW config before doign below
+        JSONObject obj;
+        PlayerConfig jwConfig = null;
+        Boolean isJwConfig = false;
+        try {
+            obj = MapUtil.toJSONObject(prop);
+            jwConfig = JsonHelper.parseConfigJson(obj);
+            isJwConfig = true;
+        } catch (Exception ex) {
+            Log.e("RNJWPlayerView", ex.toString());
+        }
+
+        // TODO TODO TODO -- Fix the reading of fields when isJwConfig is true
+
+        if (!isJwConfig) {
+            // Legacy
+            if (playlistNotTheSame(prop)) {
+                List<PlaylistItem> playlist = new ArrayList<>();
+                mPlaylistProp = prop.getArray("playlist");
+                if (mPlaylistProp != null && mPlaylistProp.size() > 0) {
+
+                    int j = 0;
+                    while (mPlaylistProp.size() > j) {
+                        ReadableMap playlistItem = mPlaylistProp.getMap(j);
+
+                        PlaylistItem newPlayListItem = Util.getPlaylistItem((playlistItem));
+                        playlist.add(newPlayListItem);
+                        j++;
+                    }
+                }
+
+                configBuilder.playlist(playlist);
+            }
+
+            // Legacy
+            if (prop.hasKey("autostart")) {
+                boolean autostart = prop.getBoolean("autostart");
+                configBuilder.autostart(autostart);
+            }
+
+            // Legacy
+            if (prop.hasKey("nextUpStyle")) {
+                ReadableMap nextUpStyle = prop.getMap("nextUpStyle");
+                if (nextUpStyle != null && nextUpStyle.hasKey("offsetSeconds")
+                        && nextUpStyle.hasKey("offsetPercentage")) {
+                    int offsetSeconds = prop.getInt("offsetSeconds");
+                    int offsetPercentage = prop.getInt("offsetPercentage");
+                    configBuilder.nextUpOffset(offsetSeconds).nextUpOffsetPercentage(offsetPercentage);
+                }
+            }
+
+            // Legacy
+            if (prop.hasKey("repeat")) {
+                boolean repeat = prop.getBoolean("repeat");
+                configBuilder.repeat(repeat);
+            }
+
+            // Legacy
+            if (prop.hasKey("styling")) {
+                ReadableMap styling = prop.getMap("styling");
+                if (styling != null) {
+                    if (styling.hasKey("displayDescription")) {
+                        boolean displayDescription = styling.getBoolean("displayDescription");
+                        configBuilder.displayDescription(displayDescription);
+                    }
+
+                    if (styling.hasKey("displayTitle")) {
+                        boolean displayTitle = styling.getBoolean("displayTitle");
+                        configBuilder.displayTitle(displayTitle);
+                    }
+
+                    if (styling.hasKey("colors")) {
+                        mColors = styling.getMap("colors");
+                    }
+                }
+            }
+
+            // Legacy
+            if (prop.hasKey("advertising")) {
+                ReadableMap ads = prop.getMap("advertising");
+                AdvertisingConfig advertisingConfig = RNJWPlayerAds.getAdvertisingConfig(ads);
+                if (advertisingConfig != null) {
+                    configBuilder.advertisingConfig(advertisingConfig);
+                }
+            }
+
+            // Legacy
+            if (prop.hasKey("stretching")) {
+                String stretching = prop.getString("stretching");
+                configBuilder.stretching(stretching);
+            }
+
+            // Legacy
+            // this isn't the ideal way to do controls...
+            // Better to just expose the `.setControls` method
+            if (prop.hasKey("controls")) {
+                boolean controls = prop.getBoolean("controls");
+                if (!controls) {
+                    UiConfig uiConfig = new UiConfig.Builder().hideAllControls().build();
+                    configBuilder.uiConfig(uiConfig);
+                }
+            }
+
+            // Legacy
+            if (prop.hasKey("hideUIGroups")) {
+                ReadableArray uiGroupsArray = prop.getArray("hideUIGroups");
+                UiConfig.Builder hideConfigBuilder = new UiConfig.Builder().displayAllControls();
+                for (int i = 0; i < uiGroupsArray.size(); i++) {
+                    UiGroup uiGroup = GROUP_TYPES.get(uiGroupsArray.getString(i));
+                    if (uiGroup != null) {
+                        hideConfigBuilder.hide(uiGroup);
+                    }
+                }
+                UiConfig hideJwControlbarUiConfig = hideConfigBuilder.build();
+                configBuilder.uiConfig(hideJwControlbarUiConfig);
+            }
+        }
+
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
+
         this.destroyPlayer();
+
         mPlayerView = new RNJWPlayer(simpleContext);
 
         mPlayerView.setFocusable(true);
@@ -649,114 +768,13 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
 
         mPlayer = mPlayerView.getPlayer();
-        // END dump old player and setback up
 
-        // TODO check if I'm a JW config before doign below
-        JSONObject obj;
-        PlayerConfig temp = null;
-        try {
-            obj = MapUtil.toJSONObject(prop);
-            temp = JsonHelper.parseConfigJson(obj);
-        } catch (Exception ex) {
-            Log.e("RNJWPlayerView", ex.toString());
+        if (isJwConfig) {
+            mPlayer.setup(jwConfig);
+        } else {
+            PlayerConfig playerConfig = configBuilder.build();
+            mPlayer.setup(playerConfig);
         }
-        if (temp != null) {
-            mPlayer.setup(temp);
-            return;
-        } 
-
-        // MOVE ON TO NON-JW CONFIG
-        if (playlistNotTheSame(prop)) {
-            List<PlaylistItem> playlist = new ArrayList<>();
-            mPlaylistProp = prop.getArray("playlist");
-            if (mPlaylistProp != null && mPlaylistProp.size() > 0) {
-
-                int j = 0;
-                while (mPlaylistProp.size() > j) {
-                    ReadableMap playlistItem = mPlaylistProp.getMap(j);
-
-                    PlaylistItem newPlayListItem = Util.getPlaylistItem((playlistItem));
-                    playlist.add(newPlayListItem);
-                    j++;
-                }
-            }
-
-            configBuilder.playlist(playlist);
-        }
-
-        if (prop.hasKey("autostart")) {
-            boolean autostart = prop.getBoolean("autostart");
-            configBuilder.autostart(autostart);
-        }
-
-        if (prop.hasKey("nextUpStyle")) {
-            ReadableMap nextUpStyle = prop.getMap("nextUpStyle");
-            if (nextUpStyle != null && nextUpStyle.hasKey("offsetSeconds") && nextUpStyle.hasKey("offsetPercentage")) {
-                int offsetSeconds = prop.getInt("offsetSeconds");
-                int offsetPercentage = prop.getInt("offsetPercentage");
-                configBuilder.nextUpOffset(offsetSeconds).nextUpOffsetPercentage(offsetPercentage);
-            }
-        }
-
-        if (prop.hasKey("repeat")) {
-            boolean repeat = prop.getBoolean("repeat");
-            configBuilder.repeat(repeat);
-        }
-
-        if (prop.hasKey("styling")) {
-            ReadableMap styling = prop.getMap("styling");
-            if (styling != null) {
-                if (styling.hasKey("displayDescription")) {
-                    boolean displayDescription = styling.getBoolean("displayDescription");
-                    configBuilder.displayDescription(displayDescription);
-                }
-
-                if (styling.hasKey("displayTitle")) {
-                    boolean displayTitle = styling.getBoolean("displayTitle");
-                    configBuilder.displayTitle(displayTitle);
-                }
-
-                if (styling.hasKey("colors")) {
-                    mColors = styling.getMap("colors");
-                }
-            }
-        }
-
-        if (prop.hasKey("advertising")) {
-            ReadableMap ads = prop.getMap("advertising");
-            AdvertisingConfig advertisingConfig = RNJWPlayerAds.getAdvertisingConfig(ads);
-            if (advertisingConfig != null) {
-                configBuilder.advertisingConfig(advertisingConfig);
-            }
-        }
-
-        if (prop.hasKey("stretching")) {
-            String stretching = prop.getString("stretching");
-            configBuilder.stretching(stretching);
-        }
-
-        if (prop.hasKey("controls")) {
-            boolean controls = prop.getBoolean("controls");
-            if (!controls) {
-                UiConfig uiConfig = new UiConfig.Builder().hideAllControls().build();
-                configBuilder.uiConfig(uiConfig);
-            }
-        }
-
-        if (prop.hasKey("hideUIGroups")) {
-            ReadableArray uiGroupsArray = prop.getArray("hideUIGroups");
-            UiConfig.Builder hideConfigBuilder = new UiConfig.Builder().displayAllControls();
-            for (int i = 0; i < uiGroupsArray.size(); i++) {
-                UiGroup uiGroup = GROUP_TYPES.get(uiGroupsArray.getString(i));
-                if (uiGroup != null) {
-                   hideConfigBuilder.hide(uiGroup);
-                }
-            }
-            UiConfig hideJwControlbarUiConfig =  hideConfigBuilder.build();
-            configBuilder.uiConfig(hideJwControlbarUiConfig);
-        }
-
-        PlayerConfig playerConfig = configBuilder.build();
 
         if (mActivity != null && prop.hasKey("pipEnabled")) {
             boolean pipEnabled = prop.getBoolean("pipEnabled");
@@ -767,6 +785,8 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
+        // Legacy
+        // This isn't the ideal way to do this on Android
         if (mColors != null) {
             if (mColors.hasKey("backgroundColor")) {
                 mPlayerView.setBackgroundColor(Color.parseColor("#" + mColors.getString("backgroundColor")));
@@ -777,29 +797,35 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
 
             if (mColors.hasKey("timeslider")) {
-                CueMarkerSeekbar seekBar = findViewById(R.id.controlbar_seekbar);
+                CueMarkerSeekbar seekBar = findViewById(com.longtailvideo.jwplayer.R.id.controlbar_seekbar);
                 ReadableMap timeslider = mColors.getMap("timeslider");
                 if (timeslider != null) {
                     LayerDrawable progressDrawable = (LayerDrawable) seekBar.getProgressDrawable();
 
                     if (timeslider.hasKey("progress")) {
-//                    seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#" + timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
+                        // seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#" +
+                        // timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
                         Drawable processDrawable = progressDrawable.findDrawableByLayerId(android.R.id.progress);
-                        processDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("progress")), PorterDuff.Mode.SRC_IN);
+                        processDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("progress")),
+                                PorterDuff.Mode.SRC_IN);
                     }
 
                     if (timeslider.hasKey("buffer")) {
-                        Drawable secondaryProgressDrawable = progressDrawable.findDrawableByLayerId(android.R.id.secondaryProgress);
-                        secondaryProgressDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("buffer")), PorterDuff.Mode.SRC_IN);
+                        Drawable secondaryProgressDrawable = progressDrawable
+                                .findDrawableByLayerId(android.R.id.secondaryProgress);
+                        secondaryProgressDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("buffer")),
+                                PorterDuff.Mode.SRC_IN);
                     }
 
                     if (timeslider.hasKey("rail")) {
                         Drawable backgroundDrawable = progressDrawable.findDrawableByLayerId(android.R.id.background);
-                        backgroundDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("rail")), PorterDuff.Mode.SRC_IN);
+                        backgroundDrawable.setColorFilter(Color.parseColor("#" + timeslider.getString("rail")),
+                                PorterDuff.Mode.SRC_IN);
                     }
 
                     if (timeslider.hasKey("thumb")) {
-                        seekBar.getThumb().setColorFilter(Color.parseColor("#" + timeslider.getString("thumb")), PorterDuff.Mode.SRC_IN);
+                        seekBar.getThumb().setColorFilter(Color.parseColor("#" + timeslider.getString("thumb")),
+                                PorterDuff.Mode.SRC_IN);
                     }
                 }
             }
@@ -816,15 +842,17 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         if (backgroundAudioEnabled) {
             audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
-            mMediaServiceController = new MediaServiceController.Builder((AppCompatActivity) mActivity, mPlayer).build();
-            doBindService();
+            // Throws a fatal error if using a playlistURL instead of manually created playlist
+            // Related to SDK-11346
+            mMediaServiceController = new MediaServiceController.Builder((AppCompatActivity) mActivity, mPlayer)
+                    .build();
         }
     }
 
     // Audio Focus
 
     public void requestAudioFocus() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (hasAudioFocus) {
                 return;
             }
@@ -837,12 +865,12 @@ public class RNJWPlayerView extends RelativeLayout implements
                 focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                         .setAudioAttributes(playbackAttributes)
                         .setAcceptsDelayedFocusGain(true)
-//                    .setWillPauseWhenDucked(true)
+                        // .setWillPauseWhenDucked(true)
                         .setOnAudioFocusChangeListener(this)
                         .build();
 
                 int res = audioManager.requestAudioFocus(focusRequest);
-                synchronized(focusLock) {
+                synchronized (focusLock) {
                     if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
                         playbackNowAuthorized = false;
                     } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -855,8 +883,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 }
                 Log.e(TAG, "audioRequest: " + res);
             }
-        }
-        else {
+        } else {
             int result = 0;
             if (audioManager != null) {
                 if (hasAudioFocus) {
@@ -916,7 +943,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         if (playbackDelayed || !userPaused) {
-                            synchronized(focusLock) {
+                            synchronized (focusLock) {
                                 playbackDelayed = false;
                             }
 
@@ -930,7 +957,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS:
                         mPlayer.pause();
-                        synchronized(focusLock) {
+                        synchronized (focusLock) {
                             wasInterrupted = true;
                             playbackDelayed = false;
                         }
@@ -938,7 +965,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                         mPlayer.pause();
-                        synchronized(focusLock) {
+                        synchronized (focusLock) {
                             wasInterrupted = true;
                             playbackDelayed = false;
                         }
@@ -1156,9 +1183,10 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
-        if (backgroundAudioEnabled) {
-            doBindService();
-        }
+        // Ideally done in onFirstFrame instead
+        // if (backgroundAudioEnabled) {
+        //     doBindService();
+        // }
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onBeforePlay");
@@ -1226,7 +1254,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         Exception ex = errorEvent.getException();
         if (ex != null) {
             event.putString("error", ex.toString());
-            event.putString("description",  errorEvent.getMessage());
+            event.putString("description", errorEvent.getMessage());
         }
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerError", event);
 
@@ -1235,13 +1263,16 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onFirstFrame(FirstFrameEvent firstFrameEvent) {
-
+        if (backgroundAudioEnabled) {
+            doBindService();
+            requestAudioFocus();
+        }
     }
 
     @Override
     public void onFullscreen(FullscreenEvent fullscreenEvent) {
         if (fullscreenEvent.getFullscreen()) {
-            if(mPlayerView != null){
+            if (mPlayerView != null) {
                 mPlayerView.requestFocus();
             }
 
@@ -1281,10 +1312,11 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onPlay(PlayEvent playEvent) {
-        if (backgroundAudioEnabled) {
-            doBindService();
-            requestAudioFocus();
-        }
+        // Ideally done in onFirstFrame instead
+        // if (backgroundAudioEnabled) {
+        //     doBindService();
+        //     requestAudioFocus();
+        // }
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlay");
@@ -1307,15 +1339,16 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onPlaylistItem(PlaylistItemEvent playlistItemEvent) {
-        if (backgroundAudioEnabled) {
-            doBindService();
-        }
+        // Ideally done in onFirstFrame instead
+        // if (backgroundAudioEnabled) {
+        //     doBindService();
+        // }
 
         currentPlayingIndex = playlistItemEvent.getIndex();
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlaylistItem");
-        event.putInt("index",playlistItemEvent.getIndex());
+        event.putInt("index", playlistItemEvent.getIndex());
         Gson gson = new Gson();
         String json = gson.toJson(playlistItemEvent.getPlaylistItem());
         event.putString("playlistItem", json);
@@ -1423,7 +1456,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     @Override
     public void onHostResume() {
         sessionDepth++;
-        if(sessionDepth == 1){
+        if (sessionDepth == 1) {
             isInBackground = false;
         }
     }
@@ -1446,10 +1479,9 @@ public class RNJWPlayerView extends RelativeLayout implements
     private final Map<String, Integer> CLIENT_TYPES = MapBuilder.of(
             "vast", 0,
             "ima", 1,
-            "ima_dai", 2
-    );
+            "ima_dai", 2);
 
-    private final Map<String, UiGroup> GROUP_TYPES =  ImmutableMap.<String, UiGroup>builder()
+    private final Map<String, UiGroup> GROUP_TYPES = ImmutableMap.<String, UiGroup>builder()
             .put("overlay", UiGroup.OVERLAY)
             .put("control_bar", UiGroup.CONTROLBAR)
             .put("center_controls", UiGroup.CENTER_CONTROLS)

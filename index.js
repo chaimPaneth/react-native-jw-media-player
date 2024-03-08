@@ -169,6 +169,8 @@ const advertisingPropTypes = PropTypes.oneOfType([
 ]);
 
 export default class JWPlayer extends Component {
+	// TODO add in the updated JW stuff?
+	// TODO modify further to allow config to be a blend of things
 	static propTypes = {
 		config: PropTypes.shape({
 			license: PropTypes.string.isRequired,
@@ -210,7 +212,7 @@ export default class JWPlayer extends Component {
 			controls: PropTypes.bool,
 			repeat: PropTypes.bool,
 			preload: PropTypes.oneOf(['auto', 'none']),
-			playlist: PropTypes.arrayOf(
+			playlist: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(
 				PropTypes.shape({
 					file: PropTypes.string,
 					sources: PropTypes.arrayOf(
@@ -241,7 +243,7 @@ export default class JWPlayer extends Component {
 					adVmap: PropTypes.string,
 					startTime: PropTypes.number,
 				})
-			),
+			)]),
 			advertising: advertisingPropTypes,
 
 			// controller only

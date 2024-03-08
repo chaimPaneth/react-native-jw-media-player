@@ -6,14 +6,13 @@ import JWPlayer from 'react-native-jw-media-player';
 import {IOS_API_KEY, ANDROID_API_KEY} from '@env';
 
 export default forwardRef((props, ref) => {
-  const { onLayout, tag, config, style, jwConfig } = props;
+  const { onLayout, tag, config, style } = props;
 
   const newProps = Object.assign({}, props);
   delete newProps.ref;
   delete newProps.key;
   delete newProps.config;
   delete newProps.style;
-  delete newProps.jwConfig;
 
   return (
     <JWPlayer
@@ -27,7 +26,7 @@ export default forwardRef((props, ref) => {
         styling: {
           colors: {},
         },
-        ...jwConfig != null ? jwConfig: config,
+        ...config
       }}
       {...newProps}
       onPlayerError={e => alert(e.nativeEvent?.error || 'Player Error.')}

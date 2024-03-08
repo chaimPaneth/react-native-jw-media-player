@@ -20,6 +20,11 @@ export default () => {
     StatusBar.setHidden(false);
   };
 
+  let jwConfig = {
+    "title": "3 Videos - Mixed Chapters",
+    "playlist": "https://cdn.jwplayer.com/v2/playlists/6s4v59eA?format=json",
+  }
+
   const renderPlayer = () => {
     return (
       <Player
@@ -27,15 +32,10 @@ export default () => {
         style={{flex: 1}}
         config={{
           autostart: true,
-          playlist: [
-            {
-              file: 'https://playertest.longtailvideo.com/adaptive/oceans/oceans.m3u8',
-              image: 'https://d3el35u4qe4frz.cloudfront.net/bkaovAYt-480.jpg',
-            },
-          ],
           styling: {
             colors: {},
           },
+          ...jwConfig
         }}
         onTime={onTime}
         onFullScreen={onFullScreen}
