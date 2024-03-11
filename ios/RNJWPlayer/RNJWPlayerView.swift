@@ -521,14 +521,15 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
             }
         }
 
-        do {
-            let skinStyling = try skinStylingBuilder.build()
-            DispatchQueue.main.async { [self] in
-                playerViewController.styling = skinStyling
-            }
-        } catch {
-            print(error)
-        }
+        // TODO this was broken when using `.playlist(string)`
+        // do {
+        //     let skinStyling = try skinStylingBuilder.build()
+        //     DispatchQueue.main.async { [self] in
+        //         playerViewController.styling = skinStyling
+        //     }
+        // } catch {
+        //     print(error)
+        // }
     }
 
     // MARK: - RNJWPlayer config helpers
