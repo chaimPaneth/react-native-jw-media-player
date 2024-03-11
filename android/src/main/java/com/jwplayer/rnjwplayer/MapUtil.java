@@ -1,4 +1,4 @@
-package com.appgoalz.rnjwplayer;
+package com.jwplayer.rnjwplayer;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;

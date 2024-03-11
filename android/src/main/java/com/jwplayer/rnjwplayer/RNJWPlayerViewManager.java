@@ -1,5 +1,5 @@
 
-package com.appgoalz.rnjwplayer;
+package com.jwplayer.rnjwplayer;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;

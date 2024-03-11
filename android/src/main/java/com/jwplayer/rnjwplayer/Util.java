@@ -1,4 +1,4 @@
-package com.appgoalz.rnjwplayer;
+package com.jwplayer.rnjwplayer;
 
 import static com.google.android.exoplayer2.util.Util.toByteArray;
 

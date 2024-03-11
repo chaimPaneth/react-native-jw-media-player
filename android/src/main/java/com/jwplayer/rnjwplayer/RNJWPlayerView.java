@@ -1,4 +1,4 @@
-package com.appgoalz.rnjwplayer;
+package com.jwplayer.rnjwplayer;
 
 
 import android.app.Activity;
