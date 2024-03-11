@@ -66,8 +66,9 @@ allprojects {
     }
 }
 
-def jwPlayerVersion = "4.15.1"
-def exoplayerVersion = "2.18.7"
+def jwPlayerVersion = "4.16.2"
+def exoplayerVersion = "2.18.7" // Deprecated. Use Media3 when targeting JW SDK > 4.16.0
+def media3ExoVersion = "1.1.1"
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
@@ -91,11 +92,12 @@ dependencies {
     }
 
     // ExoPlayer dependencies
-    implementation "com.google.android.exoplayer:exoplayer-core:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
-    implementation "com.google.android.exoplayer:exoplayer-dash:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
-    implementation "com.google.android.exoplayer:exoplayer-hls:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
-    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
-    implementation "com.google.android.exoplayer:exoplayer-ui:${safeExtGet('exoplayerVersion', exoplayerVersion)}"
+    implementation "androidx.media3:media3-common:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
+    implementation "androidx.media3:media3-exoplayer:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
+    implementation "androidx.media3:media3-exoplayer-dash:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
+    implementation "androidx.media3:media3-exoplayer-hls:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
+    implementation "androidx.media3:media3-exoplayer-smoothstreaming:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
+    implementation "androidx.media3:media3-ui:${safeExtGet('media3ExoVersion', media3ExoVersion)}"
 
     // JW Player Native UI dependencies
     implementation 'com.squareup.picasso:picasso:2.71828'
