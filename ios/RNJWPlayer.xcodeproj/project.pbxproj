@@ -17,6 +17,7 @@
 		8650D61E2B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D6192B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift */; };
 		8650D61F2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D61A2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift */; };
 		8650D6202B1D1E1E00DD1C7E /* RNJWPlayerViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650D61B2B1D1E1E00DD1C7E /* RNJWPlayerViewManager.swift */; };
+		86CF01C22B99E5C60040C826 /* RNCJWPlayerViewComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 86CF01C12B99E5C60040C826 /* RNCJWPlayerViewComponent.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +45,8 @@
 		8650D6192B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNJWPlayerViewController.swift; path = RNJWPlayer/RNJWPlayerViewController.swift; sourceTree = "<group>"; };
 		8650D61A2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "RCTConvert+RNJWPlayer.swift"; path = "RNJWPlayer/RCTConvert+RNJWPlayer.swift"; sourceTree = "<group>"; };
 		8650D61B2B1D1E1E00DD1C7E /* RNJWPlayerViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNJWPlayerViewManager.swift; path = RNJWPlayer/RNJWPlayerViewManager.swift; sourceTree = "<group>"; };
+		86CF01C02B99E5C60040C826 /* RNCJWPlayerViewComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCJWPlayerViewComponent.h; sourceTree = "<group>"; };
+		86CF01C12B99E5C60040C826 /* RNCJWPlayerViewComponent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNCJWPlayerViewComponent.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				86CF01BF2B99E18F0040C826 /* fabric */,
 				860F49F92B38AD1D00D0FCC4 /* RNJWPlayerAds.swift */,
 				86182A322B2AFA660040739A /* RNJWPlayer-Bridging-Header.h */,
 				2AA52BE226C144B200AD26AE /* RNJWPlayerViewManager.m */,
@@ -92,6 +96,16 @@
 				134814211AA4EA7D00B7C361 /* Products */,
 				3BC75FCA1E43B1DB0011FBAA /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		86CF01BF2B99E18F0040C826 /* fabric */ = {
+			isa = PBXGroup;
+			children = (
+				86CF01C02B99E5C60040C826 /* RNCJWPlayerViewComponent.h */,
+				86CF01C12B99E5C60040C826 /* RNCJWPlayerViewComponent.mm */,
+			);
+			name = fabric;
+			path = RNJWPlayer/fabric;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,6 +170,7 @@
 				8650D61F2B1D1E1E00DD1C7E /* RCTConvert+RNJWPlayer.swift in Sources */,
 				8650D61E2B1D1E1E00DD1C7E /* RNJWPlayerViewController.swift in Sources */,
 				8650D60D2B1CD21000DD1C7E /* RNJWPlayerView.swift in Sources */,
+				86CF01C22B99E5C60040C826 /* RNCJWPlayerViewComponent.mm in Sources */,
 				2AA52BE726C144B200AD26AE /* RNJWPlayerViewManager.m in Sources */,
 				860F49FA2B38AD1D00D0FCC4 /* RNJWPlayerAds.swift in Sources */,
 				86182A312B2AFA170040739A /* RNJWPlayerModels.swift in Sources */,
