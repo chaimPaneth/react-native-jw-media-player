@@ -572,7 +572,19 @@ JWPlayer enables casting by default with a casting button (if you pass the `view
 4: Enable _Access WiFi Information_ capability under `Signing & Capabilities`
 
 ###### Android
-1: Add `RNJWPlayerUseGoogleCast = true` to your *app/build.gradle* in `ext {}`, this will add `com.google.android.gms:play-services-cast-framework:21.3.0`.
+1. Add `RNJWPlayerUseGoogleCast = true` to your *app/build.gradle* in `ext {}`.
+2. Add `com.google.android.gms:play-services-cast-framework:21.3.0` to your Android **app/build.gradle**
+3. Create a class that overrides `OptionsProvider` in **your** Android codebase
+    1. See reference file `android/src/main/java/com/appgoalz/rnjwplayer/CastOptionsProvider.java`
+    2. Replace `.setTargetActivityClassName(RNJWPlayerView.class.getName())` with your player Activity
+    3. Modify the file with any options necessary for your use case
+4. Add the meta-data to your `AndroidManifest.xml` like below, ensuring 
+```xml
+    <meta-data
+        android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+        android:value="path.to.CastOptionsProvider" />
+```
+5. Casting should now be enabled
 
 #### Available methods
 
