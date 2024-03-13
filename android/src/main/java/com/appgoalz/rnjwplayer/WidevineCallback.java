@@ -4,13 +4,15 @@ import android.annotation.TargetApi;
 import android.os.Parcel;
 import android.text.TextUtils;
 
-import com.google.android.exoplayer2.drm.ExoMediaDrm;
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.drm.ExoMediaDrm;
+
 import com.jwplayer.pub.api.media.drm.MediaDrmCallback;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@TargetApi(18)
 public class WidevineCallback implements MediaDrmCallback {
 
     private final String defaultUri;
@@ -35,13 +37,13 @@ public class WidevineCallback implements MediaDrmCallback {
         }
     };
 
-    @Override
+    @OptIn(markerClass = UnstableApi.class) @Override
     public byte[] executeProvisionRequest(UUID uuid, ExoMediaDrm.ProvisionRequest request) throws IOException {
         String url = request.getDefaultUrl() + "&signedRequest=" + new String(request.getData());
         return Util.executePost(url, null, null);
     }
 
-    @Override
+    @OptIn(markerClass = UnstableApi.class) @Override
     public byte[] executeKeyRequest(UUID uuid, ExoMediaDrm.KeyRequest request) throws IOException {
         String url = request.getLicenseServerUrl();
         if (TextUtils.isEmpty(url)) {

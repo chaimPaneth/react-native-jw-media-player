@@ -1,6 +1,6 @@
 package com.appgoalz.rnjwplayer;
 
-import static com.google.android.exoplayer2.util.Util.toByteArray;
+import static androidx.media3.common.util.Util.toByteArray;
 
 import android.util.Patterns;
 import android.webkit.URLUtil;
