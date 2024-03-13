@@ -7,9 +7,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "postinstall": "rm -rf ./node_modules/react-native-jw-media-player/Example ./node_modules/react-native-jw-media-player/images ./node_modules/react-native-jw-media-player/node_modules ./node_modules/react-native-jw-media-player/yarn.lock patch-package",
-    "prepare": "patch-package"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@react-navigation/native": "6.1.7",
@@ -20,7 +18,7 @@
     "react-native-device-info": "9.0.2",
     "react-native-fs": "2.16.6",
     "react-native-gesture-handler": "2.12.1",
-    "react-native-jw-media-player": "../../react-native-jw-media-player",
+    "react-native-jw-media-player": "0.2.45",
     "react-native-orientation-locker": "1.5.0",
     "react-native-safe-area-context": "4.7.2",
     "react-native-screens": "3.25.0",
@@ -35,8 +33,6 @@
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
     "metro-react-native-babel-preset": "^0.72.4",
-    "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0",
     "react-native-dotenv": "3.3.1",
     "react-test-renderer": "18.1.0"
   },

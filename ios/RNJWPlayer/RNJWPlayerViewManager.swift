@@ -205,6 +205,7 @@ class RNJWPlayerViewManager: RCTViewManager {
         }
     }
 
+#if USE_GOOGLE_CAST
     @objc func setUpCastController(_ reactTag: NSNumber) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
             guard let view = viewRegistry?[reactTag] as? RNJWPlayerView else {
@@ -295,6 +296,7 @@ class RNJWPlayerViewManager: RCTViewManager {
             resolve(view.castState)
         }
     }
+#endif
 
     @objc func getAudioTracks(_ reactTag: NSNumber, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
         self.bridge.uiManager.addUIBlock { uiManager, viewRegistry in
