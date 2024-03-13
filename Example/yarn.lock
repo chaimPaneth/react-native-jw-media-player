@@ -9048,9 +9048,10 @@ react-native-gradle-plugin@^0.70.3:
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.70.3.tgz"
   integrity sha512-oOanj84fJEXUg9FoEAQomA8ISG+DVIrTZ3qF7m69VQUJyOGYyDZmPqKcjvRku4KXlEH6hWO9i4ACLzNBh8gC0A==
 
-react-native-jw-media-player@../../react-native-jw-media-player:
-  version "0.2.44"
-  resolved "file:.."
+react-native-jw-media-player@0.2.45:
+  version "0.2.45"
+  resolved "https://registry.npmjs.org/react-native-jw-media-player/-/react-native-jw-media-player-0.2.45.tgz"
+  integrity sha512-UYOekssH7h6P5NRcwrk0q+6EBXRAcceC4skkntw5h4dcKqq8vsFeTNZI3GxNbUZOlcYCxelM/cGUNY9RXFxW0w==
 
 react-native-local-cli@^1.0.0-alpha.5:
   version "1.0.0-alpha.5"
