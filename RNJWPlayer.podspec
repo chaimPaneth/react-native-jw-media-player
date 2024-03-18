@@ -54,7 +54,7 @@ Pod::Spec.new do |s|
     end
 
     s.subspec "fabric" do |ss|
-      ss.dependency "react-native-jw-media-player/common"
+      # ss.dependency "react-native-jw-media-player/common"
       ss.source_files         = "ios/RNJWPlayer/fabric/**/*.{h,m,mm}"
       ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
     end

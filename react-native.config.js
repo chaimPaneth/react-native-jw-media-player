@@ -12,7 +12,8 @@ module.exports = {
   dependency: {
     platforms: {
       android: supportsCodegenConfig ? {
-        componentDescriptors: [],
+        libraryName: 'rnjwplayer',
+        componentDescriptors: ['RNJWPlayerComponentDescriptor'],
         cmakeListsPath: "../android/src/main/jni/CMakeLists.txt"
       } : {},
     },
