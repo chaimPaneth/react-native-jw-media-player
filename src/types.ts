@@ -1,5 +1,5 @@
 declare module "react-native-jw-media-player" {
-  import React, {ElementRef} from "react";
+  import React from "react";
   import { ViewStyle, ColorValue } from "react-native";
   import type {
     Float,
@@ -317,39 +317,6 @@ declare module "react-native-jw-media-player" {
     shouldComponentUpdate?: (nextProps: any, nextState: any) => boolean;
   }
 
-  export interface PlayerNativeCommands {
-    pause(viewRef: ElementRef<any>): void;
-    play(viewRef: ElementRef<any>): void;
-    stop(viewRef: ElementRef<any>): void;
-    time(viewRef: ElementRef<any>): void;
-    toggleSpeed(viewRef: ElementRef<any>): void;
-    setSpeed(viewRef: ElementRef<any>, speed: Float): void;
-    setCurrentQuality(viewRef: ElementRef<any>, index: Float): void;
-    currentQuality(viewRef: ElementRef<any>): Float;
-    getQualityLevels(viewRef: ElementRef<any>): Promise<QualityLevel[] | null>;
-    setVolume(viewRef: ElementRef<any>, volume: Float): void;
-    setPlaylistIndex(viewRef: ElementRef<any>, index: Float): void;
-    setControls(viewRef: ElementRef<any>, show: boolean): void;
-    setLockScreenControls(viewRef: ElementRef<any>, show: boolean): void;
-    seekTo(viewRef: ElementRef<any>, time: Float): void;
-    loadPlaylist(viewRef: ElementRef<any>, playlistItems: PlaylistItem[]): void;
-    setFullscreen(viewRef: ElementRef<any>, fullScreen: boolean): void;
-    position(viewRef: ElementRef<any>): Promise<Float>;
-    setUpCastController(viewRef: ElementRef<any>): void;
-    presentCastDialog(viewRef: ElementRef<any>): void;
-    connectedDevice(viewRef: ElementRef<any>): Promise<CastingDevice | null>;
-    availableDevices(viewRef: ElementRef<any>): Promise<CastingDevice[] | null>;
-    castState(viewRef: ElementRef<any>): Promise<Float | null>;
-    playerState(viewRef: ElementRef<any>): Promise<Float | null>;
-    getAudioTracks(viewRef: ElementRef<any>): Promise<AudioTrack[] | null>;
-    getCurrentAudioTrack(viewRef: ElementRef<any>): Promise<Float | null>;
-    setCurrentAudioTrack(viewRef: ElementRef<any>, index: Float): void;
-    setCurrentCaptions(viewRef: ElementRef<any>, index: Float): void;
-    setVisibility(viewRef: ElementRef<any>, visibility: boolean, controls: JWControlType[]): void;
-    quite: () => void;
-    reset: () => void;
-  }
-
   export default class JWPlayer extends React.Component<PropsType> {
     pause(): void;
     play(): void;
@@ -378,5 +345,7 @@ declare module "react-native-jw-media-player" {
     setCurrentAudioTrack(index: number): void;
     setCurrentCaptions(index: number): void;
     setVisibility(visibility: boolean, controls: JWControlType[]): void;
+    quite: () => void;
+    reset: () => void;
   }
 }

@@ -1,43 +1,9 @@
 // JWPlayer.tsx
 import React, { forwardRef, useRef, useImperativeHandle, Ref } from 'react';
 import { findNodeHandle, Platform } from 'react-native';
-import JWPlayerNativeComponent from './JWPlayerNativeComponent';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import type { PropsType, PlayerNativeCommands, JWControlType } from './types';
+import JWPlayerNativeComponent, { JWPlayerCommands, PlayerNativeCommands } from './JWPlayerNativeComponent';
+import type { PropsType, JWControlType } from './types';
 import * as JWTypes from './types';
-
-const JWPlayerCommands: PlayerNativeCommands = codegenNativeCommands<PlayerNativeCommands>({
-  supportedCommands: [
-    'quite',
-    'play',
-    'pause',
-    'stop',
-    'toggleSpeed',
-    'setSpeed',
-    'setCurrentQuality',
-    'currentQuality',
-    'getQualityLevels',
-    'setVolume',
-    'setPlaylistIndex',
-    'setControls',
-    'setLockScreenControls',
-    'seekTo',
-    'loadPlaylist',
-    'setFullscreen',
-    'position',
-    'setUpCastController',
-    'presentCastDialog',
-    'connectedDevice',
-    'availableDevices',
-    'castState',
-    'playerState',
-    'getAudioTracks',
-    'getCurrentAudioTrack',
-    'setCurrentAudioTrack',
-    'setCurrentCaptions',
-    'setVisibility',
-  ],
-});
 
 const JWPlayer = forwardRef((props: PropsType, ref: Ref<typeof JWTypes>) => {
   const playerRef = useRef(null);
@@ -49,7 +15,12 @@ const JWPlayer = forwardRef((props: PropsType, ref: Ref<typeof JWTypes>) => {
   useImperativeHandle(ref, () => ({
     quite: () => {
       if (Platform.OS === 'ios') {
-        JWPlayerCommands.quite();
+        JWPlayerCommands.quite(getHandle());
+      }
+    },
+    reset: () => {
+      if (Platform.OS === 'ios') {
+        JWPlayerCommands.reset(getHandle());
       }
     },
     play: () => {
@@ -72,9 +43,9 @@ const JWPlayer = forwardRef((props: PropsType, ref: Ref<typeof JWTypes>) => {
         JWPlayerCommands.setCurrentQuality(getHandle(), index);
       }
     },
-    currentQuality: () => {
+    getCurrentQuality: () => {
       if (Platform.OS === 'android') {
-        return JWPlayerCommands.currentQuality(getHandle());
+        return JWPlayerCommands.getCurrentQuality(getHandle());
       }
     },
     getQualityLevels: () => {
@@ -150,7 +121,7 @@ const JWPlayer = forwardRef((props: PropsType, ref: Ref<typeof JWTypes>) => {
     },
     setVisibility: (visibility: boolean, controls: JWControlType[]) => {
       if (Platform.OS === 'ios') {
-        JWPlayerCommands.setVisibility(getHandle(), visibility, controls);
+        JWPlayerCommands.setVisibility(getHandle(), visibility, JSON.stringify(controls));
       }
     },
   }));

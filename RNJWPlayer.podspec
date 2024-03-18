@@ -4,6 +4,8 @@ package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
+fabric_enabled = ENV['RCT_NEW_ARCH_ENABLED'] == '1'
+
 Pod::Spec.new do |s|
   s.name         = 'RNJWPlayer'
   s.version      = package['version']
@@ -42,8 +44,20 @@ Pod::Spec.new do |s|
     }
   end
 
-  if defined?(install_modules_dependencies)
+  if defined?(install_modules_dependencies) # use fabric_enabled?
     install_modules_dependencies(s)
+
+    s.subspec "common" do |ss|
+      ss.source_files         = "common/cpp/**/*.{cpp,h}"
+      ss.header_dir           = "react/renderer/components/rnjwplayer"
+      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
+    end
+
+    s.subspec "fabric" do |ss|
+      ss.dependency "react-native-jw-media-player/common"
+      ss.source_files         = "ios/RNJWPlayer/fabric/**/*.{h,m,mm}"
+      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
+    end
   else
     s.dependency 'React-Core'
 
