@@ -1,4 +1,6 @@
 // JWPlayerNativeComponent.ts
+import React from "react";
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import type { ViewProps, ViewStyle, ColorValue, HostComponent } from 'react-native';
 
@@ -25,7 +27,7 @@ interface QualityLevel {
   label: string;
   height: Float;
   width: Float;
-  index: Float;
+  index: Int32;
 };
 interface CastingDevice {
   name?: string;
@@ -48,7 +50,7 @@ interface JWAdSettings {
 interface IMASettings {
   locale?: string;
   ppid?: string;
-  maxRedirects?: Float;
+  maxRedirects?: Int32;
   sessionID?: string;
   debugMode?: WithDefault<boolean, false>;
 };
@@ -80,7 +82,7 @@ interface AdRule {
 // }
 type ClientTypes = "vast" | "ima" | "ima_dai";
 type VASTAdvertising = {
-  adSchedule?: AdSchedule[];
+  adSchedule?: ReadonlyArray<AdSchedule>;
   adVmap?: string;
   tag?: string; // Vast xml url
   openBrowserOnAdClick?: WithDefault<boolean, false>;
@@ -89,32 +91,32 @@ type VASTAdvertising = {
   adSettings?: JWAdSettings;
 };
 type IMAAdvertising = {
-  adSchedule?: AdSchedule[];
+  adSchedule?: ReadonlyArray<AdSchedule>;
   adVmap?: string;
   tag?: string; // Vast xml url
   adClient: string; // is this needed ? "ima";
   adRules?: AdRule;
   imaSettings?: IMASettings;
-  // companionAdSlots?: CompanionAdSlot[];
-  // friendlyObstructions?: FriendlyObstruction[];
+  // companionAdSlots?: CompanionAdSlot>;
+  // friendlyObstructions?: FriendlyObstruction>;
 };
 type IMA_DAIAdvertising = {
   adClient: string; // is this needed ? "ima_dai";
   imaSettings?: IMASettings;
-  // friendlyObstructions?: FriendlyObstruction[];
+  // friendlyObstructions?: FriendlyObstruction>;
   googleDAIStream?: GoogleDAIStream;
 };
 type Advertising = VASTAdvertising | IMAAdvertising | IMA_DAIAdvertising;
 interface PlaylistItemProps {
   file: string;
-  sources?: Source[];
+  sources?: ReadonlyArray<Source>;
   image?: string;
   title?: string;
   description?: string;
   mediaId?: string;
-  adSchedule?: AdSchedule[];
+  adSchedule?: ReadonlyArray<AdSchedule>;
   adVmap?: string;
-  tracks?: Track[];
+  tracks?: ReadonlyArray<Track>;
   recommendations?: string;
   startTime?: Float;
   autostart?: WithDefault<boolean, false>;
@@ -229,13 +231,13 @@ export interface Config {
   landscapeOnFullScreen?: WithDefault<boolean, false>;
   portraitOnExitFullScreen?: WithDefault<boolean, false>;
   exitFullScreenOnPortrait?: WithDefault<boolean, false>;
-  playlist?: PlaylistItemProps[];
+  playlist?: ReadonlyArray<PlaylistItemProps>;
   stretching?: string;
   related?: Related;
   preload?: WithDefault<Preloads, null>;
   interfaceBehavior?: WithDefault<InterfaceBehaviors, null>;
   interfaceFadeDelay?: Float;
-  hideUIGroups?: WithDefault<UIGroups[], null>;
+  hideUIGroups?: WithDefault<ReadonlyArray<UIGroups>, null>;
   processSpcUrl?: string;
   fairplayCertUrl?: string;
   contentUUID?: string;
@@ -329,7 +331,7 @@ interface PlayerWarningEventProps {
 interface AdEventProps {
   client?: string;
   reason?: string;
-  type: Float;
+  type: Int32;
 };
 type NativeError = DirectEventHandler<PlayerErrorEventProps>;
 type NativeWarning = DirectEventHandler<PlayerWarningEventProps>;
@@ -367,8 +369,74 @@ export interface NativeProps extends ViewProps {
   // shouldComponentUpdate?: (nextProps: any, nextState: any) => boolean;
 }
 
-// export default codegenNativeComponent<NativeProps>('RNJWPlayer') as HostComponent<NativeProps>;
+type ComponentType = HostComponent<NativeProps>;
+
+export interface PlayerNativeCommands {
+  play: (viewRef: React.ElementRef<ComponentType>) => void;
+  pause: (viewRef: React.ElementRef<ComponentType>) => void;
+  stop: (viewRef: React.ElementRef<ComponentType>) => void;
+  toggleSpeed: (viewRef: React.ElementRef<ComponentType>) => void;
+  setSpeed: (viewRef: React.ElementRef<ComponentType>, speed: Float) => void;
+  setCurrentQuality: (viewRef: React.ElementRef<ComponentType>, index: Float) => void;
+  getCurrentQuality: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
+  getQualityLevels: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  setVolume: (viewRef: React.ElementRef<ComponentType>, volume: Float) => void;
+  setPlaylistIndex: (viewRef: React.ElementRef<ComponentType>, index: Float) => void;
+  setControls: (viewRef: React.ElementRef<ComponentType>, show: boolean) => void;
+  setLockScreenControls: (viewRef: React.ElementRef<ComponentType>, show: boolean) => void;
+  seekTo: (viewRef: React.ElementRef<ComponentType>, time: Float) => void;
+  loadPlaylist: (viewRef: React.ElementRef<ComponentType>, playlistItems: string) => void;
+  setFullscreen: (viewRef: React.ElementRef<ComponentType>, fullScreen: boolean) => void;
+  position: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
+  setUpCastController: (viewRef: React.ElementRef<ComponentType>) => void;
+  presentCastDialog: (viewRef: React.ElementRef<ComponentType>) => void;
+  connectedDevice: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  availableDevices: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  castState: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
+  playerState: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
+  getAudioTracks: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  getCurrentAudioTrack: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
+  setCurrentAudioTrack: (viewRef: React.ElementRef<ComponentType>, index: Int32) => void;
+  setCurrentCaptions: (viewRef: React.ElementRef<ComponentType>, index: Int32) => void;
+  setVisibility: (viewRef: React.ElementRef<ComponentType>, visibility: boolean, controls: string) => void;
+  quite: (viewRef: React.ElementRef<ComponentType>) => void;
+  reset: (viewRef: React.ElementRef<ComponentType>) => void;
+}
+
+export const JWPlayerCommands: PlayerNativeCommands = codegenNativeCommands<PlayerNativeCommands>({
+  supportedCommands: [
+    'play',
+    'pause',
+    'stop',
+    'toggleSpeed',
+    'setSpeed',
+    'setCurrentQuality',
+    'getCurrentQuality',
+    'getQualityLevels',
+    'setVolume',
+    'setPlaylistIndex',
+    'setControls',
+    'setLockScreenControls',
+    'seekTo',
+    'loadPlaylist',
+    'setFullscreen',
+    'position',
+    'setUpCastController',
+    'presentCastDialog',
+    'connectedDevice',
+    'availableDevices',
+    'castState',
+    'playerState',
+    'getAudioTracks',
+    'getCurrentAudioTrack',
+    'setCurrentAudioTrack',
+    'setCurrentCaptions',
+    'setVisibility',
+    'quite',
+    'reset',
+  ],
+});
 
 export default codegenNativeComponent<NativeProps>('RNJWPlayer', {
-  interfaceOnly: true,
-});
+  interfaceOnly: true, // ?
+}) as HostComponent<NativeProps>;

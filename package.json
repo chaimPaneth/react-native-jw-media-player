@@ -54,7 +54,7 @@
   "codegenConfig": {
     "name": "rnjwplayer",
     "type": "components",
-    "jsSrcsDir": "./src",
+    "jsSrcsDir": "./src/specs",
     "android": {
       "javaPackageName": "com.appgoalz.rnjwplayer"
     }

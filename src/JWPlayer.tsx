@@ -1,7 +1,7 @@
 // JWPlayer.tsx
 import React, { forwardRef, useRef, useImperativeHandle, Ref } from 'react';
 import { findNodeHandle, Platform } from 'react-native';
-import JWPlayerNativeComponent, { JWPlayerCommands, PlayerNativeCommands } from './JWPlayerNativeComponent';
+import JWPlayerNativeComponent, { JWPlayerCommands, PlayerNativeCommands } from './specs/JWPlayerNativeComponent';
 import type { PropsType, JWControlType } from './types';
 import * as JWTypes from './types';
 
