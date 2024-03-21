@@ -619,19 +619,20 @@ public class RNJWPlayerView extends RelativeLayout implements
         // Legacy
         PlayerConfig.Builder configBuilder = new PlayerConfig.Builder();
 
-        // TODO check if I'm a JW config before doign below
         JSONObject obj;
         PlayerConfig jwConfig = null;
+        Boolean mayBeJwConfig = prop.hasKey("forceLegacyConfig") ? !prop.getBoolean("forceLegacyConfig") : false;
         Boolean isJwConfig = false;
-        try {
-            obj = MapUtil.toJSONObject(prop);
-            jwConfig = JsonHelper.parseConfigJson(obj);
-            isJwConfig = true;
-        } catch (Exception ex) {
-            Log.e("RNJWPlayerView", ex.toString());
+        if(!mayBeJwConfig){
+            try {
+                obj = MapUtil.toJSONObject(prop);
+                jwConfig = JsonHelper.parseConfigJson(obj);
+                isJwConfig = true;
+            } catch (Exception ex) {
+                Log.e("RNJWPlayerView", ex.toString());
+                isJwConfig = false; // not a valid jw config. Try to setup in legacy
+            }
         }
-
-        // TODO TODO TODO -- Fix the reading of fields when isJwConfig is true
 
         if (!isJwConfig) {
             // Legacy
