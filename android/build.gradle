@@ -31,13 +31,7 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
-    sourceSets {
-        main {
-            if (useCast) {
-                manifest.srcFile 'src/main/xml/cast_enabled_manifest.xml'
-            }
-        }
-    }
+
     buildTypes {
         debug {
             // Set the build config fields for the debug build type
