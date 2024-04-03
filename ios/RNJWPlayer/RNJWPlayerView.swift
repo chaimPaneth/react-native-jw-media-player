@@ -16,16 +16,16 @@ import JWPlayerKit
     import GoogleCast
 #endif
 
-class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate {
+@objc public class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, JWTimeEventListener, AVPictureInPictureControllerDelegate {
     
     // MARK: - RNJWPlayer allocation
 
-    var playerViewController:RNJWPlayerViewController!
-    var playerView: JWPlayerView!
+    @objc public var playerViewController: RNJWPlayerViewController!
+    @objc public var playerView: JWPlayerView!
     var audioSession: AVAudioSession!
     var pipEnabled: Bool = true
     var backgroundAudioEnabled: Bool = true
-    var userPaused: Bool = false
+    @objc public var userPaused: Bool = false
     var wasInterrupted: Bool = false
     var interfaceBehavior: JWInterfaceBehavior!
     var fairplayCertUrl: String!
@@ -42,49 +42,49 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     var isCasting: Bool = false
     var availableDevices: [AnyObject]!
     
-    @objc var onBuffer:RCTDirectEventBlock?
-    @objc var onUpdateBuffer:RCTDirectEventBlock?
-    @objc var onPlay:RCTDirectEventBlock?
-    @objc var onBeforePlay:RCTDirectEventBlock?
-    @objc var onAttemptPlay:RCTDirectEventBlock?
-    @objc var onPause:RCTDirectEventBlock?
-    @objc var onIdle:RCTDirectEventBlock?
-    @objc var onPlaylistItem:RCTDirectEventBlock?
-    @objc var onLoaded:RCTDirectEventBlock?
-    @objc var onVisible:RCTDirectEventBlock?
-    @objc var onTime:RCTDirectEventBlock?
-    @objc var onSeek:RCTDirectEventBlock?
-    @objc var onSeeked:RCTDirectEventBlock?
-    @objc var onRateChanged:RCTDirectEventBlock?
-    @objc var onPlaylist:RCTDirectEventBlock?
-    @objc var onPlaylistComplete:RCTDirectEventBlock?
-    @objc var onBeforeComplete:RCTDirectEventBlock?
-    @objc var onComplete:RCTDirectEventBlock?
-    @objc var onAudioTracks:RCTDirectEventBlock?
-    @objc var onPlayerReady:RCTDirectEventBlock?
-    @objc var onSetupPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdError:RCTDirectEventBlock?
-    @objc var onAdEvent:RCTDirectEventBlock?
-    @objc var onAdTime:RCTDirectEventBlock?
-    @objc var onScreenTapped:RCTDirectEventBlock?
-    @objc var onControlBarVisible:RCTDirectEventBlock?
-    @objc var onFullScreen:RCTDirectEventBlock?
-    @objc var onFullScreenRequested:RCTDirectEventBlock?
-    @objc var onFullScreenExit:RCTDirectEventBlock?
-    @objc var onFullScreenExitRequested:RCTDirectEventBlock?
-    @objc var onPlayerSizeChange:RCTDirectEventBlock?
-    @objc var onCastingDevicesAvailable:RCTDirectEventBlock?
-    @objc var onConnectedToCastingDevice:RCTDirectEventBlock?
-    @objc var onDisconnectedFromCastingDevice:RCTDirectEventBlock?
-    @objc var onConnectionTemporarilySuspended:RCTDirectEventBlock?
-    @objc var onConnectionRecovered:RCTDirectEventBlock?
-    @objc var onConnectionFailed:RCTDirectEventBlock?
-    @objc var onCasting:RCTDirectEventBlock?
-    @objc var onCastingEnded:RCTDirectEventBlock?
-    @objc var onCastingFailed:RCTDirectEventBlock?
+    @objc var onBuffer: RCTDirectEventBlock?
+    @objc var onUpdateBuffer: RCTDirectEventBlock?
+    @objc var onPlay: RCTDirectEventBlock?
+    @objc var onBeforePlay: RCTDirectEventBlock?
+    @objc var onAttemptPlay: RCTDirectEventBlock?
+    @objc var onPause: RCTDirectEventBlock?
+    @objc var onIdle: RCTDirectEventBlock?
+    @objc var onPlaylistItem: RCTDirectEventBlock?
+    @objc var onLoaded: RCTDirectEventBlock?
+    @objc var onVisible: RCTDirectEventBlock?
+    @objc var onTime: RCTDirectEventBlock?
+    @objc var onSeek: RCTDirectEventBlock?
+    @objc var onSeeked: RCTDirectEventBlock?
+    @objc var onRateChanged: RCTDirectEventBlock?
+    @objc var onPlaylist: RCTDirectEventBlock?
+    @objc var onPlaylistComplete: RCTDirectEventBlock?
+    @objc var onBeforeComplete: RCTDirectEventBlock?
+    @objc var onComplete: RCTDirectEventBlock?
+    @objc var onAudioTracks: RCTDirectEventBlock?
+    @objc var onPlayerReady: RCTDirectEventBlock?
+    @objc var onSetupPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdError: RCTDirectEventBlock?
+    @objc var onAdEvent: RCTDirectEventBlock?
+    @objc var onAdTime: RCTDirectEventBlock?
+    @objc var onScreenTapped: RCTDirectEventBlock?
+    @objc var onControlBarVisible: RCTDirectEventBlock?
+    @objc var onFullScreen: RCTDirectEventBlock?
+    @objc var onFullScreenRequested: RCTDirectEventBlock?
+    @objc var onFullScreenExit: RCTDirectEventBlock?
+    @objc var onFullScreenExitRequested: RCTDirectEventBlock?
+    @objc var onPlayerSizeChange: RCTDirectEventBlock?
+    @objc var onCastingDevicesAvailable: RCTDirectEventBlock?
+    @objc var onConnectedToCastingDevice: RCTDirectEventBlock?
+    @objc var onDisconnectedFromCastingDevice: RCTDirectEventBlock?
+    @objc var onConnectionTemporarilySuspended: RCTDirectEventBlock?
+    @objc var onConnectionRecovered: RCTDirectEventBlock?
+    @objc var onConnectionFailed: RCTDirectEventBlock?
+    @objc var onCasting: RCTDirectEventBlock?
+    @objc var onCastingEnded: RCTDirectEventBlock?
+    @objc var onCastingFailed: RCTDirectEventBlock?
     
     init() {
         super.init(frame: CGRect(x: 20, y: 0, width: UIScreen.main.bounds.width - 40, height: 300))
@@ -99,7 +99,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         self.startDeinitProcess()
     }
     
-    override func removeFromSuperview() {
+    public override func removeFromSuperview() {
         self.startDeinitProcess()
     }
 
@@ -133,7 +133,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     }
 
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
 
         if self.playerView != nil {
@@ -215,7 +215,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         return NSDictionary(dictionary: dict1 ?? [:]).isEqual(to: dict2 ?? [:])
     }
     
-    @objc func setJsonConfig(_ config: JSONObject) {
+    @objc public func setJsonConfig(_ config: JSONObject) {
         do {
             let configuration = try JWPlayerConfigurationBuilder().configuration(json: config).build()
             playerViewController.player.configurePlayer(with: configuration)
@@ -224,7 +224,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    @objc func setConfig(_ config: [String: Any]) {
+    @objc public func setConfig(_ config: [String: Any]) {
         if (playerFailed) {
             playerFailed = false
             setNewConfig(config: config)
@@ -328,7 +328,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    @objc func setControls(_ controls:Bool) {
+    @objc public func setControls(_ controls:Bool) {
         if let playerViewControllerView = playerViewController?.view {
             self.toggleUIGroup(view: playerViewControllerView, name: "JWPlayerKit.InterfaceView", ofSubview: nil, show: controls)
         }
@@ -906,7 +906,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func setVisibility(isVisible:Bool, forControls controls:[String]) {
+    @objc public func setVisibility(isVisible:Bool, forControls controls:[String]) {
         var _controls:[JWControlType]! = [JWControlType]()
 
         for control:String? in controls {
@@ -923,7 +923,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     // MARK: - JWPlayer Delegate
 
-    func jwplayerIsReady(_ player:JWPlayer) {
+    public func jwplayerIsReady(_ player:JWPlayer) {
         settingConfig = false
         self.onPlayerReady?([:])
 
@@ -932,33 +932,33 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func jwplayer(_ player:JWPlayer, failedWithError code:UInt, message:String) {
+    public func jwplayer(_ player:JWPlayer, failedWithError code:UInt, message:String) {
         self.onPlayerError?(["error": message])
         playerFailed = true
     }
 
-    func jwplayer(_ player:JWPlayer, failedWithSetupError code:UInt, message:String) {
+    public func jwplayer(_ player:JWPlayer, failedWithSetupError code:UInt, message:String) {
         self.onSetupPlayerError?(["error": message])
         playerFailed = true
     }
 
-    func jwplayer(_ player:JWPlayer, encounteredWarning code:UInt, message:String) {
+    public func jwplayer(_ player:JWPlayer, encounteredWarning code:UInt, message:String) {
         self.onPlayerWarning?(["warning": message])
     }
 
-    func jwplayer(_ player:JWPlayer, encounteredAdError code:UInt, message:String) {
+    public func jwplayer(_ player:JWPlayer, encounteredAdError code:UInt, message:String) {
         self.onPlayerAdError?(["error": message])
     }
 
 
-    func jwplayer(_ player:JWPlayer, encounteredAdWarning code:UInt, message:String) {
+    public func jwplayer(_ player:JWPlayer, encounteredAdWarning code:UInt, message:String) {
         self.onPlayerAdWarning?(["warning": message])
     }
 
 
     // MARK: - JWPlayer View Delegate
 
-    func playerView(_ view:JWPlayerView, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
+    public func playerView(_ view:JWPlayerView, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
         let oldSizeDict: [String: Any] = [
             "width": oldSize.width,
             "height": oldSize.height
@@ -984,7 +984,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     // MARK: - JWPlayer View Controller Delegate
 
-    func playerViewController(_ controller:JWPlayerViewController, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
+    public func playerViewController(_ controller:JWPlayerViewController, sizeChangedFrom oldSize:CGSize, to newSize:CGSize) {
         let oldSizeDict: [String: Any] = [
             "width": oldSize.width,
             "height": oldSize.height
@@ -1008,61 +1008,61 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func playerViewController(_ controller:JWPlayerViewController, screenTappedAt position:CGPoint) {
+    public func playerViewController(_ controller:JWPlayerViewController, screenTappedAt position:CGPoint) {
         self.onScreenTapped?(["x": position.x, "y": position.y])
     }
 
-    func playerViewController(_ controller:JWPlayerViewController, controlBarVisibilityChanged isVisible:Bool, frame:CGRect) {
+    public func playerViewController(_ controller:JWPlayerViewController, controlBarVisibilityChanged isVisible:Bool, frame:CGRect) {
         self.onControlBarVisible?(["visible": isVisible])
     }
 
-    func playerViewControllerWillGoFullScreen(_ controller:JWPlayerViewController) -> JWFullScreenViewController? {
+    public func playerViewControllerWillGoFullScreen(_ controller:JWPlayerViewController) -> JWFullScreenViewController? {
         self.onFullScreenRequested?([:])
         return nil
     }
 
-    func playerViewControllerDidGoFullScreen(_ controller:JWPlayerViewController) {
+    public func playerViewControllerDidGoFullScreen(_ controller:JWPlayerViewController) {
         self.onFullScreen?([:])
     }
 
-    func playerViewControllerWillDismissFullScreen(_ controller:JWPlayerViewController) {
+    public func playerViewControllerWillDismissFullScreen(_ controller:JWPlayerViewController) {
         self.onFullScreenExitRequested?([:])
     }
 
-    func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
+    public func playerViewControllerDidDismissFullScreen(_ controller:JWPlayerViewController) {
         self.onFullScreenExit?([:])
     }
 
-    func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method: JWRelatedInteraction) {
+    public func playerViewController(_ controller:JWPlayerViewController, relatedMenuClosedWithMethod method: JWRelatedInteraction) {
 
     }
 
-    func playerViewController(_ controller: JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerItem], withMethod method: JWRelatedInteraction) {
+    public func playerViewController(_ controller: JWPlayerViewController, relatedMenuOpenedWithItems items: [JWPlayerItem], withMethod method: JWRelatedInteraction) {
         
     }
     
-    func playerViewController(_ controller: JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerItem, atIndex index: Int, withMethod method: JWRelatedMethod) {
+    public func playerViewController(_ controller: JWPlayerViewController, relatedItemBeganPlaying item: JWPlayerItem, atIndex index: Int, withMethod method: JWRelatedMethod) {
         
     }
 
     // MARK: Time events
 
-    override func onAdTimeEvent(_ time:JWTimeData) {
+    public func onAdTimeEvent(_ time:JWPlayerKit.JWTimeData) {
         self.onAdTime?(["position": time.position, "duration": time.duration])
     }
 
-    override func onMediaTimeEvent(_ time:JWTimeData) {
+    public func onMediaTimeEvent(_ time:JWPlayerKit.JWTimeData) {
         self.onTime?(["position": time.position, "duration": time.duration])
     }
 
     // MARK: - DRM Delegate
 
-    func contentIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
+    public func contentIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
         let data:Data! = url.host?.data(using: String.Encoding.utf8)
         handler(data)
     }
 
-    func appIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
+    public func appIdentifierForURL(_ url: URL, completionHandler handler: @escaping (Data?) -> Void) {
         guard let fairplayCertUrlString = fairplayCertUrl, let finalUrl = URL(string: fairplayCertUrlString) else {
             return
         }
@@ -1077,7 +1077,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         task.resume()
     }
 
-    func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
+    public func contentKeyWithSPCData(_ spcData: Data, completionHandler handler: @escaping (Data?, Date?, String?) -> Void) {
         if processSpcUrl == nil {
             return
         }
@@ -1106,7 +1106,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     // MARK: - AV Picture In Picture Delegate
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 //        if let playerView = playerView {
 //            if keyPath == "playbackLikelyToKeepUp" {
 //                playerView.player.play()
@@ -1122,68 +1122,68 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
+    public func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
 
     }
 
-    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
+    public func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
 
     }
 
-    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
+    public func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
 
     }
 
-    func pictureInPictureController(pictureInPictureController:AVPictureInPictureController!, failedToStartPictureInPictureWithError error:NSError!) {
+    public func pictureInPictureController(pictureInPictureController:AVPictureInPictureController!, failedToStartPictureInPictureWithError error:NSError!) {
 
     }
 
-    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
+    public func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController:AVPictureInPictureController) {
 
     }
 
-    func pictureInPictureController(_ pictureInPictureController:AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler:@escaping (Bool) -> Void) {
+    public func pictureInPictureController(_ pictureInPictureController:AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler:@escaping (Bool) -> Void) {
 
     }
     
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
+    public func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         
     }
 
     // MARK: - JWPlayer State Delegate
 
-    func jwplayerContentIsBuffering(_ player:JWPlayer) {
+    public func jwplayerContentIsBuffering(_ player:JWPlayer) {
         self.onBuffer?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, isBufferingWithReason reason:JWBufferReason) {
+    public func jwplayer(_ player:JWPlayer, isBufferingWithReason reason:JWBufferReason) {
         self.onBuffer?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, updatedBuffer percent:Double, position time:JWTimeData) {
+    public func jwplayer(_ player:JWPlayer, updatedBuffer percent:Double, position time:JWTimeData) {
         self.onUpdateBuffer?(["percent": percent, "position": time])
     }
 
-    func jwplayer(_ player:JWPlayer, didFinishLoadingWithTime loadTime:TimeInterval) {
+    public func jwplayer(_ player:JWPlayer, didFinishLoadingWithTime loadTime:TimeInterval) {
         self.onLoaded?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, isAttemptingToPlay playlistItem:JWPlayerItem, reason:JWPlayReason) {
+    public func jwplayer(_ player:JWPlayer, isAttemptingToPlay playlistItem:JWPlayerItem, reason:JWPlayReason) {
         self.onAttemptPlay?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, isPlayingWithReason reason:JWPlayReason) {
+    public func jwplayer(_ player:JWPlayer, isPlayingWithReason reason:JWPlayReason) {
         self.onPlay?([:])
 
         userPaused = false
         wasInterrupted = false
     }
 
-    func jwplayer(_ player:JWPlayer, willPlayWithReason reason:JWPlayReason) {
+    public func jwplayer(_ player:JWPlayer, willPlayWithReason reason:JWPlayReason) {
         self.onBeforePlay?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, didPauseWithReason reason:JWPauseReason) {
+    public func jwplayer(_ player:JWPlayer, didPauseWithReason reason:JWPauseReason) {
         self.onPause?([:])
 
         if !wasInterrupted {
@@ -1191,23 +1191,23 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func jwplayer(_ player:JWPlayer, didBecomeIdleWithReason reason:JWIdleReason) {
+    public func jwplayer(_ player:JWPlayer, didBecomeIdleWithReason reason:JWIdleReason) {
         self.onIdle?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, isVisible:Bool) {
+    public func jwplayer(_ player:JWPlayer, isVisible:Bool) {
         self.onVisible?(["visible": isVisible])
     }
 
-    func jwplayerContentWillComplete(_ player:JWPlayer) {
+    public func jwplayerContentWillComplete(_ player:JWPlayer) {
         self.onBeforeComplete?([:])
     }
 
-    func jwplayerContentDidComplete(_ player:JWPlayer) {
+    public func jwplayerContentDidComplete(_ player:JWPlayer) {
         self.onComplete?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, didLoadPlaylistItem item:JWPlayerItem, at index:UInt) {
+    public func jwplayer(_ player:JWPlayer, didLoadPlaylistItem item:JWPlayerItem, at index:UInt) {
 //        var sourceDict: [String: Any] = [:]
 //        var file: String?
 //
@@ -1265,7 +1265,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 //        item.addObserver(self, forKeyPath:"playbackLikelyToKeepUp", options:.new, context:nil)
     }
 
-    func jwplayer(_ player:JWPlayer, didLoadPlaylist playlist:[JWPlayerItem]) {
+    public func jwplayer(_ player:JWPlayer, didLoadPlaylist playlist:[JWPlayerItem]) {
         let playlistArray:NSMutableArray! = NSMutableArray()
 
         for item:JWPlayerItem? in playlist {
@@ -1328,220 +1328,73 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func jwplayerPlaylistHasCompleted(_ player:JWPlayer) {
+    public func jwplayerPlaylistHasCompleted(_ player:JWPlayer) {
         self.onPlaylistComplete?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, usesMediaType type:JWMediaType) {
+    public func jwplayer(_ player:JWPlayer, usesMediaType type:JWMediaType) {
 
     }
     
-    func jwplayer(_ player: JWPlayer, playbackRateChangedTo rate: Double, at time: TimeInterval) {
+    public func jwplayer(_ player: JWPlayer, playbackRateChangedTo rate: Double, at time: TimeInterval) {
         self.onRateChanged?(["rate": rate, "at": time])
     }
 
-    func jwplayerHasSeeked(_ player:JWPlayer) {
+    public func jwplayerHasSeeked(_ player:JWPlayer) {
         self.onSeeked?([:])
     }
     
-    func jwplayer(_ player: JWPlayer, seekedFrom oldPosition: TimeInterval, to newPosition: TimeInterval) {
+    public func jwplayer(_ player: JWPlayer, seekedFrom oldPosition: TimeInterval, to newPosition: TimeInterval) {
         self.onSeek?(["from": oldPosition, "to": newPosition])
     }
 
-    func jwplayer(_ player:JWPlayer, updatedCues cues:[JWCue]) {
+    public func jwplayer(_ player:JWPlayer, updatedCues cues:[JWCue]) {
 
     }
 
     // MARK: - JWPlayer Ad Delegate
 
-    func jwplayer(_ player:JWPlayer, adEvent event:JWAdEvent) {
+    public func jwplayer(_ player:JWPlayer, adEvent event:JWAdEvent) {
         self.onAdEvent?(["client": event.client, "type": event.type])
     }
 
-// pragma Mark - Casting methods
-#if USE_GOOGLE_CAST
-    func setUpCastController() {
-        if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
-           castController = JWCastController(player:playerView.player)
-           castController.delegate = self
-       }
-
-       self.scanForDevices()
-    }
-
-    func scanForDevices() {
-       if castController != nil {
-           castController.startDiscovery()
-       }
-    }
-
-    func stopScanForDevices() {
-       if castController != nil {
-           castController.stopDiscovery()
-       }
-    }
-
-    func presentCastDialog() {
-        GCKCastContext.sharedInstance().presentCastDialog()
-    }
-
-    func startDiscovery() {
-        GCKCastContext.sharedInstance().discoveryManager.startDiscovery()
-    }
-
-    func stopDiscovery() {
-        GCKCastContext.sharedInstance().discoveryManager.stopDiscovery()
-    }
-
-    func discoveryActive() -> Bool {
-        return GCKCastContext.sharedInstance().discoveryManager.discoveryActive
-    }
-
-    func hasDiscoveredDevices() -> Bool {
-        return GCKCastContext.sharedInstance().discoveryManager.hasDiscoveredDevices
-    }
-
-    func discoveryState() -> GCKDiscoveryState {
-        return GCKCastContext.sharedInstance().discoveryManager.discoveryState
-    }
-
-    func setPassiveScan(passive:Bool) {
-        GCKCastContext.sharedInstance().discoveryManager.passiveScan = passive
-    }
-
-    func castState() -> GCKCastState {
-        return GCKCastContext.sharedInstance().castState
-    }
-
-    func deviceCount() -> UInt {
-        return GCKCastContext.sharedInstance().discoveryManager.deviceCount
-    }
-
-    func getAvailableDevices() -> [JWCastingDevice]! {
-        return castController.availableDevices
-    }
-
-    func connectedDevice() -> JWCastingDevice! {
-        return castController.connectedDevice
-    }
-
-    func connectToDevice(device:JWCastingDevice!) {
-        return castController.connectToDevice(device)
-    }
-
-    func cast() {
-        return castController.cast()
-    }
-
-    func stopCasting() {
-        return castController.stopCasting()
-    }
-
-    // MARK: - JWPlayer Cast Delegate
-    
-    func castController(_ controller: JWCastController, castingBeganWithDevice device: JWCastingDevice) {
-        self.onCasting?([:])
-    }
-    
-    func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
-        self.onCastingEnded?(["error": error as Any])
-    }
-
-    func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
-        self.onCastingFailed?(["error": error as Any])
-    }
-
-    func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
-        let dict:NSMutableDictionary! = NSMutableDictionary()
-
-        dict.setObject(device.name, forKey:"name" as NSCopying)
-        dict.setObject(device.identifier, forKey:"identifier" as NSCopying)
-        
-        do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
-
-            self.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
-        } catch {
-            print("Error converting dictionary to JSON data: \(error)")
-        }
-    }
-    
-    func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
-        self.onConnectionFailed?(["error": error as Any])
-    }
-
-    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
-        self.onConnectionRecovered?([:])
-    }
-
-    func castController(_ controller: JWCastController, connectionSuspendedWithDevice device: JWCastingDevice) {
-        self.onConnectionTemporarilySuspended?([:])
-    }
-
-    func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
-        self.availableDevices = devices
-
-        var devicesInfo: [[String: Any]] = []
-        for device in devices {
-            var dict: [String: Any] = [:]
-
-            dict["name"] = device.name
-            dict["identifier"] = device.identifier
-
-            devicesInfo.append(dict)
-        }
-
-        do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
-
-            self.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
-        } catch {
-            print("Error converting dictionary to JSON data: \(error)")
-        }
-    }
-    
-    func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
-        self.onDisconnectedFromCastingDevice?(["error": error as Any])
-    }
-#endif
-
     // MARK: - JWPlayer AV Delegate
 
-    func jwplayer(_ player:JWPlayer, audioTracksUpdated levels:[JWMediaSelectionOption]) {
+    public func jwplayer(_ player:JWPlayer, audioTracksUpdated levels:[JWMediaSelectionOption]) {
         self.onAudioTracks?([:])
     }
 
-    func jwplayer(_ player:JWPlayer, audioTrackChanged currentLevel:Int) {
+    public func jwplayer(_ player:JWPlayer, audioTrackChanged currentLevel:Int) {
 
     }
     
-    func jwplayer(_ player: JWPlayer, captionPresented caption: [String], at time: JWTimeData) {
+    public func jwplayer(_ player: JWPlayer, captionPresented caption: [String], at time: JWTimeData) {
         
     }
 
-    func jwplayer(_ player:JWPlayer, captionTrackChanged index:Int) {
+    public func jwplayer(_ player:JWPlayer, captionTrackChanged index:Int) {
 
     }
 
-    func jwplayer(_ player: JWPlayer, visualQualityChanged currentVisualQuality: JWVisualQuality) {
+    public func jwplayer(_ player: JWPlayer, visualQualityChanged currentVisualQuality: JWVisualQuality) {
         
     }
     
-    func jwplayer(_ player:JWPlayer, qualityLevelChanged currentLevel:Int) {
+    public func jwplayer(_ player:JWPlayer, qualityLevelChanged currentLevel:Int) {
 
     }
     
-    func jwplayer(_ player:JWPlayer, qualityLevelsUpdated levels:[JWVideoSource]) {
+    public func jwplayer(_ player:JWPlayer, qualityLevelsUpdated levels:[JWVideoSource]) {
 
     }
 
-    func jwplayer(_ player:JWPlayer, updatedCaptionList options:[JWMediaSelectionOption]) {
+    public func jwplayer(_ player:JWPlayer, updatedCaptionList options:[JWMediaSelectionOption]) {
 
     }
 
     // MARK: - JWPlayer audio session && interruption handling
 
-    func initAudioSession(category:String?, categoryOptions:[String]?, mode:String?) {
+    public func initAudioSession(category:String?, categoryOptions:[String]?, mode:String?) {
         self.setObservers()
 
         var somethingChanged:Bool = false
@@ -1569,7 +1422,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func deinitAudioSession() {
+    public func deinitAudioSession() {
         do {
             try audioSession?.setActive(false, options: .notifyOthersOnDeactivation)
             print("setUnactive - success")
@@ -1581,7 +1434,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
 
-    func setObservers() {
+    public func setObservers() {
         if audioSession == nil {
             audioSession = AVAudioSession.sharedInstance()
 
@@ -1615,7 +1468,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func setCategory(categoryName:String!, categoryOptions:[String]!) {
+    public func setCategory(categoryName:String!, categoryOptions:[String]!) {
         if (audioSession == nil) {
             audioSession = AVAudioSession.sharedInstance()
         }
@@ -1812,3 +1665,152 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     }
 
 }
+
+#if USE_GOOGLE_CAST
+extension RNJWPlayerView: JWCastDelegate {
+    // pragma Mark - Casting methods
+    func setUpCastController() {
+        if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
+           castController = JWCastController(player:playerView.player)
+           castController.delegate = self
+       }
+
+       self.scanForDevices()
+    }
+
+    func scanForDevices() {
+       if castController != nil {
+           castController.startDiscovery()
+       }
+    }
+
+    func stopScanForDevices() {
+       if castController != nil {
+           castController.stopDiscovery()
+       }
+    }
+
+    func presentCastDialog() {
+        GCKCastContext.sharedInstance().presentCastDialog()
+    }
+
+    func startDiscovery() {
+        GCKCastContext.sharedInstance().discoveryManager.startDiscovery()
+    }
+
+    func stopDiscovery() {
+        GCKCastContext.sharedInstance().discoveryManager.stopDiscovery()
+    }
+
+    func discoveryActive() -> Bool {
+        return GCKCastContext.sharedInstance().discoveryManager.discoveryActive
+    }
+
+    func hasDiscoveredDevices() -> Bool {
+        return GCKCastContext.sharedInstance().discoveryManager.hasDiscoveredDevices
+    }
+
+    func discoveryState() -> GCKDiscoveryState {
+        return GCKCastContext.sharedInstance().discoveryManager.discoveryState
+    }
+
+    func setPassiveScan(passive:Bool) {
+        GCKCastContext.sharedInstance().discoveryManager.passiveScan = passive
+    }
+
+    func castState() -> GCKCastState {
+        return GCKCastContext.sharedInstance().castState
+    }
+
+    func deviceCount() -> UInt {
+        return GCKCastContext.sharedInstance().discoveryManager.deviceCount
+    }
+
+    func getAvailableDevices() -> [JWCastingDevice]! {
+        return castController.availableDevices
+    }
+
+    func connectedDevice() -> JWCastingDevice! {
+        return castController.connectedDevice
+    }
+
+    func connectToDevice(device:JWCastingDevice!) {
+        return castController.connectToDevice(device)
+    }
+
+    func cast() {
+        return castController.cast()
+    }
+
+    func stopCasting() {
+        return castController.stopCasting()
+    }
+
+    // MARK: - JWPlayer Cast Delegate
+    
+    func castController(_ controller: JWCastController, castingBeganWithDevice device: JWCastingDevice) {
+        self.onCasting?([:])
+    }
+    
+    func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
+        self.onCastingEnded?(["error": error as Any])
+    }
+
+    func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
+        self.onCastingFailed?(["error": error as Any])
+    }
+
+    func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
+        let dict:NSMutableDictionary! = NSMutableDictionary()
+
+        dict.setObject(device.name, forKey:"name" as NSCopying)
+        dict.setObject(device.identifier, forKey:"identifier" as NSCopying)
+        
+        do {
+            let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
+
+            self.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+        } catch {
+            print("Error converting dictionary to JSON data: \(error)")
+        }
+    }
+    
+    func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
+        self.onConnectionFailed?(["error": error as Any])
+    }
+
+    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
+        self.onConnectionRecovered?([:])
+    }
+
+    func castController(_ controller: JWCastController, connectionSuspendedWithDevice device: JWCastingDevice) {
+        self.onConnectionTemporarilySuspended?([:])
+    }
+
+    func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
+        self.availableDevices = devices
+
+        var devicesInfo: [[String: Any]] = []
+        for device in devices {
+            var dict: [String: Any] = [:]
+
+            dict["name"] = device.name
+            dict["identifier"] = device.identifier
+
+            devicesInfo.append(dict)
+        }
+
+        do {
+            let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
+
+            self.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+        } catch {
+            print("Error converting dictionary to JSON data: \(error)")
+        }
+    }
+    
+    func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
+        self.onDisconnectedFromCastingDevice?(["error": error as Any])
+    }
+}
+#endif

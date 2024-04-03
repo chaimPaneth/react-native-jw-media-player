@@ -14,7 +14,531 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol RCTRNJWPlayerViewProtocol <NSObject>
-
+- (void)play;
+- (void)pause;
+- (void)stop;
+- (void)toggleSpeed;
+- (void)setSpeed:(float)speed;
+- (void)setCurrentQuality:(float)index;
+- (void)getCurrentQuality;
+- (void)getQualityLevels;
+- (void)setVolume:(float)volume;
+- (void)setPlaylistIndex:(float)index;
+- (void)setControls:(BOOL)show;
+- (void)setLockScreenControls:(BOOL)show;
+- (void)seekTo:(float)time;
+- (void)loadPlaylist:(NSString *)playlistItems;
+- (void)setFullscreen:(BOOL)fullScreen;
+- (void)position;
+- (void)setUpCastController;
+- (void)presentCastDialog;
+- (void)connectedDevice;
+- (void)availableDevices;
+- (void)castState;
+- (void)playerState;
+- (void)getAudioTracks;
+- (void)getCurrentAudioTrack;
+- (void)setCurrentAudioTrack:(NSInteger)index;
+- (void)setCurrentCaptions:(NSInteger)index;
+- (void)setVisibility:(BOOL)visibility controls:(NSString *)controls;
+- (void)quite;
+- (void)reset;
 @end
+
+RCT_EXTERN inline void RCTRNJWPlayerHandleCommand(
+  id<RCTRNJWPlayerViewProtocol> componentView,
+  NSString const *commandName,
+  NSArray const *args)
+{
+  if ([commandName isEqualToString:@"play"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView play];
+  return;
+}
+
+if ([commandName isEqualToString:@"pause"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView pause];
+  return;
+}
+
+if ([commandName isEqualToString:@"stop"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView stop];
+  return;
+}
+
+if ([commandName isEqualToString:@"toggleSpeed"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView toggleSpeed];
+  return;
+}
+
+if ([commandName isEqualToString:@"setSpeed"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"float", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  float speed = [(NSNumber *)arg0 floatValue];
+
+  [componentView setSpeed:speed];
+  return;
+}
+
+if ([commandName isEqualToString:@"setCurrentQuality"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"float", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  float index = [(NSNumber *)arg0 floatValue];
+
+  [componentView setCurrentQuality:index];
+  return;
+}
+
+if ([commandName isEqualToString:@"getCurrentQuality"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView getCurrentQuality];
+  return;
+}
+
+if ([commandName isEqualToString:@"getQualityLevels"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView getQualityLevels];
+  return;
+}
+
+if ([commandName isEqualToString:@"setVolume"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"float", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  float volume = [(NSNumber *)arg0 floatValue];
+
+  [componentView setVolume:volume];
+  return;
+}
+
+if ([commandName isEqualToString:@"setPlaylistIndex"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"float", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  float index = [(NSNumber *)arg0 floatValue];
+
+  [componentView setPlaylistIndex:index];
+  return;
+}
+
+if ([commandName isEqualToString:@"setControls"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  BOOL show = [(NSNumber *)arg0 boolValue];
+
+  [componentView setControls:show];
+  return;
+}
+
+if ([commandName isEqualToString:@"setLockScreenControls"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  BOOL show = [(NSNumber *)arg0 boolValue];
+
+  [componentView setLockScreenControls:show];
+  return;
+}
+
+if ([commandName isEqualToString:@"seekTo"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"float", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  float time = [(NSNumber *)arg0 floatValue];
+
+  [componentView seekTo:time];
+  return;
+}
+
+if ([commandName isEqualToString:@"loadPlaylist"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSString class], @"string", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  NSString * playlistItems = (NSString *)arg0;
+
+  [componentView loadPlaylist:playlistItems];
+  return;
+}
+
+if ([commandName isEqualToString:@"setFullscreen"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  BOOL fullScreen = [(NSNumber *)arg0 boolValue];
+
+  [componentView setFullscreen:fullScreen];
+  return;
+}
+
+if ([commandName isEqualToString:@"position"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView position];
+  return;
+}
+
+if ([commandName isEqualToString:@"setUpCastController"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView setUpCastController];
+  return;
+}
+
+if ([commandName isEqualToString:@"presentCastDialog"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView presentCastDialog];
+  return;
+}
+
+if ([commandName isEqualToString:@"connectedDevice"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView connectedDevice];
+  return;
+}
+
+if ([commandName isEqualToString:@"availableDevices"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView availableDevices];
+  return;
+}
+
+if ([commandName isEqualToString:@"castState"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView castState];
+  return;
+}
+
+if ([commandName isEqualToString:@"playerState"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView playerState];
+  return;
+}
+
+if ([commandName isEqualToString:@"getAudioTracks"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView getAudioTracks];
+  return;
+}
+
+if ([commandName isEqualToString:@"getCurrentAudioTrack"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView getCurrentAudioTrack];
+  return;
+}
+
+if ([commandName isEqualToString:@"setCurrentAudioTrack"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"number", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  NSInteger index = [(NSNumber *)arg0 intValue];
+
+  [componentView setCurrentAudioTrack:index];
+  return;
+}
+
+if ([commandName isEqualToString:@"setCurrentCaptions"]) {
+#if RCT_DEBUG
+  if ([args count] != 1) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 1);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"number", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  NSInteger index = [(NSNumber *)arg0 intValue];
+
+  [componentView setCurrentCaptions:index];
+  return;
+}
+
+if ([commandName isEqualToString:@"setVisibility"]) {
+#if RCT_DEBUG
+  if ([args count] != 2) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 2);
+    return;
+  }
+#endif
+
+  NSObject *arg0 = args[0];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"RNJWPlayer", commandName, @"1st")) {
+    return;
+  }
+#endif
+  BOOL visibility = [(NSNumber *)arg0 boolValue];
+
+NSObject *arg1 = args[1];
+#if RCT_DEBUG
+  if (!RCTValidateTypeOfViewCommandArgument(arg1, [NSString class], @"string", @"RNJWPlayer", commandName, @"2nd")) {
+    return;
+  }
+#endif
+  NSString * controls = (NSString *)arg1;
+
+  [componentView setVisibility:visibility controls:controls];
+  return;
+}
+
+if ([commandName isEqualToString:@"quite"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView quite];
+  return;
+}
+
+if ([commandName isEqualToString:@"reset"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"RNJWPlayer", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView reset];
+  return;
+}
+
+#if RCT_DEBUG
+  RCTLogError(@"%@ received command %@, which is not a supported command.", @"RNJWPlayer", commandName);
+#endif
+}
 
 NS_ASSUME_NONNULL_END

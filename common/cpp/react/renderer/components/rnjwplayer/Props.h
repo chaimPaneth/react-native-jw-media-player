@@ -43,6 +43,7 @@ static inline std::string toString(const RNJWPlayerCategory &value) {
     case RNJWPlayerCategory::MultiRoute: return "MultiRoute";
   }
 }
+
 enum class RNJWPlayerMode { Default, VoiceChat, VideoChat, GameChat, VideoRecording, Measurement, MoviePlayback, SpokenAudio, VoicePrompt };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerMode &result) {
@@ -72,6 +73,7 @@ static inline std::string toString(const RNJWPlayerMode &value) {
     case RNJWPlayerMode::VoicePrompt: return "VoicePrompt";
   }
 }
+
 enum class RNJWPlayerPreload { Auto, None };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerPreload &result) {
@@ -87,6 +89,7 @@ static inline std::string toString(const RNJWPlayerPreload &value) {
     case RNJWPlayerPreload::None: return "none";
   }
 }
+
 enum class RNJWPlayerInterfaceBehavior { Normal, Hidden, Onscreen };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerInterfaceBehavior &result) {
@@ -104,6 +107,73 @@ static inline std::string toString(const RNJWPlayerInterfaceBehavior &value) {
     case RNJWPlayerInterfaceBehavior::Onscreen: return "onscreen";
   }
 }
+
+enum class RNJWPlayerCategoryOptions { MixWithOthers, DuckOthers, AllowBluetooth, DefaultToSpeaker, InterruptSpokenAudioAndMix, AllowBluetoothA2DP, AllowAirPlay, OverrideMutedMicrophone };
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerCategoryOptions &result) {
+  auto string = (std::string)value;
+  if (string == "MixWithOthers") { result = RNJWPlayerCategoryOptions::MixWithOthers; return; }
+  if (string == "DuckOthers") { result = RNJWPlayerCategoryOptions::DuckOthers; return; }
+  if (string == "AllowBluetooth") { result = RNJWPlayerCategoryOptions::AllowBluetooth; return; }
+  if (string == "DefaultToSpeaker") { result = RNJWPlayerCategoryOptions::DefaultToSpeaker; return; }
+  if (string == "InterruptSpokenAudioAndMix") { result = RNJWPlayerCategoryOptions::InterruptSpokenAudioAndMix; return; }
+  if (string == "AllowBluetoothA2DP") { result = RNJWPlayerCategoryOptions::AllowBluetoothA2DP; return; }
+  if (string == "AllowAirPlay") { result = RNJWPlayerCategoryOptions::AllowAirPlay; return; }
+  if (string == "OverrideMutedMicrophone") { result = RNJWPlayerCategoryOptions::OverrideMutedMicrophone; return; }
+  abort();
+}
+
+static inline std::string toString(const RNJWPlayerCategoryOptions &value) {
+  switch (value) {
+    case RNJWPlayerCategoryOptions::MixWithOthers: return "MixWithOthers";
+    case RNJWPlayerCategoryOptions::DuckOthers: return "DuckOthers";
+    case RNJWPlayerCategoryOptions::AllowBluetooth: return "AllowBluetooth";
+    case RNJWPlayerCategoryOptions::DefaultToSpeaker: return "DefaultToSpeaker";
+    case RNJWPlayerCategoryOptions::InterruptSpokenAudioAndMix: return "InterruptSpokenAudioAndMix";
+    case RNJWPlayerCategoryOptions::AllowBluetoothA2DP: return "AllowBluetoothA2DP";
+    case RNJWPlayerCategoryOptions::AllowAirPlay: return "AllowAirPlay";
+    case RNJWPlayerCategoryOptions::OverrideMutedMicrophone: return "OverrideMutedMicrophone";
+  }
+}
+
+enum class RNJWPlayerHideUIGroups { overlay, control_bar, center_controls, next_up, error, playlist, controls_container, settings_menu, quality_submenu, captions_submenu, playback_submenu, audiotracks_submenu, casting_menu, };
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerHideUIGroups &result) {
+  auto string = (std::string)value;
+  if (string == "overlay") { result = RNJWPlayerHideUIGroups::overlay; return; }
+  if (string == "control_bar") { result = RNJWPlayerHideUIGroups::control_bar; return; }
+  if (string == "center_controls") { result = RNJWPlayerHideUIGroups::center_controls; return; }
+  if (string == "next_up") { result = RNJWPlayerHideUIGroups::next_up; return; }
+  if (string == "error") { result = RNJWPlayerHideUIGroups::error; return; }
+  if (string == "playlist") { result = RNJWPlayerHideUIGroups::playlist; return; }
+  if (string == "controls_container") { result = RNJWPlayerHideUIGroups::controls_container; return; }
+  if (string == "settings_menu") { result = RNJWPlayerHideUIGroups::settings_menu; return; }
+  if (string == "quality_submenu") { result = RNJWPlayerHideUIGroups::quality_submenu; return; }
+  if (string == "captions_submenu") { result = RNJWPlayerHideUIGroups::captions_submenu; return; }
+  if (string == "playback_submenu") { result = RNJWPlayerHideUIGroups::playback_submenu; return; }
+  if (string == "audiotracks_submenu") { result = RNJWPlayerHideUIGroups::audiotracks_submenu; return; }
+  if (string == "casting_menu") { result = RNJWPlayerHideUIGroups::casting_menu; return; }
+  abort();
+}
+
+static inline std::string toString(const RNJWPlayerHideUIGroups &value) {
+  switch (value) {
+    case RNJWPlayerHideUIGroups::overlay: return "overlay";
+    case RNJWPlayerHideUIGroups::control_bar: return "control_bar";
+    case RNJWPlayerHideUIGroups::center_controls: return "center_controls";
+    case RNJWPlayerHideUIGroups::next_up: return "next_up";
+    case RNJWPlayerHideUIGroups::error: return "error";
+    case RNJWPlayerHideUIGroups::playlist: return "playlist";
+    case RNJWPlayerHideUIGroups::controls_container: return "controls_container";
+    case RNJWPlayerHideUIGroups::settings_menu: return "settings_menu";
+    case RNJWPlayerHideUIGroups::quality_submenu: return "quality_submenu";
+    case RNJWPlayerHideUIGroups::captions_submenu: return "captions_submenu";
+    case RNJWPlayerHideUIGroups::playback_submenu: return "playback_submenu";
+    case RNJWPlayerHideUIGroups::audiotracks_submenu: return "audiotracks_submenu";
+    case RNJWPlayerHideUIGroups::casting_menu: return "casting_menu";
+  }
+}
+
 struct RNJWPlayerConfigVastAdvertisingAdScheduleStruct {
   std::string tag;
   std::string offset;
@@ -140,7 +210,7 @@ struct RNJWPlayerConfigVastAdvertisingAdRulesStruct {
   Float startOn;
   Float frequency;
   Float timeBetweenAds;
-  RNJWPlayerStartOnSeek startOnSeek;
+  std::string startOnSeek;
 };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerConfigVastAdvertisingAdRulesStruct &result) {
@@ -268,7 +338,7 @@ struct RNJWPlayerConfigImaAdvertisingAdRulesStruct {
   Float startOn;
   Float frequency;
   Float timeBetweenAds;
-  RNJWPlayerStartOnSeek startOnSeek;
+  std::string startOnSeek;
 };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerConfigImaAdvertisingAdRulesStruct &result) {
@@ -299,7 +369,7 @@ static inline std::string toString(const RNJWPlayerConfigImaAdvertisingAdRulesSt
 struct RNJWPlayerConfigImaAdvertisingImaSettingsStruct {
   std::string locale;
   std::string ppid;
-  Float maxRedirects;
+  int maxRedirects;
   std::string sessionID;
   bool debugMode;
 };
@@ -378,7 +448,7 @@ static inline std::string toString(const RNJWPlayerConfigImaAdvertisingStruct &v
 struct RNJWPlayerConfigDaiAdvertisingImaSettingsStruct {
   std::string locale;
   std::string ppid;
-  Float maxRedirects;
+  int maxRedirects;
   std::string sessionID;
   bool debugMode;
 };
@@ -606,7 +676,7 @@ struct RNJWPlayerConfigStylingCaptionsStyleStruct {
   SharedColor fontColor;
   SharedColor backgroundColor;
   SharedColor highlightColor;
-  RNJWPlayerEdgeStyle edgeStyle;
+  std::string edgeStyle;
 };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerConfigStylingCaptionsStyleStruct &result) {
@@ -732,7 +802,7 @@ static inline std::string toString(const RNJWPlayerConfigStylingStruct &value) {
 struct RNJWPlayerConfigPlaylistSourcesStruct {
   std::string file;
   std::string label;
-  bool default;
+  bool isDefault;
 };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerConfigPlaylistSourcesStruct &result) {
@@ -746,9 +816,9 @@ static inline void fromRawValue(const PropsParserContext& context, const RawValu
   if (tmp_label != map.end()) {
     fromRawValue(context, tmp_label->second, result.label);
   }
-  auto tmp_default = map.find("default");
-  if (tmp_default != map.end()) {
-    fromRawValue(context, tmp_default->second, result.default);
+  auto tmp_isDefault = map.find("isDefault");
+  if (tmp_isDefault != map.end()) {
+    fromRawValue(context, tmp_isDefault->second, result.isDefault);
   }
 }
 
@@ -801,7 +871,7 @@ static inline void fromRawValue(const PropsParserContext& context, const RawValu
 struct RNJWPlayerConfigPlaylistTracksStruct {
   std::string file;
   std::string label;
-  bool default;
+  bool isDefault;
 };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNJWPlayerConfigPlaylistTracksStruct &result) {
@@ -815,9 +885,9 @@ static inline void fromRawValue(const PropsParserContext& context, const RawValu
   if (tmp_label != map.end()) {
     fromRawValue(context, tmp_label->second, result.label);
   }
-  auto tmp_default = map.find("default");
-  if (tmp_default != map.end()) {
-    fromRawValue(context, tmp_default->second, result.default);
+  auto tmp_isDefault = map.find("isDefault");
+  if (tmp_isDefault != map.end()) {
+    fromRawValue(context, tmp_isDefault->second, result.isDefault);
   }
 }
 
@@ -918,8 +988,8 @@ static inline void fromRawValue(const PropsParserContext& context, const RawValu
 
 
 struct RNJWPlayerConfigRelatedStruct {
-  RNJWPlayerOnClick onClick;
-  RNJWPlayerOnComplete onComplete;
+  std::string onClick;
+  std::string onComplete;
   std::string heading;
   std::string url;
   std::string autoplayMessage;
@@ -971,7 +1041,7 @@ struct RNJWPlayerConfigStruct {
   RNJWPlayerConfigStylingStruct styling;
   bool backgroundAudioEnabled;
   RNJWPlayerCategory category;
-  RNJWPlayerCategoryOptionsMask categoryOptions;
+  RNJWPlayerCategoryOptions categoryOptions;
   RNJWPlayerMode mode;
   bool fullScreenOnLandscape;
   bool landscapeOnFullScreen;
@@ -983,7 +1053,7 @@ struct RNJWPlayerConfigStruct {
   RNJWPlayerPreload preload;
   RNJWPlayerInterfaceBehavior interfaceBehavior;
   Float interfaceFadeDelay;
-  RNJWPlayerHideUIGroupsMask hideUIGroups;
+  RNJWPlayerHideUIGroups hideUIGroups;
   std::string processSpcUrl;
   std::string fairplayCertUrl;
   std::string contentUUID;

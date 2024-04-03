@@ -25,7 +25,7 @@ class RNJWPlayerEventEmitter : public ViewEventEmitter {
   struct OnPlaylistPlaylistSources {
       std::string file;
     std::string label;
-    bool default;
+    bool isDefault;
     };
 
   struct OnPlaylistPlaylistAdSchedule {
@@ -36,7 +36,7 @@ class RNJWPlayerEventEmitter : public ViewEventEmitter {
   struct OnPlaylistPlaylistTracks {
       std::string file;
     std::string label;
-    bool default;
+    bool isDefault;
     };
 
   struct OnPlaylistPlaylist {
@@ -120,7 +120,7 @@ class RNJWPlayerEventEmitter : public ViewEventEmitter {
   struct OnAdEvent {
       std::string client;
     std::string reason;
-    Float type;
+    int type;
     };
 
   struct OnAdTime {
@@ -164,7 +164,7 @@ class RNJWPlayerEventEmitter : public ViewEventEmitter {
   struct OnPlaylistItemPlaylistItemSources {
       std::string file;
     std::string label;
-    bool default;
+    bool isDefault;
     };
 
   struct OnPlaylistItemPlaylistItemAdSchedule {
@@ -175,7 +175,7 @@ class RNJWPlayerEventEmitter : public ViewEventEmitter {
   struct OnPlaylistItemPlaylistItemTracks {
       std::string file;
     std::string label;
-    bool default;
+    bool isDefault;
     };
 
   struct OnPlaylistItemPlaylistItem {

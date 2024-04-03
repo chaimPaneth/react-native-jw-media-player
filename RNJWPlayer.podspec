@@ -56,7 +56,11 @@ Pod::Spec.new do |s|
     s.subspec "fabric" do |ss|
       # ss.dependency "react-native-jw-media-player/common"
       ss.source_files         = "ios/RNJWPlayer/fabric/**/*.{h,m,mm}"
-      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
+      ss.pod_target_xcconfig  = {
+        "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"",
+        "CLANG_ENABLE_MODULES" => "YES",
+        "OTHER_CPLUSPLUSFLAGS" => "$(inherited) -fcxx-modules"
+      }
     end
   else
     s.dependency 'React-Core'
@@ -66,8 +70,9 @@ Pod::Spec.new do |s|
       s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
       s.pod_target_xcconfig    = {
           "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
-          "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-          "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+          "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 $(inherited) -fcxx-modules",
+          "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+          "CLANG_ENABLE_MODULES" => "YES",
       }
 
       s.dependency "React-RCTFabric"

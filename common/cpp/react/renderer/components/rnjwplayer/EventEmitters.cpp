@@ -39,7 +39,7 @@ void RNJWPlayerEventEmitter::onPlaylist(OnPlaylist $event) const {
       auto sourcesObject = jsi::Object(runtime);
       sourcesObject.setProperty(runtime, "file", sourcesValue.file);
 sourcesObject.setProperty(runtime, "label", sourcesValue.label);
-sourcesObject.setProperty(runtime, "default", sourcesValue.default);
+sourcesObject.setProperty(runtime, "isDefault", sourcesValue.isDefault);
       sources.setValueAtIndex(runtime, sourcesIndex++, sourcesObject);
     }
     playlistObject.setProperty(runtime, "sources", sources);
@@ -67,7 +67,7 @@ playlistObject.setProperty(runtime, "adVmap", playlistValue.adVmap);
       auto tracksObject = jsi::Object(runtime);
       tracksObject.setProperty(runtime, "file", tracksValue.file);
 tracksObject.setProperty(runtime, "label", tracksValue.label);
-tracksObject.setProperty(runtime, "default", tracksValue.default);
+tracksObject.setProperty(runtime, "isDefault", tracksValue.isDefault);
       tracks.setValueAtIndex(runtime, tracksIndex++, tracksObject);
     }
     playlistObject.setProperty(runtime, "tracks", tracks);
@@ -315,7 +315,7 @@ void RNJWPlayerEventEmitter::onPlaylistItem(OnPlaylistItem $event) const {
         auto sourcesObject = jsi::Object(runtime);
         sourcesObject.setProperty(runtime, "file", sourcesValue.file);
   sourcesObject.setProperty(runtime, "label", sourcesValue.label);
-  sourcesObject.setProperty(runtime, "default", sourcesValue.default);
+  sourcesObject.setProperty(runtime, "isDefault", sourcesValue.isDefault);
         sources.setValueAtIndex(runtime, sourcesIndex++, sourcesObject);
       }
       playlistItem.setProperty(runtime, "sources", sources);
@@ -343,7 +343,7 @@ void RNJWPlayerEventEmitter::onPlaylistItem(OnPlaylistItem $event) const {
         auto tracksObject = jsi::Object(runtime);
         tracksObject.setProperty(runtime, "file", tracksValue.file);
   tracksObject.setProperty(runtime, "label", tracksValue.label);
-  tracksObject.setProperty(runtime, "default", tracksValue.default);
+  tracksObject.setProperty(runtime, "isDefault", tracksValue.isDefault);
         tracks.setValueAtIndex(runtime, tracksIndex++, tracksObject);
       }
       playlistItem.setProperty(runtime, "tracks", tracks);

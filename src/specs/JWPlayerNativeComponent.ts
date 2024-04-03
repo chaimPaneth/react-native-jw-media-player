@@ -36,12 +36,12 @@ interface CastingDevice {
 interface Source {
   file: string;
   label: string;
-  default?: WithDefault<boolean, false>;
+  isDefault?: WithDefault<boolean, false>;
 };
 interface Track {
   file: string;
   label: string;
-  default?: WithDefault<boolean, false>;
+  isDefault?: WithDefault<boolean, false>;
 };
 interface JWAdSettings {
   allowsBackgroundPlayback?: WithDefault<boolean, false>;
@@ -69,11 +69,12 @@ interface GoogleDAIStream {
   apiKey?: string;
   adTagParameters?: UnsafeMixed; // { [key: string]: string };
 };
+type startOnSeek = "none" | "pre";
 interface AdRule {
   startOn: Float;
   frequency: Float;
   timeBetweenAds: Float;
-  startOnSeek?: WithDefault<'none' | 'pre', null>; // Mapped from JWAdShownOnSeek
+  startOnSeek?: WithDefault<startOnSeek, "none">; // Mapped from JWAdShownOnSeek
 };
 // interface FriendlyObstruction {
 //   viewId: string;
@@ -124,8 +125,8 @@ interface PlaylistItemProps {
 type RelatedOnClicks = "play" | "link";
 type RelatedOnCompletes = "show" | "hide" | "autoplay";
 interface Related {
-  onClick?: WithDefault<RelatedOnClicks, null>;
-  onComplete?: WithDefault<RelatedOnCompletes, null>;
+  onClick?: WithDefault<RelatedOnClicks, "play">;
+  onComplete?: WithDefault<RelatedOnCompletes, "show">;
   heading?: string;
   url?: string;
   autoplayMessage?: string;
@@ -151,7 +152,7 @@ interface Styling {
     fontColor?: ColorValue;
     backgroundColor?: ColorValue;
     highlightColor?: ColorValue;
-    edgeStyle?: WithDefault<EdgeStyles, null>;
+    edgeStyle?: WithDefault<EdgeStyles, "none">;
   };
   menuStyle: {
     font?: Font;
@@ -234,7 +235,7 @@ export interface Config {
   playlist?: ReadonlyArray<PlaylistItemProps>;
   stretching?: string;
   related?: Related;
-  preload?: WithDefault<Preloads, null>;
+  preload?: WithDefault<Preloads, "auto">;
   interfaceBehavior?: WithDefault<InterfaceBehaviors, null>;
   interfaceFadeDelay?: Float;
   hideUIGroups?: WithDefault<ReadonlyArray<UIGroups>, null>;
@@ -272,7 +273,7 @@ interface PlaylistEventProps {
     sources?: {
       file: string;
       label: string;
-      default?: WithDefault<boolean, false>;
+      isDefault?: WithDefault<boolean, false>;
     }[];
     image?: string;
     title?: string;
@@ -286,7 +287,7 @@ interface PlaylistEventProps {
     tracks?: {
       file: string;
       label: string;
-      default?: WithDefault<boolean, false>;
+      isDefault?: WithDefault<boolean, false>;
     }[];
     recommendations?: string;
     startTime?: Float;
@@ -299,7 +300,7 @@ interface PlaylistItemEventProps {
     sources?: {
       file: string;
       label: string;
-      default?: WithDefault<boolean, false>;
+      isDefault?: WithDefault<boolean, false>;
     }[];
     image?: string;
     title?: string;
@@ -313,7 +314,7 @@ interface PlaylistItemEventProps {
     tracks?: {
       file: string;
       label: string;
-      default?: WithDefault<boolean, false>;
+      isDefault?: WithDefault<boolean, false>;
     }[];
     recommendations?: string;
     startTime?: Float;
@@ -355,9 +356,9 @@ export interface NativeProps extends ViewProps {
   onPlayerAdError?: NativeError;
   onPlayerAdWarning?: NativeWarning;
   onAdEvent?: DirectEventHandler<AdEventProps>;
-  onAdTime?: BubblingEventHandler<TimeEventProps>;
-  onBuffer?: BubblingEventHandler<{}>;
-  onTime?: BubblingEventHandler<TimeEventProps>;
+  onAdTime?: DirectEventHandler<TimeEventProps>;
+  onBuffer?: DirectEventHandler<{}>;
+  onTime?: DirectEventHandler<TimeEventProps>;
   onFullScreenRequested?: DirectEventHandler<{}>;
   onFullScreen?: DirectEventHandler<{}>;
   onFullScreenExitRequested?: DirectEventHandler<{}>;
@@ -388,11 +389,6 @@ export interface PlayerNativeCommands {
   loadPlaylist: (viewRef: React.ElementRef<ComponentType>, playlistItems: string) => void;
   setFullscreen: (viewRef: React.ElementRef<ComponentType>, fullScreen: boolean) => void;
   position: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
-  setUpCastController: (viewRef: React.ElementRef<ComponentType>) => void;
-  presentCastDialog: (viewRef: React.ElementRef<ComponentType>) => void;
-  connectedDevice: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
-  availableDevices: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
-  castState: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
   playerState: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
   getAudioTracks: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
   getCurrentAudioTrack: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
@@ -401,6 +397,11 @@ export interface PlayerNativeCommands {
   setVisibility: (viewRef: React.ElementRef<ComponentType>, visibility: boolean, controls: string) => void;
   quite: (viewRef: React.ElementRef<ComponentType>) => void;
   reset: (viewRef: React.ElementRef<ComponentType>) => void;
+  setUpCastController: (viewRef: React.ElementRef<ComponentType>) => void;
+  presentCastDialog: (viewRef: React.ElementRef<ComponentType>) => void;
+  connectedDevice: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  availableDevices: (viewRef: React.ElementRef<ComponentType>) => Promise<string | null>;
+  castState: (viewRef: React.ElementRef<ComponentType>) => Promise<Float | null>;
 }
 
 export const JWPlayerCommands: PlayerNativeCommands = codegenNativeCommands<PlayerNativeCommands>({
@@ -421,11 +422,6 @@ export const JWPlayerCommands: PlayerNativeCommands = codegenNativeCommands<Play
     'loadPlaylist',
     'setFullscreen',
     'position',
-    'setUpCastController',
-    'presentCastDialog',
-    'connectedDevice',
-    'availableDevices',
-    'castState',
     'playerState',
     'getAudioTracks',
     'getCurrentAudioTrack',
@@ -434,6 +430,11 @@ export const JWPlayerCommands: PlayerNativeCommands = codegenNativeCommands<Play
     'setVisibility',
     'quite',
     'reset',
+    'setUpCastController',
+    'presentCastDialog',
+    'connectedDevice',
+    'availableDevices',
+    'castState',
   ],
 });
 

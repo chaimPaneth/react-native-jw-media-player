@@ -1,14 +1,33 @@
 #if __has_include("React/RCTViewManager.h")
 #import "React/RCTViewManager.h"
+#import <React/RCTComponent.h>
+#import <React/RCTUIManager.h>
+#import <React/RCTView.h>
 #else
 #import "RCTViewManager.h"
+#import "RCTUIManager.h"
+#endif
+
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <React/RCTViewComponentView.h>
+#import <react/renderer/components/rnjwplayer/EventEmitters.h>
+#import <react/renderer/components/rnjwplayer/Props.h>
+#import <react/renderer/components/rnjwplayer/RCTComponentViewHelpers.h>
+#import <react/renderer/components/rnjwplayer/ComponentDescriptors.h>
+#import <react/renderer/components/rnjwplayer/ShadowNodes.h>
+#import <React/RCTConversions.h>
+#import <React/RCTFabricComponentsPlugins.h>
+#else
 #endif
 
 #import <JWPlayerKit/JWPlayerKit-swift.h>
 
-#import "RCTUIManager.h"
+@interface RNJWPlayerViewManager : RCTViewManager
+@end
 
-@interface RCT_EXTERN_MODULE(RNJWPlayerViewManager, RCTViewManager)
+@implementation RNJWPlayerViewManager
+
+RCT_EXPORT_MODULE(RNJWPlayer)
 
 /* player state events */
 RCT_EXPORT_VIEW_PROPERTY(onTime, RCTDirectEventBlock);

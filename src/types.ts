@@ -32,12 +32,12 @@ declare module "react-native-jw-media-player" {
   interface Source {
     file: string;
     label: string;
-    default?: WithDefault<boolean, false>;
+    isDefault?: WithDefault<boolean, false>;
   }
   interface Track {
     file: string;
     label: string;
-    default?: WithDefault<boolean, false>;
+    isDefault?: WithDefault<boolean, false>;
   }
   interface JWAdSettings {
     allowsBackgroundPlayback?: WithDefault<boolean, false>;
@@ -65,11 +65,12 @@ declare module "react-native-jw-media-player" {
     apiKey?: string;
     adTagParameters?: { [key: string]: string };
   }
+  type startOnSeek = "none" | "pre";
   interface AdRule {
     startOn: Float;
     frequency: Float;
     timeBetweenAds: Float;
-    startOnSeek: 'none' | 'pre'; // Mapped from JWAdShownOnSeek
+    startOnSeek: WithDefault<startOnSeek, 'none'>; // Mapped from JWAdShownOnSeek
   }
   // interface FriendlyObstruction {
   //   viewId: string;
@@ -82,7 +83,7 @@ declare module "react-native-jw-media-player" {
     adVmap?: string;
     tag?: string; // Vast xml url
     openBrowserOnAdClick?: WithDefault<boolean, false>;
-    adClient: "vast";
+    adClient: WithDefault<string, "vast">;
     adRules?: AdRule;
     adSettings?: JWAdSettings;
   }
@@ -90,14 +91,14 @@ declare module "react-native-jw-media-player" {
     adSchedule?: AdSchedule[];
     adVmap?: string;
     tag?: string; // Vast xml url
-    adClient: "ima";
+    adClient: WithDefault<string, "ima">;
     adRules?: AdRule;
     imaSettings?: IMASettings;
     // companionAdSlots?: CompanionAdSlot[];
     // friendlyObstructions?: FriendlyObstruction[];
   }
   interface IMA_DAIAdvertising {
-    adClient: "ima_dai";
+    adClient: WithDefault<string, "ima_dai">;
     imaSettings?: IMASettings;
     // friendlyObstructions?: FriendlyObstruction[];
     googleDAIStream?: GoogleDAIStream;
@@ -120,8 +121,8 @@ declare module "react-native-jw-media-player" {
   type RelatedOnClicks = "play" | "link";
   type RelatedOnCompletes = "show" | "hide" | "autoplay";
   interface Related {
-    onClick?: RelatedOnClicks;
-    onComplete?: RelatedOnCompletes;
+    onClick?: WithDefault<RelatedOnClicks, "play">;
+    onComplete?: WithDefault<RelatedOnClicks, "show">;
     heading?: string;
     url?: string;
     autoplayMessage?: string;
@@ -147,7 +148,7 @@ declare module "react-native-jw-media-player" {
       fontColor?: ColorValue;
       backgroundColor?: ColorValue;
       highlightColor?: ColorValue;
-      edgeStyle?: EdgeStyles;
+      edgeStyle?: WithDefault<EdgeStyles, "none">;
     };
     menuStyle: {
       font?: Font;
@@ -231,7 +232,7 @@ declare module "react-native-jw-media-player" {
     stretching?: string;
     related?: Related;
     preload?: Preloads;
-    interfaceBehavior?: InterfaceBehaviors;
+    interfaceBehavior?: WithDefault<InterfaceBehaviors, "normal">;
     interfaceFadeDelay?: Float;
     hideUIGroups?: UIGroups[];
     processSpcUrl?: string;
@@ -334,11 +335,6 @@ declare module "react-native-jw-media-player" {
     loadPlaylist(playlistItems: PlaylistItem[]): void;
     setFullscreen(fullScreen: boolean): void;
     position(): Promise<number>;
-    setUpCastController(): void;
-    presentCastDialog(): void;
-    connectedDevice(): Promise<CastingDevice | null>;
-    availableDevices(): Promise<CastingDevice[] | null>;
-    castState(): Promise<number | null>;
     playerState(): Promise<number | null>;
     getAudioTracks(): Promise<AudioTrack[] | null>;
     getCurrentAudioTrack(): Promise<number | null>;
@@ -347,5 +343,10 @@ declare module "react-native-jw-media-player" {
     setVisibility(visibility: boolean, controls: JWControlType[]): void;
     quite: () => void;
     reset: () => void;
+    setUpCastController(): void;
+    presentCastDialog(): void;
+    connectedDevice(): Promise<CastingDevice | null>;
+    availableDevices(): Promise<CastingDevice[] | null>;
+    castState(): Promise<number | null>;
   }
 }
