@@ -16,11 +16,11 @@ import JWPlayerKit
     import GoogleCast
 #endif
 
-class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWCastDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, AVPictureInPictureControllerDelegate {
+class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDelegate, JWAVDelegate, JWPlayerViewDelegate, JWPlayerViewControllerDelegate, JWDRMContentKeyDataSource, JWTimeEventListener, AVPictureInPictureControllerDelegate {
     
     // MARK: - RNJWPlayer allocation
 
-    var playerViewController:RNJWPlayerViewController!
+    var playerViewController: RNJWPlayerViewController!
     var playerView: JWPlayerView!
     var audioSession: AVAudioSession!
     var pipEnabled: Bool = true
@@ -42,49 +42,49 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     var isCasting: Bool = false
     var availableDevices: [AnyObject]!
     
-    @objc var onBuffer:RCTDirectEventBlock?
-    @objc var onUpdateBuffer:RCTDirectEventBlock?
-    @objc var onPlay:RCTDirectEventBlock?
-    @objc var onBeforePlay:RCTDirectEventBlock?
-    @objc var onAttemptPlay:RCTDirectEventBlock?
-    @objc var onPause:RCTDirectEventBlock?
-    @objc var onIdle:RCTDirectEventBlock?
-    @objc var onPlaylistItem:RCTDirectEventBlock?
-    @objc var onLoaded:RCTDirectEventBlock?
-    @objc var onVisible:RCTDirectEventBlock?
-    @objc var onTime:RCTDirectEventBlock?
-    @objc var onSeek:RCTDirectEventBlock?
-    @objc var onSeeked:RCTDirectEventBlock?
-    @objc var onRateChanged:RCTDirectEventBlock?
-    @objc var onPlaylist:RCTDirectEventBlock?
-    @objc var onPlaylistComplete:RCTDirectEventBlock?
-    @objc var onBeforeComplete:RCTDirectEventBlock?
-    @objc var onComplete:RCTDirectEventBlock?
-    @objc var onAudioTracks:RCTDirectEventBlock?
-    @objc var onPlayerReady:RCTDirectEventBlock?
-    @objc var onSetupPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerError:RCTDirectEventBlock?
-    @objc var onPlayerWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdWarning:RCTDirectEventBlock?
-    @objc var onPlayerAdError:RCTDirectEventBlock?
-    @objc var onAdEvent:RCTDirectEventBlock?
-    @objc var onAdTime:RCTDirectEventBlock?
-    @objc var onScreenTapped:RCTDirectEventBlock?
-    @objc var onControlBarVisible:RCTDirectEventBlock?
-    @objc var onFullScreen:RCTDirectEventBlock?
-    @objc var onFullScreenRequested:RCTDirectEventBlock?
-    @objc var onFullScreenExit:RCTDirectEventBlock?
-    @objc var onFullScreenExitRequested:RCTDirectEventBlock?
-    @objc var onPlayerSizeChange:RCTDirectEventBlock?
-    @objc var onCastingDevicesAvailable:RCTDirectEventBlock?
-    @objc var onConnectedToCastingDevice:RCTDirectEventBlock?
-    @objc var onDisconnectedFromCastingDevice:RCTDirectEventBlock?
-    @objc var onConnectionTemporarilySuspended:RCTDirectEventBlock?
-    @objc var onConnectionRecovered:RCTDirectEventBlock?
-    @objc var onConnectionFailed:RCTDirectEventBlock?
-    @objc var onCasting:RCTDirectEventBlock?
-    @objc var onCastingEnded:RCTDirectEventBlock?
-    @objc var onCastingFailed:RCTDirectEventBlock?
+    @objc var onBuffer: RCTDirectEventBlock?
+    @objc var onUpdateBuffer: RCTDirectEventBlock?
+    @objc var onPlay: RCTDirectEventBlock?
+    @objc var onBeforePlay: RCTDirectEventBlock?
+    @objc var onAttemptPlay: RCTDirectEventBlock?
+    @objc var onPause: RCTDirectEventBlock?
+    @objc var onIdle: RCTDirectEventBlock?
+    @objc var onPlaylistItem: RCTDirectEventBlock?
+    @objc var onLoaded: RCTDirectEventBlock?
+    @objc var onVisible: RCTDirectEventBlock?
+    @objc var onTime: RCTDirectEventBlock?
+    @objc var onSeek: RCTDirectEventBlock?
+    @objc var onSeeked: RCTDirectEventBlock?
+    @objc var onRateChanged: RCTDirectEventBlock?
+    @objc var onPlaylist: RCTDirectEventBlock?
+    @objc var onPlaylistComplete: RCTDirectEventBlock?
+    @objc var onBeforeComplete: RCTDirectEventBlock?
+    @objc var onComplete: RCTDirectEventBlock?
+    @objc var onAudioTracks: RCTDirectEventBlock?
+    @objc var onPlayerReady: RCTDirectEventBlock?
+    @objc var onSetupPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerError: RCTDirectEventBlock?
+    @objc var onPlayerWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdWarning: RCTDirectEventBlock?
+    @objc var onPlayerAdError: RCTDirectEventBlock?
+    @objc var onAdEvent: RCTDirectEventBlock?
+    @objc var onAdTime: RCTDirectEventBlock?
+    @objc var onScreenTapped: RCTDirectEventBlock?
+    @objc var onControlBarVisible: RCTDirectEventBlock?
+    @objc var onFullScreen: RCTDirectEventBlock?
+    @objc var onFullScreenRequested: RCTDirectEventBlock?
+    @objc var onFullScreenExit: RCTDirectEventBlock?
+    @objc var onFullScreenExitRequested: RCTDirectEventBlock?
+    @objc var onPlayerSizeChange: RCTDirectEventBlock?
+    @objc var onCastingDevicesAvailable: RCTDirectEventBlock?
+    @objc var onConnectedToCastingDevice: RCTDirectEventBlock?
+    @objc var onDisconnectedFromCastingDevice: RCTDirectEventBlock?
+    @objc var onConnectionTemporarilySuspended: RCTDirectEventBlock?
+    @objc var onConnectionRecovered: RCTDirectEventBlock?
+    @objc var onConnectionFailed: RCTDirectEventBlock?
+    @objc var onCasting: RCTDirectEventBlock?
+    @objc var onCastingEnded: RCTDirectEventBlock?
+    @objc var onCastingFailed: RCTDirectEventBlock?
     
     init() {
         super.init(frame: CGRect(x: 20, y: 0, width: UIScreen.main.bounds.width - 40, height: 300))
@@ -1047,11 +1047,11 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
 
     // MARK: Time events
 
-    override func onAdTimeEvent(_ time:JWTimeData) {
+    func onAdTimeEvent(_ time:JWPlayerKit.JWTimeData) {
         self.onAdTime?(["position": time.position, "duration": time.duration])
     }
 
-    override func onMediaTimeEvent(_ time:JWTimeData) {
+    func onMediaTimeEvent(_ time:JWPlayerKit.JWTimeData) {
         self.onTime?(["position": time.position, "duration": time.duration])
     }
 
@@ -1357,153 +1357,6 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     func jwplayer(_ player:JWPlayer, adEvent event:JWAdEvent) {
         self.onAdEvent?(["client": event.client, "type": event.type])
     }
-
-// pragma Mark - Casting methods
-#if USE_GOOGLE_CAST
-    func setUpCastController() {
-        if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
-           castController = JWCastController(player:playerView.player)
-           castController.delegate = self
-       }
-
-       self.scanForDevices()
-    }
-
-    func scanForDevices() {
-       if castController != nil {
-           castController.startDiscovery()
-       }
-    }
-
-    func stopScanForDevices() {
-       if castController != nil {
-           castController.stopDiscovery()
-       }
-    }
-
-    func presentCastDialog() {
-        GCKCastContext.sharedInstance().presentCastDialog()
-    }
-
-    func startDiscovery() {
-        GCKCastContext.sharedInstance().discoveryManager.startDiscovery()
-    }
-
-    func stopDiscovery() {
-        GCKCastContext.sharedInstance().discoveryManager.stopDiscovery()
-    }
-
-    func discoveryActive() -> Bool {
-        return GCKCastContext.sharedInstance().discoveryManager.discoveryActive
-    }
-
-    func hasDiscoveredDevices() -> Bool {
-        return GCKCastContext.sharedInstance().discoveryManager.hasDiscoveredDevices
-    }
-
-    func discoveryState() -> GCKDiscoveryState {
-        return GCKCastContext.sharedInstance().discoveryManager.discoveryState
-    }
-
-    func setPassiveScan(passive:Bool) {
-        GCKCastContext.sharedInstance().discoveryManager.passiveScan = passive
-    }
-
-    func castState() -> GCKCastState {
-        return GCKCastContext.sharedInstance().castState
-    }
-
-    func deviceCount() -> UInt {
-        return GCKCastContext.sharedInstance().discoveryManager.deviceCount
-    }
-
-    func getAvailableDevices() -> [JWCastingDevice]! {
-        return castController.availableDevices
-    }
-
-    func connectedDevice() -> JWCastingDevice! {
-        return castController.connectedDevice
-    }
-
-    func connectToDevice(device:JWCastingDevice!) {
-        return castController.connectToDevice(device)
-    }
-
-    func cast() {
-        return castController.cast()
-    }
-
-    func stopCasting() {
-        return castController.stopCasting()
-    }
-
-    // MARK: - JWPlayer Cast Delegate
-    
-    func castController(_ controller: JWCastController, castingBeganWithDevice device: JWCastingDevice) {
-        self.onCasting?([:])
-    }
-    
-    func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
-        self.onCastingEnded?(["error": error as Any])
-    }
-
-    func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
-        self.onCastingFailed?(["error": error as Any])
-    }
-
-    func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
-        let dict:NSMutableDictionary! = NSMutableDictionary()
-
-        dict.setObject(device.name, forKey:"name" as NSCopying)
-        dict.setObject(device.identifier, forKey:"identifier" as NSCopying)
-        
-        do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
-
-            self.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
-        } catch {
-            print("Error converting dictionary to JSON data: \(error)")
-        }
-    }
-    
-    func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
-        self.onConnectionFailed?(["error": error as Any])
-    }
-
-    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
-        self.onConnectionRecovered?([:])
-    }
-
-    func castController(_ controller: JWCastController, connectionSuspendedWithDevice device: JWCastingDevice) {
-        self.onConnectionTemporarilySuspended?([:])
-    }
-
-    func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
-        self.availableDevices = devices
-
-        var devicesInfo: [[String: Any]] = []
-        for device in devices {
-            var dict: [String: Any] = [:]
-
-            dict["name"] = device.name
-            dict["identifier"] = device.identifier
-
-            devicesInfo.append(dict)
-        }
-
-        do {
-            let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
-
-            self.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
-        } catch {
-            print("Error converting dictionary to JSON data: \(error)")
-        }
-    }
-    
-    func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
-        self.onDisconnectedFromCastingDevice?(["error": error as Any])
-    }
-#endif
 
     // MARK: - JWPlayer AV Delegate
 
@@ -1812,3 +1665,152 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
     }
 
 }
+
+#if USE_GOOGLE_CAST
+extension RNJWPlayerView: JWCastDelegate {
+    // pragma Mark - Casting methods
+    func setUpCastController() {
+        if (playerView != nil) && playerView.player as! Bool && (castController == nil) {
+           castController = JWCastController(player:playerView.player)
+           castController.delegate = self
+       }
+
+       self.scanForDevices()
+    }
+
+    func scanForDevices() {
+       if castController != nil {
+           castController.startDiscovery()
+       }
+    }
+
+    func stopScanForDevices() {
+       if castController != nil {
+           castController.stopDiscovery()
+       }
+    }
+
+    func presentCastDialog() {
+        GCKCastContext.sharedInstance().presentCastDialog()
+    }
+
+    func startDiscovery() {
+        GCKCastContext.sharedInstance().discoveryManager.startDiscovery()
+    }
+
+    func stopDiscovery() {
+        GCKCastContext.sharedInstance().discoveryManager.stopDiscovery()
+    }
+
+    func discoveryActive() -> Bool {
+        return GCKCastContext.sharedInstance().discoveryManager.discoveryActive
+    }
+
+    func hasDiscoveredDevices() -> Bool {
+        return GCKCastContext.sharedInstance().discoveryManager.hasDiscoveredDevices
+    }
+
+    func discoveryState() -> GCKDiscoveryState {
+        return GCKCastContext.sharedInstance().discoveryManager.discoveryState
+    }
+
+    func setPassiveScan(passive:Bool) {
+        GCKCastContext.sharedInstance().discoveryManager.passiveScan = passive
+    }
+
+    func castState() -> GCKCastState {
+        return GCKCastContext.sharedInstance().castState
+    }
+
+    func deviceCount() -> UInt {
+        return GCKCastContext.sharedInstance().discoveryManager.deviceCount
+    }
+
+    func getAvailableDevices() -> [JWCastingDevice]! {
+        return castController.availableDevices
+    }
+
+    func connectedDevice() -> JWCastingDevice! {
+        return castController.connectedDevice
+    }
+
+    func connectToDevice(device:JWCastingDevice!) {
+        return castController.connectToDevice(device)
+    }
+
+    func cast() {
+        return castController.cast()
+    }
+
+    func stopCasting() {
+        return castController.stopCasting()
+    }
+
+    // MARK: - JWPlayer Cast Delegate
+    
+    func castController(_ controller: JWCastController, castingBeganWithDevice device: JWCastingDevice) {
+        self.onCasting?([:])
+    }
+    
+    func castController(_ controller:JWCastController, castingEndedWithError error: Error?) {
+        self.onCastingEnded?(["error": error as Any])
+    }
+
+    func castController(_ controller:JWCastController, castingFailedWithError error: Error) {
+        self.onCastingFailed?(["error": error as Any])
+    }
+
+    func castController(_ controller:JWCastController, connectedTo device: JWCastingDevice) {
+        let dict:NSMutableDictionary! = NSMutableDictionary()
+
+        dict.setObject(device.name, forKey:"name" as NSCopying)
+        dict.setObject(device.identifier, forKey:"identifier" as NSCopying)
+        
+        do {
+            let data:Data! = try JSONSerialization.data(withJSONObject: dict as Any, options:.prettyPrinted)
+
+            self.onConnectedToCastingDevice?(["device": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+        } catch {
+            print("Error converting dictionary to JSON data: \(error)")
+        }
+    }
+    
+    func castController(_ controller:JWCastController, connectionFailedWithError error: Error) {
+        self.onConnectionFailed?(["error": error as Any])
+    }
+
+    func castController(_ controller: JWCastController, connectionRecoveredWithDevice device:JWCastingDevice) {
+        self.onConnectionRecovered?([:])
+    }
+
+    func castController(_ controller: JWCastController, connectionSuspendedWithDevice device: JWCastingDevice) {
+        self.onConnectionTemporarilySuspended?([:])
+    }
+
+    func castController(_ controller: JWCastController, devicesAvailable devices:[JWCastingDevice]) {
+        self.availableDevices = devices
+
+        var devicesInfo: [[String: Any]] = []
+        for device in devices {
+            var dict: [String: Any] = [:]
+
+            dict["name"] = device.name
+            dict["identifier"] = device.identifier
+
+            devicesInfo.append(dict)
+        }
+
+        do {
+            let data:Data! = try JSONSerialization.data(withJSONObject: devicesInfo as Any, options:.prettyPrinted)
+
+            self.onCastingDevicesAvailable?(["devices": String(data:data as Data, encoding:String.Encoding.utf8) as Any])
+        } catch {
+            print("Error converting dictionary to JSON data: \(error)")
+        }
+    }
+    
+    func castController(_ controller: JWCastController, disconnectedWithError error: (Error)?) {
+        self.onDisconnectedFromCastingDevice?(["error": error as Any])
+    }
+}
+#endif

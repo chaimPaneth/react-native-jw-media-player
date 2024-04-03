@@ -11,7 +11,7 @@ declare module "react-native-jw-media-player" {
   }
 
   export interface QualityLevel {
-    playListPosition: number;
+    playlistPosition: number;
     bitRate: number;
     label: string;
     height: number;
