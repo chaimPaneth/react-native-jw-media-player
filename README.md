@@ -2,6 +2,18 @@
 
 ### A react-native bridge for JWPlayer native SDK's
 
+
+## 🎺 🎺 🎺  Announcement: Official Support by JW Player 🎺 🎺 🎺 
+
+We are thrilled to announce that the react-native-jw-media-player library, previously maintained by the open source community and myself, has now been officially adopted by JW Player. The library has been migrated to a new repository https://github.com/jwplayer/jwplayer-react-native) under JW Player's official GitHub account.
+
+Please visit the new repository for the latest updates, issues, and feature requests:
+
+[GitHub - JW Player React Native Media Player](https://github.com/jwplayer/jwplayer-react-native)
+
+We thank the community for all the contributions over the years and are excited to see the project continue to evolve under JW Player's stewardship.
+
+
 ⚠️ Important you need a `JWPlayer` license to use this library https://jwplayer.com/
 
 <img width="150" alt="sample" src="./images/1.png">
