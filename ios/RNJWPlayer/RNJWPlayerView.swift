@@ -1468,7 +1468,7 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
     }
 
-    func setCategory(categoryName:String!, categoryOptions:[String]!) {
+    func setCategory(categoryName:String!, categoryOptions:[String]?) {
         if (audioSession == nil) {
             audioSession = AVAudioSession.sharedInstance()
         }
@@ -1491,29 +1491,31 @@ class RNJWPlayerView : UIView, JWPlayerDelegate, JWPlayerStateDelegate, JWAdDele
         }
 
         var options: AVAudioSession.CategoryOptions = []
-        if categoryOptions.contains("MixWithOthers") {
-            options.insert(.mixWithOthers)
-        }
-        if categoryOptions.contains("DuckOthers") {
-            options.insert(.duckOthers)
-        }
-        if categoryOptions.contains("AllowBluetooth") {
-            options.insert(.allowBluetooth)
-        }
-        if categoryOptions.contains("InterruptSpokenAudioAndMix") {
-            options.insert(.interruptSpokenAudioAndMixWithOthers)
-        }
-        if categoryOptions.contains("AllowBluetoothA2DP") {
-            options.insert(.allowBluetoothA2DP)
-        }
-        if categoryOptions.contains("AllowAirPlay") {
-            options.insert(.allowAirPlay)
-        }
-        if categoryOptions.contains("OverrideMutedMicrophone") {
-            if #available(iOS 14.5, *) {
-                options.insert(.overrideMutedMicrophoneInterruption)
-            } else {
-                // Handle the case for earlier versions if needed
+        if(categoryOptions != nil){
+            if categoryOptions!.contains("MixWithOthers") {
+                options.insert(.mixWithOthers)
+            }
+            if categoryOptions!.contains("DuckOthers") {
+                options.insert(.duckOthers)
+            }
+            if categoryOptions!.contains("AllowBluetooth") {
+                options.insert(.allowBluetooth)
+            }
+            if categoryOptions!.contains("InterruptSpokenAudioAndMix") {
+                options.insert(.interruptSpokenAudioAndMixWithOthers)
+            }
+            if categoryOptions!.contains("AllowBluetoothA2DP") {
+                options.insert(.allowBluetoothA2DP)
+            }
+            if categoryOptions!.contains("AllowAirPlay") {
+                options.insert(.allowAirPlay)
+            }
+            if categoryOptions!.contains("OverrideMutedMicrophone") {
+                if #available(iOS 14.5, *) {
+                    options.insert(.overrideMutedMicrophoneInterruption)
+                } else {
+                    // Handle the case for earlier versions if needed
+                }
             }
         }
         
